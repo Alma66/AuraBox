@@ -1,0 +1,148 @@
+import React, { useState } from 'react';
+import EditProfileField from './EditProfileField'; // Reutilizamos el componente base
+
+interface EditPhoneFieldProps {
+  label: string;
+  value: string; // El número de teléfono completo (ej: "+5491155551234")
+  onSave: (newNumber: string) => void;
+}
+
+const EditPhoneField: React.FC<EditPhoneFieldProps> = ({ label, value, onSave }) => {
+  const [isEditing, setIsEditing] = useState(false);
+  const [countryCode, setCountryCode] = useState('+54'); // Código de país por defecto (Argentina)
+  const [areaCode, setAreaCode] = useState('911'); // Código de área por defecto (ej: 911 para CABA/GBA móvil)
+  const [phoneNumber, setPhoneNumber] = useState(''); // El resto del número
+  const [error, setError] = useState('');
+
+  // Formatea el número de teléfono para mostrarlo
+  const formatPhoneNumberDisplay = (fullNumber: string) => {
+    if (!fullNumber) return 'N/A';
+    // Asumiendo formato +CCAAANNNNNNN
+    const match = fullNumber.match(/^\+(\d{1,3})(\d{1,4})(\d{6,10})$/);
+    if (match) {
+      return `+${match[1]} ${match[2]} ${match[3].replace(/(\d{4})(\d{4})/, '$1-$2')}`; // Ej: +54 911 5555-1234
+    }
+    return fullNumber; // Si no coincide, muestra el número tal cual
+  };
+
+  // Descompone el número completo en sus partes para la edición
+  React.useEffect(() => {
+    if (value) {
+      const match = value.match(/^\+(\d{1,3})(\d{1,4})(\d{6,10})$/);
+      if (match) {
+        setCountryCode(`+${match[1]}`);
+        setAreaCode(match[2]);
+        setPhoneNumber(match[3]);
+      } else {
+        // Fallback si el formato no es el esperado
+        setCountryCode('+54');
+        setAreaCode('');
+        setPhoneNumber(value);
+      }
+    } else {
+      setCountryCode('+54');
+      setAreaCode('');
+      setPhoneNumber('');
+    }
+  }, [value, isEditing]);
+
+  const handleSave = () => {
+    setError('');
+    if (!phoneNumber || !areaCode || !countryCode) {
+      setError('Todos los campos del teléfono son obligatorios.');
+      return;
+    }
+    // Validar que sean solo números
+    if (!/^\d+$/.test(areaCode) || !/^\d+$/.test(phoneNumber)) {
+      setError('El código de área y el número de teléfono deben contener solo dígitos.');
+      return;
+    }
+
+    const fullNumber = `${countryCode}${areaCode}${phoneNumber}`;
+    onSave(fullNumber);
+    setIsEditing(false);
+  };
+
+  const handleCancel = () => {
+    setIsEditing(false);
+    setError('');
+    // Restablecer a los valores originales al cancelar
+    if (value) {
+      const match = value.match(/^\+(\d{1,3})(\d{1,4})(\d{6,10})$/);
+      if (match) {
+        setCountryCode(`+${match[1]}`);
+        setAreaCode(match[2]);
+        setPhoneNumber(match[3]);
+      } else {
+        setCountryCode('+54');
+        setAreaCode('');
+        setPhoneNumber(value);
+      }
+    } else {
+      setCountryCode('+54');
+      setAreaCode('');
+      setPhoneNumber('');
+    }
+  };
+
+  return (
+    <EditProfileField
+      label={label}
+      value={formatPhoneNumberDisplay(value)}
+      isEditing={isEditing}
+      onEdit={() => setIsEditing(true)}
+      onCancel={handleCancel}
+    >
+      <div className="flex space-x-2">
+        <div className="w-1/4">
+          <label htmlFor="countryCode" className="block text-sm font-medium text-gray-700">País</label>
+          <select
+            id="countryCode"
+            value={countryCode}
+            onChange={(e) => setCountryCode(e.target.value)}
+            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
+          >
+            <option value="+54">+54 (Argentina)</option>
+            <option value="+1">+1 (EEUU/Canadá)</option>
+            <option value="+56">+56 (Chile)</option>
+            <option value="+598">+598 (Uruguay)</option>
+            {/* Puedes añadir más códigos de país aquí */}
+          </select>
+        </div>
+        <div className="w-1/4">
+          <label htmlFor="areaCode" className="block text-sm font-medium text-gray-700">Área</label>
+          <input
+            type="text"
+            id="areaCode"
+            value={areaCode}
+            onChange={(e) => setAreaCode(e.target.value)}
+            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
+            placeholder="Ej: 911"
+            maxLength={4} // Limita la longitud del código de área
+          />
+        </div>
+        <div className="w-1/2">
+          <label htmlFor="phoneNumber" className="block text-sm font-medium text-gray-700">Número</label>
+          <input
+            type="text"
+            id="phoneNumber"
+            value={phoneNumber}
+            onChange={(e) => setPhoneNumber(e.target.value)}
+            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
+            placeholder="Ej: 55551234"
+            maxLength={10} // Limita la longitud del número
+          />
+        </div>
+      </div>
+      {error && <p className="text-red-500 text-sm mt-1">{error}</p>}
+      <button
+        onClick={handleSave}
+        className="mt-4 bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors duration-200"
+      >
+        Guardar Teléfono
+      </button>
+    </EditProfileField>
+  );
+};
+
+export default EditPhoneField;

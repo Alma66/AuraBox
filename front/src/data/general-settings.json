@@ -1,0 +1,20 @@
+{
+  "club-1": {
+    "finances": {
+      "defaultPaymentMethods": ["MercadoPago", "Tarjeta"],
+      "taxRate": 21,
+      "minStockAlert": 50,
+      "autoInvoiceThreshold": 100000 
+    },
+    "team": {
+      "maxTeamMembers": 15,
+      "require2FA": true,
+      "notificationEmails": ["admin@club1.com"]
+    },
+    "notifications": {
+      "alertLowStock": true,
+      "emailOnNewSubscription": true,
+      "smsOnDelivery": false
+    }
+  }
+}

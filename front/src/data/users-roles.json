@@ -1,0 +1,18 @@
+{
+  "club-1": {
+    "users": [
+      { "id": "team-1", "name": "Sofía G.", "email": "sofia@club1.com", "role": "administrador_del_club", "status": "activo", "assignedDate": "2022-08-01" },
+      { "id": "team-2", "name": "Martín P.", "email": "martin@club1.com", "role": "coordinador_de_entregas", "status": "activo", "assignedDate": "2023-01-15" },
+      { "id": "team-3", "name": "Elena R.", "email": "elena@club1.com", "role": "encargado_de_marketing_y_contenido", "status": "activo", "assignedDate": "2023-03-10" },
+      { "id": "team-4", "name": "Carlos L.", "email": "carlos@club1.com", "role": "delivery_rider", "status": "inactivo", "assignedDate": "2024-01-20" },
+      { "id": "team-5", "name": "Ana T.", "email": "ana@club1.com", "role": "moderador_de_reseñas", "status": "activo", "assignedDate": "2023-06-05" },
+      { "id": "team-6", "name": "Diego M.", "email": "diego@club1.com", "role": "analista_de_datos", "status": "activo", "assignedDate": "2024-02-12" },
+      { "id": "team-7", "name": "Laura S.", "email": "laura@club1.com", "role": "administrador_financiero", "status": "activo", "assignedDate": "2023-11-01" },
+      { "id": "team-8", "name": "Juan P.", "email": "juan@club1.com", "role": "planificador_de_inventario", "status": "activo", "assignedDate": "2024-04-15" },
+      { "id": "team-9", "name": "Valeria K.", "email": "valeria@club1.com", "role": "coordinador_de_eventos_y_comunidad", "status": "activo", "assignedDate": "2023-09-20" },
+      { "id": "team-10", "name": "Miguel R.", "email": "miguel@club1.com", "role": "encargado_de_atencion_post_venta", "status": "activo", "assignedDate": "2024-05-10" },
+      { "id": "team-11", "name": "Roberto G.", "email": "roberto@club1.com", "role": "administrador_de_seguridad_y_accesos", "status": "activo", "assignedDate": "2023-12-01" },
+      { "id": "team-12", "name": "Gestor Sub", "email": "gestor@club1.com", "role": "gestor_de_suscripciones", "status": "activo", "assignedDate": "2024-06-01" }
+    ]
+  }
+}

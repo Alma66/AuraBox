@@ -1,0 +1,36 @@
+{
+  "club-1": {
+    "monthlyTotals": {
+      "2024-01": { "ingresos": 500000, "egresos": 150000, "balance": 350000 },
+      "2024-02": { "ingresos": 550000, "egresos": 180000, "balance": 370000 },
+      "2024-03": { "ingresos": 600000, "egresos": 200000, "balance": 400000 },
+      "2024-04": { "ingresos": 580000, "egresos": 170000, "balance": 410000 },
+      "2024-05": { "ingresos": 620000, "egresos": 190000, "balance": 430000 },
+      "2024-06": { "ingresos": 650000, "egresos": 210000, "balance": 440000 }
+    },
+    "movements": [
+      { "id": "mov-1", "date": "2024-06-15", "type": "ingreso", "category": "suscripciones", "description": "Pago de 50 nuevas suscripciones", "amount": 250000, "status": "confirmado" },
+      { "id": "mov-2", "date": "2024-06-10", "type": "egreso", "category": "proveedores", "description": "Compra de libros y accesorios", "amount": -120000, "status": "pagado" },
+      { "id": "mov-3", "date": "2024-06-05", "type": "egreso", "category": "impuestos", "description": "IVA mensual y AFIP", "amount": -30000, "status": "pagado" },
+      { "id": "mov-4", "date": "2024-06-01", "type": "egreso", "category": "sueldos", "description": "Sueldos equipo (curadores y logística)", "amount": -50000, "status": "pagado" },
+      { "id": "mov-5", "date": "2024-06-20", "type": "egreso", "category": "packaging", "description": "Cajas y embalajes para 200 envíos", "amount": -15000, "status": "pagado" },
+      { "id": "mov-6", "date": "2024-06-25", "type": "ingreso", "category": "patrocinios", "description": "Colaboración con editorial para promo", "amount": 20000, "status": "confirmado" },
+      { "id": "mov-7", "date": "2024-06-28", "type": "egreso", "category": "marketing", "description": "Publicidad en Instagram Ads", "amount": -10000, "status": "pagado" },
+      { "id": "mov-8", "date": "2024-06-30", "type": "egreso", "category": "utilities", "description": "Luz, agua y gas (local de curaduría)", "amount": -5000, "status": "pagado" },
+      { "id": "mov-9", "date": "2024-05-15", "type": "egreso", "category": "impuestos", "description": "Permiso nuevo para importación de accesorios", "amount": -25000, "status": "pagado" },
+      { "id": "mov-10", "date": "2024-06-22", "type": "egreso", "category": "reembolsos", "description": "Reembolso por cancelación de suscripción", "amount": -8000, "status": "procesado" }
+    ]
+  },
+  "club-2": {
+    "monthlyTotals": {
+      "2024-01": { "ingresos": 2000000, "egresos": 800000, "balance": 1200000 },
+      "2024-02": { "ingresos": 2200000, "egresos": 850000, "balance": 1350000 },
+      "2024-03": { "ingresos": 2400000, "egresos": 900000, "balance": 1500000 }
+    },
+    "movements": [
+      { "id": "mov-bv1", "date": "2024-06-15", "type": "ingreso", "category": "suscripciones", "description": "Pagos de 2000 socios activos", "amount": 800000, "status": "confirmado" },
+      { "id": "mov-bv2", "date": "2024-06-12", "type": "egreso", "category": "proveedores", "description": "Compra de vinos a bodegas", "amount": -500000, "status": "pagado" },
+      { "id": "mov-bv3", "date": "2024-06-08", "type": "egreso", "category": "impuestos", "description": "Ingresos brutos y retenciones", "amount": -150000, "status": "pagado" }
+    ]
+  }
+}

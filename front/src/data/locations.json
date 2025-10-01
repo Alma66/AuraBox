@@ -1,0 +1,87 @@
+[
+  {
+    "country": "Argentina",
+    "cities": [
+      {
+        "name": "Buenos Aires",
+        "localities": ["Palermo", "Recoleta", "Belgrano", "San Telmo", "Caballito", "Villa Crespo", "Almagro"]
+      },
+      {
+        "name": "Córdoba",
+        "localities": ["Nueva Córdoba", "Centro", "General Paz", "Cerro de las Rosas", "Alberdi"]
+      },
+      {
+        "name": "Rosario",
+        "localities": ["Centro", "Pichincha", "Fisherton", "Arroyito", "Echesortu"]
+      }
+    ]
+  },
+  {
+    "country": "Chile",
+    "cities": [
+      {
+        "name": "Santiago",
+        "localities": ["Providencia", "Las Condes", "Vitacura", "Ñuñoa", "Maipú"]
+      },
+      {
+        "name": "Valparaíso",
+        "localities": ["Cerro Alegre", "Cerro Concepción", "Playa Ancha"]
+      },
+      {
+        "name": "Concepción",
+        "localities": ["Centro", "San Pedro de la Paz", "Talcahuano"]
+      }
+    ]
+  },
+  {
+    "country": "Uruguay",
+    "cities": [
+      {
+        "name": "Montevideo",
+        "localities": ["Pocitos", "Carrasco", "Centro", "Malvín", "Punta Carretas"]
+      },
+      {
+        "name": "Punta del Este",
+        "localities": ["Península", "La Barra", "Manantiales"]
+      },
+      {
+        "name": "Colonia del Sacramento",
+        "localities": ["Barrio Histórico", "Real de San Carlos"]
+      }
+    ]
+  },
+  {
+    "country": "Brasil",
+    "cities": [
+      {
+        "name": "São Paulo",
+        "localities": ["Pinheiros", "Vila Madalena", "Jardins", "Moema", "Brooklin"]
+      },
+      {
+        "name": "Río de Janeiro",
+        "localities": ["Copacabana", "Ipanema", "Leblon", "Barra da Tijuca", "Santa Teresa"]
+      },
+      {
+        "name": "Porto Alegre",
+        "localities": ["Moinhos de Vento", "Bela Vista", "Centro Histórico"]
+      }
+    ]
+  },
+  {
+    "country": "Paraguay",
+    "cities": [
+      {
+        "name": "Asunción",
+        "localities": ["Villa Morra", "Carmelitas", "Centro", "Lambaré", "San Lorenzo"]
+      },
+      {
+        "name": "Ciudad del Este",
+        "localities": ["Centro", "Presidente Franco", "Hernandarias"]
+      },
+      {
+        "name": "Encarnación",
+        "localities": ["Centro", "San Isidro", "Pacú Cuá"]
+      }
+    ]
+  }
+]
