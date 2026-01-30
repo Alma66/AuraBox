@@ -26,7 +26,7 @@ export interface SubscriptionPlanCardProps {
   plan: SubscriptionPlan;
   clubName: string;
   detailsLink?: string;
-  promoEspecial?: string; // Nueva prop para texto de promoción especial
+  promoEspecial?: string;
 }
 
 const SubscriptionPlanCard: React.FC<SubscriptionPlanCardProps> = ({ plan, clubName, detailsLink, promoEspecial }) => {
@@ -69,7 +69,6 @@ const SubscriptionPlanCard: React.FC<SubscriptionPlanCardProps> = ({ plan, clubN
         <h3 className="text-2xl font-bold text-gray-900 mb-2">{plan.name}</h3>
         <p className="text-gray-600 text-sm mb-3">Frecuencia: <span className="font-semibold">{plan.deliveryFrequency}</span></p>
        
-        {/* Descripción */}
         <div className="mb-4">
           <p className="text-gray-700 text-sm leading-relaxed">
             {showFullDescription ? plan.description : `${plan.description.substring(0, 120)}...`}
@@ -84,7 +83,6 @@ const SubscriptionPlanCard: React.FC<SubscriptionPlanCardProps> = ({ plan, clubN
           </p>
         </div>
 
-        {/* Qué incluye */}
         <div className="mb-4">
           <h4 className="text-md font-semibold text-gray-800 mb-2">¿Qué incluye?</h4>
           <ul className="list-disc list-inside text-gray-700 text-sm">
@@ -102,7 +100,6 @@ const SubscriptionPlanCard: React.FC<SubscriptionPlanCardProps> = ({ plan, clubN
           </ul>
         </div>
 
-        {/* Especificaciones */}
         {plan.specifications && plan.specifications.length > 0 && (
           <div className="mb-4">
             <h4 className="text-md font-semibold text-gray-800 mb-2">Especificaciones:</h4>
@@ -124,13 +121,11 @@ const SubscriptionPlanCard: React.FC<SubscriptionPlanCardProps> = ({ plan, clubN
           </div>
         )}
 
-        {/* Zonas de Envío */}
         <div className="mb-4">
           <h4 className="text-md font-semibold text-gray-800 mb-2">Zonas de Envío:</h4>
           <p className="text-gray-700 text-sm">{plan.shippingAreas}</p>
         </div>
 
-        {/* Promoción Especial */}
         {promoEspecial && (
           <div className="mb-4 p-3 bg-purple-50 rounded-lg border-l-4 border-purple-500">
             <p className="text-purple-800 font-semibold text-sm">{promoEspecial}</p>

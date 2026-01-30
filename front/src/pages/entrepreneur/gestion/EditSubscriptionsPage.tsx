@@ -1,4 +1,3 @@
-// src/pages/entrepreneur/EditSubscriptionsPage.tsx
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import clubsData from '../../../data/clubs.json';
@@ -11,26 +10,22 @@ const FREQUENCY_OPTIONS = ['Única', 'Mensual', 'Trimestral', 'Cuatrimestral', '
 const EditSubscriptionsPage: React.FC = () => {
   const { clubId } = useParams<{ clubId: string }>();
 
-  // Estado local para club y planes
   const [club, setClub] = useState<any>(null);
   const [plans, setPlans] = useState<SubscriptionPlan[]>([]);
-  const [activeSection, setActiveSection] = useState<string>('management'); // Tab activo: 'management' o 'create'
+  const [activeSection, setActiveSection] = useState<string>('management');
   const [selectedPlanId, setSelectedPlanId] = useState<string | null>(null);
   const [formData, setFormData] = useState<any>(null);
 
   useEffect(() => {
     const foundClub = clubsData.find(c => c.id === clubId);
-    console.log('Club encontrado para clubId:', clubId, foundClub); // Debug temporal: verifica si carga el club
     if (foundClub) {
       setClub(foundClub);
       setPlans(foundClub.subscriptionPlans || []);
-      console.log('Planes cargados:', foundClub.subscriptionPlans || []); // Debug: ve los planes
     }
   }, [clubId]);
 
-  // Seleccionar plan para editar (solo en tab 'management')
   const handleSelectPlan = (planId: string) => {
-    if (activeSection !== 'management') return; // Solo permite selección en el tab de gestión
+    if (activeSection !== 'management') return;
     setSelectedPlanId(planId);
     const plan = plans.find(p => p.planId === planId);
     if (plan) {
@@ -47,17 +42,14 @@ const EditSubscriptionsPage: React.FC = () => {
     }
   };
 
-  // Manejar cambios en el formulario
   const handleInputChange = (field: string, value: any) => {
     setFormData((prev: any) => ({ ...prev, [field]: value }));
   };
 
-  // Guardar cambios en el plan editado o nuevo
   const handleSavePlan = () => {
     if (!formData) return;
-    let updatedPlans: SubscriptionPlan[]; // Tipado explícito para resolver TS7034 y TS7005
+    let updatedPlans: SubscriptionPlan[];
     if (selectedPlanId && activeSection === 'management') {
-      // Editar plan existente
       updatedPlans = plans.map(p => {
         if (p.planId === formData.planId) {
           return {
@@ -74,7 +66,6 @@ const EditSubscriptionsPage: React.FC = () => {
         return p;
       });
     } else {
-      // Crear nuevo plan
       const newPlanId = `plan-${Date.now()}`;
       const newPlan: SubscriptionPlan = {
         planId: newPlanId,
@@ -92,19 +83,17 @@ const EditSubscriptionsPage: React.FC = () => {
         activo: formData.activo,
       };
       updatedPlans = [...plans, newPlan];
-      setSelectedPlanId(newPlanId); // Selecciona el nuevo para vista previa
+      setSelectedPlanId(newPlanId);
     }
     setPlans(updatedPlans);
     setClub((prev: any) => ({ ...prev, subscriptionPlans: updatedPlans }));
     alert(activeSection === 'management' ? 'Plan actualizado correctamente.' : 'Nuevo plan creado correctamente.');
-    // Resetear formulario si es creación
     if (activeSection === 'create') {
       setFormData(null);
       setSelectedPlanId(null);
     }
   };
 
-  // Eliminar plan (solo en tab 'management')
   const handleDeletePlan = (planId: string | null) => {
     if (!planId || activeSection !== 'management') return;
     if (window.confirm('¿Estás seguro que deseas eliminar este plan? Esta acción no se puede deshacer.')) {
@@ -119,7 +108,6 @@ const EditSubscriptionsPage: React.FC = () => {
     }
   };
 
-  // Inicializar formulario para nuevo plan (al cambiar a tab 'create')
   const initializeNewPlanForm = () => {
     setFormData({
       planId: null,
@@ -134,7 +122,6 @@ const EditSubscriptionsPage: React.FC = () => {
     setSelectedPlanId(null);
   };
 
-  // Cambiar tab
   const handleTabChange = (section: string) => {
     setActiveSection(section);
     if (section === 'create') {
@@ -157,7 +144,6 @@ const EditSubscriptionsPage: React.FC = () => {
     <div className="container mx-auto px-4 py-8 min-h-screen">
       <h1 className="text-4xl font-bold text-gray-800 mb-8 text-center">Gestión de Suscripciones - {club.name}</h1>
       <div className="flex flex-col lg:flex-row gap-8">
-        {/* Sidebar de navegación */}
         <div className="lg:w-1/4">
           <EntrepreneurSubscriptionSidebar 
             activeSection={activeSection} 
@@ -165,7 +151,6 @@ const EditSubscriptionsPage: React.FC = () => {
           />
         </div>
 
-        {/* Contenido principal */}
         <div className="lg:w-3/4 bg-white rounded-xl shadow-lg p-8">
           {activeSection === 'management' && (
             <div>
@@ -174,7 +159,6 @@ const EditSubscriptionsPage: React.FC = () => {
                 <p className="text-center text-gray-600 mb-6">No hay planes creados. Crea uno nuevo desde el sidebar.</p>
               ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-6">
-                  {/* Muestra TODOS los planes, sin filtro por activo (como en tu código original) */}
                   {plans.map(plan => (
                     <div 
                       key={plan.planId} 
@@ -184,14 +168,13 @@ const EditSubscriptionsPage: React.FC = () => {
                       <SubscriptionPlanCard
                         plan={plan}
                         clubName={club.name}
-                        detailsLink={undefined} // No link externo, solo selección
+                        detailsLink={undefined}
                       />
                     </div>
                   ))}
                 </div>
               )}
 
-              {/* Formulario de edición si hay un plan seleccionado */}
               {selectedPlanId && formData ? (
                 <>
                   <h3 className="text-xl font-bold mb-4">Editando: {formData.name}</h3>
@@ -400,11 +383,7 @@ const EditSubscriptionsPage: React.FC = () => {
                       onChange={e => handleInputChange('activo', e.target.checked)}
                       className="h-5 w-5 rounded"
                     />
-                    <label htmlFor="activo" className="font-semibold">Plan Activo
-                      New Chat
-24 lines
-
-                    </label>
+                    <label htmlFor="activo" className="font-semibold">Plan Activo</label>
                   </div>
                   <div className="flex justify-end">
                     <button
@@ -425,4 +404,5 @@ const EditSubscriptionsPage: React.FC = () => {
     </div>
   );
 };
+
 export default EditSubscriptionsPage;

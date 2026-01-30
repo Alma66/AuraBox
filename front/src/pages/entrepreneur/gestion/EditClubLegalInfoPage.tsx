@@ -1,4 +1,3 @@
-// src/pages/entrepreneur/EditClubLegalInfoPage.tsx
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import clubsData from '../../../data/clubs.json';

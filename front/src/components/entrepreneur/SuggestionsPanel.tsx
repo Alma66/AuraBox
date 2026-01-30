@@ -1,4 +1,3 @@
-// FileName: src/components/entrepreneur/SuggestionsPanel.tsx
 interface SuggestionsPanelProps {
   positiveWords: string[];
   negativeWords: string[];

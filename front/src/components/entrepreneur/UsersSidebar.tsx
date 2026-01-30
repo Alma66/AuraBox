@@ -1,10 +1,9 @@
-// FileName: /components/entrepreneur/UsersSidebar.tsx
 import React from 'react';
 
 interface UsersSidebarProps {
   activeFilter: string;
   setActiveFilter: (filter: string) => void;
-  roles: string[]; // Lista de roles disponibles (e.g., ['administrador_del_club', 'delivery_rider'])
+  roles: string[];
   searchTerm: string;
   setSearchTerm: (term: string) => void;
 }
@@ -23,7 +22,7 @@ const UsersSidebar: React.FC<UsersSidebarProps> = ({
     ...roles.map(role => ({ 
       id: role, 
       label: role.replace(/_/g, ' ').toUpperCase(), 
-      icon: 'M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z' // Icono genérico para roles
+      icon: 'M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z' 
     })),
   ];
 
@@ -31,7 +30,6 @@ const UsersSidebar: React.FC<UsersSidebarProps> = ({
     <nav className="bg-white rounded-xl shadow-lg p-6 w-full lg:w-64">
       <h3 className="text-lg font-bold text-gray-800 mb-4">Filtros de Equipo</h3>
       
-      {/* Filtros por Estado/Rol */}
       <ul className="space-y-2 mb-6">
         {sidebarItems.map((item) => (
           <li key={item.id}>
@@ -49,7 +47,6 @@ const UsersSidebar: React.FC<UsersSidebarProps> = ({
         ))}
       </ul>
 
-      {/* Búsqueda */}
       <div className="space-y-3">
         <label className="block text-sm font-medium text-gray-700 mb-2">Buscar por Nombre/Email</label>
         <input

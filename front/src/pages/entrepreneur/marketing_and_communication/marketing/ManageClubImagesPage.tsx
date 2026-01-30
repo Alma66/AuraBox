@@ -39,11 +39,9 @@ const ManageClubImagesPage: React.FC = () => {
     <div className="container mx-auto px-4 py-8 min-h-screen">
       <h1 className="text-4xl font-bold text-gray-800 mb-8 text-center">Gestionar Imágenes del Club</h1>
       <div className="flex flex-col lg:flex-row gap-8">
-        {/* Sidebar */}
         <div className="lg:w-1/4">
           <ManageClubImagesSidebar activeSection={activeSection} setActiveSection={setActiveSection} />
         </div>
-        {/* Contenido */}
         <div className="lg:w-3/4 bg-white rounded-xl shadow-lg p-8">
           <ManageClubImagesContent 
             activeSection={activeSection} 

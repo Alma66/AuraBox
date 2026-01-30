@@ -1,4 +1,3 @@
-// FileName: src/pages/entrepreneur/SubscriptionDetailForEntrepreneurPage.tsx
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../../App';
@@ -12,7 +11,7 @@ import usersData from '../../../data/user.json';
 const SubscriptionDetailForEntrepreneurPage: React.FC = () => {
   const { clubId, subscriptionId } = useParams<{ clubId: string; subscriptionId: string }>();
   const navigate = useNavigate();
-  const { user: authUser  } = useAuth();
+  const { user: authUser } = useAuth();
 
   const [subscription, setSubscription] = useState<Subscription | null>(null);
   const [club, setClub] = useState<Club | null>(null);
@@ -22,7 +21,7 @@ const SubscriptionDetailForEntrepreneurPage: React.FC = () => {
   const [selectedYear, setSelectedYear] = useState<string | null>(null);
 
   useEffect(() => {
-    if (!authUser  || authUser .role !== 'entrepreneur' || authUser .managedClubId !== clubId) {
+    if (!authUser || authUser.role !== 'entrepreneur' || authUser.managedClubId !== clubId) {
       navigate('/login');
       return;
     }
@@ -52,7 +51,7 @@ const SubscriptionDetailForEntrepreneurPage: React.FC = () => {
     setCustomer(foundCustomer);
 
     setLoading(false);
-  }, [authUser , clubId, subscriptionId, navigate]);
+  }, [authUser, clubId, subscriptionId, navigate]);
 
   const getStatusColorClass = (status: 'active' | 'paused' | 'cancelled') => {
     switch (status) {
@@ -96,14 +95,12 @@ const SubscriptionDetailForEntrepreneurPage: React.FC = () => {
     alert(actionMessage);
   };
 
-  // Resumen de reseñas
   const totalBoxesSent = subscription?.history.length || 0;
   const averageRating = subscription?.history.length
     ? Math.round(subscription.history.reduce((acc, h) => acc + h.rating, 0) / subscription.history.length)
     : 0;
   const fiveStarCount = subscription?.history.filter(h => h.rating === 5).length || 0;
 
-  // Agrupar cajas enviadas por año y mes
   const boxesByYearMonth = subscription?.history.reduce<Record<string, number>>((acc, item) => {
     const [monthName, yearStr] = item.month.split(' ');
     const key = `${yearStr}-${monthName}`;
@@ -111,10 +108,8 @@ const SubscriptionDetailForEntrepreneurPage: React.FC = () => {
     return acc;
   }, {}) || {};
 
-  // Extraer años disponibles para filtro
   const years = Array.from(new Set(subscription?.history.map(h => h.month.split(' ')[1]) || [])).sort();
 
-  // Filtrar meses por año seleccionado
   const monthsInSelectedYear = selectedYear
     ? Object.entries(boxesByYearMonth)
         .filter(([key]) => key.startsWith(selectedYear))
@@ -230,7 +225,6 @@ const SubscriptionDetailForEntrepreneurPage: React.FC = () => {
         </div>
       </div>
 
-      {/* Resumen de reseñas */}
       <div className="bg-white rounded-xl shadow-lg p-8 mb-8">
         <h3 className="text-2xl font-bold mb-4">Resumen de Reseñas</h3>
         {subscription.history.length === 0 ? (
@@ -253,7 +247,6 @@ const SubscriptionDetailForEntrepreneurPage: React.FC = () => {
         )}
       </div>
 
-      {/* Calendario simple */}
       <div className="bg-white rounded-xl shadow-lg p-8">
         <h3 className="text-2xl font-bold mb-4">Cajas enviadas por año y mes</h3>
         <div className="flex flex-wrap gap-2 mb-4">

@@ -1,4 +1,3 @@
-// FileName: src/components/entrepreneur/StatsCards.tsx
 interface StatsCardsProps {
   subscribers: number;
   revenue: number;
@@ -10,7 +9,6 @@ interface StatsCardsProps {
 const StatsCards: React.FC<StatsCardsProps> = ({ subscribers, revenue, rating, boxesSent, growth }) => {
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-      {/* Suscriptores */}
       <div className="bg-gradient-to-br from-blue-500 to-blue-600 text-white p-6 rounded-xl shadow-lg">
         <div className="flex items-center justify-between">
           <div>
@@ -24,7 +22,6 @@ const StatsCards: React.FC<StatsCardsProps> = ({ subscribers, revenue, rating, b
         <p className="text-blue-100 text-sm mt-2">+{growth}% vs. mes anterior</p>
       </div>
 
-      {/* Facturación */}
       <div className="bg-gradient-to-br from-green-500 to-green-600 text-white p-6 rounded-xl shadow-lg">
         <div className="flex items-center justify-between">
           <div>
@@ -38,7 +35,6 @@ const StatsCards: React.FC<StatsCardsProps> = ({ subscribers, revenue, rating, b
         <p className="text-green-100 text-sm mt-2">Estimado para este mes</p>
       </div>
 
-      {/* Rating */}
       <div className="bg-gradient-to-br from-purple-500 to-purple-600 text-white p-6 rounded-xl shadow-lg">
         <div className="flex items-center justify-between">
           <div>
@@ -52,7 +48,6 @@ const StatsCards: React.FC<StatsCardsProps> = ({ subscribers, revenue, rating, b
         <p className="text-purple-100 text-sm mt-2">Basado en reseñas verificadas</p>
       </div>
 
-      {/* Envíos */}
       <div className="bg-gradient-to-br from-yellow-500 to-yellow-600 text-white p-6 rounded-xl shadow-lg">
         <div className="flex items-center justify-between">
           <div>

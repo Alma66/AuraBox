@@ -1,4 +1,3 @@
-// FileName: /UserProfileContent.tsx
 import React, { useState, useEffect } from 'react';
 import clubsData from '../../data/clubs.json';
 import clientSubscriptionDetailsData from '../../data/clientSubscriptionDetails.json';
@@ -43,7 +42,7 @@ interface LocationData {
 
 interface UserProfileContentProps {
   activeSection: string;
-  user: User; // El usuario completo se pasa como prop
+  user: User;
 }
 
 const UserProfileContent: React.FC<UserProfileContentProps> = ({ activeSection, user }) => {
@@ -52,7 +51,6 @@ const UserProfileContent: React.FC<UserProfileContentProps> = ({ activeSection, 
   const [selectedSubscriptionDetails, setSelectedSubscriptionDetails] =
     useState<ClientSubscriptionDetail | null>(null);
 
-  // Estados para edición de Mi Perfil, inicializados con los datos del 'user' prop
   const [isEditingName, setIsEditingName] = useState(false);
   const [editedFirstName, setEditedFirstName] = useState(user.firstName || '');
   const [editedLastName, setEditedLastName] = useState(user.lastName || '');
@@ -61,12 +59,10 @@ const UserProfileContent: React.FC<UserProfileContentProps> = ({ activeSection, 
   const [isEditingBirthDate, setIsEditingBirthDate] = useState(false);
   const [editedBirthDate, setEditedBirthDate] = useState(user.birthDate || '');
 
-  // Estados para contenido sensible en Mi Perfil
   const [showSensitiveProfileInfo, setShowSensitiveProfileInfo] = useState(false);
   const [profilePassword, setProfilePassword] = useState('');
   const [profilePasswordError, setProfilePasswordError] = useState('');
 
-  // Sincronizar estados de edición con el prop 'user' cuando cambie
   useEffect(() => {
     setEditedFirstName(user.firstName || '');
     setEditedLastName(user.lastName || '');
@@ -77,7 +73,7 @@ const UserProfileContent: React.FC<UserProfileContentProps> = ({ activeSection, 
       (sub) => sub.userId === user.id && sub.status === 'active'
     );
     setUserSubscriptions(filteredSubscriptions);
-  }, [user]); // Dependencia en 'user' para re-inicializar cuando el usuario cambie
+  }, [user]);
 
   useEffect(() => {
     if (selectedSubscriptionId) {
@@ -99,33 +95,25 @@ const UserProfileContent: React.FC<UserProfileContentProps> = ({ activeSection, 
     setSelectedSubscriptionDetails(null);
   };
 
-  // Guardar cambios simulados
   const handleSaveName = () => {
     const newFirstName = editedFirstName.trim();
     const newLastName = editedLastName.trim();
-    // En un entorno real, aquí harías una llamada a la API para actualizar el usuario
-    // y luego actualizarías el estado global del usuario o el localStorage.
     console.log('Nombre y Apellido guardados:', newFirstName, newLastName);
-    // Para simular la actualización, podrías actualizar el localStorage aquí
-    // y luego forzar una recarga del usuario en UserProfilePage.
     setIsEditingName(false);
   };
 
   const handleSaveGender = (newGender: string) => {
-    // En un entorno real, aquí harías una llamada a la API
     console.log('Género guardado:', newGender);
-    setEditedGender(newGender); // Actualiza el estado local para reflejar el cambio
+    setEditedGender(newGender);
     setIsEditingGender(false);
   };
 
   const handleSaveBirthDate = () => {
-    // En un entorno real, aquí harías una llamada a la API
     console.log('Fecha de Nacimiento guardada:', editedBirthDate);
     setIsEditingBirthDate(false);
   };
 
   const handleSavePhoneNumber = (newNumber: string) => {
-    // En un entorno real, aquí harías una llamada a la API
     console.log('Número de teléfono guardado:', newNumber);
   };
 
@@ -204,7 +192,6 @@ const UserProfileContent: React.FC<UserProfileContentProps> = ({ activeSection, 
   };
 
   const renderContent = () => {
-    // Ya no debería ser null aquí si UserProfilePage lo pasa correctamente
     if (!user) {
       return <p className="text-gray-600">Cargando información del perfil...</p>;
     }
@@ -215,15 +202,14 @@ const UserProfileContent: React.FC<UserProfileContentProps> = ({ activeSection, 
           <div>
             <h2 className="text-2xl font-bold text-gray-800 mb-4">Mi Perfil</h2>
             <div className="space-y-4">
-              {/* Nombre y Apellido */}
               <EditProfileField
                 label="Nombre y Apellido"
-                value={`${editedFirstName} ${editedLastName}`} // Muestra el estado editado
+                value={`${editedFirstName} ${editedLastName}`}
                 isEditing={isEditingName}
                 onEdit={() => setIsEditingName(true)}
                 onCancel={() => {
-                  setEditedFirstName(user.firstName || ''); // Restaura el valor original
-                  setEditedLastName(user.lastName || ''); // Restaura el valor original
+                  setEditedFirstName(user.firstName || '');
+                  setEditedLastName(user.lastName || '');
                   setIsEditingName(false);
                 }}
               >
@@ -255,27 +241,25 @@ const UserProfileContent: React.FC<UserProfileContentProps> = ({ activeSection, 
                 </button>
               </EditProfileField>
 
-              {/* Género */}
               <EditGenderField
                 label="Género"
-                value={editedGender} // Muestra el estado editado
+                value={editedGender}
                 isEditing={isEditingGender}
                 onEdit={() => setIsEditingGender(true)}
                 onCancel={() => {
-                  setEditedGender(user.gender || ''); // Restaura el valor original
+                  setEditedGender(user.gender || '');
                   setIsEditingGender(false);
                 }}
                 onSave={handleSaveGender}
               />
 
-              {/* Fecha de Nacimiento */}
               <EditProfileField
                 label="Fecha de Nacimiento"
-                value={editedBirthDate} // Muestra el estado editado
+                value={editedBirthDate}
                 isEditing={isEditingBirthDate}
                 onEdit={() => setIsEditingBirthDate(true)}
                 onCancel={() => {
-                  setEditedBirthDate(user.birthDate || ''); // Restaura el valor original
+                  setEditedBirthDate(user.birthDate || '');
                   setIsEditingBirthDate(false);
                 }}
               >
@@ -294,7 +278,6 @@ const UserProfileContent: React.FC<UserProfileContentProps> = ({ activeSection, 
                 </button>
               </EditProfileField>
 
-              {/* Contenido sensible: DNI, Email, Teléfono */}
               <div className="relative bg-gray-100 p-6 rounded-lg shadow-md mt-8">
                 <h3 className="text-xl font-bold text-gray-800 mb-4">Información de Contacto y Documento</h3>
                 {!showSensitiveProfileInfo && (
@@ -320,7 +303,6 @@ const UserProfileContent: React.FC<UserProfileContentProps> = ({ activeSection, 
                   </div>
                 )}
                 <div className={`space-y-6 ${!showSensitiveProfileInfo ? 'blur-sm pointer-events-none' : ''}`}>
-                  {/* Tipo y Número de Documento (no editables) */}
                   <EditProfileField
                     label="Tipo de Documento y Número"
                     value={`${user.documentType || 'N/A'}: ${user.documentNumber || 'N/A'}`}
@@ -332,7 +314,6 @@ const UserProfileContent: React.FC<UserProfileContentProps> = ({ activeSection, 
                     <></>
                   </EditProfileField>
 
-                  {/* Email (no editable) */}
                   <EditProfileField
                     label="Email"
                     value={user.email}
@@ -344,7 +325,6 @@ const UserProfileContent: React.FC<UserProfileContentProps> = ({ activeSection, 
                     <></>
                   </EditProfileField>
 
-                  {/* Número de Teléfono (editable) */}
                   <EditPhoneField label="Número de Teléfono" value={user.phoneNumber || ''} onSave={handleSavePhoneNumber} />
                 </div>
               </div>
@@ -367,9 +347,8 @@ const UserProfileContent: React.FC<UserProfileContentProps> = ({ activeSection, 
               details={user.details || ''}
               onSave={(locationData: LocationData) => {
                 console.log('Ubicación guardada:', locationData);
-                // Aquí también deberías actualizar el estado global del usuario o localStorage
               }}
-              isEntrepreneurProfile={false} // Cliente ve todos los campos
+              isEntrepreneurProfile={false}
             />
           </div>
         );

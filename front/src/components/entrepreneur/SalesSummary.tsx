@@ -1,4 +1,3 @@
-// FileName: src/components/entrepreneur/SalesSummary.tsx
 interface SalesSummaryProps {
   totalRevenue: number;
   activeCount: number;

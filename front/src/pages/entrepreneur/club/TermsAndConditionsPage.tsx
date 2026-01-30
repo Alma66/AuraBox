@@ -1,4 +1,3 @@
-// src/pages/club/TermsAndConditionsPage.tsx
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import clubsData from '../../../data/clubs.json';
@@ -17,7 +16,6 @@ const TermsAndConditionsPage: React.FC = () => {
       return;
     }
 
-    // Validar y transformar termsAndConditionsSections y privacyAndSecurityPolicySections para que cumplan con LegalSection type
     const legalInfo = foundClubRaw.legalInfo || {};
     const allowedTypes = ['title', 'paragraph', 'list', 'image'];
 

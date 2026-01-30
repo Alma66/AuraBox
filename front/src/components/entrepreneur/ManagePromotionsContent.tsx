@@ -25,7 +25,6 @@ const ManagePromotionsContent: React.FC<ManagePromotionsContentProps> = ({ activ
     setPlans(updatedPlans);
     const updatedClub = { ...club, subscriptionPlans: updatedPlans };
     onUpdateClub(updatedClub);
-    // En backend: PUT /api/clubs/:id/plans/:planId
   };
 
   const addToHistorial = (planName: string, descuento: string, tipo: string) => {
@@ -155,7 +154,7 @@ const ManagePromotionsContent: React.FC<ManagePromotionsContentProps> = ({ activ
             </label>
             <button
               onClick={() => {
-                const updatedClub = { ...club, /* agregar campo promoEspecial si se extiende el type */ };
+                const updatedClub = { ...club, };
                 onUpdateClub(updatedClub);
                 alert('Promoción especial guardada');
               }}

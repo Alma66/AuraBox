@@ -1,67 +1,65 @@
-// React y hooks
 import React, { useState } from 'react';
-
-// React Router
 import { Link, useNavigate } from 'react-router-dom';
-
-// Datos y tipos
-import usersData from '../data/user.json';
+import api from '../api/config';
 import { User } from '../types/user';
 
-// Props del componente
 interface LoginPageProps {
   onLogin: (user: User) => void;
 }
 
-// Componente principal de login
 const LoginPage: React.FC<LoginPageProps> = ({ onLogin }) => {
-  // Estados del formulario
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
-  // Manejo de envío del formulario
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
+    setLoading(true);
 
-    const user = (usersData as User[]).find((u) => u.email === email);
+    try {
+      const response = await api.post('/auth/login', { email, password });
+      const { access_token } = response.data.data;
+      localStorage.setItem('access_token', access_token);
+      const payload = JSON.parse(atob(access_token.split('.')[1]));
+      const user: User = {
+        id: payload.sub.toString(),
+        firstName: payload.firstName || '',
+        lastName: payload.lastName || '',
+        email: payload.email,
+        role: payload.role.toLowerCase() as 'customer' | 'entrepreneur' | 'admin',
+        registeredDate: payload.registeredDate || '',
+        lastLogin: payload.lastLogin || '',
+      };
 
-    if (user) {
-      if (password === 'password123') {
-        onLogin(user);
+      onLogin(user);
 
-        switch (user.role) {
-          case 'customer':
-            navigate('/user/dashboard');
-            break;
-          case 'entrepreneur':
-            if (user.managedClubId) {
-              navigate(`/club/${user.managedClubId}/history`);
-            } else {
-              navigate('/entrepreneur/dashboard');
-            }
-            break;
-          case 'admin':
-            navigate('/admin/dashboard');
-            break;
-          default:
-            setError('Rol de usuario no reconocido. Contacte al soporte.');
-            break;
-        }
-      } else {
-        setError('Email o contraseña incorrectos.');
+      switch (user.role) {
+        case 'customer':
+          navigate('/user/dashboard');
+          break;
+        case 'entrepreneur':
+          navigate('/entrepreneur/profile');
+          break;
+        case 'admin':
+          navigate('/admin/dashboard');
+          break;
+        default:
+          setError('Rol del usuario no reconocido. Contacte al soporte.');
+          break;
       }
-    } else {
-      setError('Email o contraseña incorrectos.');
+    } catch (err: any) {
+      setError(err.response?.data?.message || 'Error al iniciar sesión. Verifica tus credenciales.');
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-100 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-md w-full space-y-8 p-10 bg-white rounded-xl shadow-lg">
-        {/* Encabezado */}
         <div>
           <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
             Inicia sesión en tu cuenta
@@ -73,7 +71,6 @@ const LoginPage: React.FC<LoginPageProps> = ({ onLogin }) => {
             </Link>
           </p>
         </div>
-        {/* Formulario de login */}
         <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
           <div className="rounded-md shadow-sm -space-y-px">
             <div>
@@ -110,12 +107,10 @@ const LoginPage: React.FC<LoginPageProps> = ({ onLogin }) => {
             </div>
           </div>
 
-          {/* Mensaje de error */}
           {error && (
             <p className="text-red-500 text-sm text-center">{error}</p>
           )}
 
-          {/* Opciones adicionales */}
           <div className="flex items-center justify-between">
             <div className="flex items-center">
               <input
@@ -136,13 +131,13 @@ const LoginPage: React.FC<LoginPageProps> = ({ onLogin }) => {
             </div>
           </div>
 
-          {/* Botón de submit */}
           <div>
             <button
               type="submit"
-              className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+              disabled={loading}
+              className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50"
             >
-              Iniciar Sesión
+              {loading ? 'Iniciando...' : 'Iniciar Sesión'}
             </button>
           </div>
         </form>

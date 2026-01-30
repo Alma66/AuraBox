@@ -1,4 +1,3 @@
-// src/pages/client/CartPage.tsx
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../../App';
@@ -19,7 +18,6 @@ const CartPage: React.FC = () => {
     const addedId = urlParams.get('added');
     setAddedPlanId(addedId || null);
 
-    // Inicializa carrito simulado (planes fijos, ej. 2-4 de JSON)
     const simulatedCart = (clubPlansData as SubscriptionPlan[]).slice(1, 4);
     setCartItems(simulatedCart);
     setLoading(false);
@@ -38,7 +36,7 @@ const CartPage: React.FC = () => {
   };
 
   const subtotal = cartItems.reduce((sum, item) => sum + item.price, 0);
-  const shipping = 0; // Simulado gratis
+  const shipping = 0;
   const total = subtotal + shipping;
 
   if (loading) {
@@ -55,7 +53,6 @@ const CartPage: React.FC = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-green-50 via-white to-blue-50 py-8 px-4">
       <div className="max-w-4xl mx-auto">
-        {/* Header */}
         <div className="text-center mb-8">
           <h1 className="text-4xl font-bold text-gray-800 mb-2">Mi Carrito de Compras</h1>
           <p className="text-gray-600">
@@ -64,7 +61,6 @@ const CartPage: React.FC = () => {
           </p>
         </div>
 
-        {/* Lista de Items */}
         {cartItems.length === 0 ? (
           <div className="text-center py-12">
             <svg className="mx-auto h-24 w-24 text-gray-400 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -90,7 +86,6 @@ const CartPage: React.FC = () => {
         ) : (
           <>
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-              {/* Items */}
               <div className="lg:col-span-2 space-y-6">
                 {cartItems.map((plan) => (
                   <PlanCard
@@ -102,7 +97,6 @@ const CartPage: React.FC = () => {
                 ))}
               </div>
 
-              {/* Resumen de Precios */}
               <div className="lg:col-span-1">
                 <div className="bg-white rounded-xl shadow-md p-6 sticky top-8">
                   <h2 className="text-xl font-bold text-gray-800 mb-4">Resumen del Pedido</h2>
@@ -135,7 +129,6 @@ const CartPage: React.FC = () => {
           </>
         )}
 
-        {/* Footer de página */}
         <div className="mt-12 text-center">
           <button
             onClick={() => navigate('/explore')}

@@ -1,15 +1,13 @@
-// FileName: src/components/entrepreneur/AdminToolsContent.tsx
 import React, { useMemo } from 'react';
 import { Club } from '../../types/club';
 import { User } from '../../types/user';
 import { Subscription } from '../../types/subscription';
 
-// Importar datos simulados
 import clubsData from '../../data/clubs.json';
 import subscriptionsData from '../../data/subscriptions.json';
 import reviewsData from '../../data/reviews.json';
-import analyticsData from '../../data/analytics.json'; // Si existe; si no, se calculará dinámicamente
-import usersData from '../../data/user.json'; // Corregido: asume 'users.json'
+import analyticsData from '../../data/analytics.json';
+import usersData from '../../data/user.json';
 
 interface AdminToolsContentProps {
   activeSection: string;
@@ -17,7 +15,6 @@ interface AdminToolsContentProps {
   user: User;
 }
 
-// Interfaz para Review si no existe en types
 interface Review {
   id: string;
   clubId: string;
@@ -29,14 +26,12 @@ interface Review {
   isBlockedBySystem: boolean;
 }
 
-// Interfaz para monthlyExpenses (para tipado en map)
 interface MonthlyExpense {
   month: string;
   amount: number;
 }
 
 const AdminToolsContent: React.FC<AdminToolsContentProps> = ({ activeSection, club, user }) => {
-  // Calcular métricas dinámicamente de los datos existentes
   const clubSubscriptions = useMemo(() => {
     return (subscriptionsData as Subscription[]).filter(sub => sub.clubId === club.id);
   }, [club.id]);
@@ -50,15 +45,13 @@ const AdminToolsContent: React.FC<AdminToolsContentProps> = ({ activeSection, cl
   }, [clubReviews]);
 
   const totalRevenue = useMemo(() => {
-    // Simular facturación basada en suscripciones activas (precio fijo por suscripción mensual)
     const activeSubs = clubSubscriptions.filter(sub => sub.status === 'active');
-    const avgPricePerSub = 25000; // Precio promedio simulado por suscripción mensual
+    const avgPricePerSub = 25000;
     return activeSubs.length * avgPricePerSub;
   }, [clubSubscriptions]);
 
   const monthlyGrowth = useMemo(() => {
-    // Simular crecimiento mensual (puedes calcular de datos reales más adelante)
-    return Math.round(Math.random() * 15 + 5); // Entre 5% y 20%
+    return Math.round(Math.random() * 15 + 5);
   }, []);
 
   const analytics = useMemo(() => {
@@ -82,16 +75,14 @@ const AdminToolsContent: React.FC<AdminToolsContentProps> = ({ activeSection, cl
     };
   }, [club.id]);
 
-  // Función corregida: sin espacios, con tipo explícito y tipado de usersData
   const getUserName: (userId: string) => string = (userId: string) => {
-    const foundUser  = (usersData as User[]).find(u => u.id === userId);
-    return foundUser  ? `${foundUser .firstName} ${foundUser .lastName}` : 'Usuario Desconocido';
+    const foundUser = (usersData as User[]).find(u => u.id === userId);
+    return foundUser ? `${foundUser.firstName} ${foundUser.lastName}` : 'Usuario Desconocido';
   };
 
   const renderStatsSection = () => (
     <div>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-        {/* Tarjetas de métricas clave */}
         <div className="bg-gradient-to-br from-blue-500 to-blue-600 text-white p-6 rounded-xl shadow-lg">
           <div className="flex items-center justify-between">
             <div>
@@ -145,7 +136,6 @@ const AdminToolsContent: React.FC<AdminToolsContentProps> = ({ activeSection, cl
         </div>
       </div>
 
-      {/* Gráficos Simples */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
         <div className="bg-white p-6 rounded-xl shadow-lg">
           <h3 className="text-lg font-semibold text-gray-800 mb-4">Tendencia de Suscriptores</h3>
@@ -195,7 +185,6 @@ const AdminToolsContent: React.FC<AdminToolsContentProps> = ({ activeSection, cl
         </button>
       </div>
 
-      {/* Filtros */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
         <select className="p-2 border border-gray-300 rounded-md">
           <option>Todos los Meses</option>
@@ -216,7 +205,6 @@ const AdminToolsContent: React.FC<AdminToolsContentProps> = ({ activeSection, cl
         <button className="px-4 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700">Filtrar</button>
       </div>
 
-      {/* Tabla de Ventas */}
       <div className="overflow-x-auto">
         <table className="min-w-full bg-white border border-gray-200">
           <thead>
@@ -231,7 +219,7 @@ const AdminToolsContent: React.FC<AdminToolsContentProps> = ({ activeSection, cl
           </thead>
           <tbody>
             {clubSubscriptions.slice(0, 10).map(sub => {
-              const clientUser  = (usersData as User[]).find(u => u.id === sub.userId);
+              const clientUser = (usersData as User[]).find(u => u.id === sub.userId);
               return (
                 <tr key={sub.id} className="border-b hover:bg-gray-50">
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
@@ -239,7 +227,7 @@ const AdminToolsContent: React.FC<AdminToolsContentProps> = ({ activeSection, cl
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{sub.id}</td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                    {clientUser  ? `${clientUser .firstName} ${clientUser .lastName}` : 'Cliente Anónimo'}
+                    {clientUser ? `${clientUser.firstName} ${clientUser.lastName}` : 'Cliente Anónimo'}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{sub.planId}</td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
@@ -266,7 +254,6 @@ const AdminToolsContent: React.FC<AdminToolsContentProps> = ({ activeSection, cl
         </table>
       </div>
 
-            {/* Resumen de Ventas */}
       <div className="mt-6 grid grid-cols-1 md:grid-cols-3 gap-6">
         <div className="bg-gray-50 p-4 rounded-lg text-center">
           <p className="text-2xl font-bold text-gray-900">{clubSubscriptions.length}</p>
@@ -303,12 +290,11 @@ const AdminToolsContent: React.FC<AdminToolsContentProps> = ({ activeSection, cl
               <span className="text-2xl font-bold text-green-600">{approvedReviews.length}</span>
             </div>
             <div className="flex justify-between items-center">
-              <span className="text-gray-600">Pendientes/Bloqueadas:</span>
+                            <span className="text-gray-600">Pendientes/Bloqueadas:</span>
               <span className="text-2xl font-bold text-red-600">{clubReviews.length - approvedReviews.length}</span>
             </div>
           </div>
 
-          {/* Distribución de Ratings */}
           <div className="mt-6">
             <h4 className="text-md font-medium text-gray-700 mb-3">Distribución de Ratings</h4>
             <div className="space-y-2">
@@ -382,7 +368,7 @@ const AdminToolsContent: React.FC<AdminToolsContentProps> = ({ activeSection, cl
             <tbody>
               {clubReviews.slice(0, 5).map(review => (
                 <tr key={review.id} className="border-b hover:bg-gray-50">
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                     {getUserName(review.userId)}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm">
@@ -415,7 +401,6 @@ const AdminToolsContent: React.FC<AdminToolsContentProps> = ({ activeSection, cl
         </div>
       </div>
 
-      {/* Sugerencias Automáticas */}
       <div className="mt-8 bg-blue-50 p-6 rounded-xl">
         <h3 className="text-lg font-semibold text-blue-800 mb-4">Sugerencias Basadas en Feedback</h3>
         <ul className="space-y-2 text-blue-700">

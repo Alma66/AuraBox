@@ -1,4 +1,3 @@
-// Importa los tipos y datos según tu estructura completa
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../../../App';
@@ -6,7 +5,6 @@ import { Subscription } from '../../../../types/subscription';
 import { User } from '../../../../types/user';
 import { SubscriptionPlan, Club } from '../../../../types/club';
 
-// Cambiado: Usar SubscriptionCardForEntrepreneur en lugar de SubscriptionCard inexistente
 import SubscriptionCardForEntrepreneur from '../../../../components/entrepreneur/SubscriptionCardForEntrepreneur';
 
 import subscriptionsData from '../../../../data/subscriptions.json';
@@ -35,7 +33,6 @@ const ActiveSubscriptionsPage: React.FC = () => {
       return;
     }
 
-    // Casts para fixear mismatches de tipos con JSON (ej: status string vs union, legalInfo types)
     const club = (clubsData as Club[]).find(c => c.id === managedClubId);
     setClubs(clubsData as Club[]);
     setClubPlans(club?.subscriptionPlans || []);
@@ -44,7 +41,6 @@ const ActiveSubscriptionsPage: React.FC = () => {
     setSubscriptions(clubSubs);
     setClients(usersData as User[]);
 
-    // Llamar applyFilters después de setear states para usar valores actualizados
     applyFilters(clubSubs, searchTerm, statusFilter, planFilter);
   }, [managedClubId, searchTerm, statusFilter, planFilter, navigate]);
 
@@ -89,9 +85,8 @@ const ActiveSubscriptionsPage: React.FC = () => {
   };
 
   const currentClubName = clubs.find(c => c.id === managedClubId)?.name || 'Tu Club';
-  const currentClub = clubs.find(c => c.id === managedClubId); // Para pasar a SubscriptionCardForEntrepreneur
+  const currentClub = clubs.find(c => c.id === managedClubId);  
 
-  // Métricas rápidas (usar subscriptions con cast si es necesario)
   const totalActive = subscriptions.filter(sub => sub.status === 'active').length;
   const totalPaused = subscriptions.filter(sub => sub.status === 'paused').length;
   const totalExpiring = subscriptions.filter(sub => {
@@ -119,7 +114,6 @@ const ActiveSubscriptionsPage: React.FC = () => {
         Suscripciones de {currentClubName}
       </h1>
 
-      {/* Métricas Rápidas */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
         <div className="bg-white p-6 rounded-lg shadow-md border-l-4 border-green-500">
           <p className="text-sm font-medium text-gray-500">Activas</p>
@@ -139,7 +133,6 @@ const ActiveSubscriptionsPage: React.FC = () => {
         </div>
       </div>
 
-      {/* Filtros y Búsqueda */}
       <div className="bg-white p-6 rounded-lg shadow-md mb-8 flex flex-col md:flex-row gap-4 items-center">
         <input
           type="text"
@@ -172,7 +165,6 @@ const ActiveSubscriptionsPage: React.FC = () => {
         </select>
       </div>
 
-      {/* Listado de Suscripciones */}
       {filteredSubscriptions.length > 0 ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {filteredSubscriptions.map(sub => {
@@ -182,7 +174,7 @@ const ActiveSubscriptionsPage: React.FC = () => {
               <SubscriptionCardForEntrepreneur
                 key={sub.id}
                 subscription={sub}
-                club={currentClub!} // Asumimos que existe; si no, agregar chequeo
+                club={currentClub!} 
                 plan={plan!}
                 customer={customer!}
               />

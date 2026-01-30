@@ -5,7 +5,7 @@ interface AlternatingContentProps {
   description: string;
   imageUrl: string;
   imageAlt: string;
-  reverse: boolean; // true para imagen a la derecha, false para imagen a la izquierda
+  reverse: boolean;
 }
 
 const AlternatingContent: React.FC<AlternatingContentProps> = ({ title, description, imageUrl, imageAlt, reverse }) => {

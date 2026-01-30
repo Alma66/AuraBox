@@ -1,8 +1,6 @@
-// src/components/ClubFeaturedReviews.tsx
-
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { FeaturedReview } from '../../types/club'; // Importa la interfaz (ahora exportada)
+import { FeaturedReview } from '../../types/club';
 
 interface ClubFeaturedReviewsProps {
   reviews: FeaturedReview[];
@@ -19,7 +17,7 @@ const ClubFeaturedReviews: React.FC<ClubFeaturedReviewsProps> = ({ reviews, club
     <div className="bg-white rounded-xl shadow-lg p-8 mb-8 animate-fadeInUp">
       <h2 className="text-2xl font-bold text-gray-800 mb-4">Reseñas Destacadas</h2>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-        {reviews.slice(0, 2).map((review) => ( // Mostrar solo 2-3 reseñas destacadas
+        {reviews.slice(0, 2).map((review) => (
           <div key={review.id} className="bg-gray-50 p-5 rounded-lg border border-gray-200 shadow-sm">
             <div className="flex items-center mb-2">
               <span className="text-yellow-500 text-xl font-bold mr-2">{review.rating}</span>
@@ -44,7 +42,7 @@ const ClubFeaturedReviews: React.FC<ClubFeaturedReviewsProps> = ({ reviews, club
       {reviews.length > 2 && (
         <div className="text-center mt-6">
           <Link
-            to={`/club/${clubId}/reviews`} // Ruta futura para todas las reseñas
+            to={`/club/${clubId}/reviews`}
             className="text-blue-600 hover:underline font-semibold text-lg transition-colors duration-200"
           >
             Ver todas las {reviews.length} reseñas de {clubName}

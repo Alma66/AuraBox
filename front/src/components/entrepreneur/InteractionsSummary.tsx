@@ -1,4 +1,3 @@
-// FileName: src/components/entrepreneur/InteractionsSummary.tsx
 interface InteractionsSummaryProps {
   analytics: { views: number; likes: number; favorites: number };
 }

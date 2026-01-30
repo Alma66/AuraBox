@@ -15,7 +15,6 @@ const HeroBanner: React.FC<HeroBannerProps> = ({ title, subtitle, ctaText, ctaLi
       className="relative w-full h-96 md:h-[600px] bg-cover bg-center flex items-center justify-center text-center px-4 overflow-hidden"
       style={{ backgroundImage: `url(${backgroundImage})` }}
     >
-      {/* Overlay con gradiente animado */}
       <div className="absolute inset-0 bg-gradient-to-br from-blue-800/70 to-purple-800/70 backdrop-blur-sm animate-gradient-shift"></div>
       
       <div className="relative z-10 text-white max-w-4xl">

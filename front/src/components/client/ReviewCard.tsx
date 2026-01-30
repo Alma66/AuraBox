@@ -1,17 +1,15 @@
-// src/components/client/ReviewCard.tsx
 import React from 'react';
-import { Review } from '../../types/review'; // Asume type Review de types (o infiere de JSON)
-import { Club } from '../../types/club'; // Para club name
+import { Review } from '../../types/review';
+import { Club } from '../../types/club';
 
 interface ReviewCardProps {
   review: Review;
-  club?: Partial<Club>; // Opcional, para nombre del club
+  club?: Partial<Club>;
   onDelete: () => void;
-  onEdit?: () => void; // Solo si pending
+  onEdit?: () => void;
 }
 
 const ReviewCard: React.FC<ReviewCardProps> = ({ review, club, onDelete, onEdit }) => {
-  // Componente Estrellas
   const Stars = ({ rating }: { rating: number }) => (
     <div className="flex">
       {[...Array(5)].map((_, i) => (
@@ -34,7 +32,6 @@ const ReviewCard: React.FC<ReviewCardProps> = ({ review, club, onDelete, onEdit 
 
   return (
     <div className="bg-white rounded-xl shadow-md p-6 hover:shadow-lg transition-shadow duration-300 border border-gray-200">
-      {/* Header: Club y Fecha */}
       <div className="flex justify-between items-start mb-4">
         <div>
           <h4 className="font-bold text-gray-800">{club?.name || 'Club Desconocido'}</h4>
@@ -45,15 +42,12 @@ const ReviewCard: React.FC<ReviewCardProps> = ({ review, club, onDelete, onEdit 
         <Stars rating={review.rating} />
       </div>
 
-      {/* Comment */}
       <p className="text-gray-700 mb-4 leading-relaxed">{review.comment}</p>
 
-      {/* Status Badge */}
       <div className={`inline-flex px-3 py-1 rounded-full text-sm font-medium ${statusColor} mb-4`}>
         {review.status.charAt(0).toUpperCase() + review.status.slice(1)}{blockedText}
       </div>
 
-      {/* Acciones */}
       <div className="flex space-x-2">
         {review.status === 'pending' && onEdit && (
           <button

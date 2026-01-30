@@ -1,4 +1,3 @@
-// FileName: /types/financial.d.ts
 export interface FinancialMovement {
   id: string;
   date: string;
@@ -26,10 +25,9 @@ export interface Invoice {
   clientId: string;
   amount: number;
   status: 'pendiente' | 'pagada' | 'vencida';
-  pdfUrl?: string; // Para backend
+  pdfUrl?: string; 
 }
 
-// Corregido: TeamUser  sin espacio extra, interfaz independiente
 export interface TeamUser  {
   id: string;
   name: string;
@@ -41,6 +39,6 @@ export interface TeamUser  {
 
 export interface GeneralSetting {
   key: string;
-  value: string | number | boolean | string[]; // Añadido string[] para defaultPaymentMethods
+  value: string | number | boolean | string[]; 
   category: 'finances' | 'team' | 'notifications';
 }

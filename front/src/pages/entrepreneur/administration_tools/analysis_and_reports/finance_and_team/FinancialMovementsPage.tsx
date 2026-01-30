@@ -1,16 +1,15 @@
-// FileName: /pages/entrepreneur/FinancialMovementsPage.tsx
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { useAuth } from '../../../../../App';
 import FinancialSidebar from '../../../../../components/entrepreneur/FinancialSidebar';
 import financialMovementsData from '../../../../../data/financial-movements.json';
 import { FinancialMovement, MonthlyTotal, Invoice } from '../../../../../types/financial';
-import clubsData from '../../../../../data/clubs.json'; // Para obtener nombre del club
+import clubsData from '../../../../../data/clubs.json';
 
 const FinancialMovementsPage: React.FC = () => {
   const { user } = useAuth();
-  const { clubId } = useParams<{ clubId: string }>(); // De la ruta /entrepreneur/club/:clubId/financial-movements
-  const actualClubId = clubId || user?.managedClubId || 'club-1'; // Fallback a managedClubId
+  const { clubId } = useParams<{ clubId: string }>();
+  const actualClubId = clubId || user?.managedClubId || 'club-1';
   const club = (clubsData as any[]).find(c => c.id === actualClubId);
   const clubName = club?.name || 'Tu Club';
 
@@ -23,14 +22,12 @@ const FinancialMovementsPage: React.FC = () => {
   const [dateTo, setDateTo] = useState('');
   const [statusFilter, setStatusFilter] = useState('todos');
 
-  // Simular facturas (en backend: fetch('/api/clubs/:clubId/invoices'))
   const [invoices, setInvoices] = useState<Invoice[]>([
     { id: 'FAC-001', date: '2024-06-15', clientId: 'user-1', amount: 26500, status: 'pendiente' },
     { id: 'FAC-002', date: '2024-06-20', clientId: 'user-2', amount: 4000, status: 'pagada' },
     { id: 'FAC-003', date: '2024-06-25', clientId: 'user-3', amount: 35000, status: 'vencida' },
   ]);
 
-  // Cargar datos (simulado; en backend: fetch(`/api/clubs/${actualClubId}/financial-movements`))
   useEffect(() => {
     const data = (financialMovementsData as any)[actualClubId] || financialMovementsData['club-1'];
     setMovements(data.movements || []);
@@ -38,11 +35,9 @@ const FinancialMovementsPage: React.FC = () => {
     setFilteredMovements(data.movements || []);
   }, [actualClubId]);
 
-  // Filtrar movimientos
   useEffect(() => {
     let filtered = [...movements];
 
-    // Por categoría/tipo
     if (activeFilter !== 'all' && activeFilter !== 'ingresos' && activeFilter !== 'egresos') {
       filtered = filtered.filter(m => m.category === activeFilter);
     } else if (activeFilter === 'ingresos') {
@@ -51,7 +46,6 @@ const FinancialMovementsPage: React.FC = () => {
       filtered = filtered.filter(m => m.type === 'egreso');
     }
 
-    // Por fecha
     if (dateFrom) {
       filtered = filtered.filter(m => new Date(m.date) >= new Date(dateFrom));
     }
@@ -59,7 +53,6 @@ const FinancialMovementsPage: React.FC = () => {
       filtered = filtered.filter(m => new Date(m.date) <= new Date(dateTo));
     }
 
-    // Por estado
     if (statusFilter !== 'todos') {
       filtered = filtered.filter(m => m.status === statusFilter);
     }
@@ -67,8 +60,7 @@ const FinancialMovementsPage: React.FC = () => {
     setFilteredMovements(filtered);
   }, [activeFilter, dateFrom, dateTo, statusFilter, movements]);
 
-// Línea 70 (reemplaza la existente):
-const categories = Array.from(new Set(movements.map(m => m.category))); // Dinámico de datos, compatible con target < es2015
+  const categories = Array.from(new Set(movements.map(m => m.category)));
   const handleDateFilterChange = (from: string, to: string) => {
     setDateFrom(from);
     setDateTo(to);
@@ -78,16 +70,12 @@ const categories = Array.from(new Set(movements.map(m => m.category))); // Diná
     setStatusFilter(status);
   };
 
-  // Función simulada para editar movimiento (en backend: PUT /api/movements/:id)
   const handleEditMovement = (movement: FinancialMovement) => {
     console.log('Editando movimiento:', movement);
-    // Aquí abrir modal o navegar a edit page
   };
 
-  // Función simulada para generar factura (en backend: POST /api/invoices)
   const handleGenerateInvoice = () => {
     console.log('Generando nueva factura');
-    // Lógica para nueva factura
   };
 
   const renderMovementRow = (movement: FinancialMovement) => (
@@ -207,7 +195,6 @@ const categories = Array.from(new Set(movements.map(m => m.category))); // Diná
   return (
     <div className="container mx-auto px-4 py-8 min-h-screen">
       <div className="flex flex-col lg:flex-row gap-8">
-        {/* Sidebar */}
         <div className="lg:w-1/4">
           <FinancialSidebar
             activeFilter={activeFilter}
@@ -218,11 +205,9 @@ const categories = Array.from(new Set(movements.map(m => m.category))); // Diná
           />
         </div>
 
-        {/* Contenido Principal */}
         <div className="lg:w-3/4 bg-white rounded-xl shadow-lg p-8">
           <h1 className="text-3xl font-bold text-gray-800 mb-6">Gestión Financiera - {clubName}</h1>
           
-          {/* Tabs para Movimientos vs Facturación */}
           <div className="flex border-b border-gray-200 mb-6">
             <button
               onClick={() => setActiveTab('movimientos')}
@@ -251,7 +236,6 @@ const categories = Array.from(new Set(movements.map(m => m.category))); // Diná
               <h2 className="text-2xl font-semibold text-gray-800 mb-4">Historial de Movimientos</h2>
               <p className="text-gray-600 mb-6">Total movimientos filtrados: {filteredMovements.length}. Balance general: ${filteredMovements.reduce((sum, m) => sum + m.amount, 0).toLocaleString()} ARS.</p>
               
-              {/* Tabla de Movimientos */}
               <div className="overflow-x-auto mb-6">
                 <table className="min-w-full divide-y divide-gray-200">
                   <thead className="bg-gray-50">
@@ -261,7 +245,7 @@ const categories = Array.from(new Set(movements.map(m => m.category))); // Diná
                       <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Categoría</th>
                       <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tipo</th>
                       <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Monto</th>
-                                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Estado</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Estado</th>
                       <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Acciones</th>
                     </tr>
                   </thead>

@@ -1,4 +1,3 @@
-// FileName: src/components/entrepreneur/RatingDistribution.tsx
 interface RatingDistributionProps {
   reviews: { rating: number }[];
 }

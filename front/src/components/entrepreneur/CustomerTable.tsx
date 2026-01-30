@@ -1,4 +1,3 @@
-// FileName: src/components/entrepreneur/CustomerTable.tsx
 import React, { useState, useMemo } from 'react';
 import { User } from '../../types/user';
 

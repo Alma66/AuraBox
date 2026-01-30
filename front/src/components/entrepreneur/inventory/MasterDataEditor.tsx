@@ -4,8 +4,8 @@ import { Supplier, ProductCategory } from '../../../types/inventory';
 interface MasterDataEditorProps {
   suppliers: Supplier[];
   productCategories: ProductCategory[];
-  onAddSupplier: (supplier: Omit<Supplier, 'id'>) => void; // Ajustado el tipo
-  onEditSupplier: (supplier: Supplier) => void; // Ajustado el tipo
+  onAddSupplier: (supplier: Omit<Supplier, 'id'>) => void;
+  onEditSupplier: (supplier: Supplier) => void;
   onDeleteSupplier: (supplierId: string) => void;
   onAddCategory: (category: Omit<ProductCategory, 'id'>) => void;
   onEditCategory: (category: ProductCategory) => void;
@@ -22,23 +22,20 @@ const MasterDataEditor: React.FC<MasterDataEditorProps> = ({
   onEditCategory,
   onDeleteCategory,
 }) => {
-  // Supplier state
-  const [newSupplier, setNewSupplier] = useState<Omit<Supplier, 'id'>>({ // Ajustado el tipo
+  const [newSupplier, setNewSupplier] = useState<Omit<Supplier, 'id'>>({
     name: '',
     mail: '',
     phone: '',
     type: 'general',
   });
-  const [editingSupplier, setEditingSupplier] = useState<Supplier | null>(null); // Ajustado el tipo
+  const [editingSupplier, setEditingSupplier] = useState<Supplier | null>(null);
 
-  // Category state
   const [newCategory, setNewCategory] = useState<Omit<ProductCategory, 'id'>>({
     name: '',
     description: '',
   });
   const [editingCategory, setEditingCategory] = useState<ProductCategory | null>(null);
 
-  // Handlers for suppliers
   const handleAddSupplier = () => {
     if (!newSupplier.name.trim() || !newSupplier.mail.trim()) {
       alert('Nombre y mail son obligatorios');
@@ -59,7 +56,6 @@ const MasterDataEditor: React.FC<MasterDataEditorProps> = ({
     }
   };
 
-  // Handlers for categories
   const handleAddCategory = () => {
     if (!newCategory.name.trim()) {
       alert('El nombre de la categoría es obligatorio');
@@ -84,7 +80,6 @@ const MasterDataEditor: React.FC<MasterDataEditorProps> = ({
     <div className="bg-white rounded-lg shadow-md p-6 overflow-auto">
       <h2 className="text-2xl font-semibold text-gray-800 mb-6">Gestión de Datos Maestros</h2>
 
-      {/* Proveedores */}
       <section className="mb-10">
         <h3 className="text-xl font-medium text-gray-700 mb-4">Proveedores</h3>
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
@@ -160,8 +155,7 @@ const MasterDataEditor: React.FC<MasterDataEditorProps> = ({
             </button>
           )}
         </div>
-
-        <div className="overflow-x-auto">
+                <div className="overflow-x-auto">
           <table className="min-w-full divide-y divide-gray-200">
             <thead className="bg-gray-50">
               <tr>
@@ -217,7 +211,6 @@ const MasterDataEditor: React.FC<MasterDataEditorProps> = ({
         </div>
       </section>
 
-      {/* Categorías */}
       <section>
         <h3 className="text-xl font-medium text-gray-700 mb-4">Categorías de Productos</h3>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">

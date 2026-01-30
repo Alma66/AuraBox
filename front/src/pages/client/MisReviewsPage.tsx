@@ -1,4 +1,3 @@
-// src/pages/client/MisReviewsPage.tsx
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../App';
@@ -8,7 +7,6 @@ import ReviewCard from '../../components/client/ReviewCard';
 import { User } from '../../types/user';
 import { Club } from '../../types/club';
 
-// Type para Review (infiero de JSON, agrega a types/review.d.ts si quieres)
 interface Review {
   id: string;
   clubId: string;
@@ -26,7 +24,7 @@ const MisReviewsPage: React.FC = () => {
   const [reviews, setReviews] = useState<Review[]>([]);
   const [clubs, setClubs] = useState<Club[]>([]);
   const [loading, setLoading] = useState(true);
-  const [editingReview, setEditingReview] = useState<Review | null>(null); // Para modal simulado
+  const [editingReview, setEditingReview] = useState<Review | null>(null);
 
   useEffect(() => {
     if (!user) {
@@ -34,25 +32,19 @@ const MisReviewsPage: React.FC = () => {
       return;
     }
 
-    // Simula carga: Filtra reviews por userId
     const userReviews = (reviewsData as Review[]).filter(r => r.userId === user.id);
     setReviews(userReviews);
-
-    // Carga clubs para join
     setClubs(clubsData as Club[]);
-
     setLoading(false);
   }, [user, navigate]);
 
   const handleDelete = (reviewId: string) => {
     setReviews(prev => prev.filter(r => r.id !== reviewId));
-    // En real: DELETE /api/reviews/{reviewId}
   };
 
   const handleEdit = (review: Review) => {
     setEditingReview(review);
-    // En real: Abre modal con form para PATCH /api/reviews/{id}
-    alert(`Editando reseña: "${review.comment}"`); // Simulado simple
+    alert(`Editando reseña: "${review.comment}"`);
     setEditingReview(null);
   };
 
@@ -75,7 +67,6 @@ const MisReviewsPage: React.FC = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-blue-50 py-8 px-4">
       <div className="max-w-4xl mx-auto">
-        {/* Header */}
         <div className="text-center mb-8">
           <h1 className="text-4xl font-bold text-gray-800 mb-2">Mis Reseñas</h1>
           <p className="text-gray-600">
@@ -83,7 +74,6 @@ const MisReviewsPage: React.FC = () => {
           </p>
         </div>
 
-        {/* Lista de Reseñas */}
         {reviews.length === 0 ? (
           <div className="text-center py-12">
             <svg className="mx-auto h-24 w-24 text-gray-400 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -112,7 +102,6 @@ const MisReviewsPage: React.FC = () => {
           </div>
         )}
 
-        {/* Botón Volver */}
         <div className="mt-12 text-center">
           <button
             onClick={() => navigate('/profile')}

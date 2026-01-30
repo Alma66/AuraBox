@@ -1,11 +1,10 @@
-// FileName: src/components/entrepreneur/AdminToolsSidebar.tsx
 import React from 'react';
 import { Link } from 'react-router-dom';
 
 interface AdminToolsSidebarProps {
-  activeSection: string; // 'stats' | 'sales' | 'feedback'
+  activeSection: string;  'stats' | 'sales' | 'feedback'
   setActiveSection: (section: string) => void;
-  clubId: string; // Para generar links
+  clubId: string; 
 }
 
 const AdminToolsSidebar: React.FC<AdminToolsSidebarProps> = ({ activeSection, setActiveSection, clubId }) => {

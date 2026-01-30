@@ -16,10 +16,9 @@ const ManageClubImagesContent: React.FC<ManageClubImagesContentProps> = ({ activ
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>, callback: (url: string) => void) => {
     const file = e.target.files?.[0];
-    if (file && file.type.startsWith('image/') && file.size <= 5 * 1024 * 1024) { // Max 5MB
+    if (file && file.type.startsWith('image/') && file.size <= 5 * 1024 * 1024) { 
       const url = URL.createObjectURL(file);
       callback(url);
-      // En backend: FormData con file, POST a /api/clubs/:id/images
     } else {
       alert('Solo imágenes JPG/PNG menores a 5MB');
     }

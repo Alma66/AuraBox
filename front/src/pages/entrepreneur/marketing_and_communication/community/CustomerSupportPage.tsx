@@ -1,4 +1,3 @@
-// FileName: src/pages/entrepreneur/CustomerSupportPage.tsx
 import React, { useState, useEffect, useMemo } from 'react';
 import { useParams } from 'react-router-dom';
 import { useAuth } from '../../../../App';
@@ -6,13 +5,10 @@ import { User } from '../../../../types/user';
 import { Club } from '../../../../types/club';
 import { Subscription } from '../../../../types/subscription';
 
-// Importar datos simulados
 import usersData from '../../../../data/user.json';
 import clubsData from '../../../../data/clubs.json';
 import subscriptionsData from '../../../../data/subscriptions.json';
-import messagesData from '../../../../data/messages.json'; // Nuevo archivo de mensajes
-
-// Definir la interfaz para un mensaje (puede ser más detallada si es necesario)
+import messagesData from '../../../../data/messages.json';  
 interface Message {
   id: string;
   clubId: string;
@@ -40,17 +36,14 @@ const CustomerSupportPage: React.FC = () => {
 
   useEffect(() => {
     if (!isAuthenticated || userRole !== 'entrepreneur' || !clubId || currentEntrepreneur?.managedClubId !== clubId) {
-      // Redirigir o mostrar error si el usuario no es el emprendedor correcto para este club
       return;
     }
 
-    // Simular carga de mensajes para el club del emprendedor
     const clubMessages = (messagesData as Message[]).filter(msg => msg.clubId === clubId);
     setMessages(clubMessages);
     setFilteredMessages(clubMessages);
   }, [isAuthenticated, userRole, clubId, currentEntrepreneur]);
 
-  // Aplicar filtros
   useEffect(() => {
     let tempMessages = messages;
 
@@ -83,7 +76,6 @@ const CustomerSupportPage: React.FC = () => {
 
   const handleMessageClick = (message: Message) => {
     setSelectedMessage(message);
-    // Marcar como leído si es 'new'
     if (message.status === 'new') {
       setMessages(prevMessages =>
         prevMessages.map(msg => (msg.id === message.id ? { ...msg, status: 'read' } : msg))
@@ -94,7 +86,7 @@ const CustomerSupportPage: React.FC = () => {
   const handleReply = () => {
     if (selectedMessage && replyText.trim()) {
       const newReply = {
-        sender: 'entrepreneur', // O el nombre del emprendedor
+        sender: 'entrepreneur',
         message: replyText.trim(),
         timestamp: new Date().toISOString(),
       };
@@ -127,7 +119,6 @@ const CustomerSupportPage: React.FC = () => {
 
   return (
     <div className="container mx-auto p-4 sm:p-6 lg:p-8 flex flex-col lg:flex-row gap-6">
-      {/* Panel de lista de mensajes */}
       <div className="lg:w-1/3 bg-white shadow-md rounded-lg p-6">
         <h2 className="text-2xl font-bold text-gray-800 mb-4">Atención al Cliente de {managedClub.name}</h2>
 
@@ -189,7 +180,6 @@ const CustomerSupportPage: React.FC = () => {
         </div>
       </div>
 
-      {/* Panel de detalle del mensaje y chat */}
       <div className="lg:w-2/3 bg-white shadow-md rounded-lg p-6">
         {selectedMessage ? (
           <>
@@ -223,7 +213,6 @@ const CustomerSupportPage: React.FC = () => {
               </div>
             </div>
 
-            {/* Conversación */}
             <div className="space-y-4 max-h-[400px] overflow-y-auto mb-4 pr-2">
               {selectedMessage.conversation.map((msg, index) => (
                 <div
@@ -252,7 +241,6 @@ const CustomerSupportPage: React.FC = () => {
               ))}
             </div>
 
-            {/* Área de respuesta */}
             <div className="border-t pt-4">
               <textarea
                 className="w-full p-3 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500 mb-3"

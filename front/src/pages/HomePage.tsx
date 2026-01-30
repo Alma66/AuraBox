@@ -1,28 +1,16 @@
-// React
 import React from 'react';
-
-// Componentes personalizados
 import ClubCard from '../components/club/ClubCard';
 import HeroBanner from '../components/shared/HeroBanner';
 import AlternatingContent from '../components/shared/AlternatingContent';
 import TestimonialCard from '../components/shared/TestimonialCard';
 import HowItWorks from '../components/shared/HowItWorks';
-
-// Datos de clubes
 import clubsData from '../data/clubs.json';
-
-// React Router
 import { Link } from 'react-router-dom';
-
-// Slider y estilos
 import Slider from 'react-slick';
 import 'slick-carousel/slick/slick.css';
 import 'slick-carousel/slick/slick-theme.css';
-
-// Tipos
 import { Club } from '../types/club';
 
-// Datos de testimonios
 const testimonialsData = [
   {
     id: 't1',
@@ -54,16 +42,13 @@ const testimonialsData = [
   },
 ];
 
-// Componente principal de la página de inicio
 const HomePage: React.FC = () => {
   const typedClubsData: Club[] = clubsData as Club[];
 
-  // Preparación de clubes para carrusel
   const allClubsForCarousel = typedClubsData.length < 4
     ? [...typedClubsData, ...typedClubsData, ...typedClubsData]
     : typedClubsData;
 
-  // Configuración del carrusel de clubes
   const clubCarouselSettings = {
     dots: true,
     infinite: true,
@@ -80,7 +65,6 @@ const HomePage: React.FC = () => {
     ]
   };
 
-  // Configuración del carrusel de testimonios
   const testimonialCarouselSettings = {
     dots: true,
     infinite: true,
@@ -98,7 +82,6 @@ const HomePage: React.FC = () => {
 
   return (
     <div className="min-h-screen flex flex-col">
-      {/* Banner principal */}
       <HeroBanner
         title="Descubre la Magia de los Clubes de Suscripción en Argentina"
         subtitle="Experiencias únicas, curadas con pasión, entregadas en tu puerta."
@@ -108,7 +91,6 @@ const HomePage: React.FC = () => {
       />
 
       <div className="container mx-auto px-4 py-8 flex-grow">
-        {/* Sección de clubes destacados */}
         <section className="mb-16">
           <h2 className="text-4xl font-bold text-gray-800 mb-10 text-center animate-fadeInUp">Clubes Destacados</h2>
           <Slider {...clubCarouselSettings}>
@@ -130,7 +112,6 @@ const HomePage: React.FC = () => {
           </Slider>
         </section>
 
-        {/* Sección de contenido alternado */}
         <section className="mb-16">
           <AlternatingContent
             title="Experiencias Curadas, Directo a Tu Puerta"
@@ -148,12 +129,10 @@ const HomePage: React.FC = () => {
           />
         </section>
 
-        {/* Sección de cómo funciona */}
         <section className="mb-16">
           <HowItWorks />
         </section>
 
-        {/* Sección de testimonios */}
         <section className="mb-16 bg-gradient-to-r from-blue-50 to-purple-50 py-16 rounded-xl shadow-inner">
           <h2 className="text-4xl font-bold text-gray-800 mb-12 text-center animate-fadeInUp">Lo que dicen nuestros usuarios</h2>
           <Slider {...testimonialCarouselSettings}>
@@ -170,7 +149,6 @@ const HomePage: React.FC = () => {
           </Slider>
         </section>
 
-        {/* Sección para emprendedores */}
         <section className="text-center py-16 bg-blue-600 text-white rounded-lg shadow-xl transform transition-all duration-500 hover:scale-[1.01] hover:shadow-2xl">
           <h2 className="text-4xl font-bold mb-4 animate-pulse-subtle">¿Eres un emprendedor?</h2>
           <p className="text-xl mb-8 max-w-3xl mx-auto opacity-0 animate-fadeInUp delay-200">

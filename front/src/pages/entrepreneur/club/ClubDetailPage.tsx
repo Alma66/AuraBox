@@ -1,4 +1,3 @@
-// src/pages/club/ClubDetailPage.tsx
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import Slider from 'react-slick';
@@ -92,7 +91,6 @@ const ClubDetailPage: React.FC<{ userRole: UserRole | null }> = ({ userRole }) =
     setIsEditing(false);
   };
 
-  // Función para convertir array de secciones a texto plano para textarea
   const sectionsToText = (sections?: LegalSection[]) =>
     sections
       ? sections
@@ -100,7 +98,6 @@ const ClubDetailPage: React.FC<{ userRole: UserRole | null }> = ({ userRole }) =
           .join('\n\n')
       : '';
 
-  // Función para convertir texto plano a array de párrafos (secciones)
   const textToSections = (text: string, prefix: string): LegalSection[] =>
     text.split('\n\n').map((p, i) => ({
       id: `${prefix}-${i}`,
@@ -110,7 +107,6 @@ const ClubDetailPage: React.FC<{ userRole: UserRole | null }> = ({ userRole }) =
 
   return (
     <div className="bg-gray-50 min-h-screen">
-      {/* Banner y encabezado */}
       <div className="relative h-64 md:h-96 overflow-hidden shadow-lg animate-fadeIn">
         {club.bannerImages && club.bannerImages.length > 0 ? (
           <Slider {...bannerSliderSettings}>
@@ -196,7 +192,6 @@ const ClubDetailPage: React.FC<{ userRole: UserRole | null }> = ({ userRole }) =
           Volver
         </button>
 
-        {/* Sobre Nosotros */}
         <div className="bg-white rounded-xl shadow-lg p-8 mb-8 animate-fadeInUp">
           <div className="flex justify-between items-center mb-6">
             <span className="inline-block bg-purple-100 text-purple-800 text-sm font-semibold px-3 py-1 rounded-full animate-pulse-subtle">
@@ -249,52 +244,48 @@ const ClubDetailPage: React.FC<{ userRole: UserRole | null }> = ({ userRole }) =
           {club.socialMedia && <ClubSocialMedia socialMedia={club.socialMedia} />}
         </div>
 
-        {/* Planes de Suscripción */}
         {club.subscriptionPlans && club.subscriptionPlans.length > 0 && (
-  <div className="mb-12 animate-fadeInUp delay-200">
-    <h2 className="text-3xl font-bold text-gray-800 mb-6 text-center">Nuestros Planes de Suscripción</h2>
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-      {club.subscriptionPlans.map(plan => {
-        // Mapea plan para cumplir con el tipo esperado por SubscriptionPlanCard
-        const planForCard: SubscriptionPlanCardType = {
-          planId: plan.planId,
-          name: plan.name,
-          price: plan.price,
-          currency: plan.currency,
-          description: plan.description,
-          image: plan.image || '/assets/default-plan.jpg', // image obligatorio
-          deliveryFrequency: plan.deliveryFrequency || '',
-          includes: plan.includes || [],
-          shippingAreas: plan.shippingAreas || '',
-          specifications: plan.specifications || [],
-        };
-        return (
-          <SubscriptionPlanCard
-            key={plan.planId}
-            plan={planForCard}
-            clubName={club.name}
-            detailsLink={`/club/${club.id}/plan/${plan.planId}`}
-          />
-        );
-      })}
-    </div>
-  </div>
+          <div className="mb-12 animate-fadeInUp delay-200">
+            <h2 className="text-3xl font-bold text-gray-800 mb-6 text-center">Nuestros Planes de Suscripción</h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {club.subscriptionPlans.map(plan => {
+                const planForCard: SubscriptionPlanCardType = {
+                  planId: plan.planId,
+                  name: plan.name,
+                  price: plan.price,
+                  currency: plan.currency,
+                  description: plan.description,
+                  image: plan.image || '/assets/default-plan.jpg',
+                  deliveryFrequency: plan.deliveryFrequency || '',
+                  includes: plan.includes || [],
+                  shippingAreas: plan.shippingAreas || '',
+                  specifications: plan.specifications || [],
+                };
+                return (
+                  <SubscriptionPlanCard
+                    key={plan.planId}
+                    plan={planForCard}
+                    clubName={club.name}
+                    detailsLink={`/club/${club.id}/plan/${plan.planId}`}
+                  />
+                );
+              })}
+            </div>
+          </div>
         )}
-        {/* Métodos de pago y envío */}
+
         {(club.paymentMethods || club.shippingInfo) && (
           <div className="mb-12 animate-fadeInUp delay-300">
             <ClubPaymentShippingInfo paymentMethods={club.paymentMethods} shippingInfo={club.shippingInfo} />
           </div>
         )}
 
-        {/* Reseñas destacadas */}
         {club.featuredReviews && club.featuredReviews.length > 0 && (
           <div className="mb-12 animate-fadeInUp delay-400">
             <ClubFeaturedReviews reviews={club.featuredReviews} clubName={club.name} clubId={club.id} />
           </div>
         )}
 
-        {/* Edición de contenido legal para emprendedores */}
         {isEditing && isOwner && (
           <div className="bg-white rounded-xl shadow-lg p-8 mb-8 animate-fadeInUp">
             <h2 className="text-2xl font-bold text-gray-800 mb-4">Editar Términos y Condiciones</h2>
@@ -314,14 +305,12 @@ const ClubDetailPage: React.FC<{ userRole: UserRole | null }> = ({ userRole }) =
           </div>
         )}
 
-        {/* Enlaces legales visibles para todos */}
         {(club.legalInfo?.termsAndConditionsSections?.length || club.legalInfo?.privacyAndSecurityPolicySections?.length) && (
           <div className="animate-fadeInUp delay-500">
             <ClubLegalInfo legalInfo={club.legalInfo} clubId={club.id} />
           </div>
         )}
 
-        {/* Botones guardar/cancelar */}
         {isEditing && isOwner && (
           <div className="flex space-x-4 mt-6">
             <button onClick={handleSave} className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700">

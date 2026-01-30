@@ -1,4 +1,3 @@
-// FileName: src/pages/entrepreneur/ModerateReviewsPage.tsx
 import React, { useState, useEffect, useMemo } from 'react';
 import { useParams } from 'react-router-dom';
 import { useAuth } from '../../../../App';
@@ -6,15 +5,12 @@ import { User } from '../../../../types/user';
 import { Club } from '../../../../types/club';
 import { Subscription } from '../../../../types/subscription';
 
-// Importar datos simulados
 import usersData from '../../../../data/user.json';
 import clubsData from '../../../../data/clubs.json';
 import subscriptionsData from '../../../../data/subscriptions.json';
-// Tipar explícitamente reviewsData para evitar inferencia de 'any'
 import reviewsDataRaw from '../../../../data/reviews.json';
 const reviewsData = reviewsDataRaw as Review[];
 
-// Definir la interfaz para una reseña (puede ser más detallada si es necesario)
 interface Review {
   id: string;
   clubId: string;
@@ -38,29 +34,26 @@ const ModerateReviewsPage: React.FC = () => {
   const [showBlockedOnly, setShowBlockedOnly] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [filterStatus, setFilterStatus] = useState<'all' | 'pending' | 'approved' | 'blocked'>('all');
-  const [filterSubscription, setFilterSubscription] = useState<string>('all'); // Para filtrar por suscripción
-  const [filterDate, setFilterDate] = useState<string>(''); // Para filtrar por fecha
+  const [filterSubscription, setFilterSubscription] = useState<string>('all');
+  const [filterDate, setFilterDate] = useState<string>('');
 
   const currentEntrepreneur = user as User;
   const managedClub = clubsData.find(c => c.id === currentEntrepreneur?.managedClubId) as Club;
 
   useEffect(() => {
     if (!isAuthenticated || userRole !== 'entrepreneur' || !clubId || currentEntrepreneur?.managedClubId !== clubId) {
-      // Redirigir o mostrar error si el usuario no es el emprendedor correcto para este club
       return;
     }
 
-    // Simular carga de reseñas para el club del emprendedor
     const clubReviews = reviewsData.filter(review => review.clubId === clubId);
 
-    // Lógica para detectar malas palabras y marcar isBlockedBySystem
     const reviewsWithSystemBlock: Review[] = clubReviews.map(review => {
       const lowerCaseComment = review.comment.toLowerCase();
       const containsBadWord = BAD_WORDS_ES_AR.some(word => lowerCaseComment.includes(word));
       return {
         ...review,
         isBlockedBySystem: containsBadWord,
-        status: containsBadWord ? 'pending' as const : review.status // Cast explícito para literal
+        status: containsBadWord ? 'pending' as const : review.status
       };
     });
 
@@ -68,12 +61,10 @@ const ModerateReviewsPage: React.FC = () => {
     setFilteredReviews(reviewsWithSystemBlock);
   }, [isAuthenticated, userRole, clubId, currentEntrepreneur]);
 
-  // Obtener todas las suscripciones para el filtro
   const clubSubscriptions = useMemo(() => {
     return (subscriptionsData as Subscription[]).filter(sub => sub.clubId === clubId);
   }, [clubId]);
 
-  // Aplicar filtros
   useEffect(() => {
     let tempReviews = reviews;
 
@@ -118,7 +109,7 @@ const ModerateReviewsPage: React.FC = () => {
           }
         }
         return review;
-      }).filter(review => action !== 'delete' || review.id !== reviewId) as Review[]; // Cast explícito para el filter
+      }).filter(review => action !== 'delete' || review.id !== reviewId) as Review[];
       return updatedReviews;
     });
   };

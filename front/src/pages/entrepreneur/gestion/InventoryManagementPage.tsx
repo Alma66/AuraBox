@@ -6,21 +6,18 @@ import PackagingInventoryTable from '../../../components/entrepreneur/inventory/
 import MasterDataEditor from '../../../components/entrepreneur/inventory/MasterDataEditor';
 import { useAuth } from '../../../App';
 import inventoryData from '../../../data/inventory.json';
-import { InventoryData, Product, Packaging, Supplier, ProductCategory } from '../../../types/inventory'; // Asegúrate de importar todo lo necesario
-
+import { InventoryData, Product, Packaging, Supplier, ProductCategory } from '../../../types/inventory';
 const InventoryManagementPage: React.FC = () => {
   const { user, userRole, isAuthenticated } = useAuth();
   const navigate = useNavigate();
   const [activeSection, setActiveSection] = useState<string>('product-inventory');
-  const [currentInventoryData, setCurrentInventoryData] = useState<InventoryData>(inventoryData as InventoryData); // El 'as InventoryData' debería funcionar correctamente ahora con la interfaz actualizada
-
+  const [currentInventoryData, setCurrentInventoryData] = useState<InventoryData>(inventoryData as InventoryData); 
   useEffect(() => {
     if (!isAuthenticated || userRole !== 'entrepreneur') {
       navigate('/login');
     }
   }, [isAuthenticated, userRole, navigate]);
 
-  // CRUD handlers for products
   const handleAddProduct = (newProduct: Omit<Product, 'id'>) => {
     const id = `prod${currentInventoryData.products.length + 1}`;
     setCurrentInventoryData(prev => ({
@@ -43,7 +40,6 @@ const InventoryManagementPage: React.FC = () => {
     }));
   };
 
-  // CRUD handlers for packaging
   const handleAddPackaging = (newPackaging: Omit<Packaging, 'id'>) => {
     const id = `pack${currentInventoryData.packaging.length + 1}`;
     setCurrentInventoryData(prev => ({
@@ -66,8 +62,7 @@ const InventoryManagementPage: React.FC = () => {
     }));
   };
 
-  // CRUD handlers for suppliers
-  const handleAddSupplier = (newSupplier: Omit<Supplier, 'id'>) => { // Tipo ajustado
+  const handleAddSupplier = (newSupplier: Omit<Supplier, 'id'>) => { 
     const id = `sup${currentInventoryData.suppliers.length + 1}`;
     setCurrentInventoryData(prev => ({
       ...prev,
@@ -75,7 +70,7 @@ const InventoryManagementPage: React.FC = () => {
     }));
   };
 
-  const handleEditSupplier = (updatedSupplier: Supplier) => { // Tipo ajustado
+  const handleEditSupplier = (updatedSupplier: Supplier) => { 3
     setCurrentInventoryData(prev => ({
       ...prev,
       suppliers: prev.suppliers.map(s => s.id === updatedSupplier.id ? updatedSupplier : s)
@@ -89,7 +84,6 @@ const InventoryManagementPage: React.FC = () => {
     }));
   };
 
-  // CRUD handlers for product categories
   const handleAddCategory = (newCategory: Omit<ProductCategory, 'id'>) => {
     const id = `cat${currentInventoryData.productCategories.length + 1}`;
     setCurrentInventoryData(prev => ({
@@ -120,12 +114,10 @@ const InventoryManagementPage: React.FC = () => {
     <div className="container mx-auto px-4 py-8 min-h-screen">
       <h1 className="text-4xl font-bold text-gray-800 mb-8 text-center">Gestión de Inventario</h1>
       <div className="flex flex-col lg:flex-row gap-8">
-        {/* Sidebar ajustado para estar más cerca del borde */}
         <div className="lg:w-1/5 pl-2">
           <InventorySidebar activeSection={activeSection} setActiveSection={setActiveSection} />
         </div>
 
-        {/* Contenido principal con tablas más anchas */}
         <div className="lg:w-4/5 bg-white rounded-xl shadow-lg p-8 overflow-auto">
           {activeSection === 'product-inventory' && (
             <ProductInventoryTable

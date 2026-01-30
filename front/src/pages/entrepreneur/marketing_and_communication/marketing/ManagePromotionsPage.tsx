@@ -30,7 +30,6 @@ const ManagePromotionsPage: React.FC = () => {
 
   const updateClub = (updatedClub: Club) => {
     setClub(updatedClub);
-    // En backend: PUT /api/clubs/:id
   };
 
   return (

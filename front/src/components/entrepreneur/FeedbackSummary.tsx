@@ -1,4 +1,3 @@
-// FileName: src/components/entrepreneur/FeedbackSummary.tsx
 import React from 'react';
 import { Club } from '../../types/club';
 

@@ -1,6 +1,6 @@
 import React from 'react';
 import { Navigate } from 'react-router-dom';
-import { UserRole } from '../../types/user'; // Ajusta la ruta según tu estructura
+import { UserRole } from '../../types/user';
 
 interface PrivateRouteProps {
   isAuthenticated: boolean;

@@ -1,21 +1,17 @@
-// src/components/entrepreneur/SubscriptionCard.tsx
 import React from 'react';
 import SubscriptionCardForEntrepreneur from './SubscriptionCardForEntrepreneur';
 import { Subscription } from '../../types/subscription';
 import { Club, SubscriptionPlan } from '../../types/club';
 import { User } from '../../types/user';
 
-// Props para compatibilidad (ajustadas al componente real)
 interface SubscriptionCardProps {
   subscription: Subscription;
-  client?: User; // Alias para customer
+  client?: User;
   plan?: SubscriptionPlan;
-  clubName?: string; // Alias para club.name
+  clubName?: string;
 }
 
-// Wrapper simple para mapear props antiguas al componente real
 const SubscriptionCard: React.FC<SubscriptionCardProps> = ({ subscription, client, plan, clubName }) => {
-  // Dummy club si no se pasa (usa solo el nombre para demo)
   const dummyClub: Club = {
     id: 'dummy',
     name: clubName || 'Tu Club',
@@ -39,7 +35,6 @@ const SubscriptionCard: React.FC<SubscriptionCardProps> = ({ subscription, clien
     creationDate: '',
     totalSubscribers: 0,
     monthlyBoxesSent: 0,
-    // Campos opcionales vacíos
   };
 
   return (

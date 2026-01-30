@@ -1,4 +1,3 @@
-// src/pages/client/CheckoutPage.tsx
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../App';
@@ -15,7 +14,6 @@ const CheckoutPage: React.FC = () => {
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Estados para formulario de domicilio (pre-llenado simulado)
   const [address, setAddress] = useState({
     street: '',
     streetNumber: '',
@@ -26,17 +24,14 @@ const CheckoutPage: React.FC = () => {
     instructions: ''
   });
 
-  // Estado para método de pago
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<string>('mercadopago');
 
-  // Opciones de pago simuladas (de clubs.json o genéricas)
   const paymentMethods = [
     { id: 'mercadopago', label: 'MercadoPago (Tarjeta/Débito)', icon: '💳' },
     { id: 'tarjeta', label: 'Tarjeta de Crédito/Débito', icon: '💳' },
     { id: 'transferencia', label: 'Transferencia Bancaria', icon: '🏦' }
   ];
 
-  // Carga inicial de carrito simulado
   useEffect(() => {
     if (!user) {
       setError('Debes iniciar sesión para continuar.');
@@ -44,18 +39,16 @@ const CheckoutPage: React.FC = () => {
       return;
     }
 
-    // Pre-llena domicilio con datos del usuario (de user.json simulado)
     setAddress({
       street: user.street || 'Av. Santa Fe',
       streetNumber: user.streetNumber || '1234',
       locality: user.locality || 'Palermo',
       city: user.city || 'Buenos Aires',
       postalCode: user.postalCode || '1425',
-      province: user.country || 'Buenos Aires', // Asumiendo province = country para simulación
+      province: user.country || 'Buenos Aires',
       instructions: ''
     });
 
-    // Inicializa carrito con planes simulados (ej. 2 items)
     const simulatedCart = (clubPlansData as SubscriptionPlan[]).slice(0, 2);
     setCartItems(simulatedCart);
     setLoading(false);
@@ -68,7 +61,6 @@ const CheckoutPage: React.FC = () => {
   const handleAddressChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     setAddress(prev => ({ ...prev, [name]: value }));
-    // En real: Validación más robusta (ej. postalCode formato AR)
     if (name === 'postalCode' && !/^\d{4}$/.test(value)) {
       setError('El código postal debe tener 4 dígitos.');
     } else {
@@ -86,20 +78,15 @@ const CheckoutPage: React.FC = () => {
     setIsProcessing(true);
     setError(null);
 
-    // Simula procesamiento de pago (delay 2s)
     await new Promise(resolve => setTimeout(resolve, 2000));
 
-    // Simula éxito
     setSuccess(true);
     setIsProcessing(false);
-    setCartItems([]); // Limpia carrito local
-
-    // En real: POST /api/orders con { cartItems, address, paymentMethod }
-    // Integrar MercadoPago: window.MercadoPago.processPayment(...)
+    setCartItems([]);
   };
 
   const subtotal = cartItems.reduce((sum, item) => sum + item.price, 0);
-  const shipping = 0; // Gratis
+  const shipping = 0;
   const total = subtotal + shipping;
 
   if (loading) {
@@ -134,7 +121,6 @@ const CheckoutPage: React.FC = () => {
     return (
       <div className="min-h-screen bg-gradient-to-br from-green-50 via-white to-blue-50 py-8 px-4">
         <div className="max-w-4xl mx-auto text-center py-12">
-          {/* Simula confetti con CSS animation */}
           <div className="animate-bounce text-green-600 mb-4">🎉</div>
           <h1 className="text-4xl font-bold text-gray-800 mb-4">¡Pago Realizado Exitosamente!</h1>
           <p className="text-gray-600 mb-8 max-w-md mx-auto">
@@ -162,14 +148,12 @@ const CheckoutPage: React.FC = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-blue-50 py-8 px-4">
       <div className="max-w-6xl mx-auto">
-        {/* Header */}
         <div className="text-center mb-8">
           <h1 className="text-4xl font-bold text-gray-800 mb-2">Finalizar Compra</h1>
           <p className="text-gray-600">Revisa tu información y realiza el pago seguro.</p>
         </div>
 
         <form onSubmit={handlePaymentSubmit} className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Resumen del Carrito */}
           <div className="lg:col-span-1 space-y-6">
             <div className="bg-white rounded-xl shadow-md p-6">
               <h2 className="text-xl font-bold text-gray-800 mb-4">Resumen de tu Orden</h2>
@@ -202,7 +186,6 @@ const CheckoutPage: React.FC = () => {
               </div>
             </div>
 
-            {/* Métodos de Pago */}
             <div className="bg-white rounded-xl shadow-md p-6">
               <h3 className="text-lg font-bold text-gray-800 mb-4">Método de Pago</h3>
               <div className="space-y-3">
@@ -226,7 +209,6 @@ const CheckoutPage: React.FC = () => {
             </div>
           </div>
 
-          {/* Formulario de Domicilio */}
           <div className="lg:col-span-2">
             <div className="bg-white rounded-xl shadow-md p-6">
               <h3 className="text-lg font-bold text-gray-800 mb-4">Verificar Dirección de Envío</h3>
@@ -302,7 +284,6 @@ const CheckoutPage: React.FC = () => {
           </div>
         </form>
 
-        {/* Botón de Pago (fuera del form para sticky si quieres, pero aquí simple) */}
         {!success && !loading && (
           <div className="mt-8 text-center">
             <button

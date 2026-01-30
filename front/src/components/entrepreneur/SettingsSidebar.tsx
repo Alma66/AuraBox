@@ -1,4 +1,3 @@
-// FileName: /components/entrepreneur/SettingsSidebar.tsx
 import React from 'react';
 
 interface SettingsSidebarProps {

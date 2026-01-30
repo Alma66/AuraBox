@@ -1,4 +1,3 @@
-// FileName: /pages/entrepreneur/GeneralSettingsPage.tsx
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { useAuth } from '../../../../../App';
@@ -18,11 +17,9 @@ const GeneralSettingsPage: React.FC = () => {
   const [activeSection, setActiveSection] = useState('finances');
   const [editedSettings, setEditedSettings] = useState<Record<string, any>>({});
 
-  // Cargar datos (simulado; en backend: fetch(`/api/clubs/${actualClubId}/settings`))
   useEffect(() => {
     const data = (generalSettingsData as any)[actualClubId] || generalSettingsData['club-1'];
-    
-    // Transformar los datos del JSON para que coincidan con la estructura de GeneralSetting[]
+
     const transformedSettings: Record<string, GeneralSetting[]> = {};
     for (const category in data) {
       if (Object.prototype.hasOwnProperty.call(data, category)) {
@@ -35,7 +32,6 @@ const GeneralSettingsPage: React.FC = () => {
     }
     setSettings(transformedSettings);
 
-    // Inicializar edited con valores actuales
     const initialEdited: Record<string, any> = {};
     for (const category in data) {
       if (Object.prototype.hasOwnProperty.call(data, category)) {
@@ -55,9 +51,7 @@ const GeneralSettingsPage: React.FC = () => {
 
   const handleSaveSection = () => {
     console.log('Guardando ajustes de', activeSection, editedSettings);
-    // En backend: PUT /api/clubs/:clubId/settings
     alert('Ajustes guardados exitosamente (simulado)');
-    // Actualizar settings local para reflejar cambios
     setSettings(prev => {
       const newSettings = { ...prev };
       if (newSettings[activeSection]) {
@@ -105,8 +99,8 @@ const GeneralSettingsPage: React.FC = () => {
           <p className="text-xs text-gray-500 mt-1">Valor actual: {Array.isArray(setting.value) ? setting.value.join(', ') : setting.value?.toString()}</p>
         </div>
       ))}
-      <button 
-        onClick={handleSaveSection} 
+      <button
+        onClick={handleSaveSection}
         className="bg-blue-600 text-white px-6 py-2 rounded-md hover:bg-blue-700 transition-colors duration-200"
       >
         Guardar Ajustes Financieros
@@ -149,8 +143,8 @@ const GeneralSettingsPage: React.FC = () => {
           <p className="text-xs text-gray-500 mt-1">Valor actual: {setting.value?.toString()}</p>
         </div>
       ))}
-      <button 
-        onClick={handleSaveSection} 
+      <button
+        onClick={handleSaveSection}
         className="bg-blue-600 text-white px-6 py-2 rounded-md hover:bg-blue-700 transition-colors duration-200"
       >
         Guardar Ajustes de Equipo
@@ -175,8 +169,8 @@ const GeneralSettingsPage: React.FC = () => {
           <p className="text-xs text-gray-500">Estado actual: {editedSettings[setting.key] ? 'Activado' : 'Desactivado'}</p>
         </div>
       ))}
-      <button 
-        onClick={handleSaveSection} 
+      <button
+        onClick={handleSaveSection}
         className="bg-blue-600 text-white px-6 py-2 rounded-md hover:bg-blue-700 transition-colors duration-200"
       >
         Guardar Ajustes de Notificaciones
@@ -196,12 +190,10 @@ const GeneralSettingsPage: React.FC = () => {
   return (
     <div className="container mx-auto px-4 py-8 min-h-screen">
       <div className="flex flex-col lg:flex-row gap-8">
-        {/* Sidebar */}
         <div className="lg:w-1/4">
           <SettingsSidebar activeSection={activeSection} setActiveSection={setActiveSection} />
         </div>
 
-        {/* Contenido Principal */}
         <div className="lg:w-3/4 bg-white rounded-xl shadow-lg p-8">
           <h1 className="text-3xl font-bold text-gray-800 mb-6">Ajustes Generales - {clubName}</h1>
           <p className="text-gray-600 mb-6">Configura parámetros de finanzas, equipo y notificaciones para tu club.</p>

@@ -1,10 +1,9 @@
-// FileName: /components/entrepreneur/EntrepreneurProfileContent.tsx
 import React, { useState, useEffect } from 'react';
 import { User } from '../../types/user';
 import EditProfileField from '../common/EditProfileField';
 import EditGenderField from '../common/EditGenderField';
 import SecuritySection from '../common/SecuritySection';
-import LocationSection from '../common/LocationSection'; // Reutilizamos el componente LocationSection
+import LocationSection from '../common/LocationSection';
 import EditPhoneField from '../common/EditPhoneField';
 import SettingsSection from '../common/SettingsSection';
 
@@ -25,7 +24,6 @@ interface EntrepreneurProfileContentProps {
 }
 
 const EntrepreneurProfileContent: React.FC<EntrepreneurProfileContentProps> = ({ activeSection, user }) => {
-  // Estados para edición de Mi Perfil
   const [isEditingName, setIsEditingName] = useState(false);
   const [editedFirstName, setEditedFirstName] = useState(user.firstName || '');
   const [editedLastName, setEditedLastName] = useState(user.lastName || '');
@@ -34,7 +32,6 @@ const EntrepreneurProfileContent: React.FC<EntrepreneurProfileContentProps> = ({
   const [isEditingBirthDate, setIsEditingBirthDate] = useState(false);
   const [editedBirthDate, setEditedBirthDate] = useState(user.birthDate || '');
 
-  // Estados para información del negocio
   const [isEditingLegalName, setIsEditingLegalName] = useState(false);
   const [editedLegalName, setEditedLegalName] = useState(user.legalName || '');
   const [isEditingTaxId, setIsEditingTaxId] = useState(false);
@@ -44,7 +41,6 @@ const EntrepreneurProfileContent: React.FC<EntrepreneurProfileContentProps> = ({
   const [isEditingBusinessDetails, setIsEditingBusinessDetails] = useState(false);
   const [editedBusinessDetails, setEditedBusinessDetails] = useState(user.businessDetails || '');
 
-  // Estados para contenido sensible en Mi Perfil
   const [showSensitiveProfileInfo, setShowSensitiveProfileInfo] = useState(false);
   const [profilePassword, setProfilePassword] = useState('');
   const [profilePasswordError, setProfilePasswordError] = useState('');
@@ -58,41 +54,35 @@ const EntrepreneurProfileContent: React.FC<EntrepreneurProfileContentProps> = ({
     setEditedTaxId(user.taxId || '');
     setEditedBusinessAddress(user.businessAddress || '');
     setEditedBusinessDetails(user.businessDetails || '');
-    setShowSensitiveProfileInfo(false); // Resetear al cambiar de sección
-    setProfilePassword(''); // Resetear contraseña
-    setProfilePasswordError(''); // Resetear error
+    setShowSensitiveProfileInfo(false);
+    setProfilePassword('');
+    setProfilePasswordError('');
   }, [user, activeSection]);
 
-  // Guardar cambios simulados
   const handleSaveName = () => {
     const newFirstName = editedFirstName.trim();
     const newLastName = editedLastName.trim();
     console.log('Nombre y Apellido de emprendedor guardados:', newFirstName, newLastName);
-    // Aquí iría la llamada a la API para actualizar el usuario
     setIsEditingName(false);
   };
 
   const handleSaveGender = (newGender: string) => {
     console.log('Género de emprendedor guardado:', newGender);
     setEditedGender(newGender);
-    // Aquí iría la llamada a la API para actualizar el usuario
     setIsEditingGender(false);
   };
 
   const handleSaveBirthDate = () => {
     console.log('Fecha de Nacimiento de emprendedor guardada:', editedBirthDate);
-    // Aquí iría la llamada a la API para actualizar el usuario
     setIsEditingBirthDate(false);
   };
 
   const handleSavePhoneNumber = (newNumber: string) => {
     console.log('Número de teléfono de emprendedor guardado:', newNumber);
-    // Aquí iría la llamada a la API para actualizar el usuario
   };
 
   const handleSaveBusinessInfo = (field: string, value: string) => {
     console.log(`Información de negocio (${field}) guardada:`, value);
-    // Aquí iría la llamada a la API para actualizar el usuario
     switch (field) {
       case 'legalName':
         setIsEditingLegalName(false);
@@ -111,11 +101,10 @@ const EntrepreneurProfileContent: React.FC<EntrepreneurProfileContentProps> = ({
 
   const handleSaveLocation = (locationData: LocationData) => {
     console.log('Ubicación del negocio guardada:', locationData);
-    // Aquí iría la llamada a la API para actualizar el usuario
   };
 
   const handleProfilePasswordCheck = () => {
-    if (profilePassword === 'password123') { // Contraseña de simulación
+    if (profilePassword === 'password123') {
       setShowSensitiveProfileInfo(true);
       setProfilePasswordError('');
     } else {
@@ -134,7 +123,6 @@ const EntrepreneurProfileContent: React.FC<EntrepreneurProfileContentProps> = ({
           <div>
             <h2 className="text-2xl font-bold text-gray-800 mb-4">Mi Perfil Personal</h2>
             <div className="space-y-4">
-              {/* Nombre y Apellido */}
               <EditProfileField
                 label="Nombre y Apellido"
                 value={`${editedFirstName} ${editedLastName}`}
@@ -174,7 +162,6 @@ const EntrepreneurProfileContent: React.FC<EntrepreneurProfileContentProps> = ({
                 </button>
               </EditProfileField>
 
-              {/* Género */}
               <EditGenderField
                 label="Género"
                 value={editedGender}
@@ -187,7 +174,6 @@ const EntrepreneurProfileContent: React.FC<EntrepreneurProfileContentProps> = ({
                 onSave={handleSaveGender}
               />
 
-              {/* Fecha de Nacimiento */}
               <EditProfileField
                 label="Fecha de Nacimiento"
                 value={editedBirthDate}
@@ -213,7 +199,6 @@ const EntrepreneurProfileContent: React.FC<EntrepreneurProfileContentProps> = ({
                 </button>
               </EditProfileField>
 
-              {/* Contenido sensible: DNI, Email, Teléfono */}
               <div className="relative bg-gray-100 p-6 rounded-lg shadow-md mt-8">
                 <h3 className="text-xl font-bold text-gray-800 mb-4">Información de Contacto y Documento</h3>
                 {!showSensitiveProfileInfo && (
@@ -239,7 +224,6 @@ const EntrepreneurProfileContent: React.FC<EntrepreneurProfileContentProps> = ({
                   </div>
                 )}
                 <div className={`space-y-6 ${!showSensitiveProfileInfo ? 'blur-sm pointer-events-none' : ''}`}>
-                  {/* Tipo y Número de Documento (no editables) */}
                   <EditProfileField
                     label="Tipo de Documento y Número"
                     value={`${user.documentType || 'N/A'}: ${user.documentNumber || 'N/A'}`}
@@ -251,7 +235,6 @@ const EntrepreneurProfileContent: React.FC<EntrepreneurProfileContentProps> = ({
                     <></>
                   </EditProfileField>
 
-                  {/* Email (no editable) */}
                   <EditProfileField
                     label="Email"
                     value={user.email}
@@ -263,7 +246,6 @@ const EntrepreneurProfileContent: React.FC<EntrepreneurProfileContentProps> = ({
                     <></>
                   </EditProfileField>
 
-                  {/* Número de Teléfono (editable) */}
                   <EditPhoneField label="Número de Teléfono" value={user.phoneNumber || ''} onSave={handleSavePhoneNumber} />
                 </div>
               </div>
@@ -389,7 +371,7 @@ const EntrepreneurProfileContent: React.FC<EntrepreneurProfileContentProps> = ({
               floor={user.floor || ''}
               details={user.details || ''}
               onSave={handleSaveLocation}
-              isEntrepreneurProfile={true} // Indicamos que es un perfil de emprendedor
+              isEntrepreneurProfile={true}
             />
           </div>
         );

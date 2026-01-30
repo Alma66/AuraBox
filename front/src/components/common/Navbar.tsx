@@ -1,4 +1,3 @@
-// FileName: /components/common/Navbar.tsx
 import React, { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { UserRole } from '../../types/user';
@@ -13,23 +12,14 @@ interface NavbarProps {
 const Navbar: React.FC<NavbarProps> = ({ userRole, isAuthenticated, onLogout }) => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
-  // Eliminado: isHowItWorksMenuOpen ya no es necesario como menú independiente en desktop
-  // Nuevo estado para el menú desplegable "Ayuda"
   const [isHelpMenuOpen, setIsHelpMenuOpen] = useState(false);
-
-  // Estados para los menús desplegables del emprendedor (Desktop)
   const [isClubManagementMenuOpen, setIsClubManagementMenuOpen] = useState(false);
   const [isOperationsMenuOpen, setIsOperationsMenuOpen] = useState(false);
   const [isMarketingCommMenuOpen, setIsMarketingCommMenuOpen] = useState(false);
   const [isAdminToolsMenuOpen, setIsAdminToolsMenuOpen] = useState(false);
-
-  // Estados para los submenús desplegables dentro del menú móvil
   const [isMobileSubMenuOpen, setIsMobileSubMenuOpen] = useState<string | null>(null);
 
-  // Referencias para detectar clics fuera de los menús
   const userMenuRef = useRef<HTMLDivElement>(null);
-  // Eliminado: howItWorksMenuRef ya no es necesario como menú independiente en desktop
-  // Nueva referencia para el menú "Ayuda"
   const helpMenuRef = useRef<HTMLDivElement>(null);
   const clubManagementMenuRef = useRef<HTMLDivElement>(null);
   const operationsMenuRef = useRef<HTMLDivElement>(null);
@@ -39,38 +29,32 @@ const Navbar: React.FC<NavbarProps> = ({ userRole, isAuthenticated, onLogout }) 
   const navigate = useNavigate();
   const { user } = useAuth();
 
-  // Función para cerrar todos los menús desplegables (desktop y mobile)
   const closeAllDropdowns = () => {
     setIsMobileMenuOpen(false);
     setIsUserMenuOpen(false);
-    // Cierra el nuevo menú "Ayuda"
     setIsHelpMenuOpen(false);
     setIsClubManagementMenuOpen(false);
     setIsOperationsMenuOpen(false);
     setIsMarketingCommMenuOpen(false);
     setIsAdminToolsMenuOpen(false);
-    setIsMobileSubMenuOpen(null); // Cierra todos los submenús móviles
+    setIsMobileSubMenuOpen(null);
   };
 
-  // Toggle para el menú móvil principal (hamburguesa)
   const toggleMobileMenu = () => {
     closeAllDropdowns();
     setIsMobileMenuOpen(!isMobileMenuOpen);
   };
 
-  // Toggle para el menú de usuario (perfil, logout)
   const toggleUserMenu = () => {
     closeAllDropdowns();
     setIsUserMenuOpen(!isUserMenuOpen);
   };
 
-  // Toggle para el menú "Ayuda"
   const toggleHelpMenu = () => {
     closeAllDropdowns();
     setIsHelpMenuOpen(!isHelpMenuOpen);
   };
 
-  // Toggles para los menús desplegables del emprendedor (desktop)
   const toggleClubManagementMenu = () => {
     closeAllDropdowns();
     setIsClubManagementMenuOpen(!isClubManagementMenuOpen);
@@ -91,24 +75,22 @@ const Navbar: React.FC<NavbarProps> = ({ userRole, isAuthenticated, onLogout }) 
     setIsAdminToolsMenuOpen(!isAdminToolsMenuOpen);
   };
 
-  // Toggle para los submenús dentro del menú móvil
   const toggleMobileSubMenu = (menuName: string) => {
     setIsMobileSubMenuOpen(isMobileSubMenuOpen === menuName ? null : menuName);
   };
 
   const handleLogoutClick = () => {
     onLogout();
+    localStorage.removeItem('access_token');
     closeAllDropdowns();
     navigate('/');
   };
 
-  // Hook para cerrar menús al hacer clic fuera
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (userMenuRef.current && !userMenuRef.current.contains(event.target as Node)) {
         setIsUserMenuOpen(false);
       }
-      // Cierra el menú "Ayuda" al hacer clic fuera
       if (helpMenuRef.current && !helpMenuRef.current.contains(event.target as Node)) {
         setIsHelpMenuOpen(false);
       }
@@ -131,7 +113,6 @@ const Navbar: React.FC<NavbarProps> = ({ userRole, isAuthenticated, onLogout }) 
     };
   }, []);
 
-  // Componente auxiliar para la flecha del dropdown
   const DropdownArrow = ({ isOpen }: { isOpen: boolean }) => (
     <svg
       className={`w-4 h-4 ml-1 transform ${isOpen ? 'rotate-180' : 'rotate-0'} transition-transform duration-200`}
@@ -144,7 +125,6 @@ const Navbar: React.FC<NavbarProps> = ({ userRole, isAuthenticated, onLogout }) 
     </svg>
   );
 
-  // Renderiza los botones de autenticación (Iniciar Sesión / Registrarse / Perfil)
   const renderAuthButtons = () => {
     if (isAuthenticated) {
       return (
@@ -174,7 +154,7 @@ const Navbar: React.FC<NavbarProps> = ({ userRole, isAuthenticated, onLogout }) 
               {userRole === 'customer' && (
                 <>
                   <Link
-                    to="/customer/profile" // Corregido: Asegura que apunte a la ruta correcta del perfil del cliente
+                    to="/customer/profile"
                     className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                     onClick={closeAllDropdowns}
                   >
@@ -189,17 +169,15 @@ const Navbar: React.FC<NavbarProps> = ({ userRole, isAuthenticated, onLogout }) 
                   </Link>
                 </>
               )}
-
               {userRole === 'entrepreneur' && (
                 <>
                   <Link
-                    to="/entrepreneur/profile" // Consolidado: Ahora solo hay una opción "Mi Perfil" para emprendedores
+                    to="/entrepreneur/profile"
                     className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                     onClick={closeAllDropdowns}
                   >
                     Mi Perfil
                   </Link>
-                  {/* Se elimina el enlace a /entrepreneur/dashboard aquí */}
                 </>
               )}
               {userRole === 'admin' && (
@@ -267,12 +245,10 @@ const Navbar: React.FC<NavbarProps> = ({ userRole, isAuthenticated, onLogout }) 
     }
   };
 
-  // Renderiza los menús específicos para el rol de emprendedor (desktop)
   const renderEntrepreneurDesktopMenus = () => {
     if (isAuthenticated && userRole === 'entrepreneur' && user?.managedClubId) {
       return (
         <>
-          {/* Menú: Gestión del Club */}
           <div className="relative" ref={clubManagementMenuRef}>
             <button
               onClick={toggleClubManagementMenu}
@@ -329,7 +305,6 @@ const Navbar: React.FC<NavbarProps> = ({ userRole, isAuthenticated, onLogout }) 
             )}
           </div>
 
-          {/* Menú: Operaciones (Clientes y Logística) - Dos Columnas */}
           <div className="relative" ref={operationsMenuRef}>
             <button
               onClick={toggleOperationsMenu}
@@ -399,7 +374,6 @@ const Navbar: React.FC<NavbarProps> = ({ userRole, isAuthenticated, onLogout }) 
             )}
           </div>
 
-          {/* Menú: Marketing y Comunicación (Marketing y Comunidad) - Dos Columnas */}
           <div className="relative" ref={marketingCommMenuRef}>
             <button
               onClick={toggleMarketingCommMenu}
@@ -444,7 +418,7 @@ const Navbar: React.FC<NavbarProps> = ({ userRole, isAuthenticated, onLogout }) 
                     Moderar Reseñas
                   </Link>
                   <Link
-                    to={''} // Gestionar Eventos (se mantiene vacío por ahora)
+                    to={''}
                     className="block px-2 py-1 text-sm text-gray-700 hover:bg-gray-100"
                     onClick={closeAllDropdowns}
                   >
@@ -462,7 +436,6 @@ const Navbar: React.FC<NavbarProps> = ({ userRole, isAuthenticated, onLogout }) 
             )}
           </div>
 
-          {/* Menú: Herramientas de Administración (Análisis, Finanzas, Equipo) - Dos Columnas */}
           <div className="relative" ref={adminToolsMenuRef}>
             <button
               onClick={toggleAdminToolsMenu}
@@ -530,12 +503,10 @@ const Navbar: React.FC<NavbarProps> = ({ userRole, isAuthenticated, onLogout }) 
     return null;
   };
 
-  // Renderiza los menús específicos para el rol de emprendedor (mobile)
   const renderEntrepreneurMobileMenus = () => {
     if (isAuthenticated && userRole === 'entrepreneur' && user?.managedClubId) {
       return (
         <>
-          {/* Gestión del Club (Mobile) */}
           <button
             onClick={() => toggleMobileSubMenu('clubManagement')}
             className="flex items-center justify-between w-full text-gray-700 hover:bg-gray-50 hover:text-blue-600 px-3 py-2 rounded-md text-base font-medium"
@@ -565,7 +536,6 @@ const Navbar: React.FC<NavbarProps> = ({ userRole, isAuthenticated, onLogout }) 
               </Link>
             </div>
           )}
-          {/* Operaciones (Mobile) */}
           <button
             onClick={() => toggleMobileSubMenu('operations')}
             className="flex items-center justify-between w-full text-gray-700 hover:bg-gray-50 hover:text-blue-600 px-3 py-2 rounded-md text-base font-medium"
@@ -601,7 +571,6 @@ const Navbar: React.FC<NavbarProps> = ({ userRole, isAuthenticated, onLogout }) 
             </div>
           )}
 
-          {/* Marketing y Comunicación (Mobile) */}
           <button
             onClick={() => toggleMobileSubMenu('marketingComm')}
             className="flex items-center justify-between w-full text-gray-700 hover:bg-gray-50 hover:text-blue-600 px-3 py-2 rounded-md text-base font-medium"
@@ -634,7 +603,6 @@ const Navbar: React.FC<NavbarProps> = ({ userRole, isAuthenticated, onLogout }) 
             </div>
           )}
 
-          {/* Herramientas de Administración (Mobile) */}
           <button
             onClick={() => toggleMobileSubMenu('adminTools')}
             className="flex items-center justify-between w-full text-gray-700 hover:bg-gray-50 hover:text-blue-600 px-3 py-2 rounded-md text-base font-medium"
@@ -674,16 +642,13 @@ const Navbar: React.FC<NavbarProps> = ({ userRole, isAuthenticated, onLogout }) 
 
   return (
     <nav className="bg-white shadow-md sticky top-0 z-50">
-      {/* Modificado: max-w-full para que ocupe todo el ancho y controlamos el padding interno */}
       <div className="max-w-full px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-16">
           <div className="flex items-center">
-            {/* Añadimos un padding a la izquierda del logo para que no toque el borde */}
-            <Link to="/" className="flex-shrink-0 pl-2"> {/* Ajusta 'pl-2' según necesites */}
+            <Link to="/" className="flex-shrink-0 pl-2">
               <img className="h-8 w-auto" src="/aurabox-logo.png" alt="AuraBox Logo" />
             </Link>
             <div className="hidden md:ml-6 md:space-x-8 md:flex">
-              {/* "Explorar Clubes" solo si no es emprendedor */}
               {userRole !== 'entrepreneur' && (
                 <Link
                   to="/explore"
@@ -694,7 +659,6 @@ const Navbar: React.FC<NavbarProps> = ({ userRole, isAuthenticated, onLogout }) 
                 </Link>
               )}
 
-              {/* Menú "Ayuda" (Desktop) */}
               <div className="relative" ref={helpMenuRef}>
                 <button
                   onClick={toggleHelpMenu}
@@ -730,7 +694,6 @@ const Navbar: React.FC<NavbarProps> = ({ userRole, isAuthenticated, onLogout }) 
                 )}
               </div>
 
-              {/* "Sobre Nosotros" solo si NO es emprendedor */}
               {userRole !== 'entrepreneur' && (
                 <Link
                   to="/about-us"
@@ -741,10 +704,8 @@ const Navbar: React.FC<NavbarProps> = ({ userRole, isAuthenticated, onLogout }) 
                 </Link>
               )}
 
-              {/* Opciones adicionales para Cliente Logueado */}
               {isAuthenticated && userRole === 'customer' && (
                 <>
-                  {/* Icono Wishlist (Corazón) */}
                   <Link
                     to="/customer/wishlist"
                     className="text-gray-700 hover:text-red-500 p-2 rounded-md transition-colors duration-200"
@@ -767,7 +728,6 @@ const Navbar: React.FC<NavbarProps> = ({ userRole, isAuthenticated, onLogout }) 
                     </svg>
                   </Link>
 
-                  {/* Icono Carrito */}
                   <Link
                     to="/cart"
                     className="text-gray-700 hover:text-blue-600 p-2 rounded-md transition-colors duration-200 ml-2"
@@ -792,16 +752,15 @@ const Navbar: React.FC<NavbarProps> = ({ userRole, isAuthenticated, onLogout }) 
                 </>
               )}
 
-              {renderEntrepreneurDesktopMenus()} {/* Menús para emprendedores (desktop) */}
+              {renderEntrepreneurDesktopMenus()}
             </div>
           </div>
-          <div className="flex items-center md:ml-6 pr-2"> {/* Ajustado padding */}
+          <div className="flex items-center md:ml-6 pr-2">
             {renderAuthButtons()}
             <div className="-mr-2 flex md:hidden">
-              {/* Mobile menu button */}
               <button
                 onClick={toggleMobileMenu}
-                className="inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-blue-500"
+                className="inline-flex items-center justify-center p-2 rounded-md text-gray400 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-blue-500"
               >
                 <span className="sr-only">Open main menu</span>
                 {isMobileMenuOpen ? (
@@ -833,7 +792,6 @@ const Navbar: React.FC<NavbarProps> = ({ userRole, isAuthenticated, onLogout }) 
         </div>
       </div>
 
-      {/* Mobile menu, show/hide based on menu state. */}
       {isMobileMenuOpen && (
         <div className="md:hidden absolute top-16 left-0 w-full bg-white shadow-lg py-2 z-40 overflow-y-auto max-h-[calc(100vh-64px)]">
           <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3">
@@ -847,7 +805,6 @@ const Navbar: React.FC<NavbarProps> = ({ userRole, isAuthenticated, onLogout }) 
               </Link>
             )}
 
-            {/* Menú "Ayuda" (Mobile) */}
             <button
               onClick={() => toggleMobileSubMenu('help')}
               className="flex items-center justify-between w-full text-gray-700 hover:bg-gray-50 hover:text-blue-600 px-3 py-2 rounded-md text-base font-medium"
@@ -881,7 +838,6 @@ const Navbar: React.FC<NavbarProps> = ({ userRole, isAuthenticated, onLogout }) 
               </div>
             )}
 
-            {/* "Sobre Nosotros" solo si NO es emprendedor (Mobile) */}
             {userRole !== 'entrepreneur' && (
               <Link
                 to="/about-us"
@@ -910,7 +866,6 @@ const Navbar: React.FC<NavbarProps> = ({ userRole, isAuthenticated, onLogout }) 
                     >
                       Mis Reseñas
                     </Link>
-                    {/* Iconos de Wishlist y Carrito (ya agregados previamente) */}
                     <Link
                       to="/customer/wishlist"
                       className="text-gray-700 hover:bg-gray-50 hover:text-red-600 block px-3 py-2 rounded-md text-base font-medium flex flex-col items-center"
@@ -933,7 +888,7 @@ const Navbar: React.FC<NavbarProps> = ({ userRole, isAuthenticated, onLogout }) 
                     </Link>
                   </>
                 )}
-                {userRole === 'entrepreneur' && renderEntrepreneurMobileMenus()} {/* Menús para emprendedores (mobile) */}
+                {userRole === 'entrepreneur' && renderEntrepreneurMobileMenus()}
                 {userRole === 'admin' && (
                   <Link
                     to="/admin/dashboard"

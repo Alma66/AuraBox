@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import EditProfileField from './EditProfileField';
-import EditPhoneField from './EditPhoneField'; // Asegúrate de que este componente exista
+import EditPhoneField from './EditPhoneField';
 
-// Definiciones de tipos para la actividad del usuario (simuladas)
 interface UserActivity {
   id: string;
   type: 'login' | 'password_change' | '2fa_change' | 'profile_update' | 'account_deletion_request';
@@ -24,10 +23,6 @@ interface ActiveSession {
 }
 
 interface SecuritySectionProps {
-  // userEmail, documentType, documentNumber, phoneNumber ya NO se pasan aquí
-  // porque se eliminaron de esta sección según tu indicación.
-  // Si necesitas que se pasen para alguna lógica interna de seguridad (no visual),
-  // házmelo saber.
 }
 
 const SecuritySection: React.FC<SecuritySectionProps> = () => {
@@ -35,7 +30,6 @@ const SecuritySection: React.FC<SecuritySectionProps> = () => {
   const [showSensitiveInfo, setShowSensitiveInfo] = useState(false);
   const [authError, setAuthError] = useState('');
 
-  // Contraseña
   const [isEditingPassword, setIsEditingPassword] = useState(false);
   const [oldPassword, setOldPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
@@ -43,24 +37,20 @@ const SecuritySection: React.FC<SecuritySectionProps> = () => {
   const [passwordError, setPasswordError] = useState('');
   const [passwordSuccess, setPasswordSuccess] = useState('');
 
-  // 2FA
-  const [is2FAEnabled, setIs2FAEnabled] = useState(false); // Simulación
+  const [is2FAEnabled, setIs2FAEnabled] = useState(false);
   const [isEditing2FA, setIsEditing2FA] = useState(false);
   const [twoFACode, setTwoFACode] = useState('');
   const [twoFAError, setTwoFAError] = useState('');
   const [twoFASuccess, setTwoFASuccess] = useState('');
 
-  // Preferencias de Privacidad
   const [isEditingPrivacy, setIsEditingPrivacy] = useState(false);
-  const [showGenderPublicly, setShowGenderPublicly] = useState(false); // Simulación
-  const [receivePromoEmails, setReceivePromoEmails] = useState(true); // Simulación
+  const [showGenderPublicly, setShowGenderPublicly] = useState(false);
+  const [receivePromoEmails, setReceivePromoEmails] = useState(true);
 
-  // Simulación de datos de actividad y sesiones
   const [userActivityLog, setUserActivityLog] = useState<UserActivity[]>([]);
   const [activeSessions, setActiveSessions] = useState<ActiveSession[]>([]);
 
   useEffect(() => {
-    // Simular carga inicial de datos de seguridad
     setUserActivityLog([
       { id: 'act1', type: 'login', timestamp: '2024-07-01T10:00:00Z', details: 'Inicio de sesión exitoso', ipAddress: '192.168.1.1', device: 'Chrome en Windows', location: 'Buenos Aires, Argentina' },
       { id: 'act2', type: 'profile_update', timestamp: '2024-06-28T15:30:00Z', details: 'Actualización de dirección', ipAddress: '192.168.1.1', device: 'Chrome en Windows', location: 'Buenos Aires, Argentina' },
@@ -70,11 +60,10 @@ const SecuritySection: React.FC<SecuritySectionProps> = () => {
       { id: 'sess1', device: 'Chrome en Windows', browser: 'Chrome', ipAddress: '192.168.1.1', location: 'Buenos Aires, Argentina', lastActive: 'Hace 5 minutos', isCurrent: true },
       { id: 'sess2', device: 'Safari en iOS', browser: 'Safari', ipAddress: '192.168.1.2', location: 'Córdoba, Argentina', lastActive: 'Hace 3 días', isCurrent: false },
     ]);
-    setIs2FAEnabled(true); // Simular que 2FA está activado por defecto
+    setIs2FAEnabled(true);
   }, []);
 
   const handleSecurityCheck = () => {
-    // Simulación de verificación de contraseña para desbloquear
     if (securityPassword === 'password123') {
       setShowSensitiveInfo(true);
       setAuthError('');
@@ -86,7 +75,6 @@ const SecuritySection: React.FC<SecuritySectionProps> = () => {
   const handleSavePassword = () => {
     setPasswordError('');
     setPasswordSuccess('');
-    // Simulación de validación de contraseña
     if (oldPassword.length === 0) {
       setPasswordError('Debes ingresar tu contraseña actual.');
       return;
@@ -100,19 +88,16 @@ const SecuritySection: React.FC<SecuritySectionProps> = () => {
       return;
     }
     if (oldPassword !== 'password123') {
-      // Simulación de verificación de contraseña actual
       setPasswordError('La contraseña actual es incorrecta.');
       return;
     }
 
-    // Simular guardado de contraseña (en un entorno real, sería una llamada a la API)
     console.log('Contraseña cambiada con éxito (simulado)');
     setPasswordSuccess('Contraseña actualizada con éxito.');
     setIsEditingPassword(false);
     setOldPassword('');
     setNewPassword('');
     setConfirmNewPassword('');
-    // Añadir al log de actividad
     setUserActivityLog((prev) => [
       { id: `act${prev.length + 1}`, type: 'password_change', timestamp: new Date().toISOString(), details: 'Contraseña cambiada' },
       ...prev,
@@ -123,7 +108,6 @@ const SecuritySection: React.FC<SecuritySectionProps> = () => {
     setIsEditing2FA(true);
     setTwoFASuccess('');
     setTwoFAError('');
-    // Simular envío de código
     console.log(`Simulando envío de código 2FA`);
     setTwoFASuccess('Se ha enviado un código de verificación a tu email/teléfono.');
   };
@@ -132,12 +116,10 @@ const SecuritySection: React.FC<SecuritySectionProps> = () => {
     setTwoFAError('');
     setTwoFASuccess('');
     if (twoFACode === '123456') {
-      // Código de simulación
       setIs2FAEnabled(!is2FAEnabled);
       setTwoFASuccess(`Autenticación de dos factores ${is2FAEnabled ? 'desactivada' : 'activada'} con éxito.`);
       setIsEditing2FA(false);
       setTwoFACode('');
-      // Añadir al log de actividad
       setUserActivityLog((prev) => [
         { id: `act${prev.length + 1}`, type: '2fa_change', timestamp: new Date().toISOString(), details: `2FA ${is2FAEnabled ? 'desactivada' : 'activada'}` },
         ...prev,
@@ -155,10 +137,8 @@ const SecuritySection: React.FC<SecuritySectionProps> = () => {
   };
 
   const handleCloseSession = (sessionId: string) => {
-    // Simular cierre de sesión
     setActiveSessions((prev) => prev.filter((session) => session.id !== sessionId));
     console.log(`Sesión ${sessionId} cerrada (simulado)`);
-    // Añadir al log de actividad
     setUserActivityLog((prev) => [
       { id: `act${prev.length + 1}`, type: 'login', timestamp: new Date().toISOString(), details: `Sesión cerrada en dispositivo ${sessionId}` },
       ...prev,
@@ -166,10 +146,8 @@ const SecuritySection: React.FC<SecuritySectionProps> = () => {
   };
 
   const handleCloseAllOtherSessions = () => {
-    // Simular cierre de todas las demás sesiones
     setActiveSessions((prev) => prev.filter((session) => session.isCurrent));
     console.log('Todas las demás sesiones cerradas (simulado)');
-    // Añadir al log de actividad
     setUserActivityLog((prev) => [
       { id: `act${prev.length + 1}`, type: 'login', timestamp: new Date().toISOString(), details: 'Todas las demás sesiones cerradas' },
       ...prev,
@@ -177,13 +155,11 @@ const SecuritySection: React.FC<SecuritySectionProps> = () => {
   };
 
   const handleSavePrivacySettings = () => {
-    // Simular guardado de preferencias de privacidad
     console.log('Preferencias de privacidad guardadas (simulado)', {
       showGenderPublicly,
       receivePromoEmails,
     });
     setIsEditingPrivacy(false);
-    // Añadir al log de actividad
     setUserActivityLog((prev) => [
       { id: `act${prev.length + 1}`, type: 'profile_update', timestamp: new Date().toISOString(), details: 'Preferencias de privacidad actualizadas' },
       ...prev,
@@ -192,10 +168,8 @@ const SecuritySection: React.FC<SecuritySectionProps> = () => {
 
   const handleRequestAccountDeletion = () => {
     if (window.confirm('¿Estás seguro de que quieres solicitar la eliminación de tu cuenta? Esta acción es irreversible.')) {
-      // Simular solicitud de eliminación de cuenta
       console.log('Solicitud de eliminación de cuenta enviada (simulado)');
       alert('Tu solicitud de eliminación de cuenta ha sido recibida. Nos pondremos en contacto contigo para confirmar.');
-      // Añadir al log de actividad
       setUserActivityLog((prev) => [
         { id: `act${prev.length + 1}`, type: 'account_deletion_request', timestamp: new Date().toISOString(), details: 'Solicitud de eliminación de cuenta' },
         ...prev,
@@ -229,7 +203,6 @@ const SecuritySection: React.FC<SecuritySectionProps> = () => {
         </div>
       )}
       <div className={`space-y-6 ${!showSensitiveInfo ? 'blur-sm pointer-events-none' : ''}`}>
-        {/* Contraseña */}
         <EditProfileField
           label="Contraseña"
           value="********"
@@ -300,7 +273,6 @@ const SecuritySection: React.FC<SecuritySectionProps> = () => {
           </div>
         </EditProfileField>
 
-        {/* Autenticación de Dos Factores (2FA) */}
         <div className="bg-gray-50 p-4 rounded-lg shadow-sm">
           <div className="flex justify-between items-center mb-2">
             <label className="block text-sm font-medium text-gray-700">Autenticación de Dos Factores (2FA):</label>
@@ -349,7 +321,6 @@ const SecuritySection: React.FC<SecuritySectionProps> = () => {
           )}
         </div>
 
-        {/* Dispositivos Conectados */}
         <div className="bg-gray-50 p-4 rounded-lg shadow-sm">
           <h4 className="text-lg font-semibold text-gray-800 mb-3">Dispositivos Conectados</h4>
           {activeSessions.length > 0 ? (
@@ -389,13 +360,11 @@ const SecuritySection: React.FC<SecuritySectionProps> = () => {
           )}
         </div>
 
-        {/* Historial de Actividad Reciente */}
         <div className="bg-gray-50 p-4 rounded-lg shadow-sm">
           <h4 className="text-lg font-semibold text-gray-800 mb-3">Historial de Actividad Reciente</h4>
           {userActivityLog.length > 0 ? (
             <ul className="space-y-3">
               {userActivityLog.slice(0, 5).map((activity) => (
-                // Mostrar las últimas 5 actividades
                 <li key={activity.id} className="border-b pb-2 last:border-b-0">
                   <p className="font-medium text-gray-700">{activity.details}</p>
                   <p className="text-sm text-gray-500">
@@ -409,7 +378,6 @@ const SecuritySection: React.FC<SecuritySectionProps> = () => {
           )}
         </div>
 
-        {/* Preferencias de Privacidad */}
         <EditProfileField
           label="Preferencias de Privacidad"
           value="Gestionar"
@@ -417,7 +385,6 @@ const SecuritySection: React.FC<SecuritySectionProps> = () => {
           onEdit={() => setIsEditingPrivacy(true)}
           onCancel={() => {
             setIsEditingPrivacy(false);
-            // Resetear a valores originales si se cancela (simulado)
             setShowGenderPublicly(false);
             setReceivePromoEmails(true);
           }}
@@ -434,19 +401,7 @@ const SecuritySection: React.FC<SecuritySectionProps> = () => {
               <label htmlFor="showGenderPublicly" className="ml-2 block text-sm text-gray-900">
                 Mostrar mi género públicamente (si aplica)
               </label>
-            </div>
-            <div className="flex items-center">
-              <input
-                id="receivePromoEmails"
-                type="checkbox"
-                checked={receivePromoEmails}
-                onChange={(e) => setReceivePromoEmails(e.target.checked)}
-                className="h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
-              />
-              <label htmlFor="receivePromoEmails" className="ml-2 block text-sm text-gray-900">
-                Recibir correos electrónicos promocionales
-              </label>
-            </div>
+                        </div>
             <button
               onClick={handleSavePrivacySettings}
               className="mt-4 bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors duration-200"
@@ -456,7 +411,6 @@ const SecuritySection: React.FC<SecuritySectionProps> = () => {
           </div>
         </EditProfileField>
 
-        {/* Eliminación de Cuenta */}
         <div className="bg-gray-50 p-4 rounded-lg shadow-sm text-center">
           <h4 className="text-lg font-semibold text-gray-800 mb-3">Eliminar Cuenta</h4>
           <p className="text-gray-600 mb-4">

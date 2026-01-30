@@ -1,16 +1,14 @@
-// FileName: src/components/entrepreneur/SalesFilters.tsx
 import React from 'react';
 import { Subscription } from '../../types/subscription';
 
 interface SalesFiltersProps {
   filters: { month: string; plan: string; status: string };
   setFilters: (filters: { month: string; plan: string; status: string }) => void;
-  subscriptions?: Subscription[]; // Opcional para derivar opciones
+  subscriptions?: Subscription[];
 }
 
 const SalesFilters: React.FC<SalesFiltersProps> = ({ filters, setFilters, subscriptions }) => {
-  const months = ['all', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12']; // Enero=1, etc.
-  // CORREGIDO: Usar Array.from para compatibilidad TS/ES5
+  const months = ['all', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12'];
   const plans = subscriptions ? Array.from(new Set(subscriptions.map(s => s.planId))) : ['all', 'plan-ml-1', 'plan-bv-1'];
   const statuses = ['all', 'active', 'paused', 'cancelled'];
 
@@ -41,7 +39,7 @@ const SalesFilters: React.FC<SalesFiltersProps> = ({ filters, setFilters, subscr
             onChange={(e) => handleFilterChange('plan', e.target.value)}
             className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
           >
-            <option value="all">Todos</option> {/* ← AGREGADO: Para evitar errores si plans no incluye 'all' */}
+            <option value="all">Todos</option>
             {plans.map(p => (
               <option key={p} value={p}>{p === 'all' ? 'Todos' : p}</option>
             ))}

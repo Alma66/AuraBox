@@ -1,32 +1,19 @@
-// React y hooks
 import React, { useState, useMemo } from 'react';
-
-// Componentes personalizados
 import ExploreClubCard from '../components/shared/ExploreClubCard';
-
-// Datos de clubes
 import clubsData from '../data/clubs.json';
-
-// React Router
 import { Link } from 'react-router-dom';
-
-// Tipos
 import { Club } from '../types/club';
 
-// Componente principal de exploración de clubes
 const ExploreClubsPage: React.FC = () => {
-  // Estados para filtros
   const [searchTerm, setSearchTerm] = useState<string>('');
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [minRating, setMinRating] = useState<number>(0);
 
-  // Cálculo de categorías únicas
   const categories = useMemo(() => {
     const allCategories = (clubsData as Club[]).map(club => club.category);
     return ['all', ...Array.from(new Set(allCategories))];
   }, []);
 
-  // Filtrado de clubes
   const filteredClubs = useMemo(() => {
     return (clubsData as Club[]).filter(club => {
       const matchesSearch =
@@ -44,7 +31,6 @@ const ExploreClubsPage: React.FC = () => {
         Explora Todos los Clubes
       </h1>
 
-      {/* Sección de filtros */}
       <section className="mb-12 p-6 bg-white rounded-xl shadow-lg flex flex-col md:flex-row items-center justify-between gap-6 animate-fadeInUp">
         <input
           type="text"
@@ -77,7 +63,6 @@ const ExploreClubsPage: React.FC = () => {
         </div>
       </section>
 
-      {/* Sección de resultados */}
       <section>
         {filteredClubs.length > 0 ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
@@ -104,7 +89,6 @@ const ExploreClubsPage: React.FC = () => {
         )}
       </section>
 
-      {/* Sección para emprendedores */}
       <section className="text-center py-16 bg-blue-600 text-white rounded-lg shadow-xl transform transition-all duration-500 hover:scale-[1.01] hover:shadow-2xl mt-16">
         <h2 className="text-4xl font-bold mb-4 animate-pulse-subtle">¿Tienes un Club de Suscripción?</h2>
         <p className="text-xl mb-8 max-w-3xl mx-auto opacity-0 animate-fadeInUp delay-200">

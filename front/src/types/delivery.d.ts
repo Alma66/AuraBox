@@ -1,5 +1,3 @@
-// FileName: /src/types/delivery.d.ts
-
 import { User } from './user';
 import { Club } from './club';
 import { Subscription } from './subscription';
@@ -10,13 +8,13 @@ export interface Rider {
   email: string;
   phoneNumber: string;
   vehicleType: 'moto' | 'auto' | 'bicicleta' | 'a_pie';
-  licensePlate?: string; // Para vehículos motorizados
-  availability: boolean; // Disponible para asignaciones
-  rating: number; // Promedio de calificaciones (1-5)
+  licensePlate?: string; 
+  availability: boolean; 
+  rating: number; 
   totalDeliveries: number;
-  currentAssignments: number; // Entregas asignadas actualmente
-  zonesCovered: string[]; // Zonas o provincias que cubre (ej: ['CABA', 'GBA'])
-  isActive: boolean; // Rider activo en el sistema
+  currentAssignments: number; 
+  zonesCovered: string[]; 
+  isActive: boolean; 
   createdAt: string;
   lastLogin?: string;
 }
@@ -24,14 +22,14 @@ export interface Rider {
 export interface Delivery {
   id: string;
   subscriptionId: string;
-  userId: string; // ID del cliente receptor
+  userId: string; 
   clubId: string;
   planId: string;
-  deliveryDate: string; // Fecha programada de entrega
+  deliveryDate: string; 
   status: 'pending' | 'assigned' | 'in_transit' | 'delivered' | 'failed' | 'cancelled';
-  assignedRiderId?: string; // ID del rider asignado (null si no asignado)
-  trackingNumber?: string; // Número de seguimiento (para Correo Argentino u otros)
-  shippingProvider: 'rider_propio' | 'correo_argentino' | 'oca' | 'andreani'; // Proveedor de envío
+  assignedRiderId?: string; 
+  trackingNumber?: string; 
+  shippingProvider: 'rider_propio' | 'correo_argentino' | 'oca' | 'andreani'; 
   address: {
     street: string;
     number: string;
@@ -39,15 +37,15 @@ export interface Delivery {
     city: string;
     postalCode: string;
     province: string;
-    instructions?: string; // Instrucciones adicionales (ej: "Dejar en portería")
+    instructions?: string;
   };
-  boxContent: string; // Descripción del contenido de la caja (ej: "Libro X + accesorios")
+  boxContent: string; 
   estimatedDeliveryWindow: {
-    from: string; // Hora estimada inicio (ej: "09:00")
-    to: string;   // Hora estimada fin (ej: "18:00")
+    from: string; 
+    to: string;   
   };
-  cost: number; // Costo estimado del envío
-  notes?: string; // Notas internas (ej: "Cliente ausente en entregas previas")
+  cost: number; 
+  notes?: string; 
   createdAt: string;
   updatedAt: string;
 }
@@ -57,7 +55,7 @@ export interface DeliveryAssignment {
   deliveryId: string;
   riderId: string;
   assignedAt: string;
-  completedAt?: string; // Fecha de finalización
+  completedAt?: string; 
   feedback?: {
     rating: number;
     comments: string;
@@ -65,8 +63,8 @@ export interface DeliveryAssignment {
 }
 
 export interface DeliveryHistoryEntry extends Delivery {
-  user: Partial<User>; // Datos básicos del cliente
-  club: Partial<Club>; // Datos básicos del club
-  subscription: Partial<Subscription>; // Datos de la suscripción relacionada
-  rider?: Partial<Rider>; // Rider asignado, si aplica
+  user: Partial<User>; 
+  club: Partial<Club>; 
+  subscription: Partial<Subscription>;
+  rider?: Partial<Rider>; 
 }

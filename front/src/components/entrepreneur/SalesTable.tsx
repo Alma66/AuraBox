@@ -1,4 +1,4 @@
-// FileName: src/components/entrepreneur/SalesTable.tsx
+
 import React from 'react';
 import { Subscription } from '../../types/subscription';
 import { User } from '../../types/user';
@@ -14,7 +14,7 @@ const SalesTable: React.FC<SalesTableProps> = ({ subscriptions, usersData }) => 
     return user ? `${user.firstName} ${user.lastName}` : 'Anónimo';
   };
 
-  const getRandomAmount = () => Math.round(Math.random() * 30000 + 20000); // Simulado
+  const getRandomAmount = () => Math.round(Math.random() * 30000 + 20000); 
 
   return (
     <div className="bg-white rounded-xl shadow-lg overflow-hidden">

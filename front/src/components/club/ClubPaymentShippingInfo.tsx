@@ -1,16 +1,14 @@
-// src/components/club/ClubPaymentShippingInfo.tsx
 import React from 'react';
-// Asegúrate de que la ruta a 'types/club' sea correcta
-import { ShippingInfo } from '../../types/club'; 
+import { ShippingInfo } from '../../types/club';
 
 interface ClubPaymentShippingInfoProps {
-  paymentMethods?: string[]; // Ahora es opcional
-  shippingInfo?: ShippingInfo; // Ahora es opcional
+  paymentMethods?: string[];
+  shippingInfo?: ShippingInfo;
 }
 
 const ClubPaymentShippingInfo: React.FC<ClubPaymentShippingInfoProps> = ({ paymentMethods, shippingInfo }) => {
   if ((!paymentMethods || paymentMethods.length === 0) && !shippingInfo) {
-    return null; // No renderiza nada si no hay información
+    return null;
   }
 
   return (

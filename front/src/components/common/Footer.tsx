@@ -6,7 +6,6 @@ const Footer: React.FC = () => {
     <footer className="bg-gray-800 text-white py-8 mt-12">
       <div className="container mx-auto px-4">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          {/* Columna 1: Información de AuraBox */}
           <div>
             <h3 className="text-xl font-bold mb-4">AuraBox</h3>
             <p className="text-gray-400 text-sm">
@@ -14,7 +13,6 @@ const Footer: React.FC = () => {
               Descubre, gestiona y disfruta tus cajas sorpresa favoritas.
             </p>
             <div className="flex space-x-4 mt-4">
-              {/* Iconos de Redes Sociales (usando SVGs para consistencia y control de estilo) */}
               <a 
                 href="https://www.instagram.com/aurabox_ar" 
                 target="_blank" 
@@ -51,7 +49,6 @@ const Footer: React.FC = () => {
             </div>
           </div>
 
-          {/* Columna 2: Enlaces Rápidos */}
           <div>
             <h3 className="text-xl font-bold mb-4">Explorar</h3>
             <ul className="space-y-2">
@@ -62,7 +59,6 @@ const Footer: React.FC = () => {
             </ul>
           </div>
 
-          {/* Columna 3: Contacto */}
           <div>
             <h3 className="text-xl font-bold mb-4">Contacto</h3>
             <p className="text-gray-400 text-sm">Email: info@aurabox.com</p>

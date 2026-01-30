@@ -1,4 +1,3 @@
-// FileName: src/pages/entrepreneur/ManageCustomersPage.tsx
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '../../../../App';
@@ -10,7 +9,6 @@ import subscriptionsData from '../../../../data/subscriptions.json';
 import usersData from '../../../../data/user.json';
 import locationsData from '../../../../data/locations.json';
 
-// Tipo extendido para clientes con suscripciones (usado en allCustomers y selectedCustomer)
 type ExtendedUser  = User & {
   subscriptionsInfo: {
     id: string;
@@ -30,7 +28,6 @@ const ManageCustomersPage: React.FC = () => {
 
   const [club, setClub] = useState<Club | null>(null);
   const [allCustomers, setAllCustomers] = useState<ExtendedUser []>([]);
-  // Cambiado: Tipo extendido para permitir acceso a subscriptionsInfo sin errores TS2339
   const [selectedCustomer, setSelectedCustomer] = useState<ExtendedUser  | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -41,14 +38,13 @@ const ManageCustomersPage: React.FC = () => {
       return;
     }
 
-    // Cast para fixear mismatch de tipos en Club (JSON infiere string genérico para LegalSection.type)
     const foundClub = (clubsData as Club[]).find((c) => c.id === clubId) || null;
     if (!foundClub) {
       setError('Club no encontrado.');
       setLoading(false);
       return;
     }
-    setClub(foundClub as Club); // Cast explícito para asignar a SetStateAction<Club | null>
+    setClub(foundClub as Club); 
 
     const allSubscriptions = subscriptionsData as Subscription[];
     const allUsers = usersData as User[];
@@ -82,7 +78,6 @@ const ManageCustomersPage: React.FC = () => {
     setAllCustomers(detailedCustomers);
 
     if (preselectedCustomerId) {
-      // Buscar en detailedCustomers para obtener la versión extendida con subscriptionsInfo
       const customerToSelect = detailedCustomers.find((u) => u.id === preselectedCustomerId);
       if (customerToSelect) {
         setSelectedCustomer(customerToSelect);

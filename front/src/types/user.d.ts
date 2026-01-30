@@ -68,3 +68,4 @@ export interface ClubTeamUser  extends User {
   'encargado_de_atencion_post_venta' |
   'administrador_de_seguridad_y_accesos';
 }
+declare module 'leaflet';

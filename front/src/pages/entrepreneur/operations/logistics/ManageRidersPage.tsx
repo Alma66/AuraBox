@@ -1,4 +1,3 @@
-// FileName: /src/pages/entrepreneur/ManageRidersPage.tsx
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { Rider } from '../../../../types/delivery';
@@ -29,11 +28,8 @@ const ManageRidersPage: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
 
   useEffect(() => {
-    // Simulación de fetch: En backend, API para riders del club (ej: fetch('/api/riders?clubId=' + clubId))
     const fetchData = async () => {
       try {
-        // Filtrar riders por club (simulado: todos los riders para este ejemplo)
-        // Normalizar null a undefined para licensePlate (para match con tipo Rider)
         let clubRiders = (ridersData as Rider[]).filter(r => r.isActive).map(r => ({
           ...r,
           licensePlate: r.licensePlate === null ? undefined : r.licensePlate
@@ -63,20 +59,19 @@ const ManageRidersPage: React.FC = () => {
       alert('Por favor completa los campos obligatorios.');
       return;
     }
-    // Simulación de POST: En backend, fetch('/api/riders', { method: 'POST', body: JSON.stringify(newRider) })
     const riderToAdd: Rider = {
       id: `rider-${Date.now()}`,
       name: newRider.name as string,
       email: newRider.email as string,
       phoneNumber: newRider.phoneNumber as string,
       vehicleType: newRider.vehicleType as Rider['vehicleType'],
-      licensePlate: newRider.licensePlate || undefined, // Cambiado: undefined en lugar de null
-      availability: newRider.availability ?? true, // Cambiado: ?? para manejar solo null/undefined, no false
+      licensePlate: newRider.licensePlate || undefined,
+      availability: newRider.availability ?? true,
       rating: 0,
       totalDeliveries: 0,
       currentAssignments: 0,
       zonesCovered: newRider.zonesCovered as string[] || ['CABA'],
-      isActive: newRider.isActive ?? true, // Agregado: ?? para consistencia
+      isActive: newRider.isActive ?? true,
       createdAt: new Date().toISOString()
     };
     setRiders(prev => [...prev, riderToAdd]);
@@ -94,7 +89,6 @@ const ManageRidersPage: React.FC = () => {
   };
 
   const updateRider = (updatedRider: Rider) => {
-    // Simulación de PUT: En backend, fetch('/api/riders/' + updatedRider.id, { method: 'PUT', body: JSON.stringify(updatedRider) })
     setRiders(prev => prev.map(r => r.id === updatedRider.id ? updatedRider : r));
     setEditingRider(null);
     alert('Rider actualizado exitosamente.');
@@ -102,7 +96,6 @@ const ManageRidersPage: React.FC = () => {
 
   const deleteRider = (riderId: string) => {
     if (window.confirm('¿Estás seguro de eliminar este rider? Esto lo desactivará.')) {
-      // Simulación de DELETE: En backend, fetch('/api/riders/' + riderId, { method: 'DELETE' })
       setRiders(prev => prev.map(r => r.id === riderId ? { ...r, isActive: false } : r));
       alert('Rider desactivado.');
     }
@@ -125,7 +118,6 @@ const ManageRidersPage: React.FC = () => {
     <div className="container mx-auto px-4 py-8">
       <h1 className="text-3xl font-bold mb-6">Gestionar Riders - {club.name}</h1>
       
-      {/* Estadísticas */}
       <div className="mb-6 grid grid-cols-1 md:grid-cols-3 gap-4">
         <div className="bg-white p-4 rounded-lg shadow">
           <h3 className="text-sm font-medium text-gray-500">Total Riders</h3>
@@ -141,7 +133,6 @@ const ManageRidersPage: React.FC = () => {
         </div>
       </div>
 
-      {/* Filtros y Búsqueda */}
       <div className="mb-6 flex flex-col sm:flex-row gap-4">
         <input
           type="text"
@@ -161,7 +152,6 @@ const ManageRidersPage: React.FC = () => {
         </select>
       </div>
 
-      {/* Formulario Agregar Rider */}
       <div className="mb-6 bg-white p-6 rounded-lg shadow-md">
         <h2 className="text-xl font-semibold mb-4">Agregar Nuevo Rider</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -241,7 +231,6 @@ const ManageRidersPage: React.FC = () => {
         </button>
       </div>
 
-      {/* Lista de Riders */}
       <div className="bg-white rounded-lg shadow-md overflow-hidden">
         <div className="px-6 py-4 border-b border-gray-200">
           <h2 className="text-xl font-semibold">Lista de Riders ({filteredRiders.length})</h2>
@@ -305,7 +294,6 @@ const ManageRidersPage: React.FC = () => {
         </div>
       </div>
 
-      {/* Modal de Edición (Simulado con estado) */}
       {editingRider && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white p-6 rounded-lg max-w-md w-full mx-4 max-h-[90vh] overflow-y-auto">

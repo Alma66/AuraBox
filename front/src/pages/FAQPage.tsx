@@ -1,10 +1,6 @@
-// React y hooks
 import React, { useState } from 'react';
-
-// React Router
 import { Link } from 'react-router-dom';
 
-// Interfaz para ítems de FAQ
 interface FAQItem {
   id: string;
   question: string;
@@ -13,7 +9,6 @@ interface FAQItem {
   keywords: string[];
 }
 
-// Datos de preguntas frecuentes
 const faqData: FAQItem[] = [
   {
     id: '1',
@@ -122,17 +117,13 @@ const faqData: FAQItem[] = [
   },
 ];
 
-// Componente principal de la página de FAQs
 const FAQPage: React.FC = () => {
-  // Estados para búsqueda y filtros
   const [searchTerm, setSearchTerm] = useState<string>('');
   const [openQuestion, setOpenQuestion] = useState<string | null>(null);
   const [selectedCategory, setSelectedCategory] = useState<string>('Todas');
 
-  // Lista de categorías únicas
   const categories = ['Todas', ...Array.from(new Set(faqData.map(item => item.category)))];
 
-  // Filtrado de FAQs
   const filteredFaqs = faqData.filter(faq => {
     const matchesSearch = searchTerm.toLowerCase().split(' ').every(term =>
       faq.question.toLowerCase().includes(term) ||
@@ -143,7 +134,6 @@ const FAQPage: React.FC = () => {
     return matchesSearch && matchesCategory;
   });
 
-  // Función para alternar respuesta
   const toggleQuestion = (id: string) => {
     setOpenQuestion(openQuestion === id ? null : id);
   };
@@ -157,7 +147,6 @@ const FAQPage: React.FC = () => {
         Encuentra respuestas a las preguntas más comunes sobre AuraBox, cómo funciona para suscriptores y emprendedores, y mucho más.
       </p>
 
-      {/* Sección de búsqueda y filtros */}
       <div className="mb-10 flex flex-col md:flex-row items-center justify-center space-y-4 md:space-y-0 md:space-x-4 animate-fadeIn">
         <input
           type="text"
@@ -170,7 +159,7 @@ const FAQPage: React.FC = () => {
           <select
             className="block appearance-none w-full bg-white border border-gray-300 text-gray-700 py-3 px-4 pr-8 rounded-lg shadow-sm leading-tight focus:outline-none focus:bg-white focus:border-blue-500 transition-all duration-300 hover:border-blue-400"
             value={selectedCategory}
-            onChange={(e) => setSelectedCategory(e.target.value)}
+                       onChange={(e) => setSelectedCategory(e.target.value)}
           >
             {categories.map(category => (
               <option key={category} value={category}>{category}</option>
@@ -182,7 +171,6 @@ const FAQPage: React.FC = () => {
         </div>
       </div>
 
-      {/* Sección de preguntas frecuentes */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         {filteredFaqs.length > 0 ? (
           filteredFaqs.map(faq => (
@@ -225,7 +213,6 @@ const FAQPage: React.FC = () => {
         )}
       </div>
 
-      {/* Sección de contacto para preguntas no encontradas */}
       <div className="mt-16 text-center bg-blue-50 p-8 rounded-xl shadow-md animate-fadeInUp">
         <h2 className="text-3xl font-bold text-blue-700 mb-4">¿No encontraste tu pregunta?</h2>
         <p className="text-gray-700 mb-6 max-w-xl mx-auto">
@@ -240,7 +227,6 @@ const FAQPage: React.FC = () => {
         </a>
       </div>
 
-      {/* Sección de guías y recursos */}
       <div className="mt-16">
         <h2 className="text-3xl font-bold text-center text-gray-800 mb-8 animate-fadeIn">Guías y Recursos Útiles</h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">

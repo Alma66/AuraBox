@@ -1,17 +1,14 @@
-// FileName: src/pages/entrepreneur/SalesReportsPage.tsx
 import React, { useState, useEffect, useMemo } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useAuth } from '../../../../App';
 import { User } from '../../../../types/user';
 import { Club } from '../../../../types/club';
 import { Subscription } from '../../../../types/subscription';
-import AdminToolsSidebar from '../../../../components/entrepreneur/AdminToolsSidebar'; // Reutilizado/adaptado
-import SalesTable from '../../../../components/entrepreneur/SalesTable'; // Nuevo
-import SalesFilters from '../../../../components/entrepreneur/SalesFilters'; // Nuevo
-import SalesSummary from '../../../../components/entrepreneur/SalesSummary'; // Nuevo
-import SalesChart from '../../../../components/entrepreneur/SalesChart'; // Nuevo
-
-// Datos simulados
+import AdminToolsSidebar from '../../../../components/entrepreneur/AdminToolsSidebar';
+import SalesTable from '../../../../components/entrepreneur/SalesTable';
+import SalesFilters from '../../../../components/entrepreneur/SalesFilters';
+import SalesSummary from '../../../../components/entrepreneur/SalesSummary';
+import SalesChart from '../../../../components/entrepreneur/SalesChart';
 import clubsData from '../../../../data/clubs.json';
 import subscriptionsData from '../../../../data/subscriptions.json';
 import usersData from '../../../../data/user.json';
@@ -35,13 +32,12 @@ const SalesReportsPage: React.FC = () => {
       setManagedClub(club);
       const subs = (subscriptionsData as Subscription[]).filter(sub => sub.clubId === club.id);
       setClubSubscriptions(subs);
-      setFilteredSubscriptions(subs); // Inicial: todos
+      setFilteredSubscriptions(subs);
     } else {
       window.location.href = '/';
     }
   }, [clubId, userRole, user]);
 
-  // Aplicar filtros (useMemo para optimización)
   useMemo(() => {
     let filtered = clubSubscriptions;
     if (filters.month !== 'all') {
@@ -59,10 +55,8 @@ const SalesReportsPage: React.FC = () => {
     setFilteredSubscriptions(filtered);
   }, [clubSubscriptions, filters]);
 
-  // Calcular totales para resumen (fácil backend)
   const totalRevenue = useMemo(() => {
     return filteredSubscriptions.reduce((sum, sub) => {
-      // Simular monto por sub (cambiar a fetch real)
       return sum + (sub.status === 'active' ? 25000 : 0);
     }, 0);
   }, [filteredSubscriptions]);
@@ -75,7 +69,6 @@ const SalesReportsPage: React.FC = () => {
 
   return (
     <div className="container mx-auto px-4 py-8 min-h-screen bg-gray-50">
-      {/* Header/Breadcrumbs */}
       <div className="mb-8">
         <nav className="flex mb-4" aria-label="Breadcrumb">
           <ol className="inline-flex items-center space-x-1 md:space-x-3">
@@ -109,26 +102,19 @@ const SalesReportsPage: React.FC = () => {
       </div>
 
       <div className="flex flex-col lg:flex-row gap-8">
-        {/* Sidebar (opcional) */}
         <div className="lg:w-1/4 hidden lg:block">
-         <AdminToolsSidebar activeSection="sales" setActiveSection={() => {}} clubId={clubId!} /> {/* ← COMPONENTE SIMULADO */}
+         <AdminToolsSidebar activeSection="sales" setActiveSection={() => {}} clubId={clubId!} />
         </div>
 
-        {/* Contenido Principal */}
         <div className="lg:w-3/4 space-y-8">
-          {/* Filtros */}
           <SalesFilters filters={filters} setFilters={setFilters} />
 
-          {/* Resumen de Ventas */}
           <SalesSummary totalRevenue={totalRevenue} activeCount={activeCount} totalSales={filteredSubscriptions.length} />
 
-          {/* Gráfico de Ventas */}
           <SalesChart subscriptions={filteredSubscriptions} />
 
-          {/* Tabla de Ventas */}
           <SalesTable subscriptions={filteredSubscriptions} usersData={usersData as User[]} />
 
-          {/* Botón de Exportar (simulado; backend: descarga CSV) */}
           <div className="text-center">
             <button 
               onClick={() => alert('Exportando CSV... (Implementar con backend)')} 

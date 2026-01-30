@@ -1,32 +1,25 @@
 import React, { useState } from 'react';
 
 const SettingsSection: React.FC = () => {
-  // Preferencias de Notificación
   const [emailNotifications, setEmailNotifications] = useState(true);
   const [pushNotifications, setPushNotifications] = useState(true);
   const [smsNotifications, setSmsNotifications] = useState(false);
 
-  // Preferencias de Idioma y Moneda
   const [language, setLanguage] = useState('es');
   const [currency, setCurrency] = useState('ARS');
 
-  // Preferencias de Privacidad (adicionales a las de SecuritySection)
   const [personalizationEnabled, setPersonalizationEnabled] = useState(true);
   const [dataSharingEnabled, setDataSharingEnabled] = useState(false);
 
-  // Preferencias de Contenido
   const [hideMatureContent, setHideMatureContent] = useState(false);
-  const [preferredCategories, setPreferredCategories] = useState<string[]>(['Libros', 'Café']); // Ejemplo
+  const [preferredCategories, setPreferredCategories] = useState<string[]>(['Libros', 'Café']);
 
-  // Gestión de Suscripciones (configuraciones globales)
   const [autoRenewSubscriptions, setAutoRenewSubscriptions] = useState(true);
   const [defaultPaymentMethod, setDefaultPaymentMethod] = useState('MercadoPago');
 
-  // Accesibilidad
   const [highContrastMode, setHighContrastMode] = useState(false);
   const [fontSize, setFontSize] = useState('medium');
 
-  // Simulación de guardado
   const handleSaveChanges = () => {
     console.log('Configuración guardada:', {
       emailNotifications,
@@ -50,7 +43,6 @@ const SettingsSection: React.FC = () => {
     <div className="space-y-8 p-4">
       <h2 className="text-2xl font-bold text-gray-800 mb-6">Configuración</h2>
 
-      {/* Preferencias de Notificación */}
       <div className="bg-white p-6 rounded-lg shadow-md">
         <h3 className="text-xl font-semibold text-gray-800 mb-4">Notificaciones</h3>
         <div className="space-y-4">
@@ -87,7 +79,6 @@ const SettingsSection: React.FC = () => {
         </div>
       </div>
 
-      {/* Preferencias de Idioma y Moneda */}
       <div className="bg-white p-6 rounded-lg shadow-md">
         <h3 className="text-xl font-semibold text-gray-800 mb-4">Idioma y Moneda</h3>
         <div className="space-y-4">
@@ -120,7 +111,6 @@ const SettingsSection: React.FC = () => {
         </div>
       </div>
 
-      {/* Preferencias de Privacidad (adicionales) */}
       <div className="bg-white p-6 rounded-lg shadow-md">
         <h3 className="text-xl font-semibold text-gray-800 mb-4">Privacidad de Datos</h3>
         <div className="space-y-4">
@@ -147,7 +137,6 @@ const SettingsSection: React.FC = () => {
         </div>
       </div>
 
-      {/* Preferencias de Contenido */}
       <div className="bg-white p-6 rounded-lg shadow-md">
         <h3 className="text-xl font-semibold text-gray-800 mb-4">Contenido y Preferencias</h3>
         <div className="space-y-4">
@@ -189,7 +178,6 @@ const SettingsSection: React.FC = () => {
         </div>
       </div>
 
-      {/* Gestión de Suscripciones (configuraciones globales) */}
       <div className="bg-white p-6 rounded-lg shadow-md">
         <h3 className="text-xl font-semibold text-gray-800 mb-4">Gestión de Suscripciones</h3>
         <div className="space-y-4">
@@ -219,7 +207,6 @@ const SettingsSection: React.FC = () => {
         </div>
       </div>
 
-      {/* Accesibilidad */}
       <div className="bg-white p-6 rounded-lg shadow-md">
         <h3 className="text-xl font-semibold text-gray-800 mb-4">Accesibilidad</h3>
         <div className="space-y-4">

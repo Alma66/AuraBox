@@ -3,7 +3,7 @@ import React from 'react';
 const HowItWorks: React.FC = () => {
   const steps = [
     {
-      icon: '🔍', // Puedes reemplazar con SVGs o iconos de librería
+      icon: '🔍', 
       title: 'Explora y Descubre',
       description: 'Navega por nuestro catálogo de clubes, filtrando por categoría, precio o intereses. Encuentra la experiencia perfecta para ti.'
     },
@@ -33,7 +33,7 @@ const HowItWorks: React.FC = () => {
             key={index} 
             className="bg-white rounded-lg shadow-md p-6 text-center flex flex-col items-center 
                        transform transition-all duration-300 hover:scale-[1.03] hover:shadow-xl animate-slideInUp"
-            style={{ animationDelay: `${index * 100}ms` }} // Animación secuencial
+            style={{ animationDelay: `${index * 100}ms` }} 
           >
             <div className="text-5xl mb-4 p-4 bg-blue-100 rounded-full inline-block shadow-inner">{step.icon}</div>
             <h3 className="text-xl font-semibold text-gray-800 mb-3">{step.title}</h3>

@@ -1,18 +1,9 @@
-// SECCION DE IMPORTS
-
-// React y hooks
 import React, { useState, useEffect, createContext, useContext } from 'react';
-
-// React Router
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-
-// Componentes comunes
 import Navbar from './components/common/Navbar';
 import Footer from './components/common/Footer';
 import FloatingButtons from './components/common/FloatingButtons';
 import PrivateRoute from './components/common/PrivateRoute';
-
-// Páginas públicas y generales
 import HomePage from './pages/HomePage';
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
@@ -20,59 +11,42 @@ import ExploreClubsPage from './pages/ExploreClubsPage';
 import FAQPage from './pages/FAQPage';
 import AboutUsPage from './pages/AboutUsPage';
 import ContactPage from './pages/ContactPage';
-
-// Páginas para cliente
 import UserProfilePage from './pages/client/UserProfilePage';
 import WishlistPage from './pages/client/WishlistPage';
 import CartPage from './pages/client/CartPage';
 import CheckoutPage from './pages/client/CheckoutPage';
 import MisReviewsPage from './pages/client/MisReviewsPage';
-
-// Páginas para emprendedor - club
 import ClubDetailPage from './pages/entrepreneur/club/ClubDetailPage';
 import HistoryPage from './pages/entrepreneur/club/HistoryPage';
 import SubscriptionPlanDetailPage from './pages/entrepreneur/club/SubscriptionPlanDetailPage';
 import SubscriptionDetailForEntrepreneurPage from './pages/entrepreneur/club/SubscriptionDetailForEntrepreneurPage';
 import TermsAndConditionsPage from './pages/entrepreneur/club/TermsAndConditionsPage';
 import PrivacyAndSecurityPolicyPage from './pages/entrepreneur/club/PrivacyAndSecurityPolicyPage';
-
-// Páginas para emprendedor - perfil y gestión
 import EntrepreneurProfilePage from './pages/entrepreneur/EntrepreneurProfilePage';
 import EditClubLegalInfoPage from './pages/entrepreneur/gestion/EditClubLegalInfoPage';
 import EditSubscriptionsPage from './pages/entrepreneur/gestion/EditSubscriptionsPage';
 import InventoryManagementPage from './pages/entrepreneur/gestion/InventoryManagementPage';
-
-// Páginas para emprendedor - operaciones clientes
 import ActiveSubscriptionsPage from './pages/entrepreneur/operations/clients/ActiveSubscriptionsPage';
 import CustomerHistoryPage from './pages/entrepreneur/operations/clients/CustomerHistoryPage';
 import ManageCustomersPage from './pages/entrepreneur/operations/clients/ManageCustomersPage';
-
-// Páginas para emprendedor - operaciones logística
 import AssignDeliveriesPage from './pages/entrepreneur/operations/logistics/AssignDeliveriesPage';
 import ViewDeliveriesPage from './pages/entrepreneur/operations/logistics/ViewDeliveriesPage';
 import DeliveryHistoryPage from './pages/entrepreneur/operations/logistics/DeliveryHistoryPage';
 import ManageRidersPage from './pages/entrepreneur/operations/logistics/ManageRidersPage';
-
-// Páginas para emprendedor - marketing y comunicación
 import ModerateReviewsPage from './pages/entrepreneur/marketing_and_communication/community/ModerateReviewsPage';
 import CustomerSupportPage from './pages/entrepreneur/marketing_and_communication/community/CustomerSupportPage';
 import ManageClubImagesPage from './pages/entrepreneur/marketing_and_communication/marketing/ManageClubImagesPage';
 import ManagePromotionsPage from './pages/entrepreneur/marketing_and_communication/marketing/ManagePromotionsPage';
 import SendNewsletterPage from './pages/entrepreneur/marketing_and_communication/marketing/SendNewsletterPage';
-
-// Páginas para emprendedor - herramientas de administración
 import ClubStatsPage from './pages/entrepreneur/administration_tools/analysis_and_reports/ClubStatsPage';
 import SalesReportsPage from './pages/entrepreneur/administration_tools/analysis_and_reports/SalesReportsPage';
 import FeedbackTrendsPage from './pages/entrepreneur/administration_tools/analysis_and_reports/FeedbackTrendsPage';
 import FinancialMovementsPage from './pages/entrepreneur/administration_tools/analysis_and_reports/finance_and_team/FinancialMovementsPage';
 import ManageUsersAndRolesPage from './pages/entrepreneur/administration_tools/analysis_and_reports/finance_and_team/ManageUsersAndRolesPage';
 import GeneralSettingsPage from './pages/entrepreneur/administration_tools/analysis_and_reports/finance_and_team/GeneralSettingsPage';
-
-// Tipos y datos
 import { User, UserRole } from './types/user';
 import usersData from './data/user.json';
 
-// Interfaz de la Autenticación
 interface AuthContextType {
   user: User | null;
   isAuthenticated: boolean;
@@ -81,10 +55,8 @@ interface AuthContextType {
   logout: () => void;
 }
 
-// Creación del AuthContext
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-// Hook personalizado para usar el AuthContext
 export const useAuth = () => {
   const context = useContext(AuthContext);
   if (context === undefined) {
@@ -93,42 +65,39 @@ export const useAuth = () => {
   return context;
 };
 
-// Proveedor de autenticación principal
 const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [user, setUser  ] = useState<User | null>(null);
+  const [user, setUser] = useState<User | null>(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [userRole, setUserRole] = useState<UserRole | null>(null);
   const [loading, setLoading] = useState(true);
 
-  // Cargar usuario desde localStorage al iniciar
   useEffect(() => {
-    const storedUser   = localStorage.getItem('loggedInUser  ');
-    if (storedUser ) {
+    const storedUser = localStorage.getItem('loggedInUser');
+    if (storedUser) {
       try {
         const parsedUser: User = JSON.parse(storedUser);
         if (['customer', 'entrepreneur', 'admin'].includes(parsedUser.role)) {
           const fullUser = (usersData as User[]).find(u => u.id === parsedUser.id);
-          if (fullUser ) {
-            setUser  (fullUser  );
-            setUserRole(fullUser  .role as UserRole);
+          if (fullUser) {
+            setUser(fullUser);
+            setUserRole(fullUser.role as UserRole);
             setIsAuthenticated(true);
           } else {
             console.warn("Stored user ID not found in usersData. Clearing session.");
-            localStorage.removeItem('loggedInUser  ');
+            localStorage.removeItem('loggedInUser');
           }
         } else {
           console.warn("Invalid user role stored. Clearing session.");
-          localStorage.removeItem('loggedInUser  ');
+          localStorage.removeItem('loggedInUser');
         }
       } catch (error) {
         console.error("Error parsing stored user data:", error);
-        localStorage.removeItem('loggedInUser  ');
+        localStorage.removeItem('loggedInUser');
       }
     }
     setLoading(false);
   }, []);
 
-  // Función para manejar login
   const login = (loggedInUser: User) => {
     setUser(loggedInUser);
     setUserRole(loggedInUser.role);
@@ -136,12 +105,11 @@ const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => 
     localStorage.setItem('loggedInUser', JSON.stringify(loggedInUser));
   };
 
-  // Función para manejar logout
   const logout = () => {
-    setUser  (null);
+    setUser(null);
     setUserRole(null);
     setIsAuthenticated(false);
-    localStorage.removeItem('loggedInUser  ');
+    localStorage.removeItem('loggedInUser');
   };
 
   if (loading) {
@@ -153,7 +121,6 @@ const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };
 
-// Componente para manejar logout
 const Logout: React.FC = () => {
   const { logout } = useAuth();
   useEffect(() => {
@@ -162,7 +129,6 @@ const Logout: React.FC = () => {
   return <Navigate to="/" replace />;
 };
 
-// Contenido principal de la app con navbar y rutas
 const AppContent: React.FC = () => {
   const { userRole, isAuthenticated, logout } = useAuth();
 
@@ -170,9 +136,7 @@ const AppContent: React.FC = () => {
     <>
       <Navbar userRole={userRole} isAuthenticated={isAuthenticated} onLogout={logout} />
       <main className="min-h-[calc(100vh-100px)]">
-        {/* Rutas */}
         <Routes>
-          {/* Públicas */}
           <Route path="/" element={<HomePage />} />
           <Route path="/explore" element={<ExploreClubsPage />} />
           <Route path="/faq" element={<FAQPage />} />
@@ -180,15 +144,9 @@ const AppContent: React.FC = () => {
           <Route path="/register" element={<RegisterPage />} />
           <Route path="/about-us" element={<AboutUsPage />} />
           <Route path="/contact" element={<ContactPage />} />
-
-          {/* Logout */}
           <Route path="/logout" element={<Logout />} />
-
-          {/* Visualización de políticas para clientes y visitantes */}
           <Route path="/club/:clubId/terms-and-conditions" element={<TermsAndConditionsPage />} />
           <Route path="/club/:clubId/privacy-and-security" element={<PrivacyAndSecurityPolicyPage />} />
-
-          {/* Protegidas para cliente */}
           <Route
             path="/customer/profile"
             element={
@@ -197,8 +155,6 @@ const AppContent: React.FC = () => {
               </PrivateRoute>
             }
           />
-          
-          {/* Mis Reseñas */}
           <Route
             path="/customer/reviews"
             element={
@@ -207,7 +163,6 @@ const AppContent: React.FC = () => {
               </PrivateRoute>
             }
           />
-          {/* Wishlist, Carrito y Checkout */}
           <Route
             path="/customer/wishlist"
             element={
@@ -248,7 +203,6 @@ const AppContent: React.FC = () => {
               </PrivateRoute>
             }
           />
-          {/* Perfil del emprendedor */}
           <Route
             path="/entrepreneur/profile"
             element={
@@ -257,8 +211,6 @@ const AppContent: React.FC = () => {
               </PrivateRoute>
             }
           />
-
-          {/* Edición de políticas para emprendedores */}
           <Route
             path="/entrepreneur/club/:clubId/edit-terms"
             element={
@@ -283,7 +235,6 @@ const AppContent: React.FC = () => {
               </PrivateRoute>
             }
           />
-          {/* Finanzas y equipo */}
           <Route
             path="/entrepreneur/club/:clubId/financial-management"
             element={
@@ -308,7 +259,6 @@ const AppContent: React.FC = () => {
               </PrivateRoute>
             }
           />
-          {/* Gestión de inventario */}
           <Route
             path="/entrepreneur/inventory-management"
             element={
@@ -317,8 +267,6 @@ const AppContent: React.FC = () => {
               </PrivateRoute>
             }
           />
-
-          {/* Gestión de clientes */}
           <Route
             path="/entrepreneur/club/:clubId/active-subscriptions"
             element={
@@ -327,8 +275,6 @@ const AppContent: React.FC = () => {
               </PrivateRoute>
             }
           />
-
-          {/* Análisis y reportes */}
           <Route
             path="/entrepreneur/club/:clubId/stats"
             element={
@@ -353,7 +299,6 @@ const AppContent: React.FC = () => {
               </PrivateRoute>
             }
           />
-
           <Route
             path="/entrepreneur/club/:clubId/subscription/:subscriptionId"
             element={
@@ -378,7 +323,6 @@ const AppContent: React.FC = () => {
               </PrivateRoute>
             }
           />
-          {/* Logística */}
           <Route
             path="/entrepreneur/club/:clubId/assign-deliveries"
             element={
@@ -411,8 +355,6 @@ const AppContent: React.FC = () => {
               </PrivateRoute>
             }
           />
-
-          {/* Para administrador */}
           <Route
             path="/club/:clubId/plan/:planId"
             element={
@@ -456,23 +398,20 @@ const AppContent: React.FC = () => {
           <Route
             path="/entrepreneur/club/:clubId/customer-support"
             element={
-              <PrivateRoute isAuthenticated={isAuthenticated} allowedRoles={['entrepreneur']}
-                          userRole={userRole}>
-              <CustomerSupportPage />
-            </PrivateRoute>
-          }
-        />
-        {/* Catch-all */}
-        <Route path="*" element={<Navigate to="/" replace />} />
-      </Routes>
-    </main>
-    <Footer />
-    <FloatingButtons />
-  </>
-);
+              <PrivateRoute isAuthenticated={isAuthenticated} allowedRoles={['entrepreneur']} userRole={userRole}>
+                <CustomerSupportPage />
+              </PrivateRoute>
+            }
+          />
+          <Route path="*" element={<Navigate to="/" replace />} />
+        </Routes>
+      </main>
+      <Footer />
+      <FloatingButtons />
+    </>
+  );
 };
 
-// Componente principal de la aplicación
 const App: React.FC = () => {
   return (
     <Router>

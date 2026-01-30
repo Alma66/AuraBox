@@ -1,23 +1,21 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import clubsData from '../../../data/clubs.json';
-import usersData from '../../../data/user.json'; // Importar usersData
+import usersData from '../../../data/user.json';
 import { Club, SocialMediaLinks, HistoryMoment, Milestone, KeyFigure, TeamMember } from '../../../types/club';
-import { User } from '../../../types/user'; // Importar User
+import { User } from '../../../types/user';
 import Slider from 'react-slick';
 import 'slick-carousel/slick/slick.css';
 import 'slick-carousel/slick/slick-theme.css';
 import ClubSocialMedia from '../../../components/club/ClubSocialMedia';
-import { useAuth } from '../../../App'; // Importar useAuth para obtener el usuario logueado
+import { useAuth } from '../../../App'; 
 
-// Componente para secciones animadas
 const AnimatedSection: React.FC<{ children: React.ReactNode; delay?: string }> = ({ children, delay = '0s' }) => (
   <div className="opacity-0 animate-fadeInUp" style={{ animationDelay: delay }}>
     {children}
   </div>
 );
 
-// Componente para el botón de edición flotante
 const EditButton: React.FC<{ onClick: () => void; label?: string }> = ({ onClick, label = 'Editar' }) => (
   <button
     onClick={onClick}
@@ -27,7 +25,6 @@ const EditButton: React.FC<{ onClick: () => void; label?: string }> = ({ onClick
   </button>
 );
 
-// Componente para el modal de edición genérico
 interface EditModalProps {
   isOpen: boolean;
   onClose: () => void;
@@ -70,13 +67,11 @@ const EditModal: React.FC<EditModalProps> = ({ isOpen, onClose, title, children,
 const HistoryPage: React.FC = () => {
   const { clubId } = useParams<{ clubId: string }>();
   const navigate = useNavigate();
-  const { user, userRole } = useAuth(); // Obtener el usuario y su rol del contexto de autenticación
+  const { user, userRole } = useAuth();  
 
-  // Aseguramos que clubsData se trate como un array de Club
   const initialClub = (clubsData as Club[]).find(c => c.id === clubId);
   const [club, setClub] = useState<Club | undefined>(initialClub);
 
-  // Estado para controlar los modales de edición
   const [isEditingOrigins, setIsEditingOrigins] = useState(false);
   const [isEditingMoments, setIsEditingMoments] = useState(false);
   const [isEditingMilestones, setIsEditingMilestones] = useState(false);
@@ -84,7 +79,6 @@ const HistoryPage: React.FC = () => {
   const [isEditingTeam, setIsEditingTeam] = useState(false);
   const [isEditingCommunity, setIsEditingCommunity] = useState(false);
 
-  // Estados temporales para la edición
   const [tempFullHistory, setTempFullHistory] = useState(club?.fullHistory || '');
   const [tempHistoryMoments, setTempHistoryMoments] = useState<HistoryMoment[]>(club?.historyMoments || []);
   const [tempMilestones, setTempMilestones] = useState<Milestone[]>(club?.milestones || []);
@@ -93,7 +87,6 @@ const HistoryPage: React.FC = () => {
   const [tempCommunityText, setTempCommunityText] = useState(club?.communityText || '');
 
   useEffect(() => {
-    // Sincronizar estados temporales cuando el club cambie (o al cargar)
     if (club) {
       setTempFullHistory(club.fullHistory || '');
       setTempHistoryMoments(club.historyMoments || []);
@@ -105,7 +98,6 @@ const HistoryPage: React.FC = () => {
   }, [club]);
 
 
-  // Simulación de guardado de datos (en un backend real, esto sería una llamada a la API)
   const handleSave = (field: string) => {
     if (!club) return;
 
@@ -140,14 +132,10 @@ const HistoryPage: React.FC = () => {
         break;
     }
 
-    // En un entorno real, aquí harías una llamada a la API para actualizar el club
-    // Por ahora, actualizamos el estado local para simular el cambio
     setClub(updatedClub);
     console.log(`Club ${club.name} actualizado:`, updatedClub);
-    // Aquí podrías también actualizar clubsData en localStorage si quieres persistir la simulación
   };
 
-  // Lógica para determinar si el usuario actual es el emprendedor dueño de este club
   const isEntrepreneurOwner = userRole === 'entrepreneur' && user?.managedClubId === clubId;
 
   if (!club) {
@@ -180,11 +168,10 @@ const HistoryPage: React.FC = () => {
 
   const historyParagraphs = club.fullHistory ? club.fullHistory.split('\n\n').map((p: string) => p.trim()).filter((p: string) => p.length > 0) : [];
 
-  // Usar los datos del club si existen, de lo contrario, usar los datos de prueba
   const momentsToDisplay = club.historyMoments && club.historyMoments.length > 0 ? club.historyMoments : [
     { id: 'm1', image: club.bannerImages[0] || '/assets/default-history-banner.jpg', description: `${club.name} - Un momento clave en nuestra trayectoria.` },
     { id: 'm2', image: club.bannerImages[1] || '/assets/default-history-banner.jpg', description: `Expansión y crecimiento de ${club.name}.` }
-  ].filter(m => m.image); // Filtrar si no hay imagen
+  ].filter(m => m.image); 
 
   const milestonesToDisplay = club.milestones && club.milestones.length > 0 ? club.milestones : [
     { id: 'h1', year: new Date(club.creationDate).getFullYear(), description: `Fundación de ${club.name}: Nace la idea de llevar la magia a cada hogar.` },
@@ -208,7 +195,6 @@ const HistoryPage: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-blue-100">
-      {/* Hero Section con Banner y Título */}
       <div className="relative h-80 md:h-96 overflow-hidden shadow-xl">
         <img
           src={club.historyBanner || (club.bannerImages && club.bannerImages[0]) || '/assets/default-history-banner.jpg'}
@@ -223,7 +209,6 @@ const HistoryPage: React.FC = () => {
       </div>
 
       <div className="container mx-auto px-4 py-16 max-w-6xl">
-        {/* Logo y Slogan */}
         <AnimatedSection delay="0.2s">
           <div className="flex flex-col md:flex-row items-center justify-center md:justify-start space-y-6 md:space-y-0 md:space-x-8 mb-16 p-8 bg-white rounded-3xl shadow-2xl border border-blue-200 transform hover:scale-[1.01] transition-transform duration-300">
             {club.logoImage && (
@@ -240,7 +225,6 @@ const HistoryPage: React.FC = () => {
           </div>
         </AnimatedSection>
 
-        {/* Sección de Introducción y Valores */}
         <AnimatedSection delay="0.4s">
           <section className="mb-20 p-8 bg-white rounded-3xl shadow-2xl border border-purple-200">
             <div className="flex justify-between items-center mb-6">
@@ -264,7 +248,6 @@ const HistoryPage: React.FC = () => {
           </section>
         </AnimatedSection>
 
-        {/* Modal de edición para Orígenes y Valores */}
         <EditModal
           isOpen={isEditingOrigins}
           onClose={() => setIsEditingOrigins(false)}
@@ -283,7 +266,6 @@ const HistoryPage: React.FC = () => {
           />
         </EditModal>
 
-        {/* Galería de Momentos Clave (Slider más grande) */}
         {momentsToDisplay.length > 0 && (
           <AnimatedSection delay="0.6s">
             <section className="mb-20 shadow-2xl rounded-3xl overflow-hidden border border-green-200">
@@ -309,7 +291,6 @@ const HistoryPage: React.FC = () => {
           </AnimatedSection>
         )}
 
-        {/* Modal de edición para Momentos Clave */}
         <EditModal
           isOpen={isEditingMoments}
           onClose={() => setIsEditingMoments(false)}
@@ -369,7 +350,6 @@ const HistoryPage: React.FC = () => {
         </EditModal>
 
 
-        {/* Sección de Hitos (Timeline) */}
         {milestonesToDisplay.length > 0 && (
           <AnimatedSection delay="0.8s">
             <section className="mb-20 p-8 bg-white rounded-3xl shadow-2xl border border-orange-200">
@@ -393,7 +373,6 @@ const HistoryPage: React.FC = () => {
           </AnimatedSection>
         )}
 
-        {/* Modal de edición para Hitos */}
         <EditModal
           isOpen={isEditingMilestones}
           onClose={() => setIsEditingMilestones(false)}
@@ -451,7 +430,6 @@ const HistoryPage: React.FC = () => {
         </EditModal>
 
 
-        {/* Sección de Cifras Clave */}
         <AnimatedSection delay="1.0s">
           <section className="mb-20 p-8 bg-white rounded-3xl shadow-2xl border border-blue-200">
             <div className="flex justify-between items-center mb-10">
@@ -471,7 +449,6 @@ const HistoryPage: React.FC = () => {
           </section>
         </AnimatedSection>
 
-        {/* Modal de edición para Cifras Clave */}
         <EditModal
           isOpen={isEditingFigures}
           onClose={() => setIsEditingFigures(false)}
@@ -530,7 +507,6 @@ const HistoryPage: React.FC = () => {
         </EditModal>
 
 
-        {/* Sección Conoce al Equipo */}
         {teamMembersToDisplay.length > 0 && (
           <AnimatedSection delay="1.2s">
             <section className="mb-20 p-8 bg-white rounded-3xl shadow-2xl border border-red-200">
@@ -556,7 +532,6 @@ const HistoryPage: React.FC = () => {
           </AnimatedSection>
         )}
 
-        {/* Modal de edición para Equipo */}
         <EditModal
           isOpen={isEditingTeam}
           onClose={() => setIsEditingTeam(false)}
@@ -646,7 +621,6 @@ const HistoryPage: React.FC = () => {
         </EditModal>
 
 
-        {/* Sección de Comunidad y Redes Sociales */}
         <AnimatedSection delay="1.4s">
           <section className="mb-20 p-8 bg-white rounded-3xl shadow-2xl border border-green-200">
             <div className="flex justify-between items-center mb-8">
@@ -660,7 +634,6 @@ const HistoryPage: React.FC = () => {
           </section>
         </AnimatedSection>
 
-        {/* Modal de edición para Comunidad */}
         <EditModal
           isOpen={isEditingCommunity}
           onClose={() => setIsEditingCommunity(false)}
@@ -680,7 +653,6 @@ const HistoryPage: React.FC = () => {
         </EditModal>
 
 
-        {/* CTA Final Impactante */}
         <AnimatedSection delay="1.6s">
           <div className="text-center py-20 bg-gradient-to-r from-blue-600 to-purple-700 text-white rounded-3xl shadow-2xl transform transition-all duration-500 hover:scale-[1.01] hover:shadow-3xl">
             <h2 className="text-4xl md:text-5xl font-extrabold mb-6 animate-pulse-subtle">
@@ -700,7 +672,6 @@ const HistoryPage: React.FC = () => {
           </div>
         </AnimatedSection>
 
-        {/* Botón para volver al club */}
         <div className="text-center mt-16">
           <button
             onClick={() => navigate(`/club/${club.id}`)}

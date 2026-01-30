@@ -1,11 +1,10 @@
-// FileName: /components/entrepreneur/FinancialSidebar.tsx
 import React, { useState } from 'react';
 import { FinancialMovement } from '../../types/financial';
 
 interface FinancialSidebarProps {
   activeFilter: string;
   setActiveFilter: (filter: string) => void;
-  categories: string[]; // e.g., ['suscripciones', 'proveedores', ...]
+  categories: string[];
   onDateFilterChange: (from: string, to: string) => void;
   onStatusFilterChange: (status: string) => void;
 }
@@ -26,7 +25,7 @@ const FinancialSidebar: React.FC<FinancialSidebarProps> = ({
     ...categories.map(cat => ({ 
       id: cat, 
       label: cat.charAt(0).toUpperCase() + cat.slice(1).replace(/_/g, ' '), 
-      icon: 'M9 12h3m0 0l3-3m-3 3l3 3m0 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z' // Icono genérico; personaliza por categoría si quieres
+      icon: 'M9 12h3m0 0l3-3m-3 3l3 3m0 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z' 
     })),
     { id: 'ingresos', label: 'Solo Ingresos', icon: 'M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1' },
     { id: 'egresos', label: 'Solo Egresos', icon: 'M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1' },
@@ -45,7 +44,6 @@ const FinancialSidebar: React.FC<FinancialSidebarProps> = ({
     <nav className="bg-white rounded-xl shadow-lg p-6 w-full lg:w-64">
       <h3 className="text-lg font-bold text-gray-800 mb-4">Filtros Financieros</h3>
       
-      {/* Filtros por Categoría/Tipo */}
       <ul className="space-y-2 mb-6">
         {sidebarItems.map((item) => (
           <li key={item.id}>
@@ -63,7 +61,6 @@ const FinancialSidebar: React.FC<FinancialSidebarProps> = ({
         ))}
       </ul>
 
-      {/* Filtro por Fecha */}
       <div className="space-y-3 mb-6">
         <label className="block text-sm font-medium text-gray-700 mb-2">Filtrar por Fecha</label>
         <div className="grid grid-cols-2 gap-2">
@@ -88,7 +85,6 @@ const FinancialSidebar: React.FC<FinancialSidebarProps> = ({
         </button>
       </div>
 
-      {/* Filtro por Estado */}
       <div className="space-y-2">
         <label className="block text-sm font-medium text-gray-700 mb-2">Filtrar por Estado</label>
         <select

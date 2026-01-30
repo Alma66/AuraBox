@@ -1,12 +1,11 @@
-// src/components/client/PlanCard.tsx
 import React from 'react';
 import { SubscriptionPlan } from '../../types/club';
 
 interface PlanCardProps {
   plan: SubscriptionPlan;
-  onRemove: () => void; // Para eliminar de wishlist/cart
-  onAddToCart?: () => void; // Opcional, solo para wishlist
-  isInCart?: boolean; // Para diferenciar UI
+  onRemove: () => void;
+  onAddToCart?: () => void; 
+  isInCart?: boolean; 
   className?: string;
 }
 
@@ -19,7 +18,6 @@ const PlanCard: React.FC<PlanCardProps> = ({
 }) => {
   return (
     <div className={`bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300 border border-gray-200 ${className}`}>
-      {/* Imagen */}
       <div className="relative h-48 bg-gradient-to-br from-blue-50 to-purple-50">
         <img 
           src={plan.image || '/assets/placeholder-plan.jpg'} 
@@ -31,12 +29,10 @@ const PlanCard: React.FC<PlanCardProps> = ({
         </div>
       </div>
 
-      {/* Contenido */}
       <div className="p-6">
         <h3 className="text-xl font-bold text-gray-800 mb-2">{plan.name}</h3>
         <p className="text-gray-600 mb-3 line-clamp-2">{plan.description}</p>
         
-        {/* Precio */}
         <div className="flex items-center justify-between mb-4">
           <div className="text-2xl font-bold text-blue-600">
             ${plan.price.toLocaleString()} {plan.currency}
@@ -46,7 +42,6 @@ const PlanCard: React.FC<PlanCardProps> = ({
           </span>
         </div>
 
-        {/* Incluye */}
         <div className="mb-4">
           <h4 className="text-sm font-semibold text-gray-700 mb-2">Incluye:</h4>
           <ul className="space-y-1 text-sm text-gray-600">
@@ -64,7 +59,6 @@ const PlanCard: React.FC<PlanCardProps> = ({
           </ul>
         </div>
 
-        {/* Botones */}
         <div className="flex space-x-2">
           {onAddToCart && !isInCart && (
             <button

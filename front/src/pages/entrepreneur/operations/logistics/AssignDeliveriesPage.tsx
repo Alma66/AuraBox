@@ -1,4 +1,3 @@
-// FileName: /src/pages/entrepreneur/AssignDeliveriesPage.tsx
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { Delivery, Rider } from '../../../../types/delivery';
@@ -20,10 +19,8 @@ const AssignDeliveriesPage: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    // Simulación de fetch: En backend, reemplazar por API calls (ej: fetch('/api/deliveries?clubId=' + clubId))
     const fetchData = async () => {
       try {
-        // Normalizar null a undefined en deliveriesData para match con Delivery
         const normalizedDeliveries = (deliveriesData as Delivery[]).map(d => ({
           ...d,
           assignedRiderId: d.assignedRiderId === null ? undefined : d.assignedRiderId,
@@ -31,15 +28,12 @@ const AssignDeliveriesPage: React.FC = () => {
         })).filter(d => d.clubId === clubId);
         setDeliveries(normalizedDeliveries);
 
-        // Filtrar riders disponibles por zonas del club (simulado: todos disponibles para este ejemplo)
-        // Normalizar licensePlate en riders
         const availableRiders = (ridersData as Rider[]).filter(r => r.isActive && r.availability).map(r => ({
           ...r,
           licensePlate: r.licensePlate === null ? undefined : r.licensePlate
         }));
         setRiders(availableRiders);
 
-        // Obtener club
         const foundClub = (clubsData as Club[]).find(c => c.id === clubId);
         if (foundClub && user?.managedClubId === clubId) {
           setClub(foundClub);
@@ -59,7 +53,6 @@ const AssignDeliveriesPage: React.FC = () => {
   }, [clubId, user]);
 
   const assignRiderToDelivery = (deliveryId: string, riderId: string) => {
-    // Simulación de asignación: En backend, POST a API (ej: fetch('/api/deliveries/' + deliveryId + '/assign', { method: 'POST', body: JSON.stringify({ riderId }) }))
     setDeliveries(prev => prev.map(d => 
       d.id === deliveryId 
         ? { ...d, assignedRiderId: riderId, status: 'assigned' as const, updatedAt: new Date().toISOString() }
@@ -76,10 +69,9 @@ const AssignDeliveriesPage: React.FC = () => {
   };
 
   const unassignRider = (deliveryId: string) => {
-    // Simulación de desasignación: En backend, PATCH a API
     setDeliveries(prev => prev.map(d => 
       d.id === deliveryId 
-        ? { ...d, assignedRiderId: undefined, status: 'pending' as const, updatedAt: new Date().toISOString() } // Cambiado: undefined en lugar de null
+        ? { ...d, assignedRiderId: undefined, status: 'pending' as const, updatedAt: new Date().toISOString() } 
         : d
     ));
     if (selectedRider) {
@@ -108,7 +100,6 @@ const AssignDeliveriesPage: React.FC = () => {
     <div className="container mx-auto px-4 py-8">
       <h1 className="text-3xl font-bold mb-6">Asignar Envíos - {club.name}</h1>
       
-      {/* Filtros */}
       <div className="mb-6 flex flex-col sm:flex-row gap-4">
         <select 
           value={filterStatus} 
@@ -135,7 +126,6 @@ const AssignDeliveriesPage: React.FC = () => {
         </div>
       </div>
 
-      {/* Lista de Riders Disponibles */}
       <div className="mb-6">
         <h2 className="text-xl font-semibold mb-3">Riders Disponibles</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -157,7 +147,6 @@ const AssignDeliveriesPage: React.FC = () => {
         </div>
       </div>
 
-      {/* Lista de Entregas */}
       <div className="bg-white rounded-lg shadow-md overflow-hidden">
         <div className="px-6 py-4 border-b border-gray-200">
           <h2 className="text-xl font-semibold">Entregas Pendientes/Asignadas ({filteredDeliveries.length})</h2>
@@ -181,7 +170,7 @@ const AssignDeliveriesPage: React.FC = () => {
                 <tr key={delivery.id} className="hover:bg-gray-50">
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{delivery.id}</td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                    {delivery.userId} {/* En backend, fetch nombre real */}
+                    {delivery.userId} 
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{new Date(delivery.deliveryDate).toLocaleDateString('es-AR')}</td>
                   <td className="px-6 py-4 text-sm text-gray-900 max-w-xs truncate" title={delivery.boxContent}>

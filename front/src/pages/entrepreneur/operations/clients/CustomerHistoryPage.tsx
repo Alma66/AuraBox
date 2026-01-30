@@ -1,4 +1,3 @@
-// FileName: src/pages/entrepreneur/CustomerHistoryPage.tsx
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../../../App';
@@ -35,14 +34,13 @@ const CustomerHistoryPage: React.FC = () => {
       return;
     }
 
-    // Cast para fixear mismatch de tipos en Club (JSON infiere string genérico para LegalSection.type)
     const foundClub = (clubsData as Club[]).find((c) => c.id === clubId) || null;
     if (!foundClub) {
       setError('Club no encontrado.');
       setLoading(false);
       return;
     }
-    setClub(foundClub as Club); // Cast explícito para asignar a SetStateAction<Club | null>
+    setClub(foundClub as Club); 
 
     const allSubscriptions = subscriptionsData as Subscription[];
     const allUsers = usersData as User[];
@@ -58,7 +56,6 @@ const CustomerHistoryPage: React.FC = () => {
 
         const customerSubsForClub = clubSubscriptions.filter((sub) => sub.userId === userId);
 
-        // Map subscriptions with cancelDate if status is cancelled
         const subscriptionsInfo = customerSubsForClub.map((sub) => ({
           id: sub.id,
           planId: sub.planId,

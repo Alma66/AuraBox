@@ -1,4 +1,3 @@
-// FileName: /pages/entrepreneur/ManageUsersAndRolesPage.tsx
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { useAuth } from '../../../../../App';
@@ -15,34 +14,29 @@ const ManageUsersAndRolesPage: React.FC = () => {
   const clubName = club?.name || 'Tu Club';
 
   const [teamUsers, setTeamUsers] = useState<TeamUser[]>([]);
-  const [activeFilter, setActiveFilter] = useState('todos'); // 'todos', 'activo', 'inactivo', o rol específico
+  const [activeFilter, setActiveFilter] = useState('todos');
   const [filteredUsers, setFilteredUsers] = useState<TeamUser[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
 
-  // Cargar datos (simulado; en backend: fetch(`/api/clubs/${actualClubId}/team-users`))
   useEffect(() => {
     const data = (usersRolesData as any)[actualClubId] || (usersRolesData as any)['club-1'];
     setTeamUsers(data.users || []);
     setFilteredUsers(data.users || []);
   }, [actualClubId]);
 
-  // Filtrar usuarios
   useEffect(() => {
     let filtered = [...teamUsers];
 
-    // Por estado
     if (activeFilter === 'activo') {
       filtered = filtered.filter(u => u.status === 'activo');
     } else if (activeFilter === 'inactivo') {
       filtered = filtered.filter(u => u.status === 'inactivo');
     }
 
-    // Por rol (si activeFilter es un rol específico)
     if (activeFilter !== 'todos' && activeFilter !== 'activo' && activeFilter !== 'inactivo') {
       filtered = filtered.filter(u => u.role === activeFilter);
     }
 
-    // Por búsqueda
     if (searchTerm) {
       filtered = filtered.filter(u =>
         u.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -53,32 +47,26 @@ const ManageUsersAndRolesPage: React.FC = () => {
     setFilteredUsers(filtered);
   }, [activeFilter, searchTerm, teamUsers]);
 
-  // Roles dinámicos
   const roles = Array.from(new Set(teamUsers.map(u => u.role)));
 
-  // Funciones simuladas (en backend: POST/PUT/DELETE /api/team-users)
   const handleAddUser = () => {
     console.log('Agregando nuevo usuario al equipo');
-    // Aquí: modal o navegación a form de nuevo usuario
     alert('Funcionalidad de agregar usuario (simulada para backend)');
   };
 
   const handleEditUser = (teamUser: TeamUser) => {
     console.log('Editando usuario:', teamUser);
-    // Aquí: modal para editar rol/estado/email
     alert(`Editando ${teamUser.name} (simulado)`);
   };
 
   const handleDeleteUser = (userId: string) => {
     if (window.confirm('¿Confirmar eliminación?')) {
       console.log('Eliminando usuario:', userId);
-      // En backend: DELETE /api/team-users/:id
       setTeamUsers(prev => prev.filter(u => u.id !== userId));
       alert('Usuario eliminado (simulado)');
     }
   };
 
-  // Función renderUserRow
   const renderUserRow = (teamUser: TeamUser) => (
     <tr key={teamUser.id} className="border-b hover:bg-gray-50">
       <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{teamUser.name}</td>
@@ -125,7 +113,6 @@ const ManageUsersAndRolesPage: React.FC = () => {
   return (
     <div className="container mx-auto px-4 py-8 min-h-screen">
       <div className="flex flex-col lg:flex-row gap-8">
-        {/* Sidebar */}
         <div className="lg:w-1/4">
           <UsersSidebar
             activeFilter={activeFilter}
@@ -136,7 +123,6 @@ const ManageUsersAndRolesPage: React.FC = () => {
           />
         </div>
 
-        {/* Contenido Principal */}
         <div className="lg:w-3/4 bg-white rounded-xl shadow-lg p-8">
           <h1 className="text-3xl font-bold text-gray-800 mb-6">Gestionar Usuarios y Roles - {clubName}</h1>
           <p className="text-gray-600 mb-6">Total usuarios en equipo: {teamUsers.length}. Filtrados: {filteredUsers.length}.</p>
@@ -148,7 +134,6 @@ const ManageUsersAndRolesPage: React.FC = () => {
             Agregar Nuevo Miembro al Equipo
           </button>
 
-          {/* Tabla de Usuarios */}
           <div className="overflow-x-auto">
             <table className="min-w-full divide-y divide-gray-200">
               <thead className="bg-gray-50">

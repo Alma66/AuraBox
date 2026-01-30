@@ -1,19 +1,16 @@
-// FileName: src/pages/entrepreneur/ClubStatsPage.tsx
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { useAuth } from '../../../../App';
 import { User } from '../../../../types/user';
 import { Club } from '../../../../types/club';
 import { Subscription } from '../../../../types/subscription';
-import AdminToolsSidebar from '../../../../components/entrepreneur/AdminToolsSidebar'; // Reutilizado/adaptado (ver abajo)
-import StatsCards from '../../../../components/entrepreneur/StatsCards'; // Nuevo componente extraído
-import TrendsChart from '../../../../components/entrepreneur/TrendsChart'; // Nuevo para gráficos simulados
-import InteractionsSummary from '../../../../components/entrepreneur/InteractionsSummary'; // Nuevo para interacciones digitales
-
-// Importar datos simulados
+import AdminToolsSidebar from '../../../../components/entrepreneur/AdminToolsSidebar';
+import StatsCards from '../../../../components/entrepreneur/StatsCards';
+import TrendsChart from '../../../../components/entrepreneur/TrendsChart';
+import InteractionsSummary from '../../../../components/entrepreneur/InteractionsSummary';
 import clubsData from '../../../../data/clubs.json';
 import subscriptionsData from '../../../../data/subscriptions.json';
-import analyticsData from '../../../../data/analytics.json'; // Asumiendo que existe o simular
+import analyticsData from '../../../../data/analytics.json';
 
 const ClubStatsPage: React.FC = () => {
   const { clubId } = useParams<{ clubId: string }>();
@@ -32,7 +29,6 @@ const ClubStatsPage: React.FC = () => {
     if (club && club.id === clubId) {
       setManagedClub(club);
       setClubSubscriptions((subscriptionsData as Subscription[]).filter(sub => sub.clubId === club.id));
-      // Simular analytics (fácil de cambiar a API)
       setAnalytics((analyticsData as any)[club.id] || {
         views: Math.round(Math.random() * 20000 + 5000),
         likes: Math.round(Math.random() * 1000 + 200),
@@ -40,9 +36,16 @@ const ClubStatsPage: React.FC = () => {
         monthlyExpenses: [
           { month: '2024-01', amount: 150000 + Math.random() * 50000 },
           { month: '2024-02', amount: 180000 + Math.random() * 50000 },
-          // ... más meses
+          { month: '2024-03', amount: 200000 + Math.random() * 50000 },
+          { month: '2024-04', amount: 170000 + Math.random() * 50000 },
+          { month: '2024-05', amount: 190000 + Math.random() * 50000 },
+          { month: '2024-06', amount: 210000 + Math.random() * 50000 }
         ],
-        trends: { ratingTrend: [4.2, 4.5, 4.7, 4.6, 4.8, 4.9] }
+        trends: {
+          positiveWords: ['excelente', 'recomendable', 'sorprendente', 'calidad', 'genial'],
+          negativeWords: ['tarde', 'roto', 'decepcionante', 'malo'],
+          ratingTrend: [4.2, 4.5, 4.7, 4.6, 4.8, 4.9]
+        }
       });
     } else {
       window.location.href = '/';
@@ -53,13 +56,11 @@ const ClubStatsPage: React.FC = () => {
     return <div className="text-center py-20">Cargando estadísticas...</div>;
   }
 
-  // Calcular métricas dinámicas (fácil integración backend)
-  const totalRevenue = clubSubscriptions.filter(sub => sub.status === 'active').length * 25000; // Simulado
-  const monthlyGrowth = Math.round(Math.random() * 15 + 5); // Simulado
+  const totalRevenue = clubSubscriptions.filter(sub => sub.status === 'active').length * 25000;
+  const monthlyGrowth = Math.round(Math.random() * 15 + 5);
 
   return (
     <div className="container mx-auto px-4 py-8 min-h-screen bg-gray-50">
-      {/* Header/Breadcrumbs */}
       <div className="mb-8">
         <nav className="flex mb-4" aria-label="Breadcrumb">
           <ol className="inline-flex items-center space-x-1 md:space-x-3">
@@ -90,14 +91,11 @@ const ClubStatsPage: React.FC = () => {
       </div>
 
       <div className="flex flex-col lg:flex-row gap-8">
-        {/* Sidebar (opcional, reutilizado de tu ejemplo; colapsa en mobile) */}
         <div className="lg:w-1/4 hidden lg:block">
-          <AdminToolsSidebar activeSection="stats" setActiveSection={() => {}} clubId={clubId!} /> {/* ← CORREGIDO: clubId! */}
+          <AdminToolsSidebar activeSection="stats" setActiveSection={() => {}} clubId={clubId!} />
         </div>
 
-        {/* Contenido Principal */}
         <div className="lg:w-3/4 space-y-8">
-          {/* Tarjetas de KPIs */}
           <StatsCards 
             subscribers={managedClub.totalSubscribers} 
             revenue={totalRevenue} 
@@ -106,13 +104,10 @@ const ClubStatsPage: React.FC = () => {
             growth={monthlyGrowth}
           />
 
-          {/* Gráficos de Tendencias */}
           <TrendsChart trends={analytics.trends} monthlyExpenses={analytics.monthlyExpenses} />
 
-          {/* Resumen de Interacciones */}
           <InteractionsSummary analytics={analytics} />
 
-          {/* Sección de Recomendaciones (agregado para completitud) */}
           <div className="bg-white p-6 rounded-xl shadow-lg">
             <h3 className="text-lg font-semibold text-gray-800 mb-4">Recomendaciones Basadas en Datos</h3>
             <ul className="space-y-2 text-gray-700">

@@ -1,4 +1,3 @@
-// FileName: src/components/entrepreneur/SubscriptionCardForEntrepreneur.tsx
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { Subscription } from '../../types/subscription';

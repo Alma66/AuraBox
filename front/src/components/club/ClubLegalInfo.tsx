@@ -1,11 +1,10 @@
-// src/components/club/ClubLegalInfo.tsx
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { LegalInfo } from '../../types/club';
 
 interface ClubLegalInfoProps {
   legalInfo: LegalInfo;
-  clubId: string; // Necesitamos el clubId para construir las rutas
+  clubId: string; 
 }
 
 const ClubLegalInfo: React.FC<ClubLegalInfoProps> = ({ legalInfo, clubId }) => {

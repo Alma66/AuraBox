@@ -1,8 +1,7 @@
-// src/pages/client/WishlistPage.tsx
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../App';
-import clubPlansData from '../../data/clubPlans.json'; // Importa planes simulados
+import clubPlansData from '../../data/clubPlans.json';
 import PlanCard from '../../components/client/PlanCard';
 import { SubscriptionPlan } from '../../types/club';
 
@@ -12,9 +11,7 @@ const WishlistPage: React.FC = () => {
   const [wishlistItems, setWishlistItems] = useState<SubscriptionPlan[]>([]);
   const [loading, setLoading] = useState(true);
 
-  // Simula carga de wishlist del usuario (fija, de JSON)
   useEffect(() => {
-    // Filtra planes para este usuario (simulado: toma los primeros 3)
     const simulatedWishlist = (clubPlansData as SubscriptionPlan[]).slice(0, 3);
     setWishlistItems(simulatedWishlist);
     setLoading(false);
@@ -22,11 +19,9 @@ const WishlistPage: React.FC = () => {
 
   const handleRemove = (planId: string) => {
     setWishlistItems(prev => prev.filter(item => item.planId !== planId));
-    // En backend: PATCH /api/wishlist/remove
   };
 
   const handleAddToCart = (plan: SubscriptionPlan) => {
-    // Simula adición: Navega a cart con el plan (en real: POST /api/cart/add)
     navigate(`/cart?added=${plan.planId}`);
   };
 
@@ -44,7 +39,6 @@ const WishlistPage: React.FC = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 py-8 px-4">
       <div className="max-w-7xl mx-auto">
-        {/* Header */}
         <div className="text-center mb-8">
           <h1 className="text-4xl font-bold text-gray-800 mb-2">Mi Lista de Deseos</h1>
           <p className="text-gray-600">
@@ -52,7 +46,6 @@ const WishlistPage: React.FC = () => {
           </p>
         </div>
 
-        {/* Contenido */}
         {wishlistItems.length === 0 ? (
           <div className="text-center py-12">
             <svg className="mx-auto h-24 w-24 text-gray-400 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -81,7 +74,6 @@ const WishlistPage: React.FC = () => {
           </div>
         )}
 
-        {/* Footer de página */}
         <div className="mt-12 text-center">
           <button
             onClick={() => navigate('/explore')}

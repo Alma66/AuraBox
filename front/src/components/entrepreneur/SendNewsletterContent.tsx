@@ -28,7 +28,6 @@ const SendNewsletterContent: React.FC<SendNewsletterContentProps> = ({ activeSec
       setEnviados([...enviados, newEnviado]);
       setNewsletter({ asunto: '', contenido: '', audiencia: 'todos' });
       alert('Newsletter enviado exitosamente (simulado)');
-      // En backend: POST /api/newsletters {clubId, asunto, contenido, audiencia}
     } else {
       alert('Completa asunto y contenido');
     }

@@ -5,12 +5,12 @@ interface ClubCardProps {
   id: string;
   name: string;
   category: string;
-  description: string; // Ahora es shortDescription
-  image: string;       // Ahora es mainImage o logoImage
+  description: string;
+  image: string;
   rating: number;
   reviewsCount: number;
-  price?: number;      // Opcional, ya que no todos los clubes pueden tener un precio directo en la tarjeta
-  currency?: string;   // Opcional
+  price?: number;
+  currency?: string;
 }
 
 const ClubCard: React.FC<ClubCardProps> = ({

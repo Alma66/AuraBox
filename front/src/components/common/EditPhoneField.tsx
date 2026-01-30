@@ -1,31 +1,28 @@
 import React, { useState } from 'react';
-import EditProfileField from './EditProfileField'; // Reutilizamos el componente base
+import EditProfileField from './EditProfileField';
 
 interface EditPhoneFieldProps {
   label: string;
-  value: string; // El número de teléfono completo (ej: "+5491155551234")
+  value: string;
   onSave: (newNumber: string) => void;
 }
 
 const EditPhoneField: React.FC<EditPhoneFieldProps> = ({ label, value, onSave }) => {
   const [isEditing, setIsEditing] = useState(false);
-  const [countryCode, setCountryCode] = useState('+54'); // Código de país por defecto (Argentina)
-  const [areaCode, setAreaCode] = useState('911'); // Código de área por defecto (ej: 911 para CABA/GBA móvil)
-  const [phoneNumber, setPhoneNumber] = useState(''); // El resto del número
+  const [countryCode, setCountryCode] = useState('+54');
+  const [areaCode, setAreaCode] = useState('911');
+  const [phoneNumber, setPhoneNumber] = useState('');
   const [error, setError] = useState('');
 
-  // Formatea el número de teléfono para mostrarlo
   const formatPhoneNumberDisplay = (fullNumber: string) => {
     if (!fullNumber) return 'N/A';
-    // Asumiendo formato +CCAAANNNNNNN
     const match = fullNumber.match(/^\+(\d{1,3})(\d{1,4})(\d{6,10})$/);
     if (match) {
-      return `+${match[1]} ${match[2]} ${match[3].replace(/(\d{4})(\d{4})/, '$1-$2')}`; // Ej: +54 911 5555-1234
+      return `+${match[1]} ${match[2]} ${match[3].replace(/(\d{4})(\d{4})/, '$1-$2')}`;
     }
-    return fullNumber; // Si no coincide, muestra el número tal cual
+    return fullNumber;
   };
 
-  // Descompone el número completo en sus partes para la edición
   React.useEffect(() => {
     if (value) {
       const match = value.match(/^\+(\d{1,3})(\d{1,4})(\d{6,10})$/);
@@ -34,7 +31,6 @@ const EditPhoneField: React.FC<EditPhoneFieldProps> = ({ label, value, onSave })
         setAreaCode(match[2]);
         setPhoneNumber(match[3]);
       } else {
-        // Fallback si el formato no es el esperado
         setCountryCode('+54');
         setAreaCode('');
         setPhoneNumber(value);
@@ -52,7 +48,6 @@ const EditPhoneField: React.FC<EditPhoneFieldProps> = ({ label, value, onSave })
       setError('Todos los campos del teléfono son obligatorios.');
       return;
     }
-    // Validar que sean solo números
     if (!/^\d+$/.test(areaCode) || !/^\d+$/.test(phoneNumber)) {
       setError('El código de área y el número de teléfono deben contener solo dígitos.');
       return;
@@ -66,7 +61,6 @@ const EditPhoneField: React.FC<EditPhoneFieldProps> = ({ label, value, onSave })
   const handleCancel = () => {
     setIsEditing(false);
     setError('');
-    // Restablecer a los valores originales al cancelar
     if (value) {
       const match = value.match(/^\+(\d{1,3})(\d{1,4})(\d{6,10})$/);
       if (match) {
@@ -106,7 +100,6 @@ const EditPhoneField: React.FC<EditPhoneFieldProps> = ({ label, value, onSave })
             <option value="+1">+1 (EEUU/Canadá)</option>
             <option value="+56">+56 (Chile)</option>
             <option value="+598">+598 (Uruguay)</option>
-            {/* Puedes añadir más códigos de país aquí */}
           </select>
         </div>
         <div className="w-1/4">
@@ -118,7 +111,7 @@ const EditPhoneField: React.FC<EditPhoneFieldProps> = ({ label, value, onSave })
             onChange={(e) => setAreaCode(e.target.value)}
             className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
             placeholder="Ej: 911"
-            maxLength={4} // Limita la longitud del código de área
+            maxLength={4}
           />
         </div>
         <div className="w-1/2">
@@ -130,7 +123,7 @@ const EditPhoneField: React.FC<EditPhoneFieldProps> = ({ label, value, onSave })
             onChange={(e) => setPhoneNumber(e.target.value)}
             className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
             placeholder="Ej: 55551234"
-            maxLength={10} // Limita la longitud del número
+            maxLength={10}
           />
         </div>
       </div>
