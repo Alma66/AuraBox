@@ -6,7 +6,7 @@ import { Prisma } from '@prisma/client';
 
 function sanitize(sub: any) {
   if (!sub) return sub;
-  if (sub.monthlyAmountPaid !==  && sub.monthlyAmountPaid !== null) {
+  if (sub.monthlyAmountPaid !== undefined && sub.monthlyAmountPaid !== null) {
     try {
       sub.monthlyAmountPaid = (sub.monthlyAmountPaid as any).toString();
     } catch {}
