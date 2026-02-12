@@ -1,3 +1,6 @@
+console.log('DB exists?', !!process.env.DATABASE_URL);
+console.log('ENV KEYS:', Object.keys(process.env).slice(0,10));
+
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 
