@@ -1,8 +1,9 @@
 import { Module, ValidationPipe } from '@nestjs/common';
-import { APP_GUARD, APP_PIPE, APP_INTERCEPTOR, APP_FILTER } from '@nestjs/core';
+import { APP_GUARD, APP_PIPE, APP_INTERCEPTOR, APP_FILTER, Reflector } from '@nestjs/core';
 import { JwtModule } from '@nestjs/jwt';
-import { Reflector } from '@nestjs/core';
+
 import { PrismaModule } from './prisma/prisma.module';
+
 import { AdminOrEntrepreneurRoleModule } from './modules/admin-or-entrepreneur-role/admin-or-entrepreneur-role.module';
 import { AdminsModule } from './modules/admins/admins.module';
 import { AuthModule } from './modules/auth/auth.module';
@@ -15,7 +16,7 @@ import { ClubStatusHistoryModule } from './modules/club-status-history/club-stat
 import { ClubsModule } from './modules/clubs/clubs.module';
 import { EntrepreneurClubModule } from './modules/entrepreneur-club/entrepreneur-club.module';
 import { EntrepreneurLicensesModule } from './modules/entrepreneur-licenses/entrepreneur-licenses.module';
-import { EntrepreneursModule } from './modules/entrepreneurs/entrpreneurs.module'; 
+import { EntrepreneursModule } from './modules/entrepreneurs/entrpreneurs.module';
 import { FavoritesModule } from './modules/favorites/favorites.module';
 import { ImageClubModule } from './modules/image-club/image-club.module';
 import { LicenseTypesModule } from './modules/license-types/license-types.module';
@@ -32,6 +33,7 @@ import { TransactionHistoryModule } from './modules/transaction-history/transact
 import { UserClubPreferencesModule } from './modules/user-club-preferences/user-club-preferences.module';
 import { UserSubscriptionsModule } from './modules/user-subscriptions/user-subscriptions.module';
 import { UsersModule } from './modules/users/users.module';
+
 import { JwtAuthGuard } from './common/guards/jwt-auth.guard';
 import { TransformInterceptor } from './common/interceptors/transform.interceptor';
 import { AllExceptionsFilter } from './common/filters/all-exceptions.filter';
@@ -39,6 +41,13 @@ import { AllExceptionsFilter } from './common/filters/all-exceptions.filter';
 @Module({
   imports: [
     PrismaModule,
+
+    JwtModule.register({
+      global: true,
+      secret: process.env.JWT_SECRET || 'superSecretDevKey',
+      signOptions: { expiresIn: '7d' },
+    }),
+
     AdminOrEntrepreneurRoleModule,
     AdminsModule,
     AuthModule,
@@ -62,35 +71,40 @@ import { AllExceptionsFilter } from './common/filters/all-exceptions.filter';
     ReviewsModule,
     RoleModule,
     RolePermissionsModule,
-    ShipmentsModule,    
+    ShipmentsModule,
     SubscriptionTypesModule,
     TransactionHistoryModule,
     UserClubPreferencesModule,
     UserSubscriptionsModule,
     UsersModule,
-    JwtModule.register({
-      global: true,
-      secret: process.env.JWT_SECRET || 'superSecretDevKey',
-      signOptions: { expiresIn: '7d' },
-    }),
   ],
+
   providers: [
-    Reflector, 
+    Reflector,
+
     {
       provide: APP_GUARD,
-      useClass: JwtAuthGuard, 
+      useClass: JwtAuthGuard,
     },
+
     {
       provide: APP_PIPE,
-      useClass: ValidationPipe, 
+      useFactory: () =>
+        new ValidationPipe({
+          whitelist: true,
+          forbidNonWhitelisted: true,
+          transform: true,
+        }),
     },
+
     {
       provide: APP_INTERCEPTOR,
-      useClass: TransformInterceptor, 
+      useClass: TransformInterceptor,
     },
+
     {
       provide: APP_FILTER,
-      useClass: AllExceptionsFilter, 
+      useClass: AllExceptionsFilter,
     },
   ],
 })
