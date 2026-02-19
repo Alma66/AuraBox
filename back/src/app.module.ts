@@ -1,6 +1,9 @@
 import { Module, ValidationPipe } from '@nestjs/common';
 import { APP_GUARD, APP_PIPE, APP_INTERCEPTOR, APP_FILTER, Reflector } from '@nestjs/core';
 import { JwtModule } from '@nestjs/jwt';
+import { AppController } from './app.controller';
+import { AppService } from './app.service';
+
 
 import { PrismaModule } from './prisma/prisma.module';
 
@@ -78,8 +81,10 @@ import { AllExceptionsFilter } from './common/filters/all-exceptions.filter';
     UserSubscriptionsModule,
     UsersModule,
   ],
+  controllers: [AppController],
 
   providers: [
+    AppService,
     Reflector,
 
     {
