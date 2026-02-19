@@ -1,23 +1,16 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 
-type AdminToolsSection = 'stats' | 'sales' | 'feedback';
+type AdminSection = 'stats' | 'sales' | 'feedback';
 
 interface AdminToolsSidebarProps {
-  activeSection: AdminToolsSection;
-  setActiveSection: (section: AdminToolsSection) => void;
+  activeSection: AdminSection;
+  setActiveSection: (section: AdminSection) => void;
   clubId: string;
 }
 
-type MenuItem = {
-  id: AdminToolsSection;
-  label: string;
-  icon: string;
-  path: string;
-};
-
 const AdminToolsSidebar: React.FC<AdminToolsSidebarProps> = ({ activeSection, setActiveSection, clubId }) => {
-  const menuItems: MenuItem[] = [
+  const menuItems: Array<{ id: AdminSection; label: string; icon: string; path: string }> = [
     {
       id: 'stats',
       label: 'Estadísticas del Club',
@@ -47,9 +40,8 @@ const AdminToolsSidebar: React.FC<AdminToolsSidebarProps> = ({ activeSection, se
             <Link
               to={item.path}
               onClick={() => setActiveSection(item.id)}
-              className={`w-full flex items-center p-3 rounded-lg text-left font-medium transition-colors duration-200 ${
-                activeSection === item.id ? 'bg-blue-600 text-white shadow-md' : 'text-gray-700 hover:bg-gray-100 hover:text-blue-600'
-              }`}
+              className={`w-full flex items-center p-3 rounded-lg text-left font-medium transition-colors duration-200 
+                ${activeSection === item.id ? 'bg-blue-600 text-white shadow-md' : 'text-gray-700 hover:bg-gray-100 hover:text-blue-600'}`}
             >
               <svg className="w-6 h-6 mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden>
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d={item.icon}></path>
