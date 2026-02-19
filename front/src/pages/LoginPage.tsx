@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import api from '../api/config';
-import { User } from '../types/user';
+import { User, UserRole } from '../types/user';
 
 interface LoginPageProps {
   onLogin: (user: User) => void;
@@ -21,37 +21,49 @@ const LoginPage: React.FC<LoginPageProps> = ({ onLogin }) => {
 
     try {
       const response = await api.post('/auth/login', { email, password });
-      const { access_token } = response.data.data;
-      localStorage.setItem('access_token', access_token);
-      const payload = JSON.parse(atob(access_token.split('.')[1]));
+      
+      const token = response.data.data?.access_token || response.data?.access_token;
+
+      if (!token) {
+        throw new Error('No se recibió token de autenticación');
+      }
+
+      localStorage.setItem('access_token', token);
+
+      const payload = JSON.parse(atob(token.split('.')[1]));
+      
       const user: User = {
-        id: payload.sub.toString(),
-        firstName: payload.firstName || '',
-        lastName: payload.lastName || '',
-        email: payload.email,
-        role: payload.role.toLowerCase() as 'customer' | 'entrepreneur' | 'admin',
-        registeredDate: payload.registeredDate || '',
-        lastLogin: payload.lastLogin || '',
+        id: payload.sub?.toString() || '',
+        firstName: 'Usuario', 
+        lastName: '',
+        email: payload.email || email,
+        role: (payload.role ? payload.role.toLowerCase() : 'customer') as UserRole,
+        registeredDate: new Date().toISOString(),
+        lastLogin: new Date().toISOString(),
       };
+
+      localStorage.setItem('loggedInUser', JSON.stringify(user));
 
       onLogin(user);
 
       switch (user.role) {
         case 'customer':
-          navigate('/user/dashboard');
+          navigate('/explore'); 
           break;
         case 'entrepreneur':
           navigate('/entrepreneur/profile');
           break;
         case 'admin':
-          navigate('/admin/dashboard');
+          navigate('/explore'); 
           break;
         default:
-          setError('Rol del usuario no reconocido. Contacte al soporte.');
+          navigate('/');
           break;
       }
     } catch (err: any) {
-      setError(err.response?.data?.message || 'Error al iniciar sesión. Verifica tus credenciales.');
+      console.error("Login error:", err);
+      const message = err.response?.data?.message || err.response?.data?.error || 'Error al iniciar sesión. Verifica tus credenciales.';
+      setError(message);
     } finally {
       setLoading(false);
     }
@@ -108,28 +120,8 @@ const LoginPage: React.FC<LoginPageProps> = ({ onLogin }) => {
           </div>
 
           {error && (
-            <p className="text-red-500 text-sm text-center">{error}</p>
+            <p className="text-red-500 text-sm text-center bg-red-50 p-2 rounded">{error}</p>
           )}
-
-          <div className="flex items-center justify-between">
-            <div className="flex items-center">
-              <input
-                id="remember-me"
-                name="remember-me"
-                type="checkbox"
-                className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
-              />
-              <label htmlFor="remember-me" className="ml-2 block text-sm text-gray-900">
-                Recordarme
-              </label>
-            </div>
-
-            <div className="text-sm">
-              <a href="#" className="font-medium text-blue-600 hover:text-blue-500">
-                ¿Olvidaste tu contraseña?
-              </a>
-            </div>
-          </div>
 
           <div>
             <button

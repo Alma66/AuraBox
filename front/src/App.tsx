@@ -45,7 +45,6 @@ import FinancialMovementsPage from './pages/entrepreneur/administration_tools/an
 import ManageUsersAndRolesPage from './pages/entrepreneur/administration_tools/analysis_and_reports/finance_and_team/ManageUsersAndRolesPage';
 import GeneralSettingsPage from './pages/entrepreneur/administration_tools/analysis_and_reports/finance_and_team/GeneralSettingsPage';
 import { User, UserRole } from './types/user';
-import usersData from './data/user.json';
 
 interface AuthContextType {
   user: User | null;
@@ -72,26 +71,23 @@ const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => 
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    const token = localStorage.getItem('access_token');
     const storedUser = localStorage.getItem('loggedInUser');
-    if (storedUser) {
+
+    if (token && storedUser) {
       try {
         const parsedUser: User = JSON.parse(storedUser);
         if (['customer', 'entrepreneur', 'admin'].includes(parsedUser.role)) {
-          const fullUser = (usersData as User[]).find(u => u.id === parsedUser.id);
-          if (fullUser) {
-            setUser(fullUser);
-            setUserRole(fullUser.role as UserRole);
-            setIsAuthenticated(true);
-          } else {
-            console.warn("Stored user ID not found in usersData. Clearing session.");
-            localStorage.removeItem('loggedInUser');
-          }
+          setUser(parsedUser);
+          setUserRole(parsedUser.role as UserRole);
+          setIsAuthenticated(true);
         } else {
-          console.warn("Invalid user role stored. Clearing session.");
+          localStorage.removeItem('access_token');
           localStorage.removeItem('loggedInUser');
         }
       } catch (error) {
-        console.error("Error parsing stored user data:", error);
+        console.error("Error parsing stored user:", error);
+        localStorage.removeItem('access_token');
         localStorage.removeItem('loggedInUser');
       }
     }
@@ -110,10 +106,11 @@ const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => 
     setUserRole(null);
     setIsAuthenticated(false);
     localStorage.removeItem('loggedInUser');
+    localStorage.removeItem('access_token');
   };
 
   if (loading) {
-    return <div>Cargando...</div>;
+    return <div className="flex items-center justify-center min-h-screen">Cargando AuraBox...</div>;
   }
 
   const value = { user, isAuthenticated, userRole, login, logout };
@@ -147,6 +144,8 @@ const AppContent: React.FC = () => {
           <Route path="/logout" element={<Logout />} />
           <Route path="/club/:clubId/terms-and-conditions" element={<TermsAndConditionsPage />} />
           <Route path="/club/:clubId/privacy-and-security" element={<PrivacyAndSecurityPolicyPage />} />
+          
+          {/* Rutas de Cliente */}
           <Route
             path="/customer/profile"
             element={
@@ -187,6 +186,8 @@ const AppContent: React.FC = () => {
               </PrivateRoute>
             }
           />
+
+          {/* Rutas Compartidas (Cliente, Emprendedor, Admin) */}
           <Route
             path="/club/:clubId"
             element={
@@ -203,6 +204,16 @@ const AppContent: React.FC = () => {
               </PrivateRoute>
             }
           />
+          <Route
+            path="/club/:clubId/plan/:planId"
+            element={
+              <PrivateRoute isAuthenticated={isAuthenticated} allowedRoles={['customer', 'entrepreneur', 'admin']} userRole={userRole}>
+                <SubscriptionPlanDetailPage />
+              </PrivateRoute>
+            }
+          />
+
+          {/* Rutas de Emprendedor */}
           <Route
             path="/entrepreneur/profile"
             element={
@@ -356,14 +367,6 @@ const AppContent: React.FC = () => {
             }
           />
           <Route
-            path="/club/:clubId/plan/:planId"
-            element={
-              <PrivateRoute isAuthenticated={isAuthenticated} allowedRoles={['customer', 'entrepreneur', 'admin']} userRole={userRole}>
-                <SubscriptionPlanDetailPage />
-              </PrivateRoute>
-            }
-          />
-          <Route
             path="/entrepreneur/club/:clubId/gestionar-imagenes"
             element={
               <PrivateRoute isAuthenticated={isAuthenticated} allowedRoles={['entrepreneur']} userRole={userRole}>
@@ -403,6 +406,8 @@ const AppContent: React.FC = () => {
               </PrivateRoute>
             }
           />
+
+          {/* Ruta 404 */}
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </main>
@@ -422,4 +427,4 @@ const App: React.FC = () => {
   );
 };
 
-export default App;
+export default App

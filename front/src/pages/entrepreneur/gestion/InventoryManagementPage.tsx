@@ -7,11 +7,13 @@ import MasterDataEditor from '../../../components/entrepreneur/inventory/MasterD
 import { useAuth } from '../../../App';
 import inventoryData from '../../../data/inventory.json';
 import { InventoryData, Product, Packaging, Supplier, ProductCategory } from '../../../types/inventory';
+
 const InventoryManagementPage: React.FC = () => {
   const { user, userRole, isAuthenticated } = useAuth();
   const navigate = useNavigate();
   const [activeSection, setActiveSection] = useState<string>('product-inventory');
-  const [currentInventoryData, setCurrentInventoryData] = useState<InventoryData>(inventoryData as InventoryData); 
+  const [currentInventoryData, setCurrentInventoryData] = useState<InventoryData>(inventoryData as InventoryData);
+
   useEffect(() => {
     if (!isAuthenticated || userRole !== 'entrepreneur') {
       navigate('/login');
@@ -20,89 +22,89 @@ const InventoryManagementPage: React.FC = () => {
 
   const handleAddProduct = (newProduct: Omit<Product, 'id'>) => {
     const id = `prod${currentInventoryData.products.length + 1}`;
-    setCurrentInventoryData(prev => ({
+    setCurrentInventoryData((prev) => ({
       ...prev,
-      products: [...prev.products, { ...newProduct, id }]
+      products: [...prev.products, { ...newProduct, id }],
     }));
   };
 
   const handleEditProduct = (updatedProduct: Product) => {
-    setCurrentInventoryData(prev => ({
+    setCurrentInventoryData((prev) => ({
       ...prev,
-      products: prev.products.map(p => p.id === updatedProduct.id ? updatedProduct : p)
+      products: prev.products.map((p) => (p.id === updatedProduct.id ? updatedProduct : p)),
     }));
   };
 
   const handleDeleteProduct = (productId: string) => {
-    setCurrentInventoryData(prev => ({
+    setCurrentInventoryData((prev) => ({
       ...prev,
-      products: prev.products.filter(p => p.id !== productId)
+      products: prev.products.filter((p) => p.id !== productId),
     }));
   };
 
   const handleAddPackaging = (newPackaging: Omit<Packaging, 'id'>) => {
     const id = `pack${currentInventoryData.packaging.length + 1}`;
-    setCurrentInventoryData(prev => ({
+    setCurrentInventoryData((prev) => ({
       ...prev,
-      packaging: [...prev.packaging, { ...newPackaging, id }]
+      packaging: [...prev.packaging, { ...newPackaging, id }],
     }));
   };
 
   const handleEditPackaging = (updatedPackaging: Packaging) => {
-    setCurrentInventoryData(prev => ({
+    setCurrentInventoryData((prev) => ({
       ...prev,
-      packaging: prev.packaging.map(p => p.id === updatedPackaging.id ? updatedPackaging : p)
+      packaging: prev.packaging.map((p) => (p.id === updatedPackaging.id ? updatedPackaging : p)),
     }));
   };
 
   const handleDeletePackaging = (packagingId: string) => {
-    setCurrentInventoryData(prev => ({
+    setCurrentInventoryData((prev) => ({
       ...prev,
-      packaging: prev.packaging.filter(p => p.id !== packagingId)
+      packaging: prev.packaging.filter((p) => p.id !== packagingId),
     }));
   };
 
-  const handleAddSupplier = (newSupplier: Omit<Supplier, 'id'>) => { 
+  const handleAddSupplier = (newSupplier: Omit<Supplier, 'id'>) => {
     const id = `sup${currentInventoryData.suppliers.length + 1}`;
-    setCurrentInventoryData(prev => ({
+    setCurrentInventoryData((prev) => ({
       ...prev,
-      suppliers: [...prev.suppliers, { ...newSupplier, id }]
+      suppliers: [...prev.suppliers, { ...newSupplier, id }],
     }));
   };
 
-  const handleEditSupplier = (updatedSupplier: Supplier) => { 3
-    setCurrentInventoryData(prev => ({
+  const handleEditSupplier = (updatedSupplier: Supplier) => {
+    setCurrentInventoryData((prev) => ({
       ...prev,
-      suppliers: prev.suppliers.map(s => s.id === updatedSupplier.id ? updatedSupplier : s)
+      suppliers: prev.suppliers.map((s) => (s.id === updatedSupplier.id ? updatedSupplier : s)),
     }));
   };
 
   const handleDeleteSupplier = (supplierId: string) => {
-    setCurrentInventoryData(prev => ({
+    setCurrentInventoryData((prev) => ({
       ...prev,
-      suppliers: prev.suppliers.filter(s => s.id !== supplierId)
+      suppliers: prev.suppliers.filter((s) => s.id !== supplierId),
     }));
   };
 
   const handleAddCategory = (newCategory: Omit<ProductCategory, 'id'>) => {
     const id = `cat${currentInventoryData.productCategories.length + 1}`;
-    setCurrentInventoryData(prev => ({
+    setCurrentInventoryData((prev) => ({
       ...prev,
-      productCategories: [...prev.productCategories, { ...newCategory, id }]
+      productCategories: [...prev.productCategories, { ...newCategory, id }],
     }));
   };
 
   const handleEditCategory = (updatedCategory: ProductCategory) => {
-    setCurrentInventoryData(prev => ({
+    setCurrentInventoryData((prev) => ({
       ...prev,
-      productCategories: prev.productCategories.map(c => c.id === updatedCategory.id ? updatedCategory : c)
+      productCategories: prev.productCategories.map((c) => (c.id === updatedCategory.id ? updatedCategory : c)),
     }));
   };
 
   const handleDeleteCategory = (categoryId: string) => {
-    setCurrentInventoryData(prev => ({
+    setCurrentInventoryData((prev) => ({
       ...prev,
-      productCategories: prev.productCategories.filter(c => c.id !== categoryId)
+      productCategories: prev.productCategories.filter((c) => c.id !== categoryId),
     }));
   };
 
