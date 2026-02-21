@@ -4,7 +4,7 @@ import { LoginDto } from '../users/dto/login.dto';
 import { CreateUserDto } from '../users/dto/create-user.dto';
 import { CreateEntrepreneurDto } from '../entrepreneurs/dto/create-entrepreneurs.dto';
 import { PrismaClient } from '@prisma/client';
-import bcrypt from 'bcrypt';
+import * as bcrypt from 'bcryptjs';
 import { Public } from '../../common/decorators/public.decorator';
 import { PrismaService } from '../../prisma/prisma.service';  
 
