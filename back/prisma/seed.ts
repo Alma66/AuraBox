@@ -1,12 +1,11 @@
 import { PrismaClient } from '@prisma/client';
-import * as bcrypt from 'bcrypt';
+import * as bcrypt from 'bcryptjs';
 
 const prisma = new PrismaClient();
 
 async function main() {
   const password = await bcrypt.hash('password123', 10);
 
-  // Admin
   await prisma.admins.upsert({
     where: { email: 'adminTest@example.com' },
     update: {},
@@ -22,7 +21,6 @@ async function main() {
     },
   });
 
-  // Entrepreneur
   await prisma.entrepreneurs.upsert({
     where: { email: 'emprendedorTest@example.com' },
     update: {},
@@ -38,7 +36,6 @@ async function main() {
     },
   });
 
-  // Customer (User)
   await prisma.user.upsert({
     where: { email: 'clienteTest@example.com' },
     update: {},
