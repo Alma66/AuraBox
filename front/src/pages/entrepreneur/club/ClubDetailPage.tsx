@@ -1,12 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import Slider from 'react-slick';
-
-import clubsData from '../../../data/clubs.json';
+import api, { getResponseData } from '../../../api/config';
 import { UserRole, User } from '../../../types/user';
-import { Club, LegalSection, SubscriptionPlan } from '../../../types/club';
+import { Club, LegalSection } from '../../../types/club';
 import { SubscriptionPlan as SubscriptionPlanCardType } from '../../../components/club/SubscriptionPlanCard';
-
 import SubscriptionPlanCard from '../../../components/club/SubscriptionPlanCard';
 import ClubSocialMedia from '../../../components/club/ClubSocialMedia';
 import ClubLegalInfo from '../../../components/club/ClubLegalInfo';
@@ -33,18 +31,43 @@ const ClubDetailPage: React.FC<{ userRole: UserRole | null }> = ({ userRole }) =
   const { user } = useAuth();
 
   const [club, setClub] = useState<Club | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
   const [isEditing, setIsEditing] = useState(false);
   const [editableClub, setEditableClub] = useState<Club | null>(null);
 
   useEffect(() => {
-    const foundClub = clubsData.find(c => c.id === clubId) as Club | undefined;
-    setClub(foundClub || null);
-    setEditableClub(foundClub || null);
+    const fetchClub = async () => {
+      try {
+        setLoading(true);
+        const response = await api.get(`/clubs/${clubId}`);
+        const clubData = getResponseData(response);
+        setClub(clubData);
+        setEditableClub(clubData);
+      } catch (err) {
+        console.error("Error fetching club:", err);
+        setError('Error al cargar el club.');
+      } finally {
+        setLoading(false);
+      }
+    };
+    if (clubId) fetchClub();
   }, [clubId]);
 
   const isOwner = userRole === 'entrepreneur' && user?.managedClubId === clubId;
 
-  if (!club) {
+  if (loading) {
+    return (
+      <div className="container mx-auto px-4 py-8 text-center">
+        <div className="animate-pulse">
+          <div className="h-64 bg-gray-200 rounded mb-4"></div>
+          <div className="h-8 bg-gray-200 rounded w-1/2 mx-auto mb-4"></div>
+        </div>
+      </div>
+    );
+  }
+
+  if (error || !club) {
     return (
       <div className="container mx-auto px-4 py-8 text-center animate-fadeIn">
         <h1 className="text-4xl font-bold text-red-600 mb-4">Club no encontrado</h1>
@@ -101,7 +124,7 @@ const ClubDetailPage: React.FC<{ userRole: UserRole | null }> = ({ userRole }) =
   const textToSections = (text: string, prefix: string): LegalSection[] =>
     text.split('\n\n').map((p, i) => ({
       id: `${prefix}-${i}`,
-      type: 'paragraph',
+      type: 'paragraph' as const,
       content: p,
     }));
 
@@ -180,13 +203,7 @@ const ClubDetailPage: React.FC<{ userRole: UserRole | null }> = ({ userRole }) =
           onClick={() => navigate(-1)}
           className="mb-6 flex items-center text-blue-600 hover:text-blue-800 transition-colors duration-200 transform hover:translate-x-1"
         >
-          <svg
-            className="w-5 h-5 mr-2"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-            xmlns="http://www.w3.org/2000/svg"
-          >
+          <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
           </svg>
           Volver
@@ -199,11 +216,7 @@ const ClubDetailPage: React.FC<{ userRole: UserRole | null }> = ({ userRole }) =
             </span>
             <button className="bg-gray-200 text-gray-700 px-4 py-2 rounded-full flex items-center space-x-2 hover:bg-red-100 hover:text-red-600 transition-all duration-200 transform hover:scale-105 active:scale-95">
               <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                <path
-                  fillRule="evenodd"
-                  d="M3.172 5.172a4.5 4.5 0 015.656 0L10 6.343l1.172-1.171a4.5 4.5 0 115.656 5.656L10 17.657l-6.828-6.829a4.5 4.5 0 010-5.656z"
-                  clipRule="evenodd"
-                />
+                <path fillRule="evenodd" d="M3.172 5.172a4.5 4.5 0 015.656 0L10 6.343l1.172-1.171a4.5 4.5 0 115.656 5.656L10 17.657l-6.828-6.829a4.5 4.5 0 010-5.656z" clipRule="evenodd" />
               </svg>
               <span>Favorito</span>
             </button>
@@ -282,7 +295,7 @@ const ClubDetailPage: React.FC<{ userRole: UserRole | null }> = ({ userRole }) =
 
         {club.featuredReviews && club.featuredReviews.length > 0 && (
           <div className="mb-12 animate-fadeInUp delay-400">
-            <ClubFeaturedReviews reviews={club.featuredReviews} clubName={club.name} clubId={club.id} />
+            <ClubFeaturedReviews reviews={club.featuredReviews} clubName={club.name} clubId={String(club.id)} />
           </div>
         )}
 
@@ -307,7 +320,7 @@ const ClubDetailPage: React.FC<{ userRole: UserRole | null }> = ({ userRole }) =
 
         {(club.legalInfo?.termsAndConditionsSections?.length || club.legalInfo?.privacyAndSecurityPolicySections?.length) && (
           <div className="animate-fadeInUp delay-500">
-            <ClubLegalInfo legalInfo={club.legalInfo} clubId={club.id} />
+            <ClubLegalInfo legalInfo={club.legalInfo} clubId={String(club.id)} />
           </div>
         )}
 

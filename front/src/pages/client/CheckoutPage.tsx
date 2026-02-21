@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../App';
-import clubPlansData from '../../data/clubPlans.json';
+import api, { getResponseData } from '../../api/config';
 import { SubscriptionPlan } from '../../types/club';
 import { User } from '../../types/user';
 
@@ -33,29 +33,55 @@ const CheckoutPage: React.FC = () => {
   ];
 
   useEffect(() => {
-    if (!user) {
-      setError('Debes iniciar sesión para continuar.');
-      setLoading(false);
-      return;
-    }
+    const fetchData = async () => {
+      if (!user) {
+        setError('Debes iniciar sesión para continuar.');
+        setLoading(false);
+        return;
+      }
 
-    setAddress({
-      street: user.street || 'Av. Santa Fe',
-      streetNumber: user.streetNumber || '1234',
-      locality: user.locality || 'Palermo',
-      city: user.city || 'Buenos Aires',
-      postalCode: user.postalCode || '1425',
-      province: user.country || 'Buenos Aires',
-      instructions: ''
-    });
+      try {
+        const userResponse = await api.get('/users/me');
+        const userData = getResponseData(userResponse);
 
-    const simulatedCart = (clubPlansData as SubscriptionPlan[]).slice(0, 2);
-    setCartItems(simulatedCart);
-    setLoading(false);
+        setAddress({
+          street: userData.street || 'Av. Santa Fe',
+          streetNumber: userData.streetNumber || '1234',
+          locality: userData.locality || 'Palermo',
+          city: userData.city || 'Buenos Aires',
+          postalCode: userData.postalCode || '1425',
+          province: userData.country || 'Buenos Aires',
+          instructions: ''
+        });
 
-    if (simulatedCart.length === 0) {
-      setError('Tu carrito está vacío. Agrega planes primero.');
-    }
+        const plansResponse = await api.get('/subscription-types');
+        const plansData = getResponseData(plansResponse);
+        
+        if (Array.isArray(plansData) && plansData.length > 0) {
+          const mappedPlans: SubscriptionPlan[] = plansData.slice(0, 2).map((plan: any) => ({
+            planId: String(plan.id),
+            name: plan.name,
+            price: plan.price || 0,
+            currency: 'ARS',
+            description: plan.description || '',
+            image: '/assets/default-plan.jpg',
+            deliveryFrequency: '',
+            includes: [],
+            shippingAreas: '',
+            specifications: []
+          }));
+          setCartItems(mappedPlans);
+        } else {
+          setError('Tu carrito está vacío. Agrega planes primero.');
+        }
+      } catch (err) {
+        console.error("Error fetching data:", err);
+        setError('Error al cargar datos. Intenta de nuevo.');
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchData();
   }, [user]);
 
   const handleAddressChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -78,11 +104,20 @@ const CheckoutPage: React.FC = () => {
     setIsProcessing(true);
     setError(null);
 
-    await new Promise(resolve => setTimeout(resolve, 2000));
-
-    setSuccess(true);
-    setIsProcessing(false);
-    setCartItems([]);
+    try {
+      for (const plan of cartItems) {
+        await api.post('/user-subscriptions', {
+          planId: plan.planId,
+          status: 'active'
+        });
+      }
+      setSuccess(true);
+    } catch (err) {
+      console.error("Error processing payment:", err);
+      setError('Error al procesar el pago. Intenta de nuevo.');
+    } finally {
+      setIsProcessing(false);
+    }
   };
 
   const subtotal = cartItems.reduce((sum, item) => sum + item.price, 0);
@@ -100,7 +135,7 @@ const CheckoutPage: React.FC = () => {
     );
   }
 
-  if (error) {
+  if (error && !user) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-red-50 to-white py-8 px-4">
         <div className="max-w-4xl mx-auto text-center py-12">
@@ -162,7 +197,7 @@ const CheckoutPage: React.FC = () => {
                   <div key={plan.planId} className="flex justify-between items-center py-2 border-b border-gray-200 last:border-b-0">
                     <div>
                       <p className="font-semibold text-gray-800">{plan.name}</p>
-                      <p className="text-sm text-gray-600">{plan.description.slice(0, 50)}...</p>
+                      <p className="text-sm text-gray-600">{plan.description?.slice(0, 50)}...</p>
                     </div>
                     <div className="text-right">
                       <p className="font-semibold">${plan.price.toLocaleString()} ARS</p>
@@ -188,7 +223,7 @@ const CheckoutPage: React.FC = () => {
 
             <div className="bg-white rounded-xl shadow-md p-6">
               <h3 className="text-lg font-bold text-gray-800 mb-4">Método de Pago</h3>
-              <div className="space-y-3">
+                            <div className="space-y-3">
                 {paymentMethods.map((method) => (
                   <label key={method.id} className="flex items-center p-3 border border-gray-200 rounded-lg hover:border-blue-300 cursor-pointer transition-colors">
                     <input
@@ -212,7 +247,7 @@ const CheckoutPage: React.FC = () => {
           <div className="lg:col-span-2">
             <div className="bg-white rounded-xl shadow-md p-6">
               <h3 className="text-lg font-bold text-gray-800 mb-4">Verificar Dirección de Envío</h3>
-              {error && <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded mb-4">{error}</div>}
+              {error && user && <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded mb-4">{error}</div>}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <input
                   type="text"
@@ -284,7 +319,7 @@ const CheckoutPage: React.FC = () => {
           </div>
         </form>
 
-        {!success && !loading && (
+        {!success && !loading && user && (
           <div className="mt-8 text-center">
             <button
               type="submit"

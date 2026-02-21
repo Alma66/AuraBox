@@ -1,39 +1,59 @@
 import React, { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../../../../App';
 import FinancialSidebar from '../../../../../components/entrepreneur/FinancialSidebar';
-import financialMovementsData from '../../../../../data/financial-movements.json';
+import api, { getResponseData } from '../../../../../api/config';
 import { FinancialMovement, MonthlyTotal, Invoice } from '../../../../../types/financial';
-import clubsData from '../../../../../data/clubs.json';
 
 const FinancialMovementsPage: React.FC = () => {
-  const { user } = useAuth();
+  const { user, userRole } = useAuth();
   const { clubId } = useParams<{ clubId: string }>();
-  const actualClubId = clubId || user?.managedClubId || 'club-1';
-  const club = (clubsData as any[]).find(c => c.id === actualClubId);
-  const clubName = club?.name || 'Tu Club';
+  const navigate = useNavigate();
+  const actualClubId = clubId || user?.managedClubId;
+  const [clubName, setClubName] = useState('Tu Club');
 
   const [movements, setMovements] = useState<FinancialMovement[]>([]);
   const [monthlyTotals, setMonthlyTotals] = useState<Record<string, MonthlyTotal>>({});
+  const [invoices, setInvoices] = useState<Invoice[]>([]);
   const [activeTab, setActiveTab] = useState<'movimientos' | 'facturacion'>('movimientos');
   const [activeFilter, setActiveFilter] = useState('all');
   const [filteredMovements, setFilteredMovements] = useState<FinancialMovement[]>([]);
   const [dateFrom, setDateFrom] = useState('');
   const [dateTo, setDateTo] = useState('');
   const [statusFilter, setStatusFilter] = useState('todos');
-
-  const [invoices, setInvoices] = useState<Invoice[]>([
-    { id: 'FAC-001', date: '2024-06-15', clientId: 'user-1', amount: 26500, status: 'pendiente' },
-    { id: 'FAC-002', date: '2024-06-20', clientId: 'user-2', amount: 4000, status: 'pagada' },
-    { id: 'FAC-003', date: '2024-06-25', clientId: 'user-3', amount: 35000, status: 'vencida' },
-  ]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const data = (financialMovementsData as any)[actualClubId] || financialMovementsData['club-1'];
-    setMovements(data.movements || []);
-    setMonthlyTotals(data.monthlyTotals || {});
-    setFilteredMovements(data.movements || []);
-  }, [actualClubId]);
+    const fetchData = async () => {
+      if (userRole !== 'entrepreneur' || !actualClubId) {
+        navigate('/');
+        return;
+      }
+
+      try {
+        const [clubResponse, movementsResponse, invoicesResponse] = await Promise.all([
+          api.get(`/clubs/${actualClubId}`),
+          api.get(`/clubs/${actualClubId}/financial-movements`),
+          api.get(`/clubs/${actualClubId}/invoices`)
+        ]);
+
+        const clubData = getResponseData(clubResponse);
+        const movementsData = getResponseData(movementsResponse);
+        const invoicesData = getResponseData(invoicesResponse);
+
+        setClubName(clubData.name || 'Tu Club');
+        setMovements(movementsData.movements || []);
+        setMonthlyTotals(movementsData.monthlyTotals || {});
+        setFilteredMovements(movementsData.movements || []);
+        setInvoices(invoicesData || []);
+      } catch (error) {
+        console.error("Error fetching financial data:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchData();
+  }, [actualClubId, userRole, navigate]);
 
   useEffect(() => {
     let filtered = [...movements];
@@ -61,6 +81,7 @@ const FinancialMovementsPage: React.FC = () => {
   }, [activeFilter, dateFrom, dateTo, statusFilter, movements]);
 
   const categories = Array.from(new Set(movements.map(m => m.category)));
+  
   const handleDateFilterChange = (from: string, to: string) => {
     setDateFrom(from);
     setDateTo(to);
@@ -98,7 +119,7 @@ const FinancialMovementsPage: React.FC = () => {
           {movement.status}
         </span>
       </td>
-      <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+            <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
         <button 
           onClick={() => handleEditMovement(movement)}
           className="text-blue-600 hover:text-blue-900 mr-3"
@@ -191,6 +212,10 @@ const FinancialMovementsPage: React.FC = () => {
       </div>
     </div>
   );
+
+  if (loading) {
+    return <div className="text-center py-20">Cargando movimientos financieros...</div>;
+  }
 
   return (
     <div className="container mx-auto px-4 py-8 min-h-screen">

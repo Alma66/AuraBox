@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
-import clubsData from '../../../data/clubs.json';
-import { SubscriptionPlan } from '../../../types/club';
+import { useParams, useNavigate } from 'react-router-dom';
+import api, { getResponseData } from '../../../api/config';
+import { Club, SubscriptionPlan } from '../../../types/club';
+import { useAuth } from '../../../App';
 import SubscriptionPlanCard from '../../../components/club/SubscriptionPlanCard';
 import EntrepreneurSubscriptionSidebar from '../../../components/entrepreneur/EntrepreneurSubscriptionSidebar';
 
@@ -9,20 +10,43 @@ const FREQUENCY_OPTIONS = ['Única', 'Mensual', 'Trimestral', 'Cuatrimestral', '
 
 const EditSubscriptionsPage: React.FC = () => {
   const { clubId } = useParams<{ clubId: string }>();
+  const navigate = useNavigate();
+  const { user, userRole } = useAuth();
 
-  const [club, setClub] = useState<any>(null);
+  const [club, setClub] = useState<Club | null>(null);
   const [plans, setPlans] = useState<SubscriptionPlan[]>([]);
+  const [loading, setLoading] = useState(true);
   const [activeSection, setActiveSection] = useState<string>('management');
   const [selectedPlanId, setSelectedPlanId] = useState<string | null>(null);
   const [formData, setFormData] = useState<any>(null);
 
   useEffect(() => {
-    const foundClub = clubsData.find(c => c.id === clubId);
-    if (foundClub) {
-      setClub(foundClub);
-      setPlans(foundClub.subscriptionPlans || []);
-    }
-  }, [clubId]);
+    const fetchData = async () => {
+      if (userRole !== 'entrepreneur' || !user?.managedClubId || user.managedClubId !== clubId) {
+        navigate('/login');
+        return;
+      }
+
+      try {
+        const [clubResponse, plansResponse] = await Promise.all([
+          api.get(`/clubs/${clubId}`),
+          api.get('/subscription-types')
+        ]);
+
+        const clubData = getResponseData(clubResponse);
+        const plansData = getResponseData(plansResponse);
+
+        setClub(clubData);
+        const clubPlans = plansData.filter((p: any) => String(p.clubId) === String(clubId) || !p.clubId);
+        setPlans(clubPlans);
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    if (clubId) fetchData();
+  }, [clubId, user, userRole, navigate]);
 
   const handleSelectPlan = (planId: string) => {
     if (activeSection !== 'management') return;
@@ -46,65 +70,102 @@ const EditSubscriptionsPage: React.FC = () => {
     setFormData((prev: any) => ({ ...prev, [field]: value }));
   };
 
-  const handleSavePlan = () => {
+  const handleSavePlan = async () => {
     if (!formData) return;
-    let updatedPlans: SubscriptionPlan[];
-    if (selectedPlanId && activeSection === 'management') {
-      updatedPlans = plans.map(p => {
-        if (p.planId === formData.planId) {
-          return {
-            ...p,
-            name: formData.name,
-            description: formData.description,
-            price: Number(formData.price),
-            deliveryFrequency: formData.frequency,
-            descuentoTransferencia: Number(formData.descuentoTransferencia) || 0,
-            descuentoEfectivo: Number(formData.descuentoEfectivo) || 0,
-            activo: formData.activo,
-          };
-        }
-        return p;
-      });
-    } else {
-      const newPlanId = `plan-${Date.now()}`;
-      const newPlan: SubscriptionPlan = {
-        planId: newPlanId,
-        name: formData.name,
-        description: formData.description,
-        price: Number(formData.price),
-        currency: 'ARS',
-        deliveryFrequency: formData.frequency,
-        includes: [],
-        shippingAreas: '',
-        specifications: [],
-        image: '/assets/default-plan.jpg',
-        descuentoTransferencia: Number(formData.descuentoTransferencia) || 0,
-        descuentoEfectivo: Number(formData.descuentoEfectivo) || 0,
-        activo: formData.activo,
-      };
-      updatedPlans = [...plans, newPlan];
-      setSelectedPlanId(newPlanId);
-    }
-    setPlans(updatedPlans);
-    setClub((prev: any) => ({ ...prev, subscriptionPlans: updatedPlans }));
-    alert(activeSection === 'management' ? 'Plan actualizado correctamente.' : 'Nuevo plan creado correctamente.');
-    if (activeSection === 'create') {
-      setFormData(null);
-      setSelectedPlanId(null);
+
+    try {
+      if (selectedPlanId && activeSection === 'management') {
+        await api.put(`/subscription-types/${selectedPlanId}`, {
+          name: formData.name,
+          description: formData.description,
+          price: Number(formData.price),
+          deliveryFrequency: formData.frequency,
+          descuentoTransferencia: Number(formData.descuentoTransferencia) || 0,
+          descuentoEfectivo: Number(formData.descuentoEfectivo) || 0,
+          activo: formData.activo,
+        });
+
+        setPlans(plans.map(p => {
+          if (p.planId === formData.planId) {
+            return {
+              ...p,
+              name: formData.name,
+              description: formData.description,
+              price: Number(formData.price),
+              deliveryFrequency: formData.frequency,
+              descuentoTransferencia: Number(formData.descuentoTransferencia) || 0,
+              descuentoEfectivo: Number(formData.descuentoEfectivo) || 0,
+              activo: formData.activo,
+            };
+          }
+          return p;
+        }));
+        alert('Plan actualizado correctamente.');
+      } else {
+        const newPlanData = {
+          clubId: clubId,
+          name: formData.name,
+          description: formData.description,
+          price: Number(formData.price),
+          currency: 'ARS',
+          deliveryFrequency: formData.frequency,
+          includes: [],
+          shippingAreas: '',
+          specifications: [],
+          image: '/assets/default-plan.jpg',
+          descuentoTransferencia: Number(formData.descuentoTransferencia) || 0,
+          descuentoEfectivo: Number(formData.descuentoEfectivo) || 0,
+          activo: formData.activo,
+        };
+
+        const response = await api.post('/subscription-types', newPlanData);
+        const createdPlan = getResponseData(response);
+        const newPlan: SubscriptionPlan = {
+          planId: String(createdPlan.id),
+          name: newPlanData.name,
+          description: newPlanData.description,
+          price: newPlanData.price,
+          currency: newPlanData.currency,
+          image: newPlanData.image,
+          deliveryFrequency: newPlanData.deliveryFrequency,
+          includes: newPlanData.includes,
+          shippingAreas: newPlanData.shippingAreas,
+          specifications: newPlanData.specifications,
+          descuentoTransferencia: newPlanData.descuentoTransferencia,
+          descuentoEfectivo: newPlanData.descuentoEfectivo,
+          activo: newPlanData.activo,
+        };
+        setPlans([...plans, newPlan]);
+        setSelectedPlanId(newPlan.planId);
+        alert('Nuevo plan creado correctamente.');
+      }
+
+      if (activeSection === 'create') {
+        setFormData(null);
+        setSelectedPlanId(null);
+      }
+    } catch (error) {
+      console.error("Error saving plan:", error);
+      alert('Error al guardar el plan.');
     }
   };
 
-  const handleDeletePlan = (planId: string | null) => {
+  const handleDeletePlan = async (planId: string | null) => {
     if (!planId || activeSection !== 'management') return;
-    if (window.confirm('¿Estás seguro que deseas eliminar este plan? Esta acción no se puede deshacer.')) {
-      const filteredPlans = plans.filter(p => p.planId !== planId);
-      setPlans(filteredPlans);
-      setClub((prev: any) => ({ ...prev, subscriptionPlans: filteredPlans }));
-      if (selectedPlanId === planId) {
-        setSelectedPlanId(null);
-        setFormData(null);
+    if (window.confirm('¿Estás seguro que deseas eliminar este plan?')) {
+      try {
+        await api.delete(`/subscription-types/${planId}`);
+        const filteredPlans = plans.filter(p => p.planId !== planId);
+        setPlans(filteredPlans);
+        if (selectedPlanId === planId) {
+          setSelectedPlanId(null);
+          setFormData(null);
+        }
+        alert('Plan eliminado.');
+      } catch (error) {
+        console.error("Error deleting plan:", error);
+        alert('Error al eliminar el plan.');
       }
-      alert('Plan eliminado.');
     }
   };
 
@@ -132,10 +193,14 @@ const EditSubscriptionsPage: React.FC = () => {
     }
   };
 
+  if (loading) {
+    return <div className="container mx-auto px-4 py-8 text-center">Cargando...</div>;
+  }
+
   if (!club) {
     return (
       <div className="container mx-auto p-8 text-center">
-        <p className="text-lg font-semibold">Club no encontrado o no tienes permisos para editar suscripciones. Verifica el clubId en la URL.</p>
+        <p className="text-lg font-semibold">Club no encontrado.</p>
       </div>
     );
   }
@@ -156,7 +221,7 @@ const EditSubscriptionsPage: React.FC = () => {
             <div>
               <h2 className="text-2xl font-bold mb-6">Gestión de Suscripciones</h2>
               {plans.length === 0 ? (
-                <p className="text-center text-gray-600 mb-6">No hay planes creados. Crea uno nuevo desde el sidebar.</p>
+                <p className="text-center text-gray-600 mb-6">No hay planes creados.</p>
               ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-6">
                   {plans.map(plan => (
@@ -228,7 +293,6 @@ const EditSubscriptionsPage: React.FC = () => {
                           value={formData.frequency}
                           onChange={e => handleInputChange('frequency', e.target.value)}
                           className="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                          required
                         >
                           {FREQUENCY_OPTIONS.map(option => (
                             <option key={option} value={option}>{option}</option>
@@ -345,7 +409,6 @@ const EditSubscriptionsPage: React.FC = () => {
                         value={formData.frequency}
                         onChange={e => handleInputChange('frequency', e.target.value)}
                         className="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                        required
                       >
                         {FREQUENCY_OPTIONS.map(option => (
                           <option key={option} value={option}>{option}</option>
@@ -375,7 +438,7 @@ const EditSubscriptionsPage: React.FC = () => {
                       />
                     </div>
                   </div>
-                  <div className="flex items-center space-x-3">
+                               <div className="flex items-center space-x-3">
                     <input
                       id="activo"
                       type="checkbox"

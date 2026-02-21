@@ -1,67 +1,93 @@
 import React, { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../../../../App';
 import SettingsSidebar from '../../../../../components/entrepreneur/SettingsSidebar';
-import generalSettingsData from '../../../../../data/general-settings.json';
+import api, { getResponseData } from '../../../../../api/config';
 import { GeneralSetting } from '../../../../../types/financial';
-import clubsData from '../../../../../data/clubs.json';
 
 const GeneralSettingsPage: React.FC = () => {
-  const { user } = useAuth();
+  const { user, userRole } = useAuth();
   const { clubId } = useParams<{ clubId: string }>();
-  const actualClubId = clubId || user?.managedClubId || 'club-1';
-  const club = (clubsData as any[]).find(c => c.id === actualClubId);
-  const clubName = club?.name || 'Tu Club';
+  const navigate = useNavigate();
+  const actualClubId = clubId || user?.managedClubId;
+  const [clubName, setClubName] = useState('Tu Club');
 
   const [settings, setSettings] = useState<Record<string, GeneralSetting[]>>({});
   const [activeSection, setActiveSection] = useState('finances');
   const [editedSettings, setEditedSettings] = useState<Record<string, any>>({});
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const data = (generalSettingsData as any)[actualClubId] || generalSettingsData['club-1'];
-
-    const transformedSettings: Record<string, GeneralSetting[]> = {};
-    for (const category in data) {
-      if (Object.prototype.hasOwnProperty.call(data, category)) {
-        transformedSettings[category] = Object.keys(data[category]).map(key => ({
-          key: key,
-          value: data[category][key],
-          category: category as 'finances' | 'team' | 'notifications'
-        }));
+    const fetchData = async () => {
+      if (userRole !== 'entrepreneur' || !actualClubId) {
+        navigate('/');
+        return;
       }
-    }
-    setSettings(transformedSettings);
 
-    const initialEdited: Record<string, any> = {};
-    for (const category in data) {
-      if (Object.prototype.hasOwnProperty.call(data, category)) {
-        for (const key in data[category]) {
-          if (Object.prototype.hasOwnProperty.call(data[category], key)) {
-            initialEdited[key] = data[category][key];
+      try {
+        const clubResponse = await api.get(`/clubs/${actualClubId}`);
+        const clubData = getResponseData(clubResponse);
+        setClubName(clubData.name || 'Tu Club');
+
+        const settingsResponse = await api.get(`/clubs/${actualClubId}/settings`);
+        const settingsData = getResponseData(settingsResponse);
+
+        const transformedSettings: Record<string, GeneralSetting[]> = {};
+        for (const category in settingsData) {
+          if (Object.prototype.hasOwnProperty.call(settingsData, category)) {
+            transformedSettings[category] = Object.keys(settingsData[category]).map(key => ({
+              key: key,
+              value: settingsData[category][key],
+              category: category as 'finances' | 'team' | 'notifications'
+            }));
           }
         }
+        setSettings(transformedSettings);
+
+        const initialEdited: Record<string, any> = {};
+        for (const category in settingsData) {
+          if (Object.prototype.hasOwnProperty.call(settingsData, category)) {
+            for (const key in settingsData[category]) {
+              if (Object.prototype.hasOwnProperty.call(settingsData[category], key)) {
+                initialEdited[key] = settingsData[category][key];
+              }
+            }
+          }
+        }
+        setEditedSettings(initialEdited);
+      } catch (error) {
+        console.error("Error fetching settings:", error);
+      } finally {
+        setLoading(false);
       }
-    }
-    setEditedSettings(initialEdited);
-  }, [actualClubId]);
+    };
+    fetchData();
+  }, [actualClubId, userRole, navigate]);
 
   const handleSettingChange = (key: string, value: any) => {
     setEditedSettings(prev => ({ ...prev, [key]: value }));
   };
 
-  const handleSaveSection = () => {
-    console.log('Guardando ajustes de', activeSection, editedSettings);
-    alert('Ajustes guardados exitosamente (simulado)');
-    setSettings(prev => {
-      const newSettings = { ...prev };
-      if (newSettings[activeSection]) {
-        newSettings[activeSection] = newSettings[activeSection].map(s => ({
-          ...s,
-          value: editedSettings[s.key] !== undefined ? editedSettings[s.key] : s.value
-        }));
-      }
-      return newSettings;
-    });
+  const handleSaveSection = async () => {
+    try {
+      await api.put(`/clubs/${actualClubId}/settings/${activeSection}`, {
+        [activeSection]: editedSettings
+      });
+      alert('Ajustes guardados exitosamente');
+      setSettings(prev => {
+        const newSettings = { ...prev };
+        if (newSettings[activeSection]) {
+          newSettings[activeSection] = newSettings[activeSection].map(s => ({
+            ...s,
+            value: editedSettings[s.key] !== undefined ? editedSettings[s.key] : s.value
+          }));
+        }
+        return newSettings;
+      });
+    } catch (error) {
+      console.error("Error saving settings:", error);
+      alert('Error al guardar ajustes');
+    }
   };
 
   const renderFinancesSection = () => (
@@ -187,6 +213,10 @@ const GeneralSettingsPage: React.FC = () => {
     }
   };
 
+  if (loading) {
+    return <div className="text-center py-20">Cargando ajustes...</div>;
+  }
+
   return (
     <div className="container mx-auto px-4 py-8 min-h-screen">
       <div className="flex flex-col lg:flex-row gap-8">
@@ -204,4 +234,4 @@ const GeneralSettingsPage: React.FC = () => {
   );
 };
 
-export default GeneralSettingsPage;
+export default GeneralSettingsPage;                

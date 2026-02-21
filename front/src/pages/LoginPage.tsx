@@ -36,9 +36,9 @@ const LoginPage: React.FC<LoginPageProps> = ({ onLogin }) => {
 
       onLogin(user);
 
-      switch (user.role) {
+    switch (user.role) {
         case 'customer':
-          navigate('/user/dashboard');
+          navigate('/customer/profile');
           break;
         case 'entrepreneur':
           navigate('/entrepreneur/profile');
@@ -50,6 +50,7 @@ const LoginPage: React.FC<LoginPageProps> = ({ onLogin }) => {
           setError('Rol del usuario no reconocido. Contacte al soporte.');
           break;
       }
+      
     } catch (err: any) {
       setError(err.response?.data?.message || 'Error al iniciar sesión. Verifica tus credenciales.');
     } finally {

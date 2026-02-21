@@ -1,10 +1,10 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import ClubCard from '../components/club/ClubCard';
 import HeroBanner from '../components/shared/HeroBanner';
 import AlternatingContent from '../components/shared/AlternatingContent';
 import TestimonialCard from '../components/shared/TestimonialCard';
 import HowItWorks from '../components/shared/HowItWorks';
-import clubsData from '../data/clubs.json';
+import api, { getResponseData } from '../api/config';
 import { Link } from 'react-router-dom';
 import Slider from 'react-slick';
 import 'slick-carousel/slick/slick.css';
@@ -43,11 +43,27 @@ const testimonialsData = [
 ];
 
 const HomePage: React.FC = () => {
-  const typedClubsData: Club[] = clubsData as Club[];
+  const [clubs, setClubs] = useState<Club[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  const allClubsForCarousel = typedClubsData.length < 4
-    ? [...typedClubsData, ...typedClubsData, ...typedClubsData]
-    : typedClubsData;
+  useEffect(() => {
+    const fetchClubs = async () => {
+      try {
+        const response = await api.get('/clubs');
+        const clubsData = getResponseData(response);
+        setClubs(clubsData);
+      } catch (error) {
+        console.error("Error fetching clubs:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchClubs();
+  }, []);
+
+  const allClubsForCarousel = clubs.length < 4
+    ? [...clubs, ...clubs, ...clubs]
+    : clubs;
 
   const clubCarouselSettings = {
     dots: true,
@@ -86,30 +102,34 @@ const HomePage: React.FC = () => {
         title="Descubre la Magia de los Clubes de Suscripción en Argentina"
         subtitle="Experiencias únicas, curadas con pasión, entregadas en tu puerta."
         ctaText="Explorar Clubes Ahora"
-        ctaLink="/clubes"
+        ctaLink="/explore"
         backgroundImage="/assets/hero-background.jpg"
       />
 
       <div className="container mx-auto px-4 py-8 flex-grow">
         <section className="mb-16">
           <h2 className="text-4xl font-bold text-gray-800 mb-10 text-center animate-fadeInUp">Clubes Destacados</h2>
-          <Slider {...clubCarouselSettings}>
-            {allClubsForCarousel.map((club, index) => (
-              <div key={`${club.id}-${index}`} className="px-2">
-                <ClubCard
-                  id={club.id}
-                  name={club.name}
-                  category={club.category}
-                  description={club.shortDescription}
-                  image={club.mainImage || club.logoImage || '/assets/default-club.jpg'}
-                  rating={club.rating}
-                  reviewsCount={club.reviewsCount}
-                  price={club.subscriptionPlans && club.subscriptionPlans.length > 0 ? club.subscriptionPlans[0].price : undefined}
-                  currency={club.subscriptionPlans && club.subscriptionPlans.length > 0 ? club.subscriptionPlans[0].currency : undefined}
-                />
-              </div>
-            ))}
-          </Slider>
+          {loading ? (
+            <div className="text-center py-8">Cargando clubes...</div>
+          ) : (
+            <Slider {...clubCarouselSettings}>
+              {allClubsForCarousel.map((club, index) => (
+                <div key={`${club.id}-${index}`} className="px-2">
+                  <ClubCard
+                    id={String(club.id)}
+                    name={club.name}
+                    category={club.category}
+                    description={club.shortDescription || ''}
+                    image={club.mainImage || club.logoImage || '/assets/default-club.jpg'}
+                    rating={club.rating || 0}
+                    reviewsCount={club.reviewsCount || 0}
+                    price={club.subscriptionPlans && club.subscriptionPlans.length > 0 ? club.subscriptionPlans[0].price : undefined}
+                    currency={club.subscriptionPlans && club.subscriptionPlans.length > 0 ? club.subscriptionPlans[0].currency : undefined}
+                  />
+                </div>
+              ))}
+            </Slider>
+          )}
         </section>
 
         <section className="mb-16">
@@ -133,7 +153,7 @@ const HomePage: React.FC = () => {
           <HowItWorks />
         </section>
 
-        <section className="mb-16 bg-gradient-to-r from-blue-50 to-purple-50 py-16 rounded-xl shadow-inner">
+                <section className="mb-16 bg-gradient-to-r from-blue-50 to-purple-50 py-16 rounded-xl shadow-inner">
           <h2 className="text-4xl font-bold text-gray-800 mb-12 text-center animate-fadeInUp">Lo que dicen nuestros usuarios</h2>
           <Slider {...testimonialCarouselSettings}>
             {testimonialsData.map((testimonial) => (

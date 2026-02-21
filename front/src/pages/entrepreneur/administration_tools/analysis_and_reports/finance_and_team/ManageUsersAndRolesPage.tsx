@@ -1,28 +1,50 @@
 import React, { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../../../../App';
 import UsersSidebar from '../../../../../components/entrepreneur/UsersSidebar';
-import usersRolesData from '../../../../../data/users-roles.json';
+import api, { getResponseData } from '../../../../../api/config';
 import { TeamUser } from '../../../../../types/financial';
-import clubsData from '../../../../../data/clubs.json';
 
 const ManageUsersAndRolesPage: React.FC = () => {
-  const { user } = useAuth();
+  const { user, userRole } = useAuth();
   const { clubId } = useParams<{ clubId: string }>();
-  const actualClubId = clubId || user?.managedClubId || 'club-1';
-  const club = (clubsData as any[]).find(c => c.id === actualClubId);
-  const clubName = club?.name || 'Tu Club';
+  const navigate = useNavigate();
+  const actualClubId = clubId || user?.managedClubId;
+  const [clubName, setClubName] = useState('Tu Club');
 
   const [teamUsers, setTeamUsers] = useState<TeamUser[]>([]);
   const [activeFilter, setActiveFilter] = useState('todos');
   const [filteredUsers, setFilteredUsers] = useState<TeamUser[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const data = (usersRolesData as any)[actualClubId] || (usersRolesData as any)['club-1'];
-    setTeamUsers(data.users || []);
-    setFilteredUsers(data.users || []);
-  }, [actualClubId]);
+    const fetchData = async () => {
+      if (userRole !== 'entrepreneur' || !actualClubId) {
+        navigate('/');
+        return;
+      }
+
+      try {
+        const [clubResponse, usersResponse] = await Promise.all([
+          api.get(`/clubs/${actualClubId}`),
+          api.get(`/clubs/${actualClubId}/team-users`)
+        ]);
+
+        const clubData = getResponseData(clubResponse);
+        const usersData = getResponseData(usersResponse);
+
+        setClubName(clubData.name || 'Tu Club');
+        setTeamUsers(usersData || []);
+        setFilteredUsers(usersData || []);
+      } catch (error) {
+        console.error("Error fetching users:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchData();
+  }, [actualClubId, userRole, navigate]);
 
   useEffect(() => {
     let filtered = [...teamUsers];
@@ -50,20 +72,23 @@ const ManageUsersAndRolesPage: React.FC = () => {
   const roles = Array.from(new Set(teamUsers.map(u => u.role)));
 
   const handleAddUser = () => {
-    console.log('Agregando nuevo usuario al equipo');
     alert('Funcionalidad de agregar usuario (simulada para backend)');
   };
 
   const handleEditUser = (teamUser: TeamUser) => {
-    console.log('Editando usuario:', teamUser);
     alert(`Editando ${teamUser.name} (simulado)`);
   };
 
-  const handleDeleteUser = (userId: string) => {
+  const handleDeleteUser = async (userId: string) => {
     if (window.confirm('¿Confirmar eliminación?')) {
-      console.log('Eliminando usuario:', userId);
-      setTeamUsers(prev => prev.filter(u => u.id !== userId));
-      alert('Usuario eliminado (simulado)');
+      try {
+        await api.delete(`/clubs/${actualClubId}/team-users/${userId}`);
+        setTeamUsers(prev => prev.filter(u => u.id !== userId));
+        alert('Usuario eliminado');
+      } catch (error) {
+        console.error("Error deleting user:", error);
+        alert('Error al eliminar usuario');
+      }
     }
   };
 
@@ -109,6 +134,10 @@ const ManageUsersAndRolesPage: React.FC = () => {
       </td>
     </tr>
   );
+
+  if (loading) {
+    return <div className="text-center py-20">Cargando usuarios...</div>;
+  }
 
   return (
     <div className="container mx-auto px-4 py-8 min-h-screen">

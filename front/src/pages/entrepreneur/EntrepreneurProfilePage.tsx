@@ -3,31 +3,21 @@ import { useNavigate } from 'react-router-dom';
 import EntrepreneurProfileSidebar from '../../components/entrepreneur/EntrepreneurProfileSidebar';
 import EntrepreneurProfileContent from '../../components/entrepreneur/EntrepreneurProfileContent';
 import { User } from '../../types/user';
+import { useAuth } from '../../App';
 
 const EntrepreneurProfilePage: React.FC = () => {
   const [activeSection, setActiveSection] = useState<string>('profile');
   const [loggedInUser, setLoggedInUser] = useState<User | null>(null);
   const navigate = useNavigate();
+  const { user, userRole } = useAuth();
 
   useEffect(() => {
-    const storedUser = localStorage.getItem('loggedInUser');
-    if (storedUser) {
-      try {
-        const user: User = JSON.parse(storedUser);
-        if (user.role === 'entrepreneur') {
-          setLoggedInUser(user);
-        } else {
-          navigate(user.role === 'customer' ? '/profile' : '/');
-        }
-      } catch (error) {
-        console.error("Error parsing stored user data:", error);
-        localStorage.removeItem('loggedInUser');
-        navigate('/login');
-      }
-    } else {
-      navigate('/login');
+    if (!user || userRole !== 'entrepreneur') {
+      navigate(userRole === 'customer' ? '/profile' : '/login');
+      return;
     }
-  }, [navigate]);
+    setLoggedInUser(user);
+  }, [user, userRole, navigate]);
 
   if (!loggedInUser) {
     return <div className="text-center py-20">Cargando perfil o redirigiendo...</div>;
@@ -40,7 +30,6 @@ const EntrepreneurProfilePage: React.FC = () => {
         <div className="lg:w-1/4">
           <EntrepreneurProfileSidebar activeSection={activeSection} setActiveSection={setActiveSection} />
         </div>
-
         <div className="lg:w-3/4 bg-white rounded-xl shadow-lg p-8">
           <EntrepreneurProfileContent activeSection={activeSection} user={loggedInUser} />
         </div>

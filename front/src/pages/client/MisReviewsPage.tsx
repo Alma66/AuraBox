@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../App';
-import reviewsData from '../../data/reviews.json';
-import clubsData from '../../data/clubs.json';
+import api, { getResponseData } from '../../api/config';
 import ReviewCard from '../../components/client/ReviewCard';
 import { User } from '../../types/user';
 import { Club } from '../../types/club';
@@ -24,28 +23,54 @@ const MisReviewsPage: React.FC = () => {
   const [reviews, setReviews] = useState<Review[]>([]);
   const [clubs, setClubs] = useState<Club[]>([]);
   const [loading, setLoading] = useState(true);
-  const [editingReview, setEditingReview] = useState<Review | null>(null);
 
   useEffect(() => {
-    if (!user) {
-      navigate('/login');
-      return;
-    }
+    const fetchData = async () => {
+      if (!user) {
+        navigate('/login');
+        return;
+      }
 
-    const userReviews = (reviewsData as Review[]).filter(r => r.userId === user.id);
-    setReviews(userReviews);
-    setClubs(clubsData as Club[]);
-    setLoading(false);
+      try {
+        const [reviewsResponse, clubsResponse] = await Promise.all([
+          api.get('/reviews'),
+          api.get('/clubs')
+        ]);
+        
+        const allReviews = getResponseData(reviewsResponse);
+        const allClubs = getResponseData(clubsResponse);
+        
+        const userReviews = allReviews.filter((r: any) => r.userId === user.id || r.user?.id === user.id);
+        
+        setReviews(userReviews.map((r: any) => ({
+          id: r.id,
+          clubId: r.clubId,
+          userId: r.userId,
+          rating: r.rating,
+          comment: r.comment,
+          date: r.createdAt,
+          status: r.status || 'approved',
+          isBlockedBySystem: r.isBlockedBySystem || false
+        })));
+        
+        setClubs(allClubs);
+      } catch (error) {
+        console.error("Error fetching reviews:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchData();
   }, [user, navigate]);
 
-  const handleDelete = (reviewId: string) => {
-    setReviews(prev => prev.filter(r => r.id !== reviewId));
-  };
-
-  const handleEdit = (review: Review) => {
-    setEditingReview(review);
-    alert(`Editando reseña: "${review.comment}"`);
-    setEditingReview(null);
+  const handleDelete = async (reviewId: string) => {
+    try {
+      await api.delete(`/reviews/${reviewId}`);
+      setReviews(prev => prev.filter(r => r.id !== reviewId));
+    } catch (error) {
+      console.error("Error deleting review:", error);
+      alert('Error al eliminar la reseña.');
+    }
   };
 
   const getClubName = (clubId: string) => {
@@ -96,7 +121,7 @@ const MisReviewsPage: React.FC = () => {
                 review={review}
                 club={{ name: getClubName(review.clubId) }}
                 onDelete={() => handleDelete(review.id)}
-                onEdit={review.status === 'pending' ? () => handleEdit(review) : undefined}
+                onEdit={review.status === 'pending' ? () => {} : undefined}
               />
             ))}
           </div>
@@ -104,7 +129,7 @@ const MisReviewsPage: React.FC = () => {
 
         <div className="mt-12 text-center">
           <button
-            onClick={() => navigate('/profile')}
+            onClick={() => navigate('/customer/profile')}
             className="bg-purple-600 text-white px-8 py-3 rounded-lg hover:bg-purple-700 transition-colors font-semibold"
           >
             Volver a Mi Perfil

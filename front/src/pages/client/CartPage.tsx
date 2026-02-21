@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../../App';
-import clubPlansData from '../../data/clubPlans.json';
+import api, { getResponseData } from '../../api/config';
 import PlanCard from '../../components/client/PlanCard';
 import { SubscriptionPlan } from '../../types/club';
 
@@ -18,9 +18,32 @@ const CartPage: React.FC = () => {
     const addedId = urlParams.get('added');
     setAddedPlanId(addedId || null);
 
-    const simulatedCart = (clubPlansData as SubscriptionPlan[]).slice(1, 4);
-    setCartItems(simulatedCart);
-    setLoading(false);
+    const fetchPlans = async () => {
+      try {
+        const response = await api.get('/subscription-types');
+        const plansData = getResponseData(response);
+        if (Array.isArray(plansData) && plansData.length > 0) {
+          const mappedPlans: SubscriptionPlan[] = plansData.slice(0, 3).map((plan: any) => ({
+            planId: String(plan.id),
+            name: plan.name,
+            price: plan.price || 0,
+            currency: 'ARS',
+            description: plan.description || '',
+            image: '/assets/default-plan.jpg',
+            deliveryFrequency: '',
+            includes: [],
+            shippingAreas: '',
+            specifications: []
+          }));
+          setCartItems(mappedPlans);
+        }
+      } catch (error) {
+        console.error("Error fetching plans:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchPlans();
   }, [location.search]);
 
   const handleRemove = (planId: string) => {

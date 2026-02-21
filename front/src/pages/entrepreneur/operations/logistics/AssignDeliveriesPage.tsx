@@ -1,15 +1,14 @@
 import React, { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
-import { Delivery, Rider } from '../../../../types/delivery';
-import deliveriesData from '../../../../data/deliveries.json';
-import ridersData from '../../../../data/riders.json';
-import clubsData from '../../../../data/clubs.json';
-import { Club } from '../../../../types/club';
+import { useParams, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../../../App';
+import api, { getResponseData } from '../../../../api/config';
+import { Delivery, Rider } from '../../../../types/delivery';
+import { Club } from '../../../../types/club';
 
 const AssignDeliveriesPage: React.FC = () => {
   const { clubId } = useParams<{ clubId: string }>();
-  const { user } = useAuth();
+  const { user, userRole } = useAuth();
+  const navigate = useNavigate();
   const [deliveries, setDeliveries] = useState<Delivery[]>([]);
   const [riders, setRiders] = useState<Rider[]>([]);
   const [selectedRider, setSelectedRider] = useState<Rider | null>(null);
@@ -20,75 +19,64 @@ const AssignDeliveriesPage: React.FC = () => {
 
   useEffect(() => {
     const fetchData = async () => {
+      if (!clubId || userRole !== 'entrepreneur' || user?.managedClubId !== clubId) {
+        navigate('/login');
+        return;
+      }
+
       try {
-        const normalizedDeliveries = (deliveriesData as Delivery[]).map(d => ({
-          ...d,
-          assignedRiderId: d.assignedRiderId === null ? undefined : d.assignedRiderId,
-          trackingNumber: d.trackingNumber === null ? undefined : d.trackingNumber
-        })).filter(d => d.clubId === clubId);
-        setDeliveries(normalizedDeliveries);
+        const [clubResponse, deliveriesResponse, ridersResponse] = await Promise.all([
+          api.get(`/clubs/${clubId}`),
+          api.get(`/clubs/${clubId}/deliveries`),
+          api.get(`/clubs/${clubId}/riders`)
+        ]);
 
-        const availableRiders = (ridersData as Rider[]).filter(r => r.isActive && r.availability).map(r => ({
-          ...r,
-          licensePlate: r.licensePlate === null ? undefined : r.licensePlate
-        }));
-        setRiders(availableRiders);
+        const clubData = getResponseData(clubResponse);
+        const deliveriesData = getResponseData(deliveriesResponse);
+        const ridersData = getResponseData(ridersResponse);
 
-        const foundClub = (clubsData as Club[]).find(c => c.id === clubId);
-        if (foundClub && user?.managedClubId === clubId) {
-          setClub(foundClub);
-        } else {
-          setError('No tienes acceso a este club o no existe.');
-        }
+        setClub(clubData);
+        setDeliveries(deliveriesData || []);
+        setRiders(ridersData?.filter((r: Rider) => r.isActive && r.availability) || []);
       } catch (err) {
+        console.error("Error fetching data:", err);
         setError('Error al cargar datos.');
       } finally {
         setLoading(false);
       }
     };
 
-    if (clubId && user?.managedClubId === clubId) {
-      fetchData();
-    }
-  }, [clubId, user]);
+    fetchData();
+  }, [clubId, user, userRole, navigate]);
 
-  const assignRiderToDelivery = (deliveryId: string, riderId: string) => {
-    setDeliveries(prev => prev.map(d => 
-      d.id === deliveryId 
-        ? { ...d, assignedRiderId: riderId, status: 'assigned' as const, updatedAt: new Date().toISOString() }
-        : d
-    ));
-    const selectedRiderData = riders.find(r => r.id === riderId);
-    if (selectedRiderData) {
-      setRiders(prev => prev.map(r => 
-        r.id === riderId ? { ...r, currentAssignments: r.currentAssignments + 1 } : r
-      ));
-      setSelectedRider(selectedRiderData);
+  const assignRiderToDelivery = async (deliveryId: string, riderId: string) => {
+    try {
+      await api.put(`/clubs/${clubId}/deliveries/${deliveryId}`, { assignedRiderId: riderId, status: 'assigned' });
+      setDeliveries(prev => prev.map(d => d.id === deliveryId ? { ...d, assignedRiderId: riderId, status: 'assigned' as const } : d));
+      const selectedRiderData = riders.find(r => r.id === riderId);
+      if (selectedRiderData) setSelectedRider(selectedRiderData);
+      alert('Entrega asignada correctamente.');
+    } catch (error) {
+      console.error("Error assigning rider:", error);
+      alert('Error al asignar rider.');
     }
-    alert(`Entrega ${deliveryId} asignada a rider ${riderId}`);
   };
 
-  const unassignRider = (deliveryId: string) => {
-    setDeliveries(prev => prev.map(d => 
-      d.id === deliveryId 
-        ? { ...d, assignedRiderId: undefined, status: 'pending' as const, updatedAt: new Date().toISOString() } 
-        : d
-    ));
-    if (selectedRider) {
-      setRiders(prev => prev.map(r => 
-        r.id === selectedRider.id ? { ...r, currentAssignments: Math.max(0, r.currentAssignments - 1) } : r
-      ));
+  const unassignRider = async (deliveryId: string) => {
+    try {
+      await api.put(`/clubs/${clubId}/deliveries/${deliveryId}`, { assignedRiderId: null, status: 'pending' });
+      setDeliveries(prev => prev.map(d => d.id === deliveryId ? { ...d, assignedRiderId: undefined, status: 'pending' as const } : d));
       setSelectedRider(null);
+      alert('Entrega desasignada.');
+    } catch (error) {
+      console.error("Error unassigning rider:", error);
     }
-    alert(`Entrega ${deliveryId} desasignada.`);
   };
 
   if (loading) return <div className="text-center py-10">Cargando entregas...</div>;
   if (error || !club) return <div className="text-center py-10 text-red-500">{error || 'Club no encontrado.'}</div>;
 
-  const filteredDeliveries = filterStatus === 'pending' 
-    ? deliveries.filter(d => d.status === 'pending')
-    : deliveries;
+  const filteredDeliveries = filterStatus === 'pending' ? deliveries.filter(d => d.status === 'pending') : deliveries;
 
   const getRiderName = (riderId: string | undefined) => {
     if (!riderId) return 'No asignado';
@@ -101,26 +89,16 @@ const AssignDeliveriesPage: React.FC = () => {
       <h1 className="text-3xl font-bold mb-6">Asignar Envíos - {club.name}</h1>
       
       <div className="mb-6 flex flex-col sm:flex-row gap-4">
-        <select 
-          value={filterStatus} 
-          onChange={(e) => setFilterStatus(e.target.value as 'all' | 'pending')}
-          className="px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-        >
+        <select value={filterStatus} onChange={(e) => setFilterStatus(e.target.value as any)} className="px-4 py-2 border border-gray-300 rounded-md">
           <option value="all">Todas las entregas</option>
           <option value="pending">Solo pendientes</option>
         </select>
         <div className="flex-1">
-          <label className="block text-sm font-medium text-gray-700 mb-2">Seleccionar Rider para Asignación Masiva</label>
-          <select 
-            value={selectedRider?.id || ''} 
-            onChange={(e) => setSelectedRider(riders.find(r => r.id === e.target.value) || null)}
-            className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-          >
+          <label className="block text-sm font-medium text-gray-700 mb-2">Seleccionar Rider</label>
+          <select value={selectedRider?.id || ''} onChange={(e) => setSelectedRider(riders.find(r => r.id === e.target.value) || null)} className="w-full px-4 py-2 border border-gray-300 rounded-md">
             <option value="">-- Elegir Rider --</option>
             {riders.map(rider => (
-              <option key={rider.id} value={rider.id}>
-                {rider.name} ({rider.vehicleType}) - {rider.currentAssignments} asignaciones activas
-              </option>
+              <option key={rider.id} value={rider.id}>{rider.name} ({rider.vehicleType}) - {rider.currentAssignments} asignaciones</option>
             ))}
           </select>
         </div>
@@ -135,13 +113,7 @@ const AssignDeliveriesPage: React.FC = () => {
               <p className="text-sm text-gray-600">{rider.vehicleType.toUpperCase()}</p>
               <p className="text-sm text-gray-500">Disponible: {rider.availability ? 'Sí' : 'No'}</p>
               <p className="text-sm text-gray-500">Calificación: {rider.rating}/5</p>
-              <p className="text-sm text-gray-500">Asignaciones: {rider.currentAssignments}</p>
-              <button 
-                onClick={() => setSelectedRider(rider)}
-                className="mt-2 w-full bg-blue-600 text-white py-1 px-3 rounded text-sm hover:bg-blue-700"
-              >
-                Seleccionar
-              </button>
+              <button onClick={() => setSelectedRider(rider)} className="mt-2 w-full bg-blue-600 text-white py-1 px-3 rounded text-sm hover:bg-blue-700">Seleccionar</button>
             </div>
           ))}
         </div>
@@ -149,64 +121,40 @@ const AssignDeliveriesPage: React.FC = () => {
 
       <div className="bg-white rounded-lg shadow-md overflow-hidden">
         <div className="px-6 py-4 border-b border-gray-200">
-          <h2 className="text-xl font-semibold">Entregas Pendientes/Asignadas ({filteredDeliveries.length})</h2>
+          <h2 className="text-xl font-semibold">Entregas ({filteredDeliveries.length})</h2>
         </div>
         <div className="overflow-x-auto">
           <table className="min-w-full divide-y divide-gray-200">
             <thead className="bg-gray-50">
               <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID Entrega</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Cliente</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Fecha</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Contenido</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Dirección</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Estado</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Rider Asignado</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Acciones</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">ID</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Cliente</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Fecha</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Contenido</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Estado</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Rider</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Acciones</th>
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
               {filteredDeliveries.map((delivery) => (
                 <tr key={delivery.id} className="hover:bg-gray-50">
-                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{delivery.id}</td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                    {delivery.userId} 
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{new Date(delivery.deliveryDate).toLocaleDateString('es-AR')}</td>
-                  <td className="px-6 py-4 text-sm text-gray-900 max-w-xs truncate" title={delivery.boxContent}>
-                    {delivery.boxContent}
-                  </td>
-                  <td className="px-6 py-4 text-sm text-gray-900">
-                    {delivery.address.street} {delivery.address.number}, {delivery.address.locality}
-                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">{delivery.id}</td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm">{delivery.userId}</td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm">{new Date(delivery.deliveryDate).toLocaleDateString('es-AR')}</td>
+                  <td className="px-6 py-4 text-sm max-w-xs truncate">{delivery.boxContent}</td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                      delivery.status === 'pending' ? 'bg-yellow-100 text-yellow-800' :
-                      delivery.status === 'assigned' ? 'bg-blue-100 text-blue-800' :
-                      delivery.status === 'delivered' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
-                    }`}>
+                    <span className={`px-2 text-xs rounded-full ${delivery.status === 'pending' ? 'bg-yellow-100 text-yellow-800' : delivery.status === 'assigned' ? 'bg-blue-100 text-blue-800' : 'bg-green-100 text-green-800'}`}>
                       {delivery.status}
                     </span>
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                    {getRiderName(delivery.assignedRiderId)}
-                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm">{getRiderName(delivery.assignedRiderId)}</td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                     {delivery.status === 'pending' && selectedRider && (
-                      <button
-                        onClick={() => assignRiderToDelivery(delivery.id, selectedRider.id)}
-                        className="text-green-600 hover:text-green-900 mr-3"
-                      >
-                        Asignar
-                      </button>
+                      <button onClick={() => assignRiderToDelivery(delivery.id, selectedRider.id)} className="text-green-600 hover:text-green-900 mr-3">Asignar</button>
                     )}
                     {delivery.assignedRiderId && (
-                      <button
-                        onClick={() => unassignRider(delivery.id)}
-                        className="text-red-600 hover:text-red-900"
-                      >
-                        Desasignar
-                      </button>
+                      <button onClick={() => unassignRider(delivery.id)} className="text-red-600 hover:text-red-900">Desasignar</button>
                     )}
                   </td>
                 </tr>
@@ -215,10 +163,6 @@ const AssignDeliveriesPage: React.FC = () => {
           </table>
         </div>
       </div>
-
-      {filteredDeliveries.length === 0 && (
-        <div className="text-center py-10 text-gray-500">No hay entregas para mostrar con el filtro actual.</div>
-      )}
     </div>
   );
 };

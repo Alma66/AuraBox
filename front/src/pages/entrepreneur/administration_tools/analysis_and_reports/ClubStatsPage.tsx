@@ -1,56 +1,79 @@
 import React, { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../../../../App';
-import { User } from '../../../../types/user';
 import { Club } from '../../../../types/club';
 import { Subscription } from '../../../../types/subscription';
 import AdminToolsSidebar from '../../../../components/entrepreneur/AdminToolsSidebar';
 import StatsCards from '../../../../components/entrepreneur/StatsCards';
 import TrendsChart from '../../../../components/entrepreneur/TrendsChart';
 import InteractionsSummary from '../../../../components/entrepreneur/InteractionsSummary';
-import clubsData from '../../../../data/clubs.json';
-import subscriptionsData from '../../../../data/subscriptions.json';
-import analyticsData from '../../../../data/analytics.json';
+import api, { getResponseData } from '../../../../api/config';
 
 const ClubStatsPage: React.FC = () => {
   const { clubId } = useParams<{ clubId: string }>();
-  const { user, isAuthenticated, userRole } = useAuth();
+  const { user, userRole } = useAuth();
+  const navigate = useNavigate();
   const [managedClub, setManagedClub] = useState<Club | null>(null);
   const [clubSubscriptions, setClubSubscriptions] = useState<Subscription[]>([]);
   const [analytics, setAnalytics] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (userRole !== 'entrepreneur' || !user?.managedClubId) {
-      window.location.href = '/';
-      return;
-    }
+    const fetchData = async () => {
+      if (userRole !== 'entrepreneur' || !user?.managedClubId) {
+        navigate('/');
+        return;
+      }
 
-    const club = (clubsData as Club[]).find(c => c.id === user.managedClubId);
-    if (club && club.id === clubId) {
-      setManagedClub(club);
-      setClubSubscriptions((subscriptionsData as Subscription[]).filter(sub => sub.clubId === club.id));
-      setAnalytics((analyticsData as any)[club.id] || {
-        views: Math.round(Math.random() * 20000 + 5000),
-        likes: Math.round(Math.random() * 1000 + 200),
-        favorites: Math.round(Math.random() * 500 + 100),
-        monthlyExpenses: [
-          { month: '2024-01', amount: 150000 + Math.random() * 50000 },
-          { month: '2024-02', amount: 180000 + Math.random() * 50000 },
-          { month: '2024-03', amount: 200000 + Math.random() * 50000 },
-          { month: '2024-04', amount: 170000 + Math.random() * 50000 },
-          { month: '2024-05', amount: 190000 + Math.random() * 50000 },
-          { month: '2024-06', amount: 210000 + Math.random() * 50000 }
-        ],
-        trends: {
-          positiveWords: ['excelente', 'recomendable', 'sorprendente', 'calidad', 'genial'],
-          negativeWords: ['tarde', 'roto', 'decepcionante', 'malo'],
-          ratingTrend: [4.2, 4.5, 4.7, 4.6, 4.8, 4.9]
+      try {
+        const clubIdToUse = clubId || user.managedClubId;
+
+        const [clubResponse, subsResponse] = await Promise.all([
+          api.get(`/clubs/${clubIdToUse}`),
+          api.get('/user-subscriptions')
+        ]);
+
+        const clubData = getResponseData(clubResponse);
+        const allSubs = getResponseData(subsResponse);
+
+        if (String(clubData.id) === String(clubIdToUse)) {
+          setManagedClub(clubData);
+          const clubSubs = allSubs.filter((sub: any) => sub.clubId === clubData.id || sub.club?.id === clubData.id);
+          setClubSubscriptions(clubSubs);
+          setAnalytics({
+            views: Math.round(Math.random() * 20000 + 5000),
+            likes: Math.round(Math.random() * 1000 + 200),
+            favorites: Math.round(Math.random() * 500 + 100),
+            monthlyExpenses: [
+              { month: '2024-01', amount: 150000 + Math.random() * 50000 },
+              { month: '2024-02', amount: 180000 + Math.random() * 50000 },
+              { month: '2024-03', amount: 200000 + Math.random() * 50000 },
+              { month: '2024-04', amount: 170000 + Math.random() * 50000 },
+              { month: '2024-05', amount: 190000 + Math.random() * 50000 },
+              { month: '2024-06', amount: 210000 + Math.random() * 50000 }
+            ],
+            trends: {
+              positiveWords: ['excelente', 'recomendable', 'sorprendente', 'calidad', 'genial'],
+              negativeWords: ['tarde', 'roto', 'decepcionante', 'malo'],
+              ratingTrend: [4.2, 4.5, 4.7, 4.6, 4.8, 4.9]
+            }
+          });
+        } else {
+          navigate('/');
         }
-      });
-    } else {
-      window.location.href = '/';
-    }
-  }, [clubId, userRole, user]);
+      } catch (error) {
+        console.error("Error fetching data:", error);
+        navigate('/');
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchData();
+  }, [clubId, userRole, user, navigate]);
+
+  if (loading) {
+    return <div className="text-center py-20">Cargando estadísticas...</div>;
+  }
 
   if (!managedClub || !analytics) {
     return <div className="text-center py-20">Cargando estadísticas...</div>;
@@ -65,16 +88,16 @@ const ClubStatsPage: React.FC = () => {
         <nav className="flex mb-4" aria-label="Breadcrumb">
           <ol className="inline-flex items-center space-x-1 md:space-x-3">
             <li className="inline-flex items-center">
-              <a href="/entrepreneur/dashboard" className="inline-flex items-center text-sm font-medium text-gray-700 hover:text-blue-600">
+              <Link to="/entrepreneur/dashboard" className="inline-flex items-center text-sm font-medium text-gray-700 hover:text-blue-600">
                 Dashboard Emprendedor
-              </a>
+              </Link>
             </li>
             <li>
               <div className="flex items-center">
                 <svg className="w-6 h-6 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
                   <path fillRule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clipRule="evenodd"></path>
                 </svg>
-                <a href={`/entrepreneur/club/${clubId}`} className="ml-1 text-sm font-medium text-gray-700 hover:text-blue-600 md:ml-2">{managedClub.name}</a>
+                <Link to={`/entrepreneur/club/${clubId}`} className="ml-1 text-sm font-medium text-gray-700 hover:text-blue-600 md:ml-2">{managedClub.name}</Link>
               </div>
             </li>
             <li aria-current="page">
@@ -97,10 +120,10 @@ const ClubStatsPage: React.FC = () => {
 
         <div className="lg:w-3/4 space-y-8">
           <StatsCards 
-            subscribers={managedClub.totalSubscribers} 
+            subscribers={managedClub.totalSubscribers || 0} 
             revenue={totalRevenue} 
-            rating={managedClub.rating} 
-            boxesSent={managedClub.monthlyBoxesSent}
+            rating={managedClub.rating || 0} 
+            boxesSent={managedClub.monthlyBoxesSent || 0}
             growth={monthlyGrowth}
           />
 
@@ -121,7 +144,7 @@ const ClubStatsPage: React.FC = () => {
                 <svg className="w-5 h-5 text-blue-500 mr-2 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                 </svg>
-                <span>Rating alto ({managedClub.rating.toFixed(1)}). Destaca reseñas positivas en redes para atraer más tráfico.</span>
+                <span>Rating alto ({(managedClub.rating || 0).toFixed(1)}). Destaca reseñas positivas en redes para atraer más tráfico.</span>
               </li>
               <li className="flex items-start">
                 <svg className="w-5 h-5 text-yellow-500 mr-2 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">

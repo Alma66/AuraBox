@@ -1,35 +1,57 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import api, { getResponseData } from '../../../../api/config';
 import ManagePromotionsSidebar from '../../../../components/entrepreneur/ManagePromotionsSidebar';
 import ManagePromotionsContent from '../../../../components/entrepreneur/ManagePromotionsContent';
 import { Club } from '../../../../types/club';
-import clubsData from '../../../../data/clubs.json';
+import { useAuth } from '../../../../App';
 
 const ManagePromotionsPage: React.FC = () => {
   const { clubId } = useParams<{ clubId: string }>();
   const [activeSection, setActiveSection] = useState<string>('promociones');
   const [club, setClub] = useState<Club | null>(null);
+  const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
+  const { user, userRole } = useAuth();
 
   useEffect(() => {
-    if (!clubId) {
-      navigate('/entrepreneur/profile');
-      return;
-    }
-    const foundClub = (clubsData as Club[]).find(c => c.id === clubId);
-    if (foundClub) {
-      setClub(foundClub);
-    } else {
-      navigate('/entrepreneur/profile');
-    }
-  }, [clubId, navigate]);
+    const fetchClub = async () => {
+      if (!clubId || userRole !== 'entrepreneur' || user?.managedClubId !== clubId) {
+        navigate('/login');
+        return;
+      }
 
-  if (!club) {
+      try {
+        const response = await api.get(`/clubs/${clubId}`);
+        const clubData = getResponseData(response);
+        setClub(clubData);
+      } catch (error) {
+        console.error("Error fetching club:", error);
+        navigate('/entrepreneur/profile');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchClub();
+  }, [clubId, user, userRole, navigate]);
+
+  if (loading) {
     return <div className="text-center py-20">Cargando promociones...</div>;
   }
 
-  const updateClub = (updatedClub: Club) => {
-    setClub(updatedClub);
+  if (!club) {
+    return <div className="text-center py-20">Club no encontrado</div>;
+  }
+
+  const updateClub = async (updatedClub: Club) => {
+    try {
+      await api.put(`/clubs/${clubId}`, updatedClub);
+      setClub(updatedClub);
+    } catch (error) {
+      console.error("Error updating club:", error);
+      alert('Error al actualizar promociones');
+    }
   };
 
   return (

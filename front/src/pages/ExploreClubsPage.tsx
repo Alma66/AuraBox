@@ -1,29 +1,68 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import ExploreClubCard from '../components/shared/ExploreClubCard';
-import clubsData from '../data/clubs.json';
+import api, { getResponseData } from '../api/config';
 import { Link } from 'react-router-dom';
 import { Club } from '../types/club';
 
 const ExploreClubsPage: React.FC = () => {
+  const [clubs, setClubs] = useState<Club[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
   const [searchTerm, setSearchTerm] = useState<string>('');
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [minRating, setMinRating] = useState<number>(0);
 
-  const categories = useMemo(() => {
-    const allCategories = (clubsData as Club[]).map(club => club.category);
-    return ['all', ...Array.from(new Set(allCategories))];
+  useEffect(() => {
+    const fetchClubs = async () => {
+      try {
+        setLoading(true);
+        const response = await api.get('/clubs');
+        const clubsData = getResponseData(response);
+        setClubs(clubsData);
+      } catch (err: any) {
+        console.error("Error fetching clubs:", err);
+        setError('Error al cargar los clubes. Intenta más tarde.');
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchClubs();
   }, []);
 
+  const categories = useMemo(() => {
+    const allCategories = clubs.map(club => club.category);
+    return ['all', ...Array.from(new Set(allCategories))];
+  }, [clubs]);
+
   const filteredClubs = useMemo(() => {
-    return (clubsData as Club[]).filter(club => {
+    return clubs.filter(club => {
       const matchesSearch =
         club.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        club.shortDescription.toLowerCase().includes(searchTerm.toLowerCase());
+        club.shortDescription?.toLowerCase().includes(searchTerm.toLowerCase());
       const matchesCategory = selectedCategory === 'all' || club.category === selectedCategory;
-      const matchesRating = club.rating >= minRating;
+      const matchesRating = (club.rating || 0) >= minRating;
       return matchesSearch && matchesCategory && matchesRating;
     });
-  }, [searchTerm, selectedCategory, minRating]);
+  }, [clubs, searchTerm, selectedCategory, minRating]);
+
+  if (loading) {
+    return (
+      <div className="container mx-auto px-4 py-8 text-center">
+        <div className="animate-pulse">
+          <div className="h-8 bg-gray-200 rounded w-1/3 mx-auto mb-4"></div>
+          <div className="h-4 bg-gray-200 rounded w-1/2 mx-auto"></div>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="container mx-auto px-4 py-8 text-center">
+        <p className="text-red-600 text-xl">{error}</p>
+      </div>
+    );
+  }
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -69,13 +108,13 @@ const ExploreClubsPage: React.FC = () => {
             {filteredClubs.map((club) => (
               <ExploreClubCard
                 key={club.id}
-                id={club.id}
+                id={String(club.id)}
                 name={club.name}
                 category={club.category}
-                description={club.shortDescription}
+                description={club.shortDescription || ''}
                 image={club.mainImage || club.logoImage || '/assets/default-club.jpg'}
-                rating={club.rating}
-                reviewsCount={club.reviewsCount}
+                rating={club.rating || 0}
+                reviewsCount={club.reviewsCount || 0}
               />
             ))}
           </div>

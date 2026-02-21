@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../../../App';
 import { User } from '../../../../types/user';
 import { Club } from '../../../../types/club';
@@ -9,37 +9,61 @@ import SalesTable from '../../../../components/entrepreneur/SalesTable';
 import SalesFilters from '../../../../components/entrepreneur/SalesFilters';
 import SalesSummary from '../../../../components/entrepreneur/SalesSummary';
 import SalesChart from '../../../../components/entrepreneur/SalesChart';
-import clubsData from '../../../../data/clubs.json';
-import subscriptionsData from '../../../../data/subscriptions.json';
-import usersData from '../../../../data/user.json';
+import api, { getResponseData } from '../../../../api/config';
 
 const SalesReportsPage: React.FC = () => {
   const { clubId } = useParams<{ clubId: string }>();
   const { user, userRole } = useAuth();
+  const navigate = useNavigate();
   const [managedClub, setManagedClub] = useState<Club | null>(null);
   const [clubSubscriptions, setClubSubscriptions] = useState<Subscription[]>([]);
+  const [usersData, setUsersData] = useState<User[]>([]);
   const [filteredSubscriptions, setFilteredSubscriptions] = useState<Subscription[]>([]);
   const [filters, setFilters] = useState({ month: 'all', plan: 'all', status: 'all' });
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (userRole !== 'entrepreneur' || !user?.managedClubId) {
-      window.location.href = '/';
-      return;
-    }
+    const fetchData = async () => {
+      if (userRole !== 'entrepreneur' || !user?.managedClubId) {
+        navigate('/');
+        return;
+      }
 
-    const club = (clubsData as Club[]).find(c => c.id === user.managedClubId);
-    if (club && club.id === clubId) {
-      setManagedClub(club);
-      const subs = (subscriptionsData as Subscription[]).filter(sub => sub.clubId === club.id);
-      setClubSubscriptions(subs);
-      setFilteredSubscriptions(subs);
-    } else {
-      window.location.href = '/';
-    }
-  }, [clubId, userRole, user]);
+      try {
+        const clubIdToUse = clubId || user.managedClubId;
+        
+        const [clubResponse, subsResponse, usersResponse] = await Promise.all([
+          api.get(`/clubs/${clubIdToUse}`),
+          api.get('/user-subscriptions'),
+          api.get('/users')
+        ]);
+
+        const clubData = getResponseData(clubResponse);
+        const allSubs = getResponseData(subsResponse);
+        const allUsers = getResponseData(usersResponse);
+
+        if (String(clubData.id) === String(clubIdToUse)) {
+          setManagedClub(clubData);
+          const clubSubs = allSubs.filter((sub: any) => sub.clubId === clubData.id || sub.club?.id === clubData.id);
+          setClubSubscriptions(clubSubs);
+          setFilteredSubscriptions(clubSubs);
+        } else {
+          navigate('/');
+        }
+
+        setUsersData(allUsers);
+      } catch (error) {
+        console.error("Error fetching data:", error);
+        navigate('/');
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchData();
+  }, [clubId, userRole, user, navigate]);
 
   useMemo(() => {
-    let filtered = clubSubscriptions;
+    let filtered = [...clubSubscriptions];
     if (filters.month !== 'all') {
       filtered = filtered.filter(sub => {
         const subMonth = new Date(sub.startDate).getMonth() + 1;
@@ -62,6 +86,10 @@ const SalesReportsPage: React.FC = () => {
   }, [filteredSubscriptions]);
 
   const activeCount = useMemo(() => filteredSubscriptions.filter(sub => sub.status === 'active').length, [filteredSubscriptions]);
+
+  if (loading) {
+    return <div className="text-center py-20">Cargando reportes de ventas...</div>;
+  }
 
   if (!managedClub) {
     return <div className="text-center py-20">Cargando reportes de ventas...</div>;
@@ -113,11 +141,11 @@ const SalesReportsPage: React.FC = () => {
 
           <SalesChart subscriptions={filteredSubscriptions} />
 
-          <SalesTable subscriptions={filteredSubscriptions} usersData={usersData as User[]} />
+          <SalesTable subscriptions={filteredSubscriptions} usersData={usersData} />
 
           <div className="text-center">
             <button 
-              onClick={() => alert('Exportando CSV... (Implementar con backend)')} 
+              onClick={() => alert('Exportando CSV...')} 
               className="px-6 py-3 bg-blue-600 text-white rounded-xl hover:bg-blue-700 shadow-lg transition-colors"
             >
               Exportar Reporte Completo (CSV)

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import clubsData from '../../../data/clubs.json';
+import api, { getResponseData } from '../../../api/config';
 import { Club, LegalSection } from '../../../types/club';
 import LegalContentRenderer from '../../../components/club/LegalContentRenderer';
 
@@ -8,57 +8,59 @@ const TermsAndConditionsPage: React.FC = () => {
   const { clubId } = useParams<{ clubId: string }>();
   const navigate = useNavigate();
   const [club, setClub] = useState<Club | null>(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const foundClubRaw = clubsData.find((c) => c.id === clubId);
-    if (!foundClubRaw) {
-      setClub(null);
-      return;
-    }
+    const fetchClub = async () => {
+      try {
+        const response = await api.get(`/clubs/${clubId}`);
+        const clubData = getResponseData(response);
+        
+        const legalInfo = clubData.legalInfo || {};
+        const allowedTypes = ['title', 'paragraph', 'list', 'image'];
 
-    const legalInfo = foundClubRaw.legalInfo || {};
-    const allowedTypes = ['title', 'paragraph', 'list', 'image'];
+        const sanitizeSections = (sections: any[]): LegalSection[] =>
+          sections.map((section: any) => ({
+            id: section.id,
+            type: allowedTypes.includes(section.type) ? section.type : 'paragraph',
+            content: section.content,
+            layout: section.layout,
+          }));
 
-    const sanitizeSections = (sections: any[]): LegalSection[] =>
-      sections.map((section: any) => {
-        const type = allowedTypes.includes(section.type) ? section.type : 'paragraph';
-        return {
-          id: section.id,
-          type,
-          content: section.content,
-          layout: section.layout,
+        const sanitizedClub: Club = {
+          ...clubData,
+          legalInfo: {
+            ...legalInfo,
+            termsAndConditionsSections: legalInfo.termsAndConditionsSections
+              ? sanitizeSections(legalInfo.termsAndConditionsSections)
+              : [],
+            privacyAndSecurityPolicySections: legalInfo.privacyAndSecurityPolicySections
+              ? sanitizeSections(legalInfo.privacyAndSecurityPolicySections)
+              : [],
+          },
         };
-      });
 
-    const sanitizedTerms = legalInfo.termsAndConditionsSections
-      ? sanitizeSections(legalInfo.termsAndConditionsSections)
-      : [];
-
-    const sanitizedPrivacy = legalInfo.privacyAndSecurityPolicySections
-      ? sanitizeSections(legalInfo.privacyAndSecurityPolicySections)
-      : [];
-
-    const sanitizedClub: Club = {
-      ...foundClubRaw,
-      legalInfo: {
-        ...legalInfo,
-        termsAndConditionsSections: sanitizedTerms,
-        privacyAndSecurityPolicySections: sanitizedPrivacy,
-      },
+        setClub(sanitizedClub);
+      } catch (error) {
+        console.error("Error fetching club:", error);
+        setClub(null);
+      } finally {
+        setLoading(false);
+      }
     };
-
-    setClub(sanitizedClub);
+    if (clubId) fetchClub();
   }, [clubId]);
+
+  if (loading) {
+    return <div className="text-center py-20">Cargando términos...</div>;
+  }
 
   if (!club) {
     return (
-      <div className="container mx-auto px-4 py-8 text-center animate-fadeIn">
+      <div className="container mx-auto px-4 py-8 text-center">
         <h1 className="text-4xl font-bold text-red-600 mb-4">Club no encontrado</h1>
         <p className="text-lg text-gray-700 mb-8">No se pudieron cargar los términos y condiciones.</p>
-        <button
-          onClick={() => navigate('/')}
-          className="bg-blue-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-700 transition-all duration-200 transform hover:scale-105 active:scale-95 shadow-md"
-        >
+        <button onClick={() => navigate('/')} className="bg-blue-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-700">
           Volver al inicio
         </button>
       </div>
@@ -67,19 +69,14 @@ const TermsAndConditionsPage: React.FC = () => {
 
   return (
     <div className="container mx-auto px-4 py-8 min-h-screen">
-      <button
-        onClick={() => navigate(-1)}
-        className="mb-6 flex items-center text-blue-600 hover:text-blue-800 transition-colors duration-200 transform hover:translate-x-1"
-      >
+      <button onClick={() => navigate(-1)} className="mb-6 flex items-center text-blue-600 hover:text-blue-800">
         &larr; Volver al Club
       </button>
 
       {club.legalInfo?.termsAndConditionsSections && club.legalInfo.termsAndConditionsSections.length > 0 ? (
         <LegalContentRenderer sections={club.legalInfo.termsAndConditionsSections} />
       ) : (
-        <p className="text-gray-600 text-center">
-          Este club aún no ha proporcionado sus términos y condiciones.
-        </p>
+        <p className="text-gray-600 text-center">Este club aún no ha proporcionado sus términos y condiciones.</p>
       )}
     </div>
   );

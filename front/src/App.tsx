@@ -72,27 +72,26 @@ const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => 
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const storedUser = localStorage.getItem('loggedInUser');
-    if (storedUser) {
+    const token = localStorage.getItem('access_token');
+    if (token) {
       try {
-        const parsedUser: User = JSON.parse(storedUser);
-        if (['customer', 'entrepreneur', 'admin'].includes(parsedUser.role)) {
-          const fullUser = (usersData as User[]).find(u => u.id === parsedUser.id);
-          if (fullUser) {
-            setUser(fullUser);
-            setUserRole(fullUser.role as UserRole);
-            setIsAuthenticated(true);
-          } else {
-            console.warn("Stored user ID not found in usersData. Clearing session.");
-            localStorage.removeItem('loggedInUser');
-          }
-        } else {
-          console.warn("Invalid user role stored. Clearing session.");
-          localStorage.removeItem('loggedInUser');
-        }
+        const payload = JSON.parse(atob(token.split('.')[1]));
+        const userFromToken: User = {
+          id: payload.sub?.toString() || '',
+          firstName: payload.firstName || '',
+          lastName: payload.lastName || '',
+          email: payload.email || '',
+          role: (payload.role?.toLowerCase() || 'customer') as UserRole,
+          registeredDate: payload.registeredDate || new Date().toISOString(),
+          lastLogin: payload.lastLogin || new Date().toISOString(),
+        };
+        
+        setUser(userFromToken);
+        setUserRole(userFromToken.role);
+        setIsAuthenticated(true);
       } catch (error) {
-        console.error("Error parsing stored user data:", error);
-        localStorage.removeItem('loggedInUser');
+        console.error("Error parsing token:", error);
+        localStorage.removeItem('access_token');
       }
     }
     setLoading(false);
@@ -102,14 +101,13 @@ const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => 
     setUser(loggedInUser);
     setUserRole(loggedInUser.role);
     setIsAuthenticated(true);
-    localStorage.setItem('loggedInUser', JSON.stringify(loggedInUser));
   };
 
   const logout = () => {
     setUser(null);
     setUserRole(null);
     setIsAuthenticated(false);
-    localStorage.removeItem('loggedInUser');
+    localStorage.removeItem('access_token');
   };
 
   if (loading) {

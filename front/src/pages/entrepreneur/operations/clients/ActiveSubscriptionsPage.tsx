@@ -4,22 +4,19 @@ import { useAuth } from '../../../../App';
 import { Subscription } from '../../../../types/subscription';
 import { User } from '../../../../types/user';
 import { SubscriptionPlan, Club } from '../../../../types/club';
-
+import api, { getResponseData } from '../../../../api/config';
 import SubscriptionCardForEntrepreneur from '../../../../components/entrepreneur/SubscriptionCardForEntrepreneur';
 
-import subscriptionsData from '../../../../data/subscriptions.json';
-import usersData from '../../../../data/user.json';
-import clubsData from '../../../../data/clubs.json';
-
 const ActiveSubscriptionsPage: React.FC = () => {
-  const { user } = useAuth();
+  const { user, userRole } = useAuth();
   const navigate = useNavigate();
 
   const [subscriptions, setSubscriptions] = useState<Subscription[]>([]);
   const [filteredSubscriptions, setFilteredSubscriptions] = useState<Subscription[]>([]);
   const [clients, setClients] = useState<User[]>([]);
   const [clubPlans, setClubPlans] = useState<SubscriptionPlan[]>([]);
-  const [clubs, setClubs] = useState<Club[]>([]);
+  const [club, setClub] = useState<Club | null>(null);
+  const [loading, setLoading] = useState(true);
 
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState<'all' | 'active' | 'paused' | 'expiring'>('all');
@@ -28,46 +25,62 @@ const ActiveSubscriptionsPage: React.FC = () => {
   const managedClubId = user?.managedClubId;
 
   useEffect(() => {
-    if (!managedClubId) {
-      navigate('/entrepreneur/dashboard');
+    const fetchData = async () => {
+      if (!managedClubId) {
+        navigate('/entrepreneur/dashboard');
+        return;
+      }
+
+      try {
+        const [clubResponse, subscriptionsResponse, usersResponse] = await Promise.all([
+          api.get(`/clubs/${managedClubId}`),
+          api.get(`/clubs/${managedClubId}/user-subscriptions`),
+          api.get('/users')
+        ]);
+
+        const clubData = getResponseData(clubResponse);
+        const subscriptionsData = getResponseData(subscriptionsResponse);
+        const usersData = getResponseData(usersResponse);
+
+        setClub(clubData);
+        setClubPlans(clubData.subscriptionPlans || []);
+        setSubscriptions(subscriptionsData || []);
+        setClients(usersData || []);
+
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, [managedClubId, navigate]);
+
+  useEffect(() => {
+    if (!subscriptions.length) {
+      setFilteredSubscriptions([]);
       return;
     }
 
-    const club = (clubsData as Club[]).find(c => c.id === managedClubId);
-    setClubs(clubsData as Club[]);
-    setClubPlans(club?.subscriptionPlans || []);
+    let tempSubs = [...subscriptions];
 
-    const clubSubs = (subscriptionsData as Subscription[]).filter(sub => sub.clubId === managedClubId);
-    setSubscriptions(clubSubs);
-    setClients(usersData as User[]);
-
-    applyFilters(clubSubs, searchTerm, statusFilter, planFilter);
-  }, [managedClubId, searchTerm, statusFilter, planFilter, navigate]);
-
-  const applyFilters = (
-    subs: Subscription[],
-    term: string,
-    status: 'all' | 'active' | 'paused' | 'expiring',
-    planId: string
-  ) => {
-    let tempSubs = [...subs];
-
-    if (term) {
+    if (searchTerm) {
       tempSubs = tempSubs.filter(sub => {
         const client = clients.find(c => c.id === sub.userId);
         const plan = clubPlans.find(p => p.planId === sub.planId);
         const clientName = client ? `${client.firstName} ${client.lastName}`.toLowerCase() : '';
         const planName = plan ? plan.name.toLowerCase() : '';
-        return clientName.includes(term.toLowerCase()) || planName.includes(term.toLowerCase());
+        return clientName.includes(searchTerm.toLowerCase()) || planName.includes(searchTerm.toLowerCase());
       });
     }
 
-    if (status !== 'all') {
+    if (statusFilter !== 'all') {
       const today = new Date();
       tempSubs = tempSubs.filter(sub => {
-        if (status === 'active') return sub.status === 'active';
-        if (status === 'paused') return sub.status === 'paused';
-        if (status === 'expiring') {
+        if (statusFilter === 'active') return sub.status === 'active';
+        if (statusFilter === 'paused') return sub.status === 'paused';
+        if (statusFilter === 'expiring') {
           const billingDate = new Date(sub.nextBillingDate);
           const diffTime = billingDate.getTime() - today.getTime();
           const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
@@ -77,15 +90,22 @@ const ActiveSubscriptionsPage: React.FC = () => {
       });
     }
 
-    if (planId !== 'all') {
-      tempSubs = tempSubs.filter(sub => sub.planId === planId);
+    if (planFilter !== 'all') {
+      tempSubs = tempSubs.filter(sub => sub.planId === planFilter);
     }
 
     setFilteredSubscriptions(tempSubs);
-  };
+  }, [subscriptions, searchTerm, statusFilter, planFilter, clients, clubPlans]);
 
-  const currentClubName = clubs.find(c => c.id === managedClubId)?.name || 'Tu Club';
-  const currentClub = clubs.find(c => c.id === managedClubId);  
+  if (loading) {
+    return <div className="text-center py-20">Cargando suscripciones...</div>;
+  }
+
+  if (!user || userRole !== 'entrepreneur') {
+    return <div className="text-center py-10 text-red-500">Acceso denegado.</div>;
+  }
+
+  const currentClubName = club?.name || 'Tu Club';
 
   const totalActive = subscriptions.filter(sub => sub.status === 'active').length;
   const totalPaused = subscriptions.filter(sub => sub.status === 'paused').length;
@@ -103,10 +123,6 @@ const ActiveSubscriptionsPage: React.FC = () => {
       const plan = clubPlans.find(p => p.planId === sub.planId);
       return sum + (plan ? plan.price : 0);
     }, 0);
-
-  if (!user || user.role !== 'entrepreneur') {
-    return <div className="text-center py-10 text-red-500">Acceso denegado. Solo para emprendedores.</div>;
-  }
 
   return (
     <div className="container mx-auto px-4 py-8 animate-fadeIn">
@@ -137,14 +153,14 @@ const ActiveSubscriptionsPage: React.FC = () => {
         <input
           type="text"
           placeholder="Buscar por cliente o plan..."
-          className="flex-grow p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+          className="flex-grow p-2 border border-gray-300 rounded-md"
           value={searchTerm}
           onChange={e => setSearchTerm(e.target.value)}
         />
         <select
-          className="p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+          className="p-2 border border-gray-300 rounded-md"
           value={statusFilter}
-          onChange={e => setStatusFilter(e.target.value as 'all' | 'active' | 'paused' | 'expiring')}
+          onChange={e => setStatusFilter(e.target.value as any)}
         >
           <option value="all">Todos los estados</option>
           <option value="active">Activas</option>
@@ -152,7 +168,7 @@ const ActiveSubscriptionsPage: React.FC = () => {
           <option value="expiring">Vencen pronto</option>
         </select>
         <select
-          className="p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+          className="p-2 border border-gray-300 rounded-md"
           value={planFilter}
           onChange={e => setPlanFilter(e.target.value)}
         >
@@ -174,7 +190,7 @@ const ActiveSubscriptionsPage: React.FC = () => {
               <SubscriptionCardForEntrepreneur
                 key={sub.id}
                 subscription={sub}
-                club={currentClub!} 
+                club={club!} 
                 plan={plan!}
                 customer={customer!}
               />

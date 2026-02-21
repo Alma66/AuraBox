@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../App';
-import clubPlansData from '../../data/clubPlans.json';
+import api, { getResponseData } from '../../api/config';
 import PlanCard from '../../components/client/PlanCard';
 import { SubscriptionPlan } from '../../types/club';
 
@@ -12,13 +12,47 @@ const WishlistPage: React.FC = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const simulatedWishlist = (clubPlansData as SubscriptionPlan[]).slice(0, 3);
-    setWishlistItems(simulatedWishlist);
-    setLoading(false);
-  }, []);
+    const fetchWishlist = async () => {
+      if (!user) {
+        setLoading(false);
+        return;
+      }
 
-  const handleRemove = (planId: string) => {
-    setWishlistItems(prev => prev.filter(item => item.planId !== planId));
+      try {
+        const response = await api.get('/favorites');
+        const favoritesData = getResponseData(response);
+        
+        if (Array.isArray(favoritesData) && favoritesData.length > 0) {
+          const mappedPlans: SubscriptionPlan[] = favoritesData.slice(0, 3).map((fav: any) => ({
+            planId: String(fav.id),
+            name: fav.club?.name || 'Club',
+            price: fav.club?.subscriptionPlans?.[0]?.price || 0,
+            currency: fav.club?.subscriptionPlans?.[0]?.currency || 'ARS',
+            description: fav.club?.shortDescription || '',
+            image: fav.club?.mainImage || '/assets/default-plan.jpg',
+            deliveryFrequency: '',
+            includes: [],
+            shippingAreas: '',
+            specifications: []
+          }));
+          setWishlistItems(mappedPlans);
+        }
+      } catch (error) {
+        console.error("Error fetching wishlist:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchWishlist();
+  }, [user]);
+
+  const handleRemove = async (planId: string) => {
+    try {
+      await api.delete(`/favorites/${planId}`);
+      setWishlistItems(prev => prev.filter(item => item.planId !== planId));
+    } catch (error) {
+      console.error("Error removing from wishlist:", error);
+    }
   };
 
   const handleAddToCart = (plan: SubscriptionPlan) => {
