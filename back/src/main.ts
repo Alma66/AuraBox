@@ -9,9 +9,9 @@ async function bootstrap() {
     const app = await NestFactory.create(AppModule);
 
     app.enableCors({
-      origin: process.env.FRONTEND_URL || 'http://localhost:3000',
-      credentials: true,
-    });
+        origin: [/vercel\.app$/, /railway\.app$/],  
+        credentials: true,
+      });
 
     const port = process.env.PORT ? Number(process.env.PORT) : 3001;
     await app.listen(port);
