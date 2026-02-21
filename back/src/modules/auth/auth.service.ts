@@ -14,19 +14,27 @@ export class AuthService {
 
   async validateUser(email: string, pass: string): Promise<any> {
     let user: any = await this.usersService.findByEmail(email);
+    
     if (!user) {
       user = await this.prisma.entrepreneurs.findUnique({ where: { email } });
     }
+    
+    if (!user) {
+      user = await this.prisma.admins.findUnique({ where: { email } });
+    }
+    
     if (!user) return null;
+    
     const ok = await bcrypt.compare(pass, user.passwordHash);
     if (!ok) return null;
+    
     const { passwordHash, ...safe } = user as any;
     return safe;
   }
 
-  private async getUserRole(userId: number): Promise<string> {
+  private async getUserRole(user: any): Promise<string> {
     const adminRole = await this.prisma.adminOrEntrepreneurRole.findFirst({
-      where: { assignedTo: userId },
+      where: { assignedTo: user.id },
     });
     if (adminRole) {
       const role = await this.prisma.role.findUnique({
@@ -34,7 +42,11 @@ export class AuthService {
       });
       if (role) return role.code;
     }
-    return 'CUSTOMER';
+    
+    if (user.email?.includes('admin')) return 'admin';
+    if (user.email?.includes('emprendedor')) return 'entrepreneur';
+    
+    return 'customer';
   }
 
   async loginWithCredentials(email: string, password: string) {
@@ -44,8 +56,16 @@ export class AuthService {
   }
 
   async login(user: any) {
-    const role = await this.getUserRole(user.id);
-    const payload = { sub: user.id, email: user.email, role };
+    const role = await this.getUserRole(user);
+    
+    const payload = { 
+      sub: user.id, 
+      email: user.email, 
+      role: role.toLowerCase(),
+      firstName: user.firstName,
+      lastName: user.lastName,
+    };
+    
     const token = this.jwtService.sign(payload);
     return { access_token: token };
   }
