@@ -16,7 +16,7 @@ async function main() {
       lastName: 'AuraBox',
       documentType: 'DNI',
       documentNumber: 12345678,
-      phoneNumber: 1234567890,
+      phoneNumber: 123456789,
       active: true,
     },
   });
@@ -31,7 +31,7 @@ async function main() {
       lastName: 'Pérez',
       documentType: 'DNI',
       documentNumber: 23456789,
-      phoneNumber: 2345678901,
+      phoneNumber: 234567890,
       active: true,
     },
   });
@@ -46,7 +46,7 @@ async function main() {
       lastName: 'Gómez',
       documentType: 'DNI',
       documentNumber: 34567890,
-      phoneNumber: 3456789012,
+      phoneNumber: 345678901,
       active: true,
     },
   });
