@@ -1,23 +1,32 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
+import { ValidationPipe } from '@nestjs/common';
 
 async function bootstrap() {
-  console.log('>>> BOOTSTRAP: env keys (first 20):', Object.keys(process.env).slice(0, 20));
-  console.log('>>> BOOTSTRAP: DATABASE_URL exists?', !!process.env.DATABASE_URL);
-
   try {
     const app = await NestFactory.create(AppModule);
 
+    app.useGlobalPipes(
+      new ValidationPipe({
+        whitelist: true,
+        forbidNonWhitelisted: true,
+        transform: true,
+      }),
+    );
+
     app.enableCors({
-        origin: true,  
-        credentials: true,
-      });
+      origin: true, 
+      credentials: true,
+      methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+      allowedHeaders: ['Content-Type', 'Authorization'],
+    });
 
     const port = process.env.PORT ? Number(process.env.PORT) : 3001;
+
     await app.listen(port);
-    console.log(`App running on http://localhost:${port}`);
+    console.log(`🚀 Server running on port ${port}`);
   } catch (err) {
-    console.error('>>> BOOTSTRAP ERROR:', err);
+    console.error('❌ BOOTSTRAP ERROR:', err);
     process.exit(1);
   }
 }
