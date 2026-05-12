@@ -28,6 +28,6 @@ api.interceptors.response.use(
   }
 );
 
-export const getResponseData = (response) => response.data;
+export const getResponseData = (response) => response.data?.data ?? response.data;
 
 export default api;
