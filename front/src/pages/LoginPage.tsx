@@ -21,22 +21,27 @@ const LoginPage: React.FC<LoginPageProps> = ({ onLogin }) => {
 
     try {
       const response = await api.post('/auth/login', { email, password });
-      const { access_token } = response.data.data;
+      const data = response.data?.data ?? response.data;
+      const { access_token } = data;
+
       localStorage.setItem('access_token', access_token);
+
       const payload = JSON.parse(atob(access_token.split('.')[1]));
+
       const user: User = {
-        id: payload.sub.toString(),
+        id: payload.sub?.toString() || '',
         firstName: payload.firstName || '',
         lastName: payload.lastName || '',
-        email: payload.email,
-        role: payload.role.toLowerCase() as 'customer' | 'entrepreneur' | 'admin',
-        registeredDate: payload.registeredDate || '',
-        lastLogin: payload.lastLogin || '',
+        email: payload.email || '',
+        role: (payload.role?.toLowerCase() || 'customer') as 'customer' | 'entrepreneur' | 'admin',
+        registeredDate: payload.registeredDate || new Date().toISOString(),
+        lastLogin: new Date().toISOString(),
+        managedClubId: payload.managedClubId?.toString() || undefined,
       };
 
       onLogin(user);
 
-    switch (user.role) {
+      switch (user.role) {
         case 'customer':
           navigate('/customer/profile');
           break;
@@ -47,10 +52,8 @@ const LoginPage: React.FC<LoginPageProps> = ({ onLogin }) => {
           navigate('/admin/dashboard');
           break;
         default:
-          setError('Rol del usuario no reconocido. Contacte al soporte.');
-          break;
+          setError('Rol del usuario no reconocido.');
       }
-      
     } catch (err: any) {
       setError(err.response?.data?.message || 'Error al iniciar sesión. Verifica tus credenciales.');
     } finally {
@@ -66,18 +69,17 @@ const LoginPage: React.FC<LoginPageProps> = ({ onLogin }) => {
             Inicia sesión en tu cuenta
           </h2>
           <p className="mt-2 text-center text-sm text-gray-600">
-            ¿O no tienes una cuenta?{' '}
+            ¿No tenés una cuenta?{' '}
             <Link to="/register" className="font-medium text-blue-600 hover:text-blue-500">
-              Regístrate aquí
+              Registrate aquí
             </Link>
           </p>
         </div>
+
         <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
           <div className="rounded-md shadow-sm -space-y-px">
             <div>
-              <label htmlFor="email-address" className="sr-only">
-                Dirección de Email
-              </label>
+              <label htmlFor="email-address" className="sr-only">Email</label>
               <input
                 id="email-address"
                 name="email"
@@ -85,15 +87,13 @@ const LoginPage: React.FC<LoginPageProps> = ({ onLogin }) => {
                 autoComplete="email"
                 required
                 className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm"
-                placeholder="Dirección de Email"
+                placeholder="Email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
               />
             </div>
             <div>
-              <label htmlFor="password" className="sr-only">
-                Contraseña
-              </label>
+              <label htmlFor="password" className="sr-only">Contraseña</label>
               <input
                 id="password"
                 name="password"
@@ -108,9 +108,7 @@ const LoginPage: React.FC<LoginPageProps> = ({ onLogin }) => {
             </div>
           </div>
 
-          {error && (
-            <p className="text-red-500 text-sm text-center">{error}</p>
-          )}
+          {error && <p className="text-red-500 text-sm text-center">{error}</p>}
 
           <div className="flex items-center justify-between">
             <div className="flex items-center">
@@ -124,7 +122,6 @@ const LoginPage: React.FC<LoginPageProps> = ({ onLogin }) => {
                 Recordarme
               </label>
             </div>
-
             <div className="text-sm">
               <a href="#" className="font-medium text-blue-600 hover:text-blue-500">
                 ¿Olvidaste tu contraseña?

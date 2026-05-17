@@ -1,19 +1,11 @@
 import { Body, Controller, Post, UsePipes, ValidationPipe } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { LoginDto } from '../users/dto/login.dto';
-import { CreateUserDto } from '../users/dto/create-user.dto';
-import { CreateEntrepreneurDto } from '../entrepreneurs/dto/create-entrepreneurs.dto';
-import { PrismaClient } from '@prisma/client';
-import * as bcrypt from 'bcryptjs';
 import { Public } from '../../common/decorators/public.decorator';
-import { PrismaService } from '../../prisma/prisma.service';  
 
 @Controller('auth')
 export class AuthController {
-  constructor(
-    private readonly authService: AuthService,
-    private readonly prisma: PrismaService,    
-  ) {}
+  constructor(private readonly authService: AuthService) {}
 
   @Public()
   @Post('login')
@@ -23,50 +15,30 @@ export class AuthController {
   }
 
   @Public()
-  @Post('register')
+  @Post('register/customer')
   @UsePipes(new ValidationPipe({ whitelist: true, transform: true }))
-  async register(@Body() dto: any) { 
-    const { userType, ...data } = dto;
-    if (userType === 'customer') {
-      const birthDate = new Date(data.birthDate);
-      const age = new Date().getFullYear() - birthDate.getFullYear();
-      if (age < 16) throw new Error('Debes tener al menos 16 años para registrarte como cliente.');
-      const hashed = await bcrypt.hash(data.password, 10);
-      const user = await this.prisma.user.create({
-        data: {
-          firstName: data.firstName,
-          lastName: data.lastName,
-          email: data.email,
-          passwordHash: hashed,
-          documentType: data.documentType,
-          documentNumber: data.documentNumber,
-          phoneNumber: data.phoneNumber,
-          birthDate: new Date(data.birthDate),
-        },
-      });
-      return user;
-    } else if (userType === 'entrepreneur') {
-      const birthDate = new Date(data.birthDate);
-      const age = new Date().getFullYear() - birthDate.getFullYear();
-      if (age < 18) throw new Error('Debes tener al menos 18 años para registrarte como emprendedor.');
-      const hashed = await bcrypt.hash(data.password, 10);
-      const entrepreneur = await this.prisma.entrepreneurs.create({
-        data: {
-          firstName: data.firstName,
-          lastName: data.lastName,
-          email: data.email,
-          passwordHash: hashed,
-          documentType: data.documentType,
-          documentNumber: data.documentNumber,
-          phoneNumber: data.phoneNumber,
-          birthDate: new Date(data.birthDate),
-          city: data.city,
-          province: data.province,
-        },
-      });
-      return entrepreneur;
-    } else {
-      throw new Error('Tipo de usuario inválido.');
-    }
+  async registerCustomer(@Body() dto: any) {
+    return this.authService.registerCustomer(dto);
+  }
+
+  @Public()
+  @Post('register/entrepreneur')
+  @UsePipes(new ValidationPipe({ whitelist: true, transform: true }))
+  async registerEntrepreneur(@Body() dto: any) {
+    return this.authService.registerEntrepreneur(dto);
+  }
+
+  @Public()
+  @Post('register/entrepreneur/club')
+  @UsePipes(new ValidationPipe({ whitelist: true, transform: true }))
+  async registerEntrepreneurClub(@Body() dto: any) {
+    return this.authService.registerEntrepreneurClub(dto);
+  }
+
+  @Public()
+  @Post('register/customer/complete-profile')
+  @UsePipes(new ValidationPipe({ whitelist: true, transform: true }))
+  async completeCustomerProfile(@Body() dto: any) {
+    return this.authService.completeCustomerProfile(dto);
   }
 }
