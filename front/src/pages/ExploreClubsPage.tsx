@@ -9,7 +9,6 @@ const ExploreClubsPage: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [searchTerm, setSearchTerm] = useState<string>('');
-  const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [minRating, setMinRating] = useState<number>(0);
 
   useEffect(() => {
@@ -18,7 +17,7 @@ const ExploreClubsPage: React.FC = () => {
         setLoading(true);
         const response = await api.get('/clubs');
         const clubsData = getResponseData(response);
-        setClubs(clubsData);
+        setClubs(Array.isArray(clubsData) ? clubsData : []);
       } catch (err: any) {
         console.error("Error fetching clubs:", err);
         setError('Error al cargar los clubes. Intenta más tarde.');
@@ -29,21 +28,18 @@ const ExploreClubsPage: React.FC = () => {
     fetchClubs();
   }, []);
 
-  const categories = useMemo(() => {
-    const allCategories = clubs.map(club => club.category);
-    return ['all', ...Array.from(new Set(allCategories))];
-  }, [clubs]);
-
   const filteredClubs = useMemo(() => {
     return clubs.filter(club => {
+      const searchLower = searchTerm.toLowerCase();
       const matchesSearch =
-        club.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        club.shortDescription?.toLowerCase().includes(searchTerm.toLowerCase());
-      const matchesCategory = selectedCategory === 'all' || club.category === selectedCategory;
-      const matchesRating = (club.rating || 0) >= minRating;
-      return matchesSearch && matchesCategory && matchesRating;
+        club.name.toLowerCase().includes(searchLower) ||
+        (club.shortDescription || '').toLowerCase().includes(searchLower) ||
+        (club.slogan || '').toLowerCase().includes(searchLower);
+      const clubRating = club.averageRating || 0;
+      const matchesRating = clubRating >= minRating;
+      return matchesSearch && matchesRating;
     });
-  }, [clubs, searchTerm, selectedCategory, minRating]);
+  }, [clubs, searchTerm, minRating]);
 
   if (loading) {
     return (
@@ -78,28 +74,15 @@ const ExploreClubsPage: React.FC = () => {
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
         />
-        <div className="flex flex-col sm:flex-row gap-4 w-full md:w-auto">
-          <select
-            className="p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-200 text-lg"
-            value={selectedCategory}
-            onChange={(e) => setSelectedCategory(e.target.value)}
-          >
-            {categories.map(category => (
-              <option key={category} value={category}>
-                {category === 'all' ? 'Todas las Categorías' : category}
-              </option>
-            ))}
-          </select>
-          <select
-            className="p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-200 text-lg"
-            value={minRating}
-            onChange={(e) => setMinRating(Number(e.target.value))}
-          >
-            <option value={0}>Cualquier Rating</option>
-            <option value={4}>4 Estrellas o más</option>
-            <option value={4.5}>4.5 Estrellas o más</option>
-          </select>
-        </div>
+        <select
+          className="p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-200 text-lg"
+          value={minRating}
+          onChange={(e) => setMinRating(Number(e.target.value))}
+        >
+          <option value={0}>Cualquier Rating</option>
+          <option value={4}>4 Estrellas o más</option>
+          <option value={4.5}>4.5 Estrellas o más</option>
+        </select>
       </section>
 
       <section>
@@ -110,11 +93,11 @@ const ExploreClubsPage: React.FC = () => {
                 key={club.id}
                 id={String(club.id)}
                 name={club.name}
-                category={club.category}
-                description={club.shortDescription || ''}
-                image={club.mainImage || club.logoImage || '/assets/default-club.jpg'}
-                rating={club.rating || 0}
-                reviewsCount={club.reviewsCount || 0}
+                category={club.category || ''}
+                description={club.shortDescription || club.slogan || ''}
+                image={club.logoUrl || '/assets/default-club.jpg'}
+                rating={club.averageRating || 0}
+                reviewsCount={club.totalReviews || 0}
               />
             ))}
           </div>

@@ -1,11 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import api, { getResponseData } from '../../../api/config';
-import { Club, HistoryMoment, Milestone, KeyFigure, TeamMember } from '../../../types/club';
+import { Club, Milestone, KeyFigure, TeamMember } from '../../../types/club';
 import { useAuth } from '../../../App';
-import Slider from 'react-slick';
-import 'slick-carousel/slick/slick.css';
-import 'slick-carousel/slick/slick-theme.css';
 import ClubSocialMedia from '../../../components/club/ClubSocialMedia';
 
 const AnimatedSection: React.FC<{ children: React.ReactNode; delay?: string }> = ({ children, delay = '0s' }) => (
@@ -33,7 +30,6 @@ interface EditModalProps {
 
 const EditModal: React.FC<EditModalProps> = ({ isOpen, onClose, title, children, onSave }) => {
   if (!isOpen) return null;
-
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
       <div className="bg-white rounded-lg shadow-xl p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto relative">
@@ -70,14 +66,12 @@ const HistoryPage: React.FC = () => {
   const [loading, setLoading] = useState(true);
 
   const [isEditingOrigins, setIsEditingOrigins] = useState(false);
-  const [isEditingMoments, setIsEditingMoments] = useState(false);
   const [isEditingMilestones, setIsEditingMilestones] = useState(false);
   const [isEditingFigures, setIsEditingFigures] = useState(false);
   const [isEditingTeam, setIsEditingTeam] = useState(false);
   const [isEditingCommunity, setIsEditingCommunity] = useState(false);
 
-  const [tempFullHistory, setTempFullHistory] = useState('');
-  const [tempHistoryMoments, setTempHistoryMoments] = useState<HistoryMoment[]>([]);
+  const [tempHistory, setTempHistory] = useState('');
   const [tempMilestones, setTempMilestones] = useState<Milestone[]>([]);
   const [tempKeyFigures, setTempKeyFigures] = useState<KeyFigure[]>([]);
   const [tempTeamMembers, setTempTeamMembers] = useState<TeamMember[]>([]);
@@ -89,9 +83,7 @@ const HistoryPage: React.FC = () => {
         const response = await api.get(`/clubs/${clubId}`);
         const clubData = getResponseData(response);
         setClub(clubData);
-        
-        setTempFullHistory(clubData.fullHistory || '');
-        setTempHistoryMoments(clubData.historyMoments || []);
+        setTempHistory(clubData.history || '');
         setTempMilestones(clubData.milestones || []);
         setTempKeyFigures(clubData.keyFigures || []);
         setTempTeamMembers(clubData.teamMembers || []);
@@ -107,38 +99,19 @@ const HistoryPage: React.FC = () => {
 
   const handleSave = async (field: string) => {
     if (!club) return;
-
     try {
-      const updateData: any = {};
-      
+      const updateData: Partial<Club> = {};
       switch (field) {
-        case 'origins':
-          updateData.fullHistory = tempFullHistory;
-          break;
-        case 'moments':
-          updateData.historyMoments = tempHistoryMoments;
-          break;
-        case 'milestones':
-          updateData.milestones = tempMilestones;
-          break;
-        case 'figures':
-          updateData.keyFigures = tempKeyFigures;
-          break;
-        case 'team':
-          updateData.teamMembers = tempTeamMembers;
-          break;
-        case 'community':
-          updateData.communityText = tempCommunityText;
-          break;
+        case 'origins': updateData.history = tempHistory; break;
+        case 'milestones': updateData.milestones = tempMilestones; break;
+        case 'figures': updateData.keyFigures = tempKeyFigures; break;
+        case 'team': updateData.teamMembers = tempTeamMembers; break;
+        case 'community': updateData.communityText = tempCommunityText; break;
       }
-
       await api.put(`/clubs/${club.id}`, updateData);
-      
       setClub({ ...club, ...updateData });
-      
       switch (field) {
         case 'origins': setIsEditingOrigins(false); break;
-        case 'moments': setIsEditingMoments(false); break;
         case 'milestones': setIsEditingMilestones(false); break;
         case 'figures': setIsEditingFigures(false); break;
         case 'team': setIsEditingTeam(false); break;
@@ -150,7 +123,7 @@ const HistoryPage: React.FC = () => {
     }
   };
 
-  const isEntrepreneurOwner = userRole === 'entrepreneur' && user?.managedClubId === clubId;
+  const isEntrepreneurOwner = userRole === 'entrepreneur' && String(user?.managedClubId) === String(clubId);
 
   if (loading) {
     return <div className="text-center py-20">Cargando historia...</div>;
@@ -171,50 +144,48 @@ const HistoryPage: React.FC = () => {
     );
   }
 
-  const sliderSettings = {
-    dots: true,
-    infinite: true,
-    speed: 800,
-    slidesToShow: 1,
-    slidesToScroll: 1,
-    autoplay: true,
-    autoplaySpeed: 5000,
-    arrows: true,
-    fade: true,
-    cssEase: 'ease-in-out',
-  };
+  const creationYear = club.creationDate ? new Date(club.creationDate).getFullYear() : null;
+  const creationDateFormatted = club.creationDate
+    ? new Date(club.creationDate).toLocaleDateString('es-AR', { year: 'numeric', month: 'long' })
+    : 'No disponible';
 
-  const historyParagraphs = club.fullHistory ? club.fullHistory.split('\n\n').map((p: string) => p.trim()).filter((p: string) => p.length > 0) : [];
+  const historyText = club.history || club.fullHistory || '';
+  const historyParagraphs: string[] = historyText
+    ? historyText.split('\n\n').map((p: string) => p.trim()).filter((p: string) => p.length > 0)
+    : [];
 
-  const momentsToDisplay = club.historyMoments && club.historyMoments.length > 0 ? club.historyMoments : [
-    { id: 'm1', image: club.bannerImages?.[0] || '/assets/default-history-banner.jpg', description: `${club.name} - Un momento clave en nuestra trayectoria.` },
-    { id: 'm2', image: club.bannerImages?.[1] || '/assets/default-history-banner.jpg', description: `Expansión y crecimiento de ${club.name}.` }
-  ].filter((m: any) => m.image);
+  const milestonesToDisplay: Milestone[] = club.milestones && club.milestones.length > 0
+    ? club.milestones
+    : creationYear
+      ? [
+          { id: 'h1', year: creationYear, description: `Fundación de ${club.name}: Nace la idea de llevar la magia a cada hogar.` },
+          { id: 'h2', year: creationYear + 1, description: 'Primera edición especial: Lanzamiento de una caja temática, agotada en 48 horas.' },
+          { id: 'h3', year: creationYear + 2, description: 'Alcanzamos los primeros suscriptores: Nuestra comunidad no para de crecer.' },
+        ]
+      : [];
 
-  const milestonesToDisplay = club.milestones && club.milestones.length > 0 ? club.milestones : [
-    { id: 'h1', year: new Date(club.creationDate).getFullYear(), description: `Fundación de ${club.name}: Nace la idea de llevar la magia a cada hogar.` },
-    { id: 'h2', year: new Date(club.creationDate).getFullYear() + 1, description: `Primera edición especial: Lanzamiento de una caja temática, agotada en 48 horas.` },
-    { id: 'h3', year: new Date(club.creationDate).getFullYear() + 2, description: `Alcanzamos los 1000 suscriptores: Nuestra comunidad no para de crecer.` },
-  ];
+  const figuresToDisplay: KeyFigure[] = club.keyFigures && club.keyFigures.length > 0
+    ? club.keyFigures
+    : [
+        { id: 'f1', title: 'Rating Promedio', value: club.averageRating ? `${club.averageRating} / 5` : 'Sin reseñas aún' },
+        { id: 'f2', title: 'Total de Reseñas', value: String(club.totalReviews || 0) },
+        { id: 'f3', title: 'Fecha de Creación', value: creationDateFormatted },
+      ];
 
-  const figuresToDisplay = club.keyFigures && club.keyFigures.length > 0 ? club.keyFigures : [
-    { id: 'f1', title: "Fecha de Creación", value: new Date(club.creationDate).toLocaleDateString('es-AR', { year: 'numeric', month: 'long', day: 'numeric' }) },
-    { id: 'f2', title: "Suscriptores Totales", value: (club.totalSubscribers || 0).toLocaleString('es-AR') },
-    { id: 'f3', title: "Cajas Enviadas Mensuales", value: (club.monthlyBoxesSent || 0).toLocaleString('es-AR') }
-  ];
+  const teamMembersToDisplay: TeamMember[] = club.teamMembers && club.teamMembers.length > 0
+    ? club.teamMembers
+    : [
+        { id: 't1', name: 'Fundador/a', role: 'Visión y Pasión', bio: 'La mente detrás de la magia, dedicando su vida a este proyecto.', image: '/assets/default-avatar.jpg' },
+        { id: 't2', name: 'Coordinador/a', role: 'Logística y Operaciones', bio: 'Asegurando que cada detalle funcione a la perfección.', image: '/assets/default-avatar.jpg' },
+      ];
 
-  const teamMembersToDisplay = club.teamMembers && club.teamMembers.length > 0 ? club.teamMembers : [
-    { id: 't1', name: "Fundador/a", role: "Visión y Pasión", bio: "La mente detrás de la magia, dedicando su vida a este proyecto.", image: "/assets/default-avatar.jpg" },
-    { id: 't2', name: "Coordinador/a", role: "Logística y Operaciones", bio: "Asegurando que cada detalle funcione a la perfección.", image: "/assets/default-avatar.jpg" }
-  ];
-
-  const communityTextToDisplay = club.communityText || "Más allá de las cajas, somos una familia de entusiastas. Conéctate con nosotros y otros suscriptores en nuestras redes sociales.";
+  const communityTextToDisplay = club.communityText || 'Más allá de las cajas, somos una familia de entusiastas. Conéctate con nosotros y otros suscriptores en nuestras redes sociales.';
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-blue-100">
       <div className="relative h-80 md:h-96 overflow-hidden shadow-xl">
         <img
-          src={club.historyBanner || (club.bannerImages && club.bannerImages[0]) || '/assets/default-history-banner.jpg'}
+          src={club.logoUrl || '/assets/default-history-banner.jpg'}
           alt={`Historia de ${club.name}`}
           className="w-full h-full object-cover object-center transform scale-105 transition-transform duration-1000 ease-out"
         />
@@ -228,16 +199,17 @@ const HistoryPage: React.FC = () => {
       <div className="container mx-auto px-4 py-16 max-w-6xl">
         <AnimatedSection delay="0.2s">
           <div className="flex flex-col md:flex-row items-center justify-center md:justify-start space-y-6 md:space-y-0 md:space-x-8 mb-16 p-8 bg-white rounded-3xl shadow-2xl border border-blue-200 transform hover:scale-[1.01] transition-transform duration-300">
-            {club.logoImage && (
+            {club.logoUrl && (
               <img
-                src={club.logoImage}
+                src={club.logoUrl}
                 alt={`${club.name} logo`}
-                className="w-32 h-32 md:w-40 md:h-40 rounded-full border-6 border-blue-600 shadow-xl object-cover"
+                className="w-32 h-32 md:w-40 md:h-40 rounded-full border-4 border-blue-600 shadow-xl object-cover"
               />
             )}
             <div className="text-center md:text-left">
               <h2 className="text-4xl font-bold text-gray-900 mb-2">{club.name}</h2>
               {club.slogan && <p className="text-2xl text-gray-700 mt-1 italic font-light">{club.slogan}</p>}
+              {club.shortDescription && <p className="text-gray-600 mt-2">{club.shortDescription}</p>}
             </div>
           </div>
         </AnimatedSection>
@@ -250,11 +222,11 @@ const HistoryPage: React.FC = () => {
             </div>
             <div className="text-gray-800 leading-relaxed text-lg space-y-6">
               {historyParagraphs.length > 0 ? (
-                historyParagraphs.map((para, idx) => (
+                historyParagraphs.map((para: string, idx: number) => (
                   <p key={idx} className="text-justify">{para}</p>
                 ))
               ) : (
-                <p className="text-center italic">No hay una historia detallada disponible para este club.</p>
+                <p className="text-center italic text-gray-500">No hay una historia detallada disponible para este club.</p>
               )}
               <blockquote className="border-l-4 border-blue-500 pl-4 italic text-gray-600 mt-8">
                 "Cada caja es una promesa, cada entrega una conexión."
@@ -263,73 +235,13 @@ const HistoryPage: React.FC = () => {
           </section>
         </AnimatedSection>
 
-        <EditModal
-          isOpen={isEditingOrigins}
-          onClose={() => setIsEditingOrigins(false)}
-          title="Editar Orígenes y Valores"
-          onSave={() => handleSave('origins')}
-        >
-          <label className="block text-gray-700 text-sm font-bold mb-2">Historia Completa:</label>
+        <EditModal isOpen={isEditingOrigins} onClose={() => setIsEditingOrigins(false)} title="Editar Orígenes y Valores" onSave={() => handleSave('origins')}>
+          <label className="block text-gray-700 text-sm font-bold mb-2">Historia del Club:</label>
           <textarea
             className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline h-48"
-            value={tempFullHistory}
-            onChange={(e) => setTempFullHistory(e.target.value)}
+            value={tempHistory}
+            onChange={(e) => setTempHistory(e.target.value)}
           />
-        </EditModal>
-
-        {momentsToDisplay.length > 0 && (
-          <AnimatedSection delay="0.6s">
-            <section className="mb-20 shadow-2xl rounded-3xl overflow-hidden border border-green-200">
-              <div className="flex justify-between items-center mb-8 pt-8 px-8">
-                <h3 className="text-3xl font-bold text-green-800 text-center flex-grow">Momentos que Marcaron Nuestra Historia</h3>
-                {isEntrepreneurOwner && <EditButton onClick={() => setIsEditingMoments(true)} />}
-              </div>
-              <Slider {...sliderSettings} className="p-4">
-                {momentsToDisplay.map((moment: HistoryMoment, idx: number) => (
-                  <div key={moment.id || idx} className="px-2">
-                    <img
-                      src={moment.image}
-                      alt={`Imagen histórica ${idx + 1}`}
-                      className="w-full h-80 md:h-96 object-cover rounded-2xl shadow-xl"
-                    />
-                    <p className="text-center text-gray-600 mt-4 text-lg italic">{moment.description}</p>
-                  </div>
-                ))}
-              </Slider>
-            </section>
-          </AnimatedSection>
-        )}
-
-        <EditModal
-          isOpen={isEditingMoments}
-          onClose={() => setIsEditingMoments(false)}
-          title="Editar Momentos"
-          onSave={() => handleSave('moments')}
-        >
-          {tempHistoryMoments.map((moment, index) => (
-            <div key={moment.id || index} className="mb-4 p-4 border rounded-lg bg-gray-50">
-              <input
-                type="text"
-                className="shadow border rounded w-full py-2 px-3 mb-2"
-                value={moment.image}
-                onChange={(e) => {
-                  const newMoments = [...tempHistoryMoments];
-                  newMoments[index].image = e.target.value;
-                  setTempHistoryMoments(newMoments);
-                }}
-                placeholder="URL de imagen"
-              />
-              <textarea
-                className="shadow border rounded w-full py-2 px-3 h-24"
-                value={moment.description}
-                onChange={(e) => {
-                  const newMoments = [...tempHistoryMoments];
-                  newMoments[index].description = e.target.value;
-                  setTempHistoryMoments(newMoments);
-                }}
-              />
-            </div>
-          ))}
         </EditModal>
 
         {milestonesToDisplay.length > 0 && (
@@ -340,7 +252,7 @@ const HistoryPage: React.FC = () => {
                 {isEntrepreneurOwner && <EditButton onClick={() => setIsEditingMilestones(true)} />}
               </div>
               <div className="relative border-l-4 border-orange-400 pl-8 ml-4">
-                {milestonesToDisplay.map((milestone, idx) => (
+                {milestonesToDisplay.map((milestone: Milestone, idx: number) => (
                   <div key={milestone.id || idx} className="mb-8 relative">
                     <div className="absolute -left-10 top-0 flex items-center justify-center w-8 h-8 bg-orange-500 rounded-full text-white font-bold text-sm">
                       {milestone.year}
@@ -352,34 +264,29 @@ const HistoryPage: React.FC = () => {
                 ))}
               </div>
             </section>
-                      </AnimatedSection>
+          </AnimatedSection>
         )}
 
-        <EditModal
-          isOpen={isEditingMilestones}
-          onClose={() => setIsEditingMilestones(false)}
-          title="Editar Hitos"
-          onSave={() => handleSave('milestones')}
-        >
-          {tempMilestones.map((milestone, index) => (
+        <EditModal isOpen={isEditingMilestones} onClose={() => setIsEditingMilestones(false)} title="Editar Hitos" onSave={() => handleSave('milestones')}>
+          {tempMilestones.map((milestone: Milestone, index: number) => (
             <div key={milestone.id || index} className="mb-4 p-4 border rounded-lg bg-gray-50">
               <input
                 type="number"
                 className="shadow border rounded w-full py-2 px-3 mb-2"
                 value={milestone.year}
                 onChange={(e) => {
-                  const newMilestones = [...tempMilestones];
-                  newMilestones[index].year = parseInt(e.target.value);
-                  setTempMilestones(newMilestones);
+                  const updated = [...tempMilestones];
+                  updated[index] = { ...updated[index], year: parseInt(e.target.value) };
+                  setTempMilestones(updated);
                 }}
               />
               <textarea
                 className="shadow border rounded w-full py-2 px-3 h-24"
                 value={milestone.description}
                 onChange={(e) => {
-                  const newMilestones = [...tempMilestones];
-                  newMilestones[index].description = e.target.value;
-                  setTempMilestones(newMilestones);
+                  const updated = [...tempMilestones];
+                  updated[index] = { ...updated[index], description: e.target.value };
+                  setTempMilestones(updated);
                 }}
               />
             </div>
@@ -392,8 +299,8 @@ const HistoryPage: React.FC = () => {
               <h3 className="text-3xl font-bold text-blue-800 text-center flex-grow">Cifras que Nos Impulsan</h3>
               {isEntrepreneurOwner && <EditButton onClick={() => setIsEditingFigures(true)} />}
             </div>
-            <div className={`grid grid-cols-1 ${figuresToDisplay.length > 3 ? 'md:grid-cols-2 lg:grid-cols-3' : 'md:grid-cols-3'} gap-8 text-center`}>
-              {figuresToDisplay.map((figure, idx) => (
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
+              {figuresToDisplay.map((figure: KeyFigure, idx: number) => (
                 <div key={figure.id || idx} className="bg-blue-50 p-6 rounded-lg shadow-md border border-blue-200">
                   <h4 className="text-xl font-semibold mb-2 text-blue-700">{figure.title}</h4>
                   <p className="text-3xl font-extrabold text-blue-600">{figure.value}</p>
@@ -403,22 +310,17 @@ const HistoryPage: React.FC = () => {
           </section>
         </AnimatedSection>
 
-        <EditModal
-          isOpen={isEditingFigures}
-          onClose={() => setIsEditingFigures(false)}
-          title="Editar Cifras"
-          onSave={() => handleSave('figures')}
-        >
-          {tempKeyFigures.map((figure, index) => (
+        <EditModal isOpen={isEditingFigures} onClose={() => setIsEditingFigures(false)} title="Editar Cifras" onSave={() => handleSave('figures')}>
+          {tempKeyFigures.map((figure: KeyFigure, index: number) => (
             <div key={figure.id || index} className="mb-4 p-4 border rounded-lg bg-gray-50">
               <input
                 type="text"
                 className="shadow border rounded w-full py-2 px-3 mb-2"
                 value={figure.title}
                 onChange={(e) => {
-                  const newFigures = [...tempKeyFigures];
-                  newFigures[index].title = e.target.value;
-                  setTempKeyFigures(newFigures);
+                  const updated = [...tempKeyFigures];
+                  updated[index] = { ...updated[index], title: e.target.value };
+                  setTempKeyFigures(updated);
                 }}
                 placeholder="Título"
               />
@@ -427,9 +329,9 @@ const HistoryPage: React.FC = () => {
                 className="shadow border rounded w-full py-2 px-3"
                 value={figure.value}
                 onChange={(e) => {
-                  const newFigures = [...tempKeyFigures];
-                  newFigures[index].value = e.target.value;
-                  setTempKeyFigures(newFigures);
+                  const updated = [...tempKeyFigures];
+                  updated[index] = { ...updated[index], value: e.target.value };
+                  setTempKeyFigures(updated);
                 }}
                 placeholder="Valor"
               />
@@ -445,7 +347,7 @@ const HistoryPage: React.FC = () => {
                 {isEntrepreneurOwner && <EditButton onClick={() => setIsEditingTeam(true)} />}
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                {teamMembersToDisplay.map((member, idx) => (
+                {teamMembersToDisplay.map((member: TeamMember, idx: number) => (
                   <div key={member.id || idx} className="flex flex-col items-center text-center bg-red-50 p-6 rounded-lg shadow-md border border-red-200">
                     <img
                       src={member.image || '/assets/default-avatar.jpg'}
@@ -462,22 +364,17 @@ const HistoryPage: React.FC = () => {
           </AnimatedSection>
         )}
 
-        <EditModal
-          isOpen={isEditingTeam}
-          onClose={() => setIsEditingTeam(false)}
-          title="Editar Equipo"
-          onSave={() => handleSave('team')}
-        >
-          {tempTeamMembers.map((member, index) => (
+        <EditModal isOpen={isEditingTeam} onClose={() => setIsEditingTeam(false)} title="Editar Equipo" onSave={() => handleSave('team')}>
+          {tempTeamMembers.map((member: TeamMember, index: number) => (
             <div key={member.id || index} className="mb-4 p-4 border rounded-lg bg-gray-50">
               <input
                 type="text"
                 className="shadow border rounded w-full py-2 px-3 mb-2"
                 value={member.name}
                 onChange={(e) => {
-                  const newMembers = [...tempTeamMembers];
-                  newMembers[index].name = e.target.value;
-                  setTempTeamMembers(newMembers);
+                  const updated = [...tempTeamMembers];
+                  updated[index] = { ...updated[index], name: e.target.value };
+                  setTempTeamMembers(updated);
                 }}
                 placeholder="Nombre"
               />
@@ -486,9 +383,9 @@ const HistoryPage: React.FC = () => {
                 className="shadow border rounded w-full py-2 px-3 mb-2"
                 value={member.role}
                 onChange={(e) => {
-                  const newMembers = [...tempTeamMembers];
-                  newMembers[index].role = e.target.value;
-                  setTempTeamMembers(newMembers);
+                  const updated = [...tempTeamMembers];
+                  updated[index] = { ...updated[index], role: e.target.value };
+                  setTempTeamMembers(updated);
                 }}
                 placeholder="Puesto"
               />
@@ -496,9 +393,9 @@ const HistoryPage: React.FC = () => {
                 className="shadow border rounded w-full py-2 px-3 h-24"
                 value={member.bio}
                 onChange={(e) => {
-                  const newMembers = [...tempTeamMembers];
-                  newMembers[index].bio = e.target.value;
-                  setTempTeamMembers(newMembers);
+                  const updated = [...tempTeamMembers];
+                  updated[index] = { ...updated[index], bio: e.target.value };
+                  setTempTeamMembers(updated);
                 }}
                 placeholder="Biografía"
               />
@@ -519,12 +416,7 @@ const HistoryPage: React.FC = () => {
           </section>
         </AnimatedSection>
 
-        <EditModal
-          isOpen={isEditingCommunity}
-          onClose={() => setIsEditingCommunity(false)}
-          title="Editar Comunidad"
-          onSave={() => handleSave('community')}
-        >
+        <EditModal isOpen={isEditingCommunity} onClose={() => setIsEditingCommunity(false)} title="Editar Comunidad" onSave={() => handleSave('community')}>
           <textarea
             className="shadow border rounded w-full py-2 px-3 h-32"
             value={tempCommunityText}

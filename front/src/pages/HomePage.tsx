@@ -43,40 +43,42 @@ const testimonialsData = [
 ];
 
 const HomePage: React.FC = () => {
-  const [clubs, setClubs] = useState<Club[]>([]);
+  const [featuredClubs, setFeaturedClubs] = useState<Club[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const fetchClubs = async () => {
+    const fetchFeatured = async () => {
       try {
-        const response = await api.get('/clubs');
-        const clubsData = getResponseData(response);
-        setClubs(clubsData);
+        const response = await api.get('/clubs/featured');
+        const data = getResponseData(response);
+        setFeaturedClubs(Array.isArray(data) ? data : []);
       } catch (error) {
-        console.error("Error fetching clubs:", error);
+        console.error("Error fetching featured clubs:", error);
       } finally {
         setLoading(false);
       }
     };
-    fetchClubs();
+    fetchFeatured();
   }, []);
 
-  const allClubsForCarousel = clubs.length < 4
-    ? [...clubs, ...clubs, ...clubs]
-    : clubs;
+  const clubsForCarousel: Club[] = featuredClubs.length > 0 && featuredClubs.length < 4
+    ? [...featuredClubs, ...featuredClubs, ...featuredClubs]
+    : featuredClubs;
+
+  const slidesToShow = Math.min(featuredClubs.length || 1, 3);
 
   const clubCarouselSettings = {
     dots: true,
     infinite: true,
     speed: 500,
-    slidesToShow: 4,
+    slidesToShow: slidesToShow,
     slidesToScroll: 1,
     autoplay: true,
     autoplaySpeed: 3000,
     pauseOnHover: true,
     responsive: [
-      { breakpoint: 1280, settings: { slidesToShow: 3 } },
-      { breakpoint: 1024, settings: { slidesToShow: 2 } },
+      { breakpoint: 1280, settings: { slidesToShow: Math.min(slidesToShow, 3) } },
+      { breakpoint: 1024, settings: { slidesToShow: Math.min(slidesToShow, 2) } },
       { breakpoint: 768, settings: { slidesToShow: 1 } }
     ]
   };
@@ -105,26 +107,25 @@ const HomePage: React.FC = () => {
         ctaLink="/explore"
         backgroundImage="/assets/hero-background.jpg"
       />
-
       <div className="container mx-auto px-4 py-8 flex-grow">
         <section className="mb-16">
           <h2 className="text-4xl font-bold text-gray-800 mb-10 text-center animate-fadeInUp">Clubes Destacados</h2>
           {loading ? (
             <div className="text-center py-8">Cargando clubes...</div>
+          ) : featuredClubs.length === 0 ? (
+            <div className="text-center py-8 text-gray-500">No hay clubes destacados disponibles aún.</div>
           ) : (
             <Slider {...clubCarouselSettings}>
-              {allClubsForCarousel.map((club, index) => (
+              {clubsForCarousel.map((club: Club, index: number) => (
                 <div key={`${club.id}-${index}`} className="px-2">
                   <ClubCard
                     id={String(club.id)}
                     name={club.name}
-                    category={club.category}
+                    category={club.category || ''}
                     description={club.shortDescription || ''}
-                    image={club.mainImage || club.logoImage || '/assets/default-club.jpg'}
-                    rating={club.rating || 0}
-                    reviewsCount={club.reviewsCount || 0}
-                    price={club.subscriptionPlans && club.subscriptionPlans.length > 0 ? club.subscriptionPlans[0].price : undefined}
-                    currency={club.subscriptionPlans && club.subscriptionPlans.length > 0 ? club.subscriptionPlans[0].currency : undefined}
+                    image={club.logoUrl || '/assets/default-club.jpg'}
+                    rating={club.averageRating || 0}
+                    reviewsCount={club.totalReviews || 0}
                   />
                 </div>
               ))}
@@ -153,7 +154,7 @@ const HomePage: React.FC = () => {
           <HowItWorks />
         </section>
 
-                <section className="mb-16 bg-gradient-to-r from-blue-50 to-purple-50 py-16 rounded-xl shadow-inner">
+        <section className="mb-16 bg-gradient-to-r from-blue-50 to-purple-50 py-16 rounded-xl shadow-inner">
           <h2 className="text-4xl font-bold text-gray-800 mb-12 text-center animate-fadeInUp">Lo que dicen nuestros usuarios</h2>
           <Slider {...testimonialCarouselSettings}>
             {testimonialsData.map((testimonial) => (
@@ -178,8 +179,8 @@ const HomePage: React.FC = () => {
           <Link
             to="/register"
             className="inline-block bg-white text-blue-600 px-10 py-4 rounded-full font-bold text-xl
-                               hover:bg-blue-100 hover:scale-105 transition-all duration-300 shadow-lg
-                               focus:outline-none focus:ring-4 focus:ring-white focus:ring-opacity-70 animate-bounce-once"
+                       hover:bg-blue-100 hover:scale-105 transition-all duration-300 shadow-lg
+                       focus:outline-none focus:ring-4 focus:ring-white focus:ring-opacity-70 animate-bounce-once"
           >
             Registra tu Club Ahora
           </Link>

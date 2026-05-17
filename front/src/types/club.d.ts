@@ -1,5 +1,3 @@
-import { LegalSection } from './legalSection';
-
 export type LegalSectionType = "title" | "paragraph" | "list" | "image";
 
 export interface ShippingInfo {
@@ -19,12 +17,11 @@ export interface SubscriptionPlan {
   price: number;
   currency: string;
   description: string;
-  image: string; 
-  deliveryFrequency: string; 
-  includes: string[]; 
-  shippingAreas: string; 
-  specifications: { type: string; value: string }[]; 
-
+  image: string;
+  deliveryFrequency: string;
+  includes: string[];
+  shippingAreas: string;
+  specifications: { type: string; value: string }[];
   descuentoTransferencia?: number;
   descuentoEfectivo?: number;
   activo?: boolean;
@@ -53,56 +50,62 @@ export interface SocialMediaLinks {
 }
 
 export interface HistoryMoment {
-  id: string; 
+  id: string;
   image: string;
   description: string;
 }
 
 export interface Milestone {
-  id: string; 
+  id: string;
   year: number;
   description: string;
 }
 
 export interface KeyFigure {
-  id: string; 
+  id: string;
   title: string;
-  value: string; 
+  value: string;
 }
 
 export interface TeamMember {
-  id: string; 
+  id: string;
   name: string;
   role: string;
   bio: string;
   image: string;
 }
 
-
 export interface Club {
-  id: string;
+  id: string | number;
   name: string;
-  category: string;
-  mainImage: string;
-  slogan: string;
-  bannerImages: string[]; 
-  logoImage: string;
-  shortDescription: string;
-  fullHistory: string;
-  historyBanner: string; 
-  socialMedia: SocialMediaLinks;
-  paymentMethods: string[];
-  shippingInfo: ShippingInfo;
-  legalInfo: LegalInfo;
-  rating: number;
-  reviewsCount: number;
-  featuredReviews: FeaturedReview[];
-  subscriptionPlans: SubscriptionPlan[];
-  ownerId: string;
-  creationDate: string;
-  totalSubscribers: number;
-  monthlyBoxesSent: number;
-
+  logoUrl?: string;
+  slogan?: string;
+  history?: string;
+  shortDescription?: string;
+  contactEmail?: string;
+  whatsappContact?: string;
+  clubStatus?: string;
+  creationDate?: string;
+  averageRating?: number | null;
+  totalReviews?: number;
+  reviews?: { id: number; rating: number; title?: string; comment?: string }[];
+  category?: string;
+  mainImage?: string;
+  logoImage?: string;
+  bannerImages?: string[];
+  fullHistory?: string;
+  historyBanner?: string;
+  socialMedia?: SocialMediaLinks;
+  paymentMethods?: string[];
+  shippingInfo?: ShippingInfo;
+  legalInfo?: LegalInfo;
+  rating?: number;
+  reviewsCount?: number;
+  featuredReviews?: FeaturedReview[];
+  subscriptionPlans?: SubscriptionPlan[];
+  ownerId?: string;
+  totalSubscribers?: number;
+  monthlyBoxesSent?: number;
   historyMoments?: HistoryMoment[];
   milestones?: Milestone[];
   keyFigures?: KeyFigure[];

@@ -33,6 +33,12 @@ export class ClubsController {
   }
 
   @Public()
+  @Get('featured')
+  async findFeatured() {
+    return this.clubsService.findFeatured();
+  }
+
+  @Public()
   @Get()
   async findAll() {
     return this.clubsService.findAll();
