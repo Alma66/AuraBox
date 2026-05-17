@@ -1,11 +1,15 @@
-import { IsInt, IsOptional, IsDateString } from 'class-validator';
+import { 
+  IsInt, 
+  IsOptional, 
+  IsDateString, 
+} from 'class-validator';
 
 export class CreateEntrepreneurClubDto {
   @IsInt()
-  idEntrepreneurs: number;
+  idEntrepreneurs!: number;
 
   @IsInt()
-  idClub: number;
+  idClub!: number;
 
   @IsOptional()
   @IsDateString()

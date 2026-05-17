@@ -1,13 +1,19 @@
-import { IsEmail, IsOptional, IsString, MinLength } from 'class-validator';
+import { 
+  IsEmail, 
+  IsOptional, 
+  IsString, 
+  MinLength, 
+  IsEnum,
+ } from 'class-validator';
 import { ClubStatus } from '@prisma/client';
 
 export class CreateClubDto {
   @IsString()
   @MinLength(3)
-  name: string;
+  name!: string;
 
   @IsString()
-  logoUrl: string;
+  logoUrl!: string;
 
   @IsOptional()
   @IsString()
@@ -18,15 +24,16 @@ export class CreateClubDto {
   history?: string;
 
   @IsString()
-  shortDescription: string;
+  shortDescription!: string;
 
   @IsEmail()
-  contactEmail: string;
+  contactEmail!: string;
 
   @IsOptional()
   @IsString()
   whatsappContact?: string;
 
   @IsOptional()
+  @IsEnum(ClubStatus)
   clubStatus?: ClubStatus;
 }

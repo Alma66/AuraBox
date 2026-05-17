@@ -1,4 +1,9 @@
-import { IsInt, IsOptional, IsString, IsDateString } from 'class-validator';
+import { 
+  IsInt, 
+  IsOptional, 
+  IsString, 
+  IsDateString,
+ } from 'class-validator';
 import { Transform } from 'class-transformer';
 
 export class CreateUserSubscriptionDto {
@@ -7,7 +12,7 @@ export class CreateUserSubscriptionDto {
   idUser?: number;
 
   @IsInt()
-  idSubscriptionTypes: number;
+  idSubscriptionTypes!: number;
 
   @IsOptional()
   @IsInt()

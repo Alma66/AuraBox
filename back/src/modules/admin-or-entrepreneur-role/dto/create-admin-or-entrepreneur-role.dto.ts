@@ -1,21 +1,26 @@
-import { IsInt, IsEnum, IsOptional, IsDateString } from 'class-validator';
+import { 
+  IsInt, 
+  IsEnum, 
+  IsOptional, 
+  IsDateString 
+} from 'class-validator';
 import { AssignedToType } from '@prisma/client';
 
 export class CreateAdminOrEntrepreneurRoleDto {
   @IsInt()
-  idRole: number;
+  idRole!: number;
 
   @IsEnum(AssignedToType)
-  assignedToType: AssignedToType;
+  assignedToType!: AssignedToType;
 
   @IsInt()
-  assignedTo: number;
+  assignedTo!: number;
 
   @IsEnum(AssignedToType)
-  assignedByType: AssignedToType;
+  assignedByType!: AssignedToType;
 
   @IsInt()
-  assignedBy: number;
+  assignedBy!: number;
 
   @IsOptional()
   @IsDateString()

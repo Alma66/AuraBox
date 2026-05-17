@@ -1,12 +1,19 @@
-import { IsInt, IsOptional, IsString, IsUrl, IsEnum, IsDateString } from 'class-validator';
+import { 
+  IsInt, 
+  IsOptional, 
+  IsString, 
+  IsUrl, 
+  IsEnum, 
+  IsDateString,
+ } from 'class-validator';
 import { ContentType } from '@prisma/client';
 
 export class CreateImageClubDto {
   @IsInt()
-  idClub: number;
+  idClub!: number;
 
   @IsUrl()
-  imageUrl: string;
+  imageUrl!: string;
 
   @IsOptional()
   @IsString()

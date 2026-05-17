@@ -1,15 +1,20 @@
-import { IsString, IsOptional, IsEnum, IsDateString } from 'class-validator';
+import { 
+  IsString, 
+  IsOptional, 
+  IsEnum, 
+  IsDateString,
+ } from 'class-validator';
 import { RoleScope } from '@prisma/client';
 
 export class CreateRoleDto {
   @IsString()
-  code: string;
+  code!: string;
 
   @IsString()
-  name: string;
+  name!: string;
 
   @IsString()
-  description: string;
+  description!: string;
 
   @IsOptional()
   @IsEnum(RoleScope)

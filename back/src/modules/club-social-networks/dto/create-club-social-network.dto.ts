@@ -1,12 +1,16 @@
-import { IsInt, IsString, IsUrl } from 'class-validator';
+import { 
+  IsInt, 
+  IsString, 
+  IsUrl, 
+} from 'class-validator';
 
 export class CreateClubSocialNetworkDto {
   @IsInt()
-  idClub: number;
+  idClub!: number;
 
   @IsString()
-  networkType: string;
+  networkType!: string;
 
   @IsUrl()
-  profileUrl: string;
+  profileUrl!: string;
 }

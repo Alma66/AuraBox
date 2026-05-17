@@ -1,14 +1,19 @@
-import { IsString, IsOptional, IsBoolean, IsDateString } from 'class-validator';
+import { 
+  IsString, 
+  IsOptional, 
+  IsBoolean, 
+  IsDateString,
+ } from 'class-validator';
 
 export class CreatePlatformRuleDto {
   @IsString()
-  title: string;
+  title!: string;
 
   @IsString()
-  content: string;
+  content!: string;
 
   @IsString()
-  version: string;
+  version!: string;
 
   @IsOptional()
   @IsDateString()
@@ -19,5 +24,5 @@ export class CreatePlatformRuleDto {
   active?: boolean;
 
   @IsString()
-  ruleType: string;
+  ruleType!: string;
 }

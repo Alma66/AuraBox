@@ -1,16 +1,24 @@
-import { IsInt, IsOptional, IsString, IsDateString, IsBoolean, Min, Max } from 'class-validator';
+import { 
+  IsInt, 
+  IsOptional, 
+  IsString, 
+  IsDateString, 
+  IsBoolean, 
+  Min, 
+  Max,
+ } from 'class-validator';
 
 export class CreateReviewDto {
   @IsInt()
-  idUser: number;
+  idUser!: number;
 
   @IsInt()
-  idClub: number;
+  idClub!: number;
 
   @IsInt()
   @Min(1)
   @Max(5)
-  rating: number;
+  rating!: number;
 
   @IsOptional()
   @IsString()

@@ -8,17 +8,17 @@ import {
 
 export class CreateBoxContentHistoryDto {
   @IsInt()
-  idSubscriptionTypes: number;
+  idSubscriptionTypes!: number;
 
   @IsString()
   @MaxLength(30)
-  deliveryMonthYear: string;  
+  deliveryMonthYear!: string;
 
   @IsString()
-  productName: string;
+  productName!: string;
 
   @IsString()
-  productDescription: string;
+  productDescription!: string;
 
   @IsOptional()
   @IsString()

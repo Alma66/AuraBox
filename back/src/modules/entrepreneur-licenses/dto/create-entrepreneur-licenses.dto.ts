@@ -1,11 +1,17 @@
-import { IsInt, IsOptional, IsDateString, IsString, IsUrl } from 'class-validator';
+import {
+  IsInt,
+  IsOptional,
+  IsDateString,
+  IsString,
+  IsUrl,
+} from 'class-validator';
 
 export class CreateEntrepreneurLicenseDto {
   @IsInt()
-  idEntrepreneurs: number;
+  idEntrepreneurs!: number;
 
   @IsInt()
-  idLicenseTypes: number;
+  idLicenseTypes!: number;
 
   @IsOptional()
   @IsDateString()

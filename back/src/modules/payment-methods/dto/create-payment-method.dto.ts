@@ -1,8 +1,12 @@
-import { IsString, IsBoolean, IsOptional } from 'class-validator';
+import { 
+  IsString, 
+  IsBoolean, 
+  IsOptional,
+ } from 'class-validator';
 
 export class CreatePaymentMethodDto {
   @IsString()
-  method: string;
+  method!: string;
 
   @IsOptional()
   @IsBoolean()

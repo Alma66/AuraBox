@@ -1,20 +1,25 @@
-import { IsInt, IsString, IsOptional, IsDateString } from 'class-validator';
+import { 
+  IsInt, 
+  IsString, 
+  IsOptional, 
+  IsDateString,
+ } from 'class-validator';
 
 export class CreateUserClubPreferenceDto {
   @IsInt()
-  idUser: number;
+  idUser!: number;
 
   @IsInt()
-  idSubscriptionTypes: number;
+  idSubscriptionTypes!: number;
 
   @IsInt()
-  idClub: number;
+  idClub!: number;
 
   @IsString()
-  preferenceType: string;
+  preferenceType!: string;
 
   @IsString()
-  preferenceValue: string;
+  preferenceValue!: string;
 
   @IsOptional()
   @IsDateString()

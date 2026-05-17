@@ -1,14 +1,21 @@
-import { IsBoolean, IsInt, IsOptional, IsString, MinLength, IsEnum } from 'class-validator';
+import { 
+  IsBoolean, 
+  IsInt, 
+  IsOptional, 
+  IsString, 
+  MinLength, 
+  IsEnum,
+ } from 'class-validator';
 import { Transform } from 'class-transformer';
 import { Frequency } from '@prisma/client';
 
 export class CreateSubscriptionTypeDto {
   @IsInt()
-  idClub: number;
+  idClub!: number;
 
   @IsString()
   @MinLength(2)
-  name: string;
+  name!: string;
 
   @IsOptional()
   @IsString()
@@ -19,10 +26,10 @@ export class CreateSubscriptionTypeDto {
     if (typeof value === 'number') return value.toString();
     return String(value);
   })
-  basePrice: string;
+  basePrice!: string;
 
   @IsEnum(Frequency)
-  frequency: Frequency;
+  frequency!: Frequency;
 
   @IsOptional()
   @Transform(({ value }) => (value === null || value === undefined ? value : String(value)))

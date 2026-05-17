@@ -1,9 +1,11 @@
-import { IsInt } from 'class-validator';
+import { 
+  IsInt,
+ } from 'class-validator';
 
 export class CreateClubCategoryDto {
   @IsInt()
-  idCategories: number;
+  idCategories!: number;
 
   @IsInt()
-  idClub: number;
+  idClub!: number;
 }

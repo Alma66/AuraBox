@@ -1,11 +1,15 @@
-import { IsInt, IsOptional, IsDateString } from 'class-validator';
+import { 
+  IsInt, 
+  IsOptional, 
+  IsDateString,
+ } from 'class-validator';
 
 export class CreateFavoriteDto {
   @IsInt()
-  idUser: number;
+  idUser!: number;
 
   @IsInt()
-  idClub: number;
+  idClub!: number;
 
   @IsOptional()
   @IsDateString()

@@ -1,36 +1,45 @@
-import { IsString, IsEmail, IsOptional, IsInt, MinLength, IsEnum, IsDateString } from 'class-validator';
+import {
+  IsString,
+  IsEmail,
+  IsOptional,
+  IsInt,
+  MinLength,
+  IsEnum,
+  IsDateString,
+} from 'class-validator';
+
 import { DocumentType } from '@prisma/client';
 
 export class CreateEntrepreneurDto {
   @IsString()
-  firstName: string;
+  firstName!: string;
 
   @IsString()
-  lastName: string;
+  lastName!: string;
 
   @IsEmail()
-  email: string;
+  email!: string;
 
   @IsString()
   @MinLength(6)
-  password: string;
+  password!: string;
 
   @IsEnum(DocumentType)
-  documentType: DocumentType;
+  documentType!: DocumentType;
 
   @IsInt()
-  documentNumber: number;
+  documentNumber!: number;
 
   @IsOptional()
   @IsInt()
   cuitCuil?: number;
 
   @IsOptional()
-  @IsInt()   
-  phoneNumber?: number; 
+  @IsInt()
+  phoneNumber?: number;
 
   @IsDateString()
-  birthDate: string;
+  birthDate!: string;
 
   @IsOptional()
   @IsString()

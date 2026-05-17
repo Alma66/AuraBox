@@ -1,14 +1,18 @@
-import { IsInt, IsOptional, IsDateString } from 'class-validator';
+import { 
+  IsInt, 
+  IsOptional, 
+  IsDateString,
+ } from 'class-validator';
 
 export class CreateRolePermissionDto {
   @IsInt()
-  idRole: number;
+  idRole!: number;
 
   @IsInt()
-  idPermissions: number;
+  idPermissions!: number;
 
   @IsInt()
-  grantedById: number;
+  grantedById!: number;
 
   @IsOptional()
   @IsDateString()

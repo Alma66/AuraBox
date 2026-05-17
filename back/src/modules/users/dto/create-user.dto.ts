@@ -1,29 +1,37 @@
-import { IsEmail, IsEnum, IsInt, IsString, MinLength, IsDateString, IsOptional } from 'class-validator';
+import { 
+  IsEmail, 
+  IsEnum, 
+  IsInt, 
+  IsString, 
+  MinLength, 
+  IsDateString, 
+  IsOptional,
+ } from 'class-validator';
 import { Transform } from 'class-transformer';
 import { DocumentType } from '@prisma/client';
 
 export class CreateUserDto {
   @IsString()
   @MinLength(2)
-  firstName: string;
+  firstName!: string;
 
   @IsString()
   @MinLength(2)
-  lastName: string;
+  lastName!: string;
 
   @IsEmail()
-  email: string;
+  email!: string;
 
   @IsString()
   @MinLength(6)
-  password: string;
+  password!: string;
 
   @IsEnum(DocumentType)
-  documentType: DocumentType;
+  documentType!: DocumentType;
 
   @Transform(({ value }) => (value === null || value === undefined ? value : parseInt(String(value), 10)))
   @IsInt()
-  documentNumber: number;
+  documentNumber!: number;
 
   @IsOptional()
   @Transform(({ value }) => (value === null || value === undefined ? value : parseInt(String(value), 10)))
@@ -31,7 +39,7 @@ export class CreateUserDto {
   phoneNumber?: number;
 
   @IsDateString()
-  birthDate: string; 
+  birthDate!: string; 
 
-  userType: 'customer' | 'entrepreneur';
+  userType!: 'customer' | 'entrepreneur';
 }

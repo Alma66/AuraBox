@@ -1,33 +1,42 @@
-import { IsString, IsEmail, IsOptional, IsEnum, MinLength, IsInt } from 'class-validator';  
+import {
+  IsString,
+  IsEmail,
+  IsOptional,
+  IsEnum,
+  MinLength,
+  IsInt,
+  IsBoolean,
+} from 'class-validator';
 import { DocumentType } from '@prisma/client';
 
 export class CreateAdminDto {
   @IsString()
-  firstName: string;
+  firstName!: string;
 
   @IsString()
-  lastName: string;
+  lastName!: string;
 
   @IsEmail()
-  email: string;
+  email!: string;
 
   @IsString()
   @MinLength(6)
-  password: string;
+  password!: string;
 
   @IsEnum(DocumentType)
-  documentType: DocumentType;
+  documentType!: DocumentType;
 
-  @IsInt()  
-  documentNumber: number;  
+  @IsInt()
+  documentNumber!: number;
 
-  @IsInt()  
-  phoneNumber: number;  
+  @IsInt()
+  phoneNumber!: number;
 
   @IsOptional()
   @IsString()
   notes?: string;
 
   @IsOptional()
+  @IsBoolean()
   active?: boolean;
 }
