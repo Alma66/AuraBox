@@ -3,6 +3,7 @@ import { PrismaService } from '../../prisma/prisma.service';
 import { CreateEntrepreneurLicenseDto } from './dto/create-entrepreneur-licenses.dto';
 import { UpdateEntrepreneurLicenseDto } from './dto/update-entrepreneur-licenses.dto';
 import { VerificationStatus } from '@prisma/client';
+import { CloudinaryService } from '../cloudinary/cloudinary.service';
 
 function sanitize(license: any) {
   if (!license) return license;
@@ -14,9 +15,12 @@ function sanitize(license: any) {
 
 @Injectable()
 export class EntrepreneurLicensesService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly cloudinary: CloudinaryService,
+  ) {}
 
-  async create(dto: CreateEntrepreneurLicenseDto) {
+  async create(dto: CreateEntrepreneurLicenseDto, documentFile?: Express.Multer.File) {
     const entrepreneur = await this.prisma.entrepreneurs.findUnique({
       where: { id: dto.idEntrepreneurs },
     });
@@ -27,13 +31,18 @@ export class EntrepreneurLicensesService {
     });
     if (!licenseType) throw new NotFoundException('Tipo de licencia no encontrado');
 
+    let documentUrl = dto.documentUrl ?? null;
+    if (documentFile) {
+      documentUrl = await this.cloudinary.uploadDocument(documentFile, 'aurabox/licenses');
+    }
+
     const created = await this.prisma.entrepreneur_Licenses.create({
       data: {
         idEntrepreneurs: dto.idEntrepreneurs,
         idLicenseTypes: dto.idLicenseTypes,
         issueDate: dto.issueDate ? new Date(dto.issueDate) : null,
         expirationDate: dto.expirationDate ? new Date(dto.expirationDate) : null,
-        documentUrl: dto.documentUrl ?? null,
+        documentUrl,
         verificationNotes: dto.verificationNotes ?? null,
         verificationStatus: VerificationStatus.PENDIENTE,
       },
@@ -112,7 +121,6 @@ export class EntrepreneurLicensesService {
   async remove(id: number) {
     const existing = await this.prisma.entrepreneur_Licenses.findUnique({ where: { id } });
     if (!existing) throw new NotFoundException('Licencia no encontrada');
-
     await this.prisma.entrepreneur_Licenses.delete({ where: { id } });
     return { message: 'Licencia eliminada correctamente' };
   }

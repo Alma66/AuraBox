@@ -14,6 +14,8 @@ var __param = (this && this.__param) || function (paramIndex, decorator) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ClubsController = void 0;
 const common_1 = require("@nestjs/common");
+const platform_express_1 = require("@nestjs/platform-express");
+const multer_1 = require("multer");
 const clubs_service_1 = require("./clubs.service");
 const create_club_dto_1 = require("./dto/create-club.dto");
 const update_club_dto_1 = require("./dto/update-club.dto");
@@ -26,8 +28,8 @@ let ClubsController = class ClubsController {
     constructor(clubsService) {
         this.clubsService = clubsService;
     }
-    async create(dto, req) {
-        return this.clubsService.create(req.user.id, dto);
+    async create(dto, req, logo) {
+        return this.clubsService.create(req.user.id, dto, logo);
     }
     async findFeatured() {
         return this.clubsService.findFeatured();
@@ -50,11 +52,24 @@ __decorate([
     (0, common_1.UseGuards)(roles_guard_1.RolesGuard),
     (0, roles_decorator_1.Roles)('OWNER'),
     (0, common_1.Post)(),
+    (0, common_1.UseInterceptors)((0, platform_express_1.FileInterceptor)('logo', {
+        storage: (0, multer_1.memoryStorage)(),
+        limits: { fileSize: 5 * 1024 * 1024 },
+        fileFilter: (req, file, callback) => {
+            if (!file.mimetype.match(/\/(jpg|jpeg|png|gif|webp)$/)) {
+                callback(new Error('Solo se permiten imágenes'), false);
+            }
+            else {
+                callback(null, true);
+            }
+        },
+    })),
     (0, common_1.UsePipes)(new common_1.ValidationPipe({ whitelist: true, transform: true })),
     __param(0, (0, common_1.Body)()),
     __param(1, (0, common_1.Request)()),
+    __param(2, (0, common_1.UploadedFile)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [create_club_dto_1.CreateClubDto, Object]),
+    __metadata("design:paramtypes", [create_club_dto_1.CreateClubDto, Object, Object]),
     __metadata("design:returntype", Promise)
 ], ClubsController.prototype, "create", null);
 __decorate([

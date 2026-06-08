@@ -38,6 +38,20 @@ let CloudinaryService = class CloudinaryService {
         const folder = parts[parts.length - 2];
         return `${folder}/${filename}`;
     }
+    async uploadDocument(file, folder = 'aurabox') {
+        return new Promise((resolve, reject) => {
+            const uploadStream = cloudinary_1.v2.uploader.upload_stream({
+                folder: folder,
+                resource_type: 'raw',
+            }, (error, result) => {
+                if (error)
+                    reject(error);
+                else
+                    resolve(result.secure_url);
+            });
+            uploadStream.end(file.buffer);
+        });
+    }
 };
 exports.CloudinaryService = CloudinaryService;
 exports.CloudinaryService = CloudinaryService = __decorate([

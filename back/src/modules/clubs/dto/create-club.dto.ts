@@ -4,7 +4,7 @@ import {
   IsString, 
   MinLength, 
   IsEnum,
- } from 'class-validator';
+} from 'class-validator';
 import { ClubStatus } from '@prisma/client';
 
 export class CreateClubDto {
@@ -12,8 +12,9 @@ export class CreateClubDto {
   @MinLength(3)
   name!: string;
 
+  @IsOptional()
   @IsString()
-  logoUrl!: string;
+  logoUrl?: string;
 
   @IsOptional()
   @IsString()

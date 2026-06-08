@@ -12,6 +12,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.ClubsService = void 0;
 const common_1 = require("@nestjs/common");
 const prisma_service_1 = require("../../prisma/prisma.service");
+const cloudinary_service_1 = require("../cloudinary/cloudinary.service");
 function sanitizeClub(club) {
     if (!club)
         return club;
@@ -31,19 +32,25 @@ function computeRating(reviews) {
 }
 let ClubsService = class ClubsService {
     prisma;
-    constructor(prisma) {
+    cloudinary;
+    constructor(prisma, cloudinary) {
         this.prisma = prisma;
+        this.cloudinary = cloudinary;
     }
-    async create(ownerId, dto) {
+    async create(ownerId, dto, logoFile) {
         const entrepreneur = await this.prisma.entrepreneurs.findUnique({
             where: { id: ownerId },
         });
         if (!entrepreneur)
             throw new common_1.ForbiddenException('Solo entrepreneurs pueden crear clubs');
+        let logoUrl = dto.logoUrl ?? '';
+        if (logoFile) {
+            logoUrl = await this.cloudinary.uploadImage(logoFile, 'aurabox/clubs');
+        }
         const club = await this.prisma.club.create({
             data: {
                 name: dto.name,
-                logoUrl: dto.logoUrl,
+                logoUrl,
                 slogan: dto.slogan,
                 history: dto.history,
                 shortDescription: dto.shortDescription,
@@ -138,6 +145,7 @@ let ClubsService = class ClubsService {
 exports.ClubsService = ClubsService;
 exports.ClubsService = ClubsService = __decorate([
     (0, common_1.Injectable)(),
-    __metadata("design:paramtypes", [prisma_service_1.PrismaService])
+    __metadata("design:paramtypes", [prisma_service_1.PrismaService,
+        cloudinary_service_1.CloudinaryService])
 ], ClubsService);
 //# sourceMappingURL=clubs.service.js.map

@@ -13,6 +13,7 @@ exports.EntrepreneurLicensesService = void 0;
 const common_1 = require("@nestjs/common");
 const prisma_service_1 = require("../../prisma/prisma.service");
 const client_1 = require("@prisma/client");
+const cloudinary_service_1 = require("../cloudinary/cloudinary.service");
 function sanitize(license) {
     if (!license)
         return license;
@@ -26,10 +27,12 @@ function sanitize(license) {
 }
 let EntrepreneurLicensesService = class EntrepreneurLicensesService {
     prisma;
-    constructor(prisma) {
+    cloudinary;
+    constructor(prisma, cloudinary) {
         this.prisma = prisma;
+        this.cloudinary = cloudinary;
     }
-    async create(dto) {
+    async create(dto, documentFile) {
         const entrepreneur = await this.prisma.entrepreneurs.findUnique({
             where: { id: dto.idEntrepreneurs },
         });
@@ -40,13 +43,17 @@ let EntrepreneurLicensesService = class EntrepreneurLicensesService {
         });
         if (!licenseType)
             throw new common_1.NotFoundException('Tipo de licencia no encontrado');
+        let documentUrl = dto.documentUrl ?? null;
+        if (documentFile) {
+            documentUrl = await this.cloudinary.uploadDocument(documentFile, 'aurabox/licenses');
+        }
         const created = await this.prisma.entrepreneur_Licenses.create({
             data: {
                 idEntrepreneurs: dto.idEntrepreneurs,
                 idLicenseTypes: dto.idLicenseTypes,
                 issueDate: dto.issueDate ? new Date(dto.issueDate) : null,
                 expirationDate: dto.expirationDate ? new Date(dto.expirationDate) : null,
-                documentUrl: dto.documentUrl ?? null,
+                documentUrl,
                 verificationNotes: dto.verificationNotes ?? null,
                 verificationStatus: client_1.VerificationStatus.PENDIENTE,
             },
@@ -128,6 +135,7 @@ let EntrepreneurLicensesService = class EntrepreneurLicensesService {
 exports.EntrepreneurLicensesService = EntrepreneurLicensesService;
 exports.EntrepreneurLicensesService = EntrepreneurLicensesService = __decorate([
     (0, common_1.Injectable)(),
-    __metadata("design:paramtypes", [prisma_service_1.PrismaService])
+    __metadata("design:paramtypes", [prisma_service_1.PrismaService,
+        cloudinary_service_1.CloudinaryService])
 ], EntrepreneurLicensesService);
 //# sourceMappingURL=entrepreneur-licenses.service.js.map

@@ -11,9 +11,12 @@ import {
   Request,
   UsePipes,
   ValidationPipe,
-  ForbiddenException,
   Query,
+  UseInterceptors,
+  UploadedFile,
 } from '@nestjs/common';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { memoryStorage } from 'multer';
 import { BoxContentHistoryService } from './box-content-history.service';
 import { CreateBoxContentHistoryDto } from './dto/create-box-content-history.dto';
 import { UpdateBoxContentHistoryDto } from './dto/update-box-content-history.dto';
@@ -22,16 +25,31 @@ import { RolesGuard } from '../auth/roles.guard';
 import { Roles } from '../auth/roles.decorator';
 
 @Controller('box-content-history')
-@UseGuards(JwtAuthGuard) 
+@UseGuards(JwtAuthGuard)
 export class BoxContentHistoryController {
   constructor(private readonly svc: BoxContentHistoryService) {}
 
   @UseGuards(RolesGuard)
   @Roles('OWNER', 'ADMIN')
   @Post()
+  @UseInterceptors(FileInterceptor('image', {
+    storage: memoryStorage(),
+    limits: { fileSize: 5 * 1024 * 1024 },
+    fileFilter: (req, file, callback) => {
+      if (!file.mimetype.match(/\/(jpg|jpeg|png|gif|webp)$/)) {
+        callback(new Error('Solo se permiten imágenes'), false);
+      } else {
+        callback(null, true);
+      }
+    },
+  }))
   @UsePipes(new ValidationPipe({ whitelist: true, transform: true }))
-  async create(@Body() dto: CreateBoxContentHistoryDto, @Request() req) {
-    return this.svc.create(dto);
+  async create(
+    @Body() dto: CreateBoxContentHistoryDto,
+    @Request() req,
+    @UploadedFile() image?: Express.Multer.File,
+  ) {
+    return this.svc.create(dto, image);
   }
 
   @UseGuards(RolesGuard)
@@ -59,17 +77,21 @@ export class BoxContentHistoryController {
   }
 
   @UseGuards(RolesGuard)
-  @Roles('OWNER', 'ADMIN')
+  @Roles('OWNER','ADMIN')
   @Put(':id')
   @UsePipes(new ValidationPipe({ whitelist: true, transform: true }))
-  async update(@Param('id', ParseIntPipe) id: number, @Body() dto: UpdateBoxContentHistoryDto, @Request() req) {
+  async update(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() dto: UpdateBoxContentHistoryDto,
+    @Request() req,
+  ) {
     return this.svc.update(id, dto);
   }
 
   @UseGuards(RolesGuard)
   @Roles('OWNER', 'ADMIN')
   @Delete(':id')
-  async remove(@Param('id', ParseIntPipe) id: number, @Request() req) {
+  async remove(@Param('id', ParseIntPipe) id: number) {
     return this.svc.remove(id);
   }
 }

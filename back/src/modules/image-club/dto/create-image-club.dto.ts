@@ -5,15 +5,16 @@ import {
   IsUrl, 
   IsEnum, 
   IsDateString,
- } from 'class-validator';
+} from 'class-validator';
 import { ContentType } from '@prisma/client';
 
 export class CreateImageClubDto {
   @IsInt()
   idClub!: number;
 
+  @IsOptional()
   @IsUrl()
-  imageUrl!: string;
+  imageUrl?: string;
 
   @IsOptional()
   @IsString()

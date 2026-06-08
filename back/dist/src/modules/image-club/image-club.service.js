@@ -12,6 +12,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.ImageClubService = void 0;
 const common_1 = require("@nestjs/common");
 const prisma_service_1 = require("../../prisma/prisma.service");
+const cloudinary_service_1 = require("../cloudinary/cloudinary.service");
 function sanitize(image) {
     if (!image)
         return image;
@@ -21,17 +22,23 @@ function sanitize(image) {
 }
 let ImageClubService = class ImageClubService {
     prisma;
-    constructor(prisma) {
+    cloudinary;
+    constructor(prisma, cloudinary) {
         this.prisma = prisma;
+        this.cloudinary = cloudinary;
     }
-    async create(dto) {
+    async create(dto, imageFile) {
         const club = await this.prisma.club.findUnique({ where: { id: dto.idClub } });
         if (!club)
             throw new common_1.NotFoundException('Club no encontrado');
+        let imageUrl = dto.imageUrl ?? '';
+        if (imageFile) {
+            imageUrl = await this.cloudinary.uploadImage(imageFile, 'aurabox/clubs/gallery');
+        }
         const created = await this.prisma.image_Club.create({
             data: {
                 idClub: dto.idClub,
-                imageUrl: dto.imageUrl,
+                imageUrl,
                 description: dto.description ?? null,
                 contentType: dto.contentType ?? 'Imagen',
                 uploadDate: dto.uploadDate ? new Date(dto.uploadDate) : new Date(),
@@ -73,6 +80,10 @@ let ImageClubService = class ImageClubService {
         const item = await this.prisma.image_Club.findUnique({ where: { id } });
         if (!item)
             throw new common_1.NotFoundException('Imagen no encontrada');
+        if (item.imageUrl) {
+            const publicId = this.cloudinary.extractPublicId(item.imageUrl);
+            await this.cloudinary.deleteImage(publicId);
+        }
         await this.prisma.image_Club.delete({ where: { id } });
         return { message: 'Imagen eliminada correctamente' };
     }
@@ -80,6 +91,7 @@ let ImageClubService = class ImageClubService {
 exports.ImageClubService = ImageClubService;
 exports.ImageClubService = ImageClubService = __decorate([
     (0, common_1.Injectable)(),
-    __metadata("design:paramtypes", [prisma_service_1.PrismaService])
+    __metadata("design:paramtypes", [prisma_service_1.PrismaService,
+        cloudinary_service_1.CloudinaryService])
 ], ImageClubService);
 //# sourceMappingURL=image-club.service.js.map

@@ -14,6 +14,8 @@ var __param = (this && this.__param) || function (paramIndex, decorator) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ImageClubController = void 0;
 const common_1 = require("@nestjs/common");
+const platform_express_1 = require("@nestjs/platform-express");
+const multer_1 = require("multer");
 const image_club_service_1 = require("./image-club.service");
 const create_image_club_dto_1 = require("./dto/create-image-club.dto");
 const update_image_club_dto_1 = require("./dto/update-image-club.dto");
@@ -25,8 +27,8 @@ let ImageClubController = class ImageClubController {
     constructor(imageClubService) {
         this.imageClubService = imageClubService;
     }
-    async create(dto, req) {
-        return this.imageClubService.create(dto);
+    async create(dto, req, image) {
+        return this.imageClubService.create(dto, image);
     }
     async findAll() {
         return this.imageClubService.findAll();
@@ -40,7 +42,7 @@ let ImageClubController = class ImageClubController {
     async update(id, dto, req) {
         return this.imageClubService.update(id, dto);
     }
-    async remove(id, req) {
+    async remove(id) {
         return this.imageClubService.remove(id);
     }
 };
@@ -49,11 +51,24 @@ __decorate([
     (0, common_1.UseGuards)(roles_guard_1.RolesGuard),
     (0, roles_decorator_1.Roles)('OWNER', 'ADMIN'),
     (0, common_1.Post)(),
+    (0, common_1.UseInterceptors)((0, platform_express_1.FileInterceptor)('image', {
+        storage: (0, multer_1.memoryStorage)(),
+        limits: { fileSize: 5 * 1024 * 1024 },
+        fileFilter: (req, file, callback) => {
+            if (!file.mimetype.match(/\/(jpg|jpeg|png|gif|webp)$/)) {
+                callback(new Error('Solo se permiten imágenes'), false);
+            }
+            else {
+                callback(null, true);
+            }
+        },
+    })),
     (0, common_1.UsePipes)(new common_1.ValidationPipe({ whitelist: true, transform: true })),
     __param(0, (0, common_1.Body)()),
     __param(1, (0, common_1.Request)()),
+    __param(2, (0, common_1.UploadedFile)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [create_image_club_dto_1.CreateImageClubDto, Object]),
+    __metadata("design:paramtypes", [create_image_club_dto_1.CreateImageClubDto, Object, Object]),
     __metadata("design:returntype", Promise)
 ], ImageClubController.prototype, "create", null);
 __decorate([
@@ -95,9 +110,8 @@ __decorate([
     (0, roles_decorator_1.Roles)('OWNER', 'ADMIN'),
     (0, common_1.Delete)(':id'),
     __param(0, (0, common_1.Param)('id', common_1.ParseIntPipe)),
-    __param(1, (0, common_1.Request)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Number, Object]),
+    __metadata("design:paramtypes", [Number]),
     __metadata("design:returntype", Promise)
 ], ImageClubController.prototype, "remove", null);
 exports.ImageClubController = ImageClubController = __decorate([

@@ -11,7 +11,11 @@ import {
   ValidationPipe,
   Request,
   ParseIntPipe,
+  UseInterceptors,
+  UploadedFile,
 } from '@nestjs/common';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { memoryStorage } from 'multer';
 import { ClubsService } from './clubs.service';
 import { CreateClubDto } from './dto/create-club.dto';
 import { UpdateClubDto } from './dto/update-club.dto';
@@ -27,9 +31,24 @@ export class ClubsController {
   @UseGuards(RolesGuard)
   @Roles('OWNER')
   @Post()
+  @UseInterceptors(FileInterceptor('logo', {
+    storage: memoryStorage(),
+    limits: { fileSize: 5 * 1024 * 1024 },
+    fileFilter: (req, file, callback) => {
+      if (!file.mimetype.match(/\/(jpg|jpeg|png|gif|webp)$/)) {
+        callback(new Error('Solo se permiten imágenes'), false);
+      } else {
+        callback(null, true);
+      }
+    },
+  }))
   @UsePipes(new ValidationPipe({ whitelist: true, transform: true }))
-  async create(@Body() dto: CreateClubDto, @Request() req) {
-    return this.clubsService.create(req.user.id, dto);
+  async create(
+    @Body() dto: CreateClubDto,
+    @Request() req,
+    @UploadedFile() logo?: Express.Multer.File,
+  ) {
+    return this.clubsService.create(req.user.id, dto, logo);
   }
 
   @Public()

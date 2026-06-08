@@ -2,6 +2,7 @@ import { Injectable, NotFoundException, ForbiddenException } from '@nestjs/commo
 import { PrismaService } from '../../prisma/prisma.service';
 import { CreateClubDto } from './dto/create-club.dto';
 import { UpdateClubDto } from './dto/update-club.dto';
+import { CloudinaryService } from '../cloudinary/cloudinary.service';
 
 function sanitizeClub(club: any) {
   if (!club) return club;
@@ -22,18 +23,26 @@ function computeRating(reviews: { rating: number }[]): { averageRating: number; 
 
 @Injectable()
 export class ClubsService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly cloudinary: CloudinaryService,
+  ) {}
 
-  async create(ownerId: number, dto: CreateClubDto) {
+  async create(ownerId: number, dto: CreateClubDto, logoFile?: Express.Multer.File) {
     const entrepreneur = await this.prisma.entrepreneurs.findUnique({
       where: { id: ownerId },
     });
     if (!entrepreneur) throw new ForbiddenException('Solo entrepreneurs pueden crear clubs');
 
+    let logoUrl = dto.logoUrl ?? '';
+    if (logoFile) {
+      logoUrl = await this.cloudinary.uploadImage(logoFile, 'aurabox/clubs');
+    }
+
     const club = await this.prisma.club.create({
       data: {
         name: dto.name,
-        logoUrl: dto.logoUrl,
+        logoUrl,
         slogan: dto.slogan,
         history: dto.history,
         shortDescription: dto.shortDescription,
@@ -57,7 +66,6 @@ export class ClubsService {
     const clubs = await this.prisma.club.findMany({
       orderBy: { creationDate: 'desc' },
     });
-
     const clubsWithRatings = await Promise.all(
       clubs.map(async (club) => {
         const reviews = await this.prisma.reviews.findMany({
@@ -68,19 +76,16 @@ export class ClubsService {
         return sanitizeClub({ ...club, averageRating, totalReviews });
       }),
     );
-
     return clubsWithRatings;
   }
 
   async findOne(id: number) {
     const club = await this.prisma.club.findUnique({ where: { id } });
     if (!club) throw new NotFoundException('Club no encontrado');
-
     const reviews = await this.prisma.reviews.findMany({
       where: { idClub: id, active: true },
       select: { id: true, rating: true, title: true, comment: true },
     });
-
     const { averageRating, totalReviews } = computeRating(reviews);
     return sanitizeClub({ ...club, averageRating, totalReviews, reviews });
   }
@@ -89,7 +94,6 @@ export class ClubsService {
     const clubs = await this.prisma.club.findMany({
       where: { clubStatus: 'APROBADO' },
     });
-
     const withRatings = await Promise.all(
       clubs.map(async (club) => {
         const reviews = await this.prisma.reviews.findMany({
@@ -100,19 +104,16 @@ export class ClubsService {
         return { ...club, averageRating, totalReviews };
       }),
     );
-
     const sorted = withRatings.sort((a, b) => {
       if (b.averageRating !== a.averageRating) return b.averageRating - a.averageRating;
       return b.totalReviews - a.totalReviews;
     });
-
     return sorted.slice(0, 3).map(sanitizeClub);
   }
 
   async update(id: number, userId: number, userRole: string, dto: UpdateClubDto) {
     const club = await this.prisma.club.findUnique({ where: { id } });
     if (!club) throw new NotFoundException('Club no encontrado');
-
     if (userRole === 'OWNER') {
       const association = await this.prisma.entrepreneur_Club.findFirst({
         where: { idEntrepreneurs: userId, idClub: id },
@@ -121,7 +122,6 @@ export class ClubsService {
     } else if (userRole !== 'ADMIN') {
       throw new ForbiddenException('No autorizado para editar clubes');
     }
-
     const updated = await this.prisma.club.update({
       where: { id },
       data: dto,

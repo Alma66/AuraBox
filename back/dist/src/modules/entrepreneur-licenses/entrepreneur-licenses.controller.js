@@ -14,6 +14,8 @@ var __param = (this && this.__param) || function (paramIndex, decorator) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.EntrepreneurLicensesController = void 0;
 const common_1 = require("@nestjs/common");
+const platform_express_1 = require("@nestjs/platform-express");
+const multer_1 = require("multer");
 const entrepreneur_licenses_service_1 = require("./entrepreneur-licenses.service");
 const create_entrepreneur_licenses_dto_1 = require("./dto/create-entrepreneur-licenses.dto");
 const update_entrepreneur_licenses_dto_1 = require("./dto/update-entrepreneur-licenses.dto");
@@ -25,11 +27,11 @@ let EntrepreneurLicensesController = class EntrepreneurLicensesController {
     constructor(service) {
         this.service = service;
     }
-    async create(dto, req) {
+    async create(dto, req, document) {
         if (req.user.role !== 'ADMIN' && req.user.id !== dto.idEntrepreneurs) {
             throw new common_1.ForbiddenException('No autorizado para crear esta licencia');
         }
-        return this.service.create(dto);
+        return this.service.create(dto, document);
     }
     async findAll() {
         return this.service.findAll();
@@ -64,11 +66,24 @@ let EntrepreneurLicensesController = class EntrepreneurLicensesController {
 exports.EntrepreneurLicensesController = EntrepreneurLicensesController;
 __decorate([
     (0, common_1.Post)(),
+    (0, common_1.UseInterceptors)((0, platform_express_1.FileInterceptor)('document', {
+        storage: (0, multer_1.memoryStorage)(),
+        limits: { fileSize: 10 * 1024 * 1024 },
+        fileFilter: (req, file, callback) => {
+            if (!file.mimetype.match(/\/(pdf|jpg|jpeg|png)$/)) {
+                callback(new Error('Solo se permiten PDF o imágenes'), false);
+            }
+            else {
+                callback(null, true);
+            }
+        },
+    })),
     (0, common_1.UsePipes)(new common_1.ValidationPipe({ whitelist: true, transform: true })),
     __param(0, (0, common_1.Body)()),
     __param(1, (0, common_1.Request)()),
+    __param(2, (0, common_1.UploadedFile)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [create_entrepreneur_licenses_dto_1.CreateEntrepreneurLicenseDto, Object]),
+    __metadata("design:paramtypes", [create_entrepreneur_licenses_dto_1.CreateEntrepreneurLicenseDto, Object, Object]),
     __metadata("design:returntype", Promise)
 ], EntrepreneurLicensesController.prototype, "create", null);
 __decorate([

@@ -12,6 +12,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.BoxContentHistoryService = void 0;
 const common_1 = require("@nestjs/common");
 const prisma_service_1 = require("../../prisma/prisma.service");
+const cloudinary_service_1 = require("../cloudinary/cloudinary.service");
 function sanitize(history) {
     if (!history)
         return history;
@@ -23,13 +24,19 @@ function sanitize(history) {
 }
 let BoxContentHistoryService = class BoxContentHistoryService {
     prisma;
-    constructor(prisma) {
+    cloudinary;
+    constructor(prisma, cloudinary) {
         this.prisma = prisma;
+        this.cloudinary = cloudinary;
     }
-    async create(dto) {
+    async create(dto, imageFile) {
         const subType = await this.prisma.subscription_Types.findUnique({ where: { id: dto.idSubscriptionTypes } });
         if (!subType)
             throw new common_1.NotFoundException('Tipo de suscripción no encontrado');
+        let productImageUrl = dto.productImageUrl ?? null;
+        if (imageFile) {
+            productImageUrl = await this.cloudinary.uploadImage(imageFile, 'aurabox/boxes');
+        }
         const created = await this.prisma.boxContentHistory.create({
             data: {
                 idSubscriptionTypes: dto.idSubscriptionTypes,
@@ -38,7 +45,7 @@ let BoxContentHistoryService = class BoxContentHistoryService {
                 productDescription: dto.productDescription,
                 usageInstructions: dto.usageInstructions ?? null,
                 productExpirationDate: dto.productExpirationDate ? new Date(dto.productExpirationDate) : null,
-                productImageUrl: dto.productImageUrl ?? null,
+                productImageUrl,
                 productVideoUrl: dto.productVideoUrl ?? null,
                 additionalNotes: dto.additionalNotes ?? null,
                 publicationDate: dto.publicationDate ? new Date(dto.publicationDate) : null,
@@ -93,6 +100,10 @@ let BoxContentHistoryService = class BoxContentHistoryService {
         const item = await this.prisma.boxContentHistory.findUnique({ where: { id } });
         if (!item)
             throw new common_1.NotFoundException('Historial de caja no encontrado');
+        if (item.productImageUrl) {
+            const publicId = this.cloudinary.extractPublicId(item.productImageUrl);
+            await this.cloudinary.deleteImage(publicId);
+        }
         await this.prisma.boxContentHistory.delete({ where: { id } });
         return { message: 'Registro de BoxContentHistory eliminado correctamente' };
     }
@@ -100,6 +111,7 @@ let BoxContentHistoryService = class BoxContentHistoryService {
 exports.BoxContentHistoryService = BoxContentHistoryService;
 exports.BoxContentHistoryService = BoxContentHistoryService = __decorate([
     (0, common_1.Injectable)(),
-    __metadata("design:paramtypes", [prisma_service_1.PrismaService])
+    __metadata("design:paramtypes", [prisma_service_1.PrismaService,
+        cloudinary_service_1.CloudinaryService])
 ], BoxContentHistoryService);
 //# sourceMappingURL=box-content-history.service.js.map

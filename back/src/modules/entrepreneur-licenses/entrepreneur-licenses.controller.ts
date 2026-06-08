@@ -13,7 +13,11 @@ import {
   ValidationPipe,
   ForbiddenException,
   Patch,
+  UseInterceptors,
+  UploadedFile,
 } from '@nestjs/common';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { memoryStorage } from 'multer';
 import { EntrepreneurLicensesService } from './entrepreneur-licenses.service';
 import { CreateEntrepreneurLicenseDto } from './dto/create-entrepreneur-licenses.dto';
 import { UpdateEntrepreneurLicenseDto } from './dto/update-entrepreneur-licenses.dto';
@@ -27,12 +31,27 @@ export class EntrepreneurLicensesController {
   constructor(private readonly service: EntrepreneurLicensesService) {}
 
   @Post()
+  @UseInterceptors(FileInterceptor('document', {
+    storage: memoryStorage(),
+    limits: { fileSize: 10 * 1024 * 1024 }, // 10MB para PDFs
+    fileFilter: (req, file, callback) => {
+      if (!file.mimetype.match(/\/(pdf|jpg|jpeg|png)$/)) {
+        callback(new Error('Solo se permiten PDF o imágenes'), false);
+      } else {
+        callback(null, true);
+      }
+    },
+  }))
   @UsePipes(new ValidationPipe({ whitelist: true, transform: true }))
-  async create(@Body() dto: CreateEntrepreneurLicenseDto, @Request() req) {
+  async create(
+    @Body() dto: CreateEntrepreneurLicenseDto,
+    @Request() req,
+    @UploadedFile() document?: Express.Multer.File,
+  ) {
     if (req.user.role !== 'ADMIN' && req.user.id !== dto.idEntrepreneurs) {
       throw new ForbiddenException('No autorizado para crear esta licencia');
     }
-    return this.service.create(dto);
+    return this.service.create(dto, document);
   }
 
   @UseGuards(RolesGuard)
@@ -43,7 +62,10 @@ export class EntrepreneurLicensesController {
   }
 
   @Get('by-entrepreneur/:idEntrepreneur')
-  async findByEntrepreneur(@Param('idEntrepreneur', ParseIntPipe) idEntrepreneur: number, @Request() req) {
+  async findByEntrepreneur(
+    @Param('idEntrepreneur', ParseIntPipe) idEntrepreneur: number,
+    @Request() req,
+  ) {
     if (req.user.id !== idEntrepreneur && req.user.role !== 'ADMIN') {
       throw new ForbiddenException('No autorizado para ver estas licencias');
     }
@@ -61,7 +83,11 @@ export class EntrepreneurLicensesController {
 
   @Patch(':id')
   @UsePipes(new ValidationPipe({ whitelist: true, transform: true }))
-  async update(@Param('id', ParseIntPipe) id: number, @Body() dto: UpdateEntrepreneurLicenseDto, @Request() req) {
+  async update(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() dto: UpdateEntrepreneurLicenseDto,
+    @Request() req,
+  ) {
     const existing = await this.service.findOne(id);
     if (req.user.id !== existing.idEntrepreneurs && req.user.role !== 'ADMIN') {
       throw new ForbiddenException('No autorizado para actualizar esta licencia');
@@ -73,7 +99,10 @@ export class EntrepreneurLicensesController {
   @Roles('ADMIN')
   @Put(':id/verify')
   @UsePipes(new ValidationPipe({ whitelist: true, transform: true }))
-  async verify(@Param('id', ParseIntPipe) id: number, @Body() body: { verificationStatus: string; verificationNotes?: string }) {
+  async verify(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() body: { verificationStatus: string; verificationNotes?: string },
+  ) {
     return this.service.verify(id, body.verificationStatus, body.verificationNotes);
   }
 

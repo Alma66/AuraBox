@@ -36,4 +36,20 @@ export class CloudinaryService {
     const folder = parts[parts.length - 2];
     return `${folder}/${filename}`;
   }
+  
+  async uploadDocument(file: Express.Multer.File, folder: string = 'aurabox'): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const uploadStream = cloudinary.uploader.upload_stream(
+      {
+        folder: folder,
+        resource_type: 'raw', // ← esto es lo que permite PDFs
+      },
+      (error, result) => {
+        if (error) reject(error);
+        else resolve(result!.secure_url);
+      }
+    );
+    uploadStream.end(file.buffer);
+  });
+}
 }

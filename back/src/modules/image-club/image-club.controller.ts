@@ -11,8 +11,11 @@ import {
   Request,
   UsePipes,
   ValidationPipe,
-  ForbiddenException,
+  UseInterceptors,
+  UploadedFile,
 } from '@nestjs/common';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { memoryStorage } from 'multer';
 import { ImageClubService } from './image-club.service';
 import { CreateImageClubDto } from './dto/create-image-club.dto';
 import { UpdateImageClubDto } from './dto/update-image-club.dto';
@@ -28,9 +31,24 @@ export class ImageClubController {
   @UseGuards(RolesGuard)
   @Roles('OWNER', 'ADMIN')
   @Post()
+  @UseInterceptors(FileInterceptor('image', {
+    storage: memoryStorage(),
+    limits: { fileSize: 5 * 1024 * 1024 },
+    fileFilter: (req, file, callback) => {
+      if (!file.mimetype.match(/\/(jpg|jpeg|png|gif|webp)$/)) {
+        callback(new Error('Solo se permiten imágenes'), false);
+      } else {
+        callback(null, true);
+      }
+    },
+  }))
   @UsePipes(new ValidationPipe({ whitelist: true, transform: true }))
-  async create(@Body() dto: CreateImageClubDto, @Request() req) {
-    return this.imageClubService.create(dto);
+  async create(
+    @Body() dto: CreateImageClubDto,
+    @Request() req,
+    @UploadedFile() image?: Express.Multer.File,
+  ) {
+    return this.imageClubService.create(dto, image);
   }
 
   @UseGuards(RolesGuard)
@@ -54,14 +72,18 @@ export class ImageClubController {
   @Roles('OWNER', 'ADMIN')
   @Put(':id')
   @UsePipes(new ValidationPipe({ whitelist: true, transform: true }))
-  async update(@Param('id', ParseIntPipe) id: number, @Body() dto: UpdateImageClubDto, @Request() req) {
+  async update(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() dto: UpdateImageClubDto,
+    @Request() req,
+  ) {
     return this.imageClubService.update(id, dto);
   }
 
   @UseGuards(RolesGuard)
   @Roles('OWNER', 'ADMIN')
   @Delete(':id')
-  async remove(@Param('id', ParseIntPipe) id: number, @Request() req) {
+  async remove(@Param('id', ParseIntPipe) id: number) {
     return this.imageClubService.remove(id);
   }
 }

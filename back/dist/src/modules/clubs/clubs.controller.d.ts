@@ -4,7 +4,7 @@ import { UpdateClubDto } from './dto/update-club.dto';
 export declare class ClubsController {
     private readonly clubsService;
     constructor(clubsService: ClubsService);
-    create(dto: CreateClubDto, req: any): Promise<any>;
+    create(dto: CreateClubDto, req: any, logo?: Express.Multer.File): Promise<any>;
     findFeatured(): Promise<any[]>;
     findAll(): Promise<any[]>;
     findOne(id: number): Promise<any>;

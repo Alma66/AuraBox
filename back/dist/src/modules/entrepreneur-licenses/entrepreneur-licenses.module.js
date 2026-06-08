@@ -11,12 +11,13 @@ const common_1 = require("@nestjs/common");
 const entrepreneur_licenses_service_1 = require("./entrepreneur-licenses.service");
 const entrepreneur_licenses_controller_1 = require("./entrepreneur-licenses.controller");
 const prisma_module_1 = require("../../prisma/prisma.module");
+const cloudinary_module_1 = require("../cloudinary/cloudinary.module");
 let EntrepreneurLicensesModule = class EntrepreneurLicensesModule {
 };
 exports.EntrepreneurLicensesModule = EntrepreneurLicensesModule;
 exports.EntrepreneurLicensesModule = EntrepreneurLicensesModule = __decorate([
     (0, common_1.Module)({
-        imports: [prisma_module_1.PrismaModule],
+        imports: [prisma_module_1.PrismaModule, cloudinary_module_1.CloudinaryModule],
         controllers: [entrepreneur_licenses_controller_1.EntrepreneurLicensesController],
         providers: [entrepreneur_licenses_service_1.EntrepreneurLicensesService],
     })

@@ -1,10 +1,12 @@
 import { PrismaService } from '../../prisma/prisma.service';
 import { CreateClubDto } from './dto/create-club.dto';
 import { UpdateClubDto } from './dto/update-club.dto';
+import { CloudinaryService } from '../cloudinary/cloudinary.service';
 export declare class ClubsService {
     private readonly prisma;
-    constructor(prisma: PrismaService);
-    create(ownerId: number, dto: CreateClubDto): Promise<any>;
+    private readonly cloudinary;
+    constructor(prisma: PrismaService, cloudinary: CloudinaryService);
+    create(ownerId: number, dto: CreateClubDto, logoFile?: Express.Multer.File): Promise<any>;
     findAll(): Promise<any[]>;
     findOne(id: number): Promise<any>;
     findFeatured(): Promise<any[]>;

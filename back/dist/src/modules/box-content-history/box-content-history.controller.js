@@ -14,6 +14,8 @@ var __param = (this && this.__param) || function (paramIndex, decorator) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.BoxContentHistoryController = void 0;
 const common_1 = require("@nestjs/common");
+const platform_express_1 = require("@nestjs/platform-express");
+const multer_1 = require("multer");
 const box_content_history_service_1 = require("./box-content-history.service");
 const create_box_content_history_dto_1 = require("./dto/create-box-content-history.dto");
 const update_box_content_history_dto_1 = require("./dto/update-box-content-history.dto");
@@ -25,8 +27,8 @@ let BoxContentHistoryController = class BoxContentHistoryController {
     constructor(svc) {
         this.svc = svc;
     }
-    async create(dto, req) {
-        return this.svc.create(dto);
+    async create(dto, req, image) {
+        return this.svc.create(dto, image);
     }
     async findAll(page, perPage) {
         const p = page ? parseInt(page, 10) : 1;
@@ -45,7 +47,7 @@ let BoxContentHistoryController = class BoxContentHistoryController {
     async update(id, dto, req) {
         return this.svc.update(id, dto);
     }
-    async remove(id, req) {
+    async remove(id) {
         return this.svc.remove(id);
     }
 };
@@ -54,11 +56,24 @@ __decorate([
     (0, common_1.UseGuards)(roles_guard_1.RolesGuard),
     (0, roles_decorator_1.Roles)('OWNER', 'ADMIN'),
     (0, common_1.Post)(),
+    (0, common_1.UseInterceptors)((0, platform_express_1.FileInterceptor)('image', {
+        storage: (0, multer_1.memoryStorage)(),
+        limits: { fileSize: 5 * 1024 * 1024 },
+        fileFilter: (req, file, callback) => {
+            if (!file.mimetype.match(/\/(jpg|jpeg|png|gif|webp)$/)) {
+                callback(new Error('Solo se permiten imágenes'), false);
+            }
+            else {
+                callback(null, true);
+            }
+        },
+    })),
     (0, common_1.UsePipes)(new common_1.ValidationPipe({ whitelist: true, transform: true })),
     __param(0, (0, common_1.Body)()),
     __param(1, (0, common_1.Request)()),
+    __param(2, (0, common_1.UploadedFile)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [create_box_content_history_dto_1.CreateBoxContentHistoryDto, Object]),
+    __metadata("design:paramtypes", [create_box_content_history_dto_1.CreateBoxContentHistoryDto, Object, Object]),
     __metadata("design:returntype", Promise)
 ], BoxContentHistoryController.prototype, "create", null);
 __decorate([
@@ -109,9 +124,8 @@ __decorate([
     (0, roles_decorator_1.Roles)('OWNER', 'ADMIN'),
     (0, common_1.Delete)(':id'),
     __param(0, (0, common_1.Param)('id', common_1.ParseIntPipe)),
-    __param(1, (0, common_1.Request)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Number, Object]),
+    __metadata("design:paramtypes", [Number]),
     __metadata("design:returntype", Promise)
 ], BoxContentHistoryController.prototype, "remove", null);
 exports.BoxContentHistoryController = BoxContentHistoryController = __decorate([
