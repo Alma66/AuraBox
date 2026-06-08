@@ -5,29 +5,29 @@ export declare class LicenseTypesService {
     private readonly prisma;
     constructor(prisma: PrismaService);
     create(dto: CreateLicenseTypeDto): Promise<{
-        id: number;
         name: string;
         description: string | null;
+        id: number;
     }>;
     findAll(): Promise<{
-        id: number;
         name: string;
         description: string | null;
+        id: number;
     }[]>;
     findByName(name: string): Promise<{
-        id: number;
         name: string;
         description: string | null;
+        id: number;
     } | null>;
     findOne(id: number): Promise<{
-        id: number;
         name: string;
         description: string | null;
+        id: number;
     }>;
     update(id: number, dto: UpdateLicenseTypeDto): Promise<{
-        id: number;
         name: string;
         description: string | null;
+        id: number;
     }>;
     remove(id: number): Promise<{
         message: string;

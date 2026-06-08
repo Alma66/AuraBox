@@ -5,6 +5,7 @@ export declare class ClubsController {
     private readonly clubsService;
     constructor(clubsService: ClubsService);
     create(dto: CreateClubDto, req: any): Promise<any>;
+    findFeatured(): Promise<any[]>;
     findAll(): Promise<any[]>;
     findOne(id: number): Promise<any>;
     update(id: number, dto: UpdateClubDto, req: any): Promise<any>;

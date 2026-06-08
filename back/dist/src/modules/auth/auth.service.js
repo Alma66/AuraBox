@@ -58,12 +58,26 @@ let AuthService = class AuthService {
         this.prisma = prisma;
     }
     async validateUser(email, pass) {
-        let user = await this.usersService.findByEmail(email);
-        if (!user) {
-            user = await this.prisma.entrepreneurs.findUnique({ where: { email } });
+        let user = null;
+        let role = 'customer';
+        const foundUser = await this.prisma.user.findUnique({ where: { email } });
+        if (foundUser) {
+            user = foundUser;
+            role = 'customer';
         }
         if (!user) {
-            user = await this.prisma.admins.findUnique({ where: { email } });
+            const foundEntrepreneur = await this.prisma.entrepreneurs.findUnique({ where: { email } });
+            if (foundEntrepreneur) {
+                user = foundEntrepreneur;
+                role = 'entrepreneur';
+            }
+        }
+        if (!user) {
+            const foundAdmin = await this.prisma.admins.findUnique({ where: { email } });
+            if (foundAdmin) {
+                user = foundAdmin;
+                role = 'admin';
+            }
         }
         if (!user)
             return null;
@@ -71,42 +85,137 @@ let AuthService = class AuthService {
         if (!ok)
             return null;
         const { passwordHash, ...safe } = user;
-        return safe;
-    }
-    async getUserRole(user) {
-        const adminRole = await this.prisma.adminOrEntrepreneurRole.findFirst({
-            where: { assignedTo: user.id },
-        });
-        if (adminRole) {
-            const role = await this.prisma.role.findUnique({
-                where: { id: adminRole.idRole },
-            });
-            if (role)
-                return role.code;
-        }
-        if (user.email?.includes('admin'))
-            return 'admin';
-        if (user.email?.includes('emprendedor'))
-            return 'entrepreneur';
-        return 'customer';
+        return { ...safe, role };
     }
     async loginWithCredentials(email, password) {
         const user = await this.validateUser(email, password);
         if (!user)
             throw new common_1.UnauthorizedException('Credenciales inválidas');
-        return this.login(user);
+        return this.buildToken(user);
     }
-    async login(user) {
-        const role = await this.getUserRole(user);
+    async buildToken(user) {
+        let managedClubId = null;
+        if (user.role === 'entrepreneur') {
+            const association = await this.prisma.entrepreneur_Club.findFirst({
+                where: { idEntrepreneurs: user.id },
+                orderBy: { associationDate: 'desc' },
+            });
+            if (association)
+                managedClubId = association.idClub;
+        }
         const payload = {
             sub: user.id,
             email: user.email,
-            role: role.toLowerCase(),
+            role: user.role,
             firstName: user.firstName,
             lastName: user.lastName,
         };
+        if (managedClubId)
+            payload.managedClubId = managedClubId;
         const token = this.jwtService.sign(payload);
         return { access_token: token };
+    }
+    async registerCustomer(dto) {
+        const exists = await this.prisma.user.findFirst({
+            where: { OR: [{ email: dto.email }, { documentNumber: parseInt(dto.documentNumber) }] },
+        });
+        if (exists)
+            throw new common_1.BadRequestException('Email o documento ya registrado');
+        const birthDate = new Date(dto.birthDate);
+        const age = new Date().getFullYear() - birthDate.getFullYear();
+        if (age < 16)
+            throw new common_1.BadRequestException('Debes tener al menos 16 años para registrarte como cliente.');
+        const hashed = await bcrypt.hash(dto.password, 10);
+        const user = await this.prisma.user.create({
+            data: {
+                firstName: dto.firstName,
+                lastName: dto.lastName,
+                email: dto.email,
+                passwordHash: hashed,
+                documentType: dto.documentType,
+                documentNumber: parseInt(dto.documentNumber),
+                phoneNumber: dto.phoneNumber ? parseInt(dto.phoneNumber) : null,
+                birthDate: new Date(dto.birthDate),
+            },
+        });
+        const { passwordHash, ...safe } = user;
+        return { ...safe, role: 'customer' };
+    }
+    async completeCustomerProfile(dto) {
+        const { userId, streetAddress, addressNumber, floorNumber, addressDetails, city, province, postalCode } = dto;
+        if (!userId)
+            throw new common_1.BadRequestException('userId es requerido');
+        const updated = await this.prisma.user.update({
+            where: { id: parseInt(userId) },
+            data: {
+                streetAddress: streetAddress ?? null,
+                addressNumber: addressNumber ? parseInt(addressNumber) : null,
+                floorNumber: floorNumber ?? null,
+                addressDetails: addressDetails ?? null,
+                city: city ?? null,
+                province: province ?? null,
+                postalCode: postalCode ?? null,
+            },
+        });
+        const { passwordHash, ...safe } = updated;
+        return safe;
+    }
+    async registerEntrepreneur(dto) {
+        const exists = await this.prisma.entrepreneurs.findFirst({
+            where: { OR: [{ email: dto.email }, { documentNumber: parseInt(dto.documentNumber) }] },
+        });
+        if (exists)
+            throw new common_1.BadRequestException('Email o documento ya registrado');
+        const birthDate = new Date(dto.birthDate);
+        const age = new Date().getFullYear() - birthDate.getFullYear();
+        if (age < 18)
+            throw new common_1.BadRequestException('Debes tener al menos 18 años para registrarte como emprendedor.');
+        const hashed = await bcrypt.hash(dto.password, 10);
+        const entrepreneur = await this.prisma.entrepreneurs.create({
+            data: {
+                firstName: dto.firstName,
+                lastName: dto.lastName,
+                email: dto.email,
+                passwordHash: hashed,
+                documentType: dto.documentType,
+                documentNumber: parseInt(dto.documentNumber),
+                phoneNumber: dto.phoneNumber ? parseInt(dto.phoneNumber) : null,
+                birthDate: new Date(dto.birthDate),
+                city: dto.city ?? null,
+                province: dto.province ?? null,
+            },
+        });
+        const { passwordHash, ...safe } = entrepreneur;
+        return { ...safe, role: 'entrepreneur' };
+    }
+    async registerEntrepreneurClub(dto) {
+        const { entrepreneurId, name, logoUrl, shortDescription, contactEmail, slogan, history, whatsappContact } = dto;
+        if (!entrepreneurId)
+            throw new common_1.BadRequestException('entrepreneurId es requerido');
+        const entrepreneur = await this.prisma.entrepreneurs.findUnique({
+            where: { id: parseInt(entrepreneurId) },
+        });
+        if (!entrepreneur)
+            throw new common_1.BadRequestException('Emprendedor no encontrado');
+        const club = await this.prisma.club.create({
+            data: {
+                name,
+                logoUrl: logoUrl ?? '',
+                slogan: slogan ?? null,
+                history: history ?? null,
+                shortDescription,
+                contactEmail,
+                whatsappContact: whatsappContact ?? null,
+                clubStatus: 'PENDIENTE_APROBACION',
+            },
+        });
+        await this.prisma.entrepreneur_Club.create({
+            data: {
+                idEntrepreneurs: parseInt(entrepreneurId),
+                idClub: club.id,
+            },
+        });
+        return club;
     }
 };
 exports.AuthService = AuthService;

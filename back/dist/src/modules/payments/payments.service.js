@@ -47,20 +47,25 @@ let PaymentsService = class PaymentsService {
             if (!pm)
                 throw new common_1.NotFoundException('Método de pago no encontrado');
         }
-        const created = await this.prisma.payment.create({
-            data: {
-                idUserSubscription: dto.idUserSubscription,
-                idUser: dto.idUser,
-                idClub: dto.idClub,
-                idGatewayTransaction: dto.idGatewayTransaction,
-                idPaymentMethods: dto.idPaymentMethods,
-                totalAmountPaid: dto.totalAmountPaid,
-                clubAmount: dto.clubAmount,
-                commissionAmount: dto.commissionAmount,
-                paymentDate: dto.paymentDate ? new Date(dto.paymentDate) : new Date(),
-                paymentStatus: dto.paymentStatus,
-            },
-        });
+        const data = {
+            idUserSubscription: dto.idUserSubscription,
+            idUser: dto.idUser,
+            idClub: dto.idClub,
+            paymentDate: dto.paymentDate ? new Date(dto.paymentDate) : new Date(),
+            paymentStatus: dto.paymentStatus,
+        };
+        if (dto.idGatewayTransaction !== undefined && dto.idGatewayTransaction !== null) {
+            data.idGatewayTransaction = String(dto.idGatewayTransaction);
+        }
+        if (dto.idPaymentMethods !== undefined)
+            data.idPaymentMethods = dto.idPaymentMethods;
+        if (dto.totalAmountPaid !== undefined && dto.totalAmountPaid !== null)
+            data.totalAmountPaid = String(dto.totalAmountPaid);
+        if (dto.clubAmount !== undefined && dto.clubAmount !== null)
+            data.clubAmount = String(dto.clubAmount);
+        if (dto.commissionAmount !== undefined && dto.commissionAmount !== null)
+            data.commissionAmount = String(dto.commissionAmount);
+        const created = await this.prisma.payment.create({ data });
         return sanitize(created);
     }
     async findAll() {
@@ -93,12 +98,35 @@ let PaymentsService = class PaymentsService {
         const payment = await this.prisma.payment.findUnique({ where: { id } });
         if (!payment)
             throw new common_1.NotFoundException('Pago no encontrado');
+        const data = {};
+        if (dto.paymentDate !== undefined) {
+            data.paymentDate = dto.paymentDate ? new Date(dto.paymentDate) : payment.paymentDate;
+        }
+        if (dto.paymentStatus !== undefined)
+            data.paymentStatus = dto.paymentStatus;
+        if (dto.idUserSubscription !== undefined)
+            data.idUserSubscription = dto.idUserSubscription;
+        if (dto.idUser !== undefined)
+            data.idUser = dto.idUser;
+        if (dto.idClub !== undefined)
+            data.idClub = dto.idClub;
+        if (dto.idGatewayTransaction !== undefined && dto.idGatewayTransaction !== null) {
+            data.idGatewayTransaction = String(dto.idGatewayTransaction);
+        }
+        else if (dto.idGatewayTransaction === null) {
+            data.idGatewayTransaction = null;
+        }
+        if (dto.idPaymentMethods !== undefined)
+            data.idPaymentMethods = dto.idPaymentMethods;
+        if (dto.totalAmountPaid !== undefined)
+            data.totalAmountPaid = dto.totalAmountPaid !== null ? String(dto.totalAmountPaid) : null;
+        if (dto.clubAmount !== undefined)
+            data.clubAmount = dto.clubAmount !== null ? String(dto.clubAmount) : null;
+        if (dto.commissionAmount !== undefined)
+            data.commissionAmount = dto.commissionAmount !== null ? String(dto.commissionAmount) : null;
         const updated = await this.prisma.payment.update({
             where: { id },
-            data: {
-                ...dto,
-                paymentDate: dto.paymentDate ? new Date(dto.paymentDate) : payment.paymentDate,
-            },
+            data,
         });
         return sanitize(updated);
     }

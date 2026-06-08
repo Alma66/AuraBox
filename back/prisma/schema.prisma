@@ -183,7 +183,7 @@ model Club_Status_History {
   idAdmins       Int      @map("ID_Admins")
   previousStatus ClubStatus @map("Previous_Status")
   newStatus      ClubStatus @map("New_Status")
-  changeDate     Boolean  @default(true) @map("Change_Date")
+  changeDate     DateTime  @default(now()) @map("Change_Date")
   changeReason   String?  @map("Change_Reason")
 
   @@map("Club_Status_History")

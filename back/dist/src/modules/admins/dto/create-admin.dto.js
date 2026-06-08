@@ -60,6 +60,7 @@ __decorate([
 ], CreateAdminDto.prototype, "notes", void 0);
 __decorate([
     (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.IsBoolean)(),
     __metadata("design:type", Boolean)
 ], CreateAdminDto.prototype, "active", void 0);
 //# sourceMappingURL=create-admin.dto.js.map

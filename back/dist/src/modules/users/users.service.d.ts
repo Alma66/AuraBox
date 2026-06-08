@@ -10,23 +10,23 @@ export declare class UsersService {
     findById(id: number): Promise<any>;
     findByEmail(email: string): Promise<{
         id: number;
-        email: string;
-        documentNumber: number;
         firstName: string;
         lastName: string;
+        email: string;
         passwordHash: string;
         documentType: import("@prisma/client").$Enums.DocumentType;
+        documentNumber: number;
         phoneNumber: number | null;
         active: boolean;
         registrationDate: Date;
         birthDate: Date | null;
-        city: string | null;
-        province: string | null;
         balanceAvailable: Prisma.Decimal | null;
         streetAddress: string | null;
         addressNumber: number | null;
         floorNumber: string | null;
         addressDetails: string | null;
+        city: string | null;
+        province: string | null;
         postalCode: string | null;
     } | null>;
     update(id: number, dto: UpdateUserDto): Promise<any>;

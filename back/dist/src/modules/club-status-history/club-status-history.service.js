@@ -30,7 +30,7 @@ let ClubStatusHistoryService = class ClubStatusHistoryService {
                 idAdmins: dto.idAdmins,
                 previousStatus: dto.previousStatus,
                 newStatus: dto.newStatus,
-                changeDate: dto.changeDate ?? true,
+                changeDate: dto.changeDate ? new Date(dto.changeDate) : new Date(),
                 changeReason: dto.changeReason ?? null,
             },
         });
@@ -74,6 +74,7 @@ let ClubStatusHistoryService = class ClubStatusHistoryService {
             where: { id },
             data: {
                 ...dto,
+                changeDate: dto.changeDate ? new Date(dto.changeDate) : undefined,
             },
         });
     }

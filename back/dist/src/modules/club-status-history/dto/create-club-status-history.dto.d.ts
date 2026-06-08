@@ -4,6 +4,6 @@ export declare class CreateClubStatusHistoryDto {
     idAdmins: number;
     previousStatus: ClubStatus;
     newStatus: ClubStatus;
-    changeDate?: boolean;
+    changeDate?: string;
     changeReason?: string;
 }

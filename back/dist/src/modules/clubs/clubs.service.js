@@ -20,6 +20,15 @@ function sanitizeClub(club) {
     }
     return club;
 }
+function computeRating(reviews) {
+    if (!reviews || reviews.length === 0)
+        return { averageRating: 0, totalReviews: 0 };
+    const sum = reviews.reduce((acc, r) => acc + r.rating, 0);
+    return {
+        averageRating: Math.round((sum / reviews.length) * 10) / 10,
+        totalReviews: reviews.length,
+    };
+}
 let ClubsService = class ClubsService {
     prisma;
     constructor(prisma) {
@@ -55,13 +64,45 @@ let ClubsService = class ClubsService {
         const clubs = await this.prisma.club.findMany({
             orderBy: { creationDate: 'desc' },
         });
-        return clubs.map(sanitizeClub);
+        const clubsWithRatings = await Promise.all(clubs.map(async (club) => {
+            const reviews = await this.prisma.reviews.findMany({
+                where: { idClub: club.id, active: true },
+                select: { rating: true },
+            });
+            const { averageRating, totalReviews } = computeRating(reviews);
+            return sanitizeClub({ ...club, averageRating, totalReviews });
+        }));
+        return clubsWithRatings;
     }
     async findOne(id) {
         const club = await this.prisma.club.findUnique({ where: { id } });
         if (!club)
             throw new common_1.NotFoundException('Club no encontrado');
-        return sanitizeClub(club);
+        const reviews = await this.prisma.reviews.findMany({
+            where: { idClub: id, active: true },
+            select: { id: true, rating: true, title: true, comment: true },
+        });
+        const { averageRating, totalReviews } = computeRating(reviews);
+        return sanitizeClub({ ...club, averageRating, totalReviews, reviews });
+    }
+    async findFeatured() {
+        const clubs = await this.prisma.club.findMany({
+            where: { clubStatus: 'APROBADO' },
+        });
+        const withRatings = await Promise.all(clubs.map(async (club) => {
+            const reviews = await this.prisma.reviews.findMany({
+                where: { idClub: club.id, active: true },
+                select: { rating: true },
+            });
+            const { averageRating, totalReviews } = computeRating(reviews);
+            return { ...club, averageRating, totalReviews };
+        }));
+        const sorted = withRatings.sort((a, b) => {
+            if (b.averageRating !== a.averageRating)
+                return b.averageRating - a.averageRating;
+            return b.totalReviews - a.totalReviews;
+        });
+        return sorted.slice(0, 3).map(sanitizeClub);
     }
     async update(id, userId, userRole, dto) {
         const club = await this.prisma.club.findUnique({ where: { id } });

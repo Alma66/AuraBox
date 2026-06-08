@@ -12,6 +12,8 @@ const core_1 = require("@nestjs/core");
 const jwt_1 = require("@nestjs/jwt");
 const app_controller_1 = require("./app.controller");
 const app_service_1 = require("./app.service");
+const config_1 = require("@nestjs/config");
+const cloudinary_module_1 = require("./modules/cloudinary/cloudinary.module");
 const prisma_module_1 = require("./prisma/prisma.module");
 const admin_or_entrepreneur_role_module_1 = require("./modules/admin-or-entrepreneur-role/admin-or-entrepreneur-role.module");
 const admins_module_1 = require("./modules/admins/admins.module");
@@ -52,6 +54,8 @@ exports.AppModule = AppModule = __decorate([
     (0, common_1.Module)({
         imports: [
             prisma_module_1.PrismaModule,
+            config_1.ConfigModule.forRoot({ isGlobal: true }),
+            cloudinary_module_1.CloudinaryModule,
             jwt_1.JwtModule.register({
                 global: true,
                 secret: process.env.JWT_SECRET || 'superSecretDevKey',

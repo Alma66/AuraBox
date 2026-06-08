@@ -57,6 +57,7 @@ __decorate([
 ], CreateClubDto.prototype, "whatsappContact", void 0);
 __decorate([
     (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.IsEnum)(client_1.ClubStatus),
     __metadata("design:type", String)
 ], CreateClubDto.prototype, "clubStatus", void 0);
 //# sourceMappingURL=create-club.dto.js.map

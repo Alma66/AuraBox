@@ -9,19 +9,19 @@ export declare class EntrepreneursService {
     findOne(id: number): Promise<any>;
     findByEmail(email: string): Promise<{
         id: number;
-        email: string;
-        documentNumber: number;
         firstName: string;
         lastName: string;
+        email: string;
         passwordHash: string;
         documentType: import("@prisma/client").$Enums.DocumentType;
+        documentNumber: number;
         phoneNumber: number | null;
         active: boolean;
-        cuitCuil: number | null;
         registrationDate: Date;
         birthDate: Date | null;
         city: string | null;
         province: string | null;
+        cuitCuil: number | null;
     } | null>;
     update(id: number, dto: UpdateEntrepreneurDto): Promise<any>;
     deactivate(id: number): Promise<any>;

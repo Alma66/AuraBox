@@ -29,6 +29,9 @@ let ClubsController = class ClubsController {
     async create(dto, req) {
         return this.clubsService.create(req.user.id, dto);
     }
+    async findFeatured() {
+        return this.clubsService.findFeatured();
+    }
     async findAll() {
         return this.clubsService.findAll();
     }
@@ -54,6 +57,13 @@ __decorate([
     __metadata("design:paramtypes", [create_club_dto_1.CreateClubDto, Object]),
     __metadata("design:returntype", Promise)
 ], ClubsController.prototype, "create", null);
+__decorate([
+    (0, public_decorator_1.Public)(),
+    (0, common_1.Get)('featured'),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", []),
+    __metadata("design:returntype", Promise)
+], ClubsController.prototype, "findFeatured", null);
 __decorate([
     (0, public_decorator_1.Public)(),
     (0, common_1.Get)(),

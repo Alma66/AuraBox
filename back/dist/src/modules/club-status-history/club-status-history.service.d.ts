@@ -5,58 +5,58 @@ export declare class ClubStatusHistoryService {
     private readonly prisma;
     constructor(prisma: PrismaService);
     create(dto: CreateClubStatusHistoryDto): Promise<{
-        id: number;
         idClub: number;
         idAdmins: number;
         previousStatus: import("@prisma/client").$Enums.ClubStatus;
         newStatus: import("@prisma/client").$Enums.ClubStatus;
         changeDate: boolean;
         changeReason: string | null;
+        id: number;
     }>;
     findAll(): Promise<{
-        id: number;
         idClub: number;
         idAdmins: number;
         previousStatus: import("@prisma/client").$Enums.ClubStatus;
         newStatus: import("@prisma/client").$Enums.ClubStatus;
         changeDate: boolean;
         changeReason: string | null;
+        id: number;
     }[]>;
     findByClub(idClub: number): Promise<{
-        id: number;
         idClub: number;
         idAdmins: number;
         previousStatus: import("@prisma/client").$Enums.ClubStatus;
         newStatus: import("@prisma/client").$Enums.ClubStatus;
         changeDate: boolean;
         changeReason: string | null;
+        id: number;
     }[]>;
     findByAdmin(idAdmins: number): Promise<{
-        id: number;
         idClub: number;
         idAdmins: number;
         previousStatus: import("@prisma/client").$Enums.ClubStatus;
         newStatus: import("@prisma/client").$Enums.ClubStatus;
         changeDate: boolean;
         changeReason: string | null;
+        id: number;
     }[]>;
     findOne(id: number): Promise<{
-        id: number;
         idClub: number;
         idAdmins: number;
         previousStatus: import("@prisma/client").$Enums.ClubStatus;
         newStatus: import("@prisma/client").$Enums.ClubStatus;
         changeDate: boolean;
         changeReason: string | null;
+        id: number;
     }>;
     update(id: number, dto: UpdateClubStatusHistoryDto): Promise<{
-        id: number;
         idClub: number;
         idAdmins: number;
         previousStatus: import("@prisma/client").$Enums.ClubStatus;
         newStatus: import("@prisma/client").$Enums.ClubStatus;
         changeDate: boolean;
         changeReason: string | null;
+        id: number;
     }>;
     remove(id: number): Promise<{
         message: string;

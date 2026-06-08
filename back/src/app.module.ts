@@ -4,7 +4,8 @@ import { JwtModule } from '@nestjs/jwt';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 
-
+import { ConfigModule } from '@nestjs/config';
+import { CloudinaryModule } from './modules/cloudinary/cloudinary.module';
 import { PrismaModule } from './prisma/prisma.module';
 
 import { AdminOrEntrepreneurRoleModule } from './modules/admin-or-entrepreneur-role/admin-or-entrepreneur-role.module';
@@ -44,7 +45,8 @@ import { AllExceptionsFilter } from './common/filters/all-exceptions.filter';
 @Module({
   imports: [
     PrismaModule,
-
+    ConfigModule.forRoot({ isGlobal: true }),
+    CloudinaryModule,
     JwtModule.register({
       global: true,
       secret: process.env.JWT_SECRET || 'superSecretDevKey',

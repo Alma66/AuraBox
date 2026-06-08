@@ -39,8 +39,8 @@ __decorate([
 ], CreateClubStatusHistoryDto.prototype, "newStatus", void 0);
 __decorate([
     (0, class_validator_1.IsOptional)(),
-    (0, class_validator_1.IsBoolean)(),
-    __metadata("design:type", Boolean)
+    (0, class_validator_1.IsString)(),
+    __metadata("design:type", String)
 ], CreateClubStatusHistoryDto.prototype, "changeDate", void 0);
 __decorate([
     (0, class_validator_1.IsOptional)(),

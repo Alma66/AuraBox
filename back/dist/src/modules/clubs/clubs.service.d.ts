@@ -7,6 +7,7 @@ export declare class ClubsService {
     create(ownerId: number, dto: CreateClubDto): Promise<any>;
     findAll(): Promise<any[]>;
     findOne(id: number): Promise<any>;
+    findFeatured(): Promise<any[]>;
     update(id: number, userId: number, userRole: string, dto: UpdateClubDto): Promise<any>;
     remove(id: number, userRole: string): Promise<{
         message: string;
