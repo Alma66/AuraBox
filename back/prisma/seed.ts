@@ -5385,7 +5385,7 @@ for (const club of clubsConEfectivo) {
       idAdmins: admin.id,
       previousStatus: ClubStatus.PENDIENTE_APROBACION,
       newStatus: ClubStatus.APROBADO,
-      changeDate: true,
+      changeDate: new Date('2025-01-15'),
       changeReason: 'Documentación validada correctamente',
     },
   });
@@ -5395,7 +5395,7 @@ for (const club of clubsConEfectivo) {
       idAdmins: admin.id,
       previousStatus: ClubStatus.PENDIENTE_APROBACION,
       newStatus: ClubStatus.APROBADO,
-      changeDate: true,
+      changeDate: new Date('2025-01-15'),
       changeReason: 'Documentación validada correctamente',
     },
   });
@@ -5405,7 +5405,7 @@ for (const club of clubsConEfectivo) {
       idAdmins: admin.id,
       previousStatus: ClubStatus.PENDIENTE_APROBACION,
       newStatus: ClubStatus.APROBADO,
-      changeDate: true,
+      changeDate: new Date('2025-01-15'),
       changeReason: 'Documentación validada correctamente',
     },
   });
@@ -5415,7 +5415,7 @@ for (const club of clubsConEfectivo) {
       idAdmins: admin.id,
       previousStatus: ClubStatus.PENDIENTE_APROBACION,
       newStatus: ClubStatus.APROBADO,
-      changeDate: true,
+      changeDate: new Date('2025-01-15'),
       changeReason: 'Documentación validada correctamente',
     },
   });
@@ -5428,7 +5428,7 @@ for (const club of clubsConEfectivo) {
       idAdmins: admin.id,
       previousStatus: ClubStatus.PENDIENTE_APROBACION,
       newStatus: ClubStatus.APROBADO,
-      changeDate: true,
+      changeDate: new Date('2025-01-15'),
       changeReason: 'Documentación validada correctamente',
     },
   });
@@ -5438,7 +5438,7 @@ for (const club of clubsConEfectivo) {
       idAdmins: admin.id,
       previousStatus: ClubStatus.PENDIENTE_APROBACION,
       newStatus: ClubStatus.APROBADO,
-      changeDate: true,
+      changeDate: new Date('2025-01-15'),
       changeReason: 'Documentación validada correctamente',
     },
   });
@@ -5448,7 +5448,7 @@ for (const club of clubsConEfectivo) {
       idAdmins: admin.id,
       previousStatus: ClubStatus.PENDIENTE_APROBACION,
       newStatus: ClubStatus.APROBADO,
-      changeDate: true,
+      changeDate: new Date('2025-01-15'),
       changeReason: 'Documentación validada correctamente',
     },
   });
@@ -5458,7 +5458,7 @@ for (const club of clubsConEfectivo) {
       idAdmins: admin.id,
       previousStatus: ClubStatus.PENDIENTE_APROBACION,
       newStatus: ClubStatus.APROBADO,
-      changeDate: true,
+      changeDate: new Date('2025-01-15'),
       changeReason: 'Documentación validada correctamente',
     },
   });
@@ -5471,7 +5471,7 @@ for (const club of clubsConEfectivo) {
       idAdmins: admin.id,
       previousStatus: ClubStatus.PENDIENTE_APROBACION,
       newStatus: ClubStatus.APROBADO,
-      changeDate: true,
+      changeDate: new Date('2025-01-15'),
       changeReason: 'Documentación validada correctamente',
     },
   });
@@ -5481,7 +5481,7 @@ for (const club of clubsConEfectivo) {
       idAdmins: admin.id,
       previousStatus: ClubStatus.PENDIENTE_APROBACION,
       newStatus: ClubStatus.APROBADO,
-      changeDate: true,
+      changeDate: new Date('2025-01-15'),
       changeReason: 'Documentación validada correctamente',
     },
   });
@@ -5494,7 +5494,7 @@ for (const club of clubsConEfectivo) {
       idAdmins: admin.id,
       previousStatus: ClubStatus.PENDIENTE_APROBACION,
       newStatus: ClubStatus.APROBADO,
-      changeDate: true,
+      changeDate: new Date('2025-01-15'),
       changeReason: 'Documentación validada correctamente',
     },
   });
@@ -5504,7 +5504,7 @@ for (const club of clubsConEfectivo) {
       idAdmins: admin.id,
       previousStatus: ClubStatus.PENDIENTE_APROBACION,
       newStatus: ClubStatus.APROBADO,
-      changeDate: true,
+      changeDate: new Date('2025-01-15'),
       changeReason: 'Documentación validada correctamente',
     },
   });
@@ -5517,7 +5517,7 @@ for (const club of clubsConEfectivo) {
       idAdmins: admin.id,
       previousStatus: ClubStatus.PENDIENTE_APROBACION,
       newStatus: ClubStatus.APROBADO,
-      changeDate: true,
+      changeDate: new Date('2025-01-15'),
       changeReason: 'Documentación validada correctamente',
     },
   });
@@ -5530,7 +5530,7 @@ for (const club of clubsConEfectivo) {
       idAdmins: admin.id,
       previousStatus: ClubStatus.PENDIENTE_APROBACION,
       newStatus: ClubStatus.APROBADO,
-      changeDate: true,
+      changeDate: new Date('2025-01-15'),
       changeReason: 'Documentación validada correctamente',
     },
   });
@@ -5540,7 +5540,7 @@ for (const club of clubsConEfectivo) {
       idAdmins: admin.id,
       previousStatus: ClubStatus.PENDIENTE_APROBACION,
       newStatus: ClubStatus.APROBADO,
-      changeDate: true,
+      changeDate: new Date('2025-01-15'),
       changeReason: 'Documentación validada correctamente',
     },
   });
@@ -5553,7 +5553,7 @@ for (const club of clubsConEfectivo) {
       idAdmins: admin.id,
       previousStatus: ClubStatus.PENDIENTE_APROBACION,
       newStatus: ClubStatus.APROBADO,
-      changeDate: true,
+      changeDate: new Date('2025-01-15'),
       changeReason: 'Documentación validada correctamente',
     },
   });
@@ -5563,7 +5563,7 @@ for (const club of clubsConEfectivo) {
       idAdmins: admin.id,
       previousStatus: ClubStatus.PENDIENTE_APROBACION,
       newStatus: ClubStatus.APROBADO,
-      changeDate: true,
+      changeDate: new Date('2025-01-15'),
       changeReason: 'Documentación validada correctamente',
     },
   });
@@ -5573,7 +5573,7 @@ for (const club of clubsConEfectivo) {
       idAdmins: admin.id,
       previousStatus: ClubStatus.PENDIENTE_APROBACION,
       newStatus: ClubStatus.APROBADO,
-      changeDate: true,
+      changeDate: new Date('2025-01-15'),
       changeReason: 'Documentación validada correctamente',
     },
   });
@@ -5586,7 +5586,7 @@ for (const club of clubsConEfectivo) {
       idAdmins: admin.id,
       previousStatus: ClubStatus.PENDIENTE_APROBACION,
       newStatus: ClubStatus.APROBADO,
-      changeDate: true,
+      changeDate: new Date('2025-01-15'),
       changeReason: 'Documentación validada correctamente',
     },
   });
@@ -5596,7 +5596,7 @@ for (const club of clubsConEfectivo) {
       idAdmins: admin.id,
       previousStatus: ClubStatus.PENDIENTE_APROBACION,
       newStatus: ClubStatus.APROBADO,
-      changeDate: true,
+      changeDate: new Date('2025-01-15'),
       changeReason: 'Documentación validada correctamente',
     },
   });
@@ -5609,7 +5609,7 @@ for (const club of clubsConEfectivo) {
       idAdmins: admin.id,
       previousStatus: ClubStatus.PENDIENTE_APROBACION,
       newStatus: ClubStatus.APROBADO,
-      changeDate: true,
+      changeDate: new Date('2025-01-15'),
       changeReason: 'Documentación validada correctamente',
     },
   });
@@ -5622,7 +5622,7 @@ for (const club of clubsConEfectivo) {
       idAdmins: admin.id,
       previousStatus: ClubStatus.PENDIENTE_APROBACION,
       newStatus: ClubStatus.APROBADO,
-      changeDate: true,
+      changeDate: new Date('2025-01-15'),
       changeReason: 'Documentación validada correctamente',
     },
   });
@@ -5635,7 +5635,7 @@ for (const club of clubsConEfectivo) {
       idAdmins: admin.id,
       previousStatus: ClubStatus.PENDIENTE_APROBACION,
       newStatus: ClubStatus.APROBADO,
-      changeDate: true,
+      changeDate: new Date('2025-01-15'),
       changeReason: 'Documentación validada correctamente',
     },
   });
@@ -5648,7 +5648,7 @@ for (const club of clubsConEfectivo) {
       idAdmins: admin.id,
       previousStatus: ClubStatus.PENDIENTE_APROBACION,
       newStatus: ClubStatus.APROBADO,
-      changeDate: true,
+      changeDate: new Date('2025-01-15'),
       changeReason: 'Documentación validada correctamente',
     },
   });
@@ -5661,7 +5661,7 @@ for (const club of clubsConEfectivo) {
       idAdmins: admin.id,
       previousStatus: ClubStatus.PENDIENTE_APROBACION,
       newStatus: ClubStatus.APROBADO,
-      changeDate: true,
+      changeDate: new Date('2025-01-15'),
       changeReason: 'Documentación validada correctamente',
     },
   });
@@ -5671,7 +5671,7 @@ for (const club of clubsConEfectivo) {
       idAdmins: admin.id,
       previousStatus: ClubStatus.PENDIENTE_APROBACION,
       newStatus: ClubStatus.APROBADO,
-      changeDate: true,
+      changeDate: new Date('2025-01-15'),
       changeReason: 'Documentación validada correctamente',
     },
   });
@@ -5684,7 +5684,7 @@ for (const club of clubsConEfectivo) {
       idAdmins: admin.id,
       previousStatus: ClubStatus.PENDIENTE_APROBACION,
       newStatus: ClubStatus.APROBADO,
-      changeDate: true,
+      changeDate: new Date('2025-01-15'),
       changeReason: 'Documentación validada correctamente',
     },
   });
@@ -5694,7 +5694,7 @@ for (const club of clubsConEfectivo) {
       idAdmins: admin.id,
       previousStatus: ClubStatus.PENDIENTE_APROBACION,
       newStatus: ClubStatus.APROBADO,
-      changeDate: true,
+      changeDate: new Date('2025-01-15'),
       changeReason: 'Documentación validada correctamente',
     },
   });
@@ -5707,7 +5707,7 @@ for (const club of clubsConEfectivo) {
       idAdmins: admin.id,
       previousStatus: ClubStatus.PENDIENTE_APROBACION,
       newStatus: ClubStatus.APROBADO,
-      changeDate: true,
+      changeDate: new Date('2025-01-15'),
       changeReason: 'Documentación validada correctamente',
     },
   });
@@ -5720,7 +5720,7 @@ for (const club of clubsConEfectivo) {
       idAdmins: admin.id,
       previousStatus: ClubStatus.PENDIENTE_APROBACION,
       newStatus: ClubStatus.APROBADO,
-      changeDate: true,
+      changeDate: new Date('2025-01-15'),
       changeReason: 'Documentación validada correctamente',
     },
   });
@@ -5733,7 +5733,7 @@ for (const club of clubsConEfectivo) {
       idAdmins: admin.id,
       previousStatus: ClubStatus.PENDIENTE_APROBACION,
       newStatus: ClubStatus.APROBADO,
-      changeDate: true,
+      changeDate: new Date('2025-01-15'),
       changeReason: 'Documentación validada correctamente',
     },
   });
@@ -5743,7 +5743,7 @@ for (const club of clubsConEfectivo) {
       idAdmins: admin.id,
       previousStatus: ClubStatus.PENDIENTE_APROBACION,
       newStatus: ClubStatus.APROBADO,
-      changeDate: true,
+      changeDate: new Date('2025-01-15'),
       changeReason: 'Documentación validada correctamente',
     },
   });
@@ -5756,7 +5756,7 @@ for (const club of clubsConEfectivo) {
       idAdmins: admin.id,
       previousStatus: ClubStatus.PENDIENTE_APROBACION,
       newStatus: ClubStatus.APROBADO,
-      changeDate: true,
+      changeDate: new Date('2025-01-15'),
       changeReason: 'Documentación validada correctamente',
     },
   });
@@ -5769,7 +5769,7 @@ for (const club of clubsConEfectivo) {
       idAdmins: admin.id,
       previousStatus: ClubStatus.PENDIENTE_APROBACION,
       newStatus: ClubStatus.APROBADO,
-      changeDate: true,
+      changeDate: new Date('2025-01-15'),
       changeReason: 'Documentación validada correctamente',
     },
   });
@@ -5782,7 +5782,7 @@ for (const club of clubsConEfectivo) {
       idAdmins: admin.id,
       previousStatus: ClubStatus.PENDIENTE_APROBACION,
       newStatus: ClubStatus.APROBADO,
-      changeDate: true,
+      changeDate: new Date('2025-01-15'),
       changeReason: 'Documentación validada correctamente',
     },
   });
@@ -5795,7 +5795,7 @@ for (const club of clubsConEfectivo) {
       idAdmins: admin.id,
       previousStatus: ClubStatus.PENDIENTE_APROBACION,
       newStatus: ClubStatus.APROBADO,
-      changeDate: true,
+      changeDate: new Date('2025-01-15'),
       changeReason: 'Documentación validada correctamente',
     },
   });
@@ -5808,7 +5808,7 @@ for (const club of clubsConEfectivo) {
       idAdmins: admin.id,
       previousStatus: ClubStatus.PENDIENTE_APROBACION,
       newStatus: ClubStatus.APROBADO,
-      changeDate: true,
+      changeDate: new Date('2025-01-15'),
       changeReason: 'Documentación validada correctamente',
     },
   });
@@ -5821,7 +5821,7 @@ for (const club of clubsConEfectivo) {
       idAdmins: admin.id,
       previousStatus: ClubStatus.PENDIENTE_APROBACION,
       newStatus: ClubStatus.APROBADO,
-      changeDate: true,
+      changeDate: new Date('2025-01-15'),
       changeReason: 'Documentación validada correctamente',
     },
   });
@@ -5831,7 +5831,7 @@ for (const club of clubsConEfectivo) {
       idAdmins: admin.id,
       previousStatus: ClubStatus.PENDIENTE_APROBACION,
       newStatus: ClubStatus.APROBADO,
-      changeDate: true,
+      changeDate: new Date('2025-01-15'),
       changeReason: 'Documentación validada correctamente',
     },
   });
@@ -5844,7 +5844,7 @@ for (const club of clubsConEfectivo) {
       idAdmins: admin.id,
       previousStatus: ClubStatus.PENDIENTE_APROBACION,
       newStatus: ClubStatus.APROBADO,
-      changeDate: true,
+      changeDate: new Date('2025-01-15'),
       changeReason: 'Documentación validada correctamente',
     },
   });
@@ -5857,7 +5857,7 @@ for (const club of clubsConEfectivo) {
       idAdmins: admin.id,
       previousStatus: ClubStatus.PENDIENTE_APROBACION,
       newStatus: ClubStatus.APROBADO,
-      changeDate: true,
+      changeDate: new Date('2025-01-15'),
       changeReason: 'Documentación validada correctamente',
     },
   });
@@ -5870,7 +5870,7 @@ for (const club of clubsConEfectivo) {
       idAdmins: admin.id,
       previousStatus: ClubStatus.PENDIENTE_APROBACION,
       newStatus: ClubStatus.APROBADO,
-      changeDate: true,
+      changeDate: new Date('2025-01-15'),
       changeReason: 'Documentación validada correctamente',
     },
   });
@@ -5883,7 +5883,7 @@ for (const club of clubsConEfectivo) {
       idAdmins: admin.id,
       previousStatus: ClubStatus.PENDIENTE_APROBACION,
       newStatus: ClubStatus.APROBADO,
-      changeDate: true,
+      changeDate: new Date('2025-01-15'),
       changeReason: 'Documentación validada correctamente',
     },
   });
@@ -5896,7 +5896,7 @@ for (const club of clubsConEfectivo) {
       idAdmins: admin.id,
       previousStatus: ClubStatus.PENDIENTE_APROBACION,
       newStatus: ClubStatus.APROBADO,
-      changeDate: true,
+      changeDate: new Date('2025-01-15'),
       changeReason: 'Documentación validada correctamente',
     },
   });
@@ -5909,7 +5909,7 @@ for (const club of clubsConEfectivo) {
       idAdmins: admin.id,
       previousStatus: ClubStatus.PENDIENTE_APROBACION,
       newStatus: ClubStatus.APROBADO,
-      changeDate: true,
+      changeDate: new Date('2025-01-15'),
       changeReason: 'Documentación validada correctamente',
     },
   });
@@ -5922,7 +5922,7 @@ for (const club of clubsConEfectivo) {
       idAdmins: admin.id,
       previousStatus: ClubStatus.PENDIENTE_APROBACION,
       newStatus: ClubStatus.APROBADO,
-      changeDate: true,
+      changeDate: new Date('2025-01-15'),
       changeReason: 'Documentación validada correctamente',
     },
   });
@@ -5935,7 +5935,7 @@ for (const club of clubsConEfectivo) {
       idAdmins: admin.id,
       previousStatus: ClubStatus.PENDIENTE_APROBACION,
       newStatus: ClubStatus.APROBADO,
-      changeDate: true,
+      changeDate: new Date('2025-01-15'),
       changeReason: 'Documentación validada correctamente',
     },
   });
