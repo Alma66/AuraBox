@@ -1,0 +1,2 @@
+-- AlterTable
+ALTER TABLE "Entrepreneurs" ALTER COLUMN "CUIT_CUIL" SET DATA TYPE BIGINT;

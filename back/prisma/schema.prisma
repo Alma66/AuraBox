@@ -197,7 +197,7 @@ model Entrepreneurs {
   passwordHash     String   @map("Password_Hash")
   documentType     DocumentType @map("Document_Type")
   documentNumber   Int      @unique @map("Document_Number")
-  cuitCuil         Int?     @unique @map("CUIT_CUIL")
+  cuitCuil         BigInt?     @unique @map("CUIT_CUIL")
   phoneNumber      Int?     @map("Phone_Number")
   registrationDate DateTime @default(now()) @map("Registration_Date")
   birthDate        DateTime? @map("Birth_Date")
