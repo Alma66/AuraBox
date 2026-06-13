@@ -130,9 +130,9 @@ const UserProfileContent: React.FC<UserProfileContentProps> = ({ activeSection, 
     const club = (clubsData as Club[]).find((c) => c.id === subscription.clubId);
     if (!club) return null;
 
-    const plan = club.subscriptionPlans.find(
-      (p: SubscriptionPlan) => p.planId === subscription.planId
-    );
+   const plan = club.subscriptionPlans?.find(
+  (p: SubscriptionPlan) => p.planId === subscription.planId
+);
     const planName = plan ? plan.name : 'Plan Desconocido';
     const planImage = plan ? plan.image : club.mainImage || '/assets/default-club-image.jpg';
 
