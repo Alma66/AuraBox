@@ -1,81 +1,81 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+
+const SETTINGS_KEY = 'aurabox_settings';
+
+interface Settings {
+  emailNotifications: boolean;
+  pushNotifications: boolean;
+  smsNotifications: boolean;
+  language: string;
+  currency: string;
+  personalizationEnabled: boolean;
+  dataSharingEnabled: boolean;
+  hideMatureContent: boolean;
+  preferredCategories: string[];
+  autoRenewSubscriptions: boolean;
+  defaultPaymentMethod: string;
+  highContrastMode: boolean;
+  fontSize: string;
+}
+
+const defaultSettings: Settings = {
+  emailNotifications: true,
+  pushNotifications: true,
+  smsNotifications: false,
+  language: 'es',
+  currency: 'ARS',
+  personalizationEnabled: true,
+  dataSharingEnabled: false,
+  hideMatureContent: false,
+  preferredCategories: ['Libros', 'Café'],
+  autoRenewSubscriptions: true,
+  defaultPaymentMethod: 'MercadoPago',
+  highContrastMode: false,
+  fontSize: 'medium',
+};
 
 const SettingsSection: React.FC = () => {
-  const [emailNotifications, setEmailNotifications] = useState(true);
-  const [pushNotifications, setPushNotifications] = useState(true);
-  const [smsNotifications, setSmsNotifications] = useState(false);
+  const [settings, setSettings] = useState<Settings>(defaultSettings);
+  const [saveSuccess, setSaveSuccess] = useState('');
 
-  const [language, setLanguage] = useState('es');
-  const [currency, setCurrency] = useState('ARS');
+  useEffect(() => {
+    const stored = localStorage.getItem(SETTINGS_KEY);
+    if (stored) {
+      try { setSettings({ ...defaultSettings, ...JSON.parse(stored) }); } catch {}
+    }
+  }, []);
 
-  const [personalizationEnabled, setPersonalizationEnabled] = useState(true);
-  const [dataSharingEnabled, setDataSharingEnabled] = useState(false);
-
-  const [hideMatureContent, setHideMatureContent] = useState(false);
-  const [preferredCategories, setPreferredCategories] = useState<string[]>(['Libros', 'Café']);
-
-  const [autoRenewSubscriptions, setAutoRenewSubscriptions] = useState(true);
-  const [defaultPaymentMethod, setDefaultPaymentMethod] = useState('MercadoPago');
-
-  const [highContrastMode, setHighContrastMode] = useState(false);
-  const [fontSize, setFontSize] = useState('medium');
+  const set = <K extends keyof Settings>(key: K, value: Settings[K]) => {
+    setSettings(prev => ({ ...prev, [key]: value }));
+  };
 
   const handleSaveChanges = () => {
-    console.log('Configuración guardada:', {
-      emailNotifications,
-      pushNotifications,
-      smsNotifications,
-      language,
-      currency,
-      personalizationEnabled,
-      dataSharingEnabled,
-      hideMatureContent,
-      preferredCategories,
-      autoRenewSubscriptions,
-      defaultPaymentMethod,
-      highContrastMode,
-      fontSize,
-    });
-    alert('¡Configuración guardada con éxito!');
+    localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings));
+    setSaveSuccess('¡Configuración guardada con éxito!');
+    setTimeout(() => setSaveSuccess(''), 3000);
   };
 
   return (
     <div className="space-y-8 p-4">
       <h2 className="text-2xl font-bold text-gray-800 mb-6">Configuración</h2>
 
+      {saveSuccess && <p className="text-green-600 bg-green-50 p-2 rounded text-sm">{saveSuccess}</p>}
+
       <div className="bg-white p-6 rounded-lg shadow-md">
         <h3 className="text-xl font-semibold text-gray-800 mb-4">Notificaciones</h3>
         <div className="space-y-4">
-          <div className="flex items-center justify-between">
-            <label htmlFor="emailNotifications" className="text-gray-700">Notificaciones por Email</label>
-            <input
-              type="checkbox"
-              id="emailNotifications"
-              checked={emailNotifications}
-              onChange={(e) => setEmailNotifications(e.target.checked)}
-              className="h-5 w-5 text-blue-600 rounded focus:ring-blue-500"
-            />
-          </div>
-          <div className="flex items-center justify-between">
-            <label htmlFor="pushNotifications" className="text-gray-700">Notificaciones Push (App)</label>
-            <input
-              type="checkbox"
-              id="pushNotifications"
-              checked={pushNotifications}
-              onChange={(e) => setPushNotifications(e.target.checked)}
-              className="h-5 w-5 text-blue-600 rounded focus:ring-blue-500"
-            />
-          </div>
-          <div className="flex items-center justify-between">
-            <label htmlFor="smsNotifications" className="text-gray-700">Notificaciones por SMS</label>
-            <input
-              type="checkbox"
-              id="smsNotifications"
-              checked={smsNotifications}
-              onChange={(e) => setSmsNotifications(e.target.checked)}
-              className="h-5 w-5 text-blue-600 rounded focus:ring-blue-500"
-            />
-          </div>
+          {([
+            ['emailNotifications', 'Notificaciones por Email'],
+            ['pushNotifications', 'Notificaciones Push (App)'],
+            ['smsNotifications', 'Notificaciones por SMS'],
+          ] as [keyof Settings, string][]).map(([key, label]) => (
+            <div key={key} className="flex items-center justify-between">
+              <label htmlFor={key} className="text-gray-700">{label}</label>
+              <input type="checkbox" id={key} checked={settings[key] as boolean}
+                onChange={(e) => set(key, e.target.checked)}
+                className="h-5 w-5 text-blue-600 rounded focus:ring-blue-500" />
+            </div>
+          ))}
         </div>
       </div>
 
@@ -84,12 +84,8 @@ const SettingsSection: React.FC = () => {
         <div className="space-y-4">
           <div>
             <label htmlFor="language" className="block text-gray-700 text-sm font-medium mb-1">Idioma de la Interfaz</label>
-            <select
-              id="language"
-              value={language}
-              onChange={(e) => setLanguage(e.target.value)}
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
-            >
+            <select id="language" value={settings.language} onChange={(e) => set('language', e.target.value)}
+              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm">
               <option value="es">Español (Argentina)</option>
               <option value="en">English (US)</option>
               <option value="pt">Português (Brasil)</option>
@@ -97,12 +93,8 @@ const SettingsSection: React.FC = () => {
           </div>
           <div>
             <label htmlFor="currency" className="block text-gray-700 text-sm font-medium mb-1">Moneda Preferida</label>
-            <select
-              id="currency"
-              value={currency}
-              onChange={(e) => setCurrency(e.target.value)}
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
-            >
+            <select id="currency" value={settings.currency} onChange={(e) => set('currency', e.target.value)}
+              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm">
               <option value="ARS">ARS - Pesos Argentinos</option>
               <option value="USD">USD - Dólares Estadounidenses</option>
               <option value="BRL">BRL - Reales Brasileños</option>
@@ -114,26 +106,17 @@ const SettingsSection: React.FC = () => {
       <div className="bg-white p-6 rounded-lg shadow-md">
         <h3 className="text-xl font-semibold text-gray-800 mb-4">Privacidad de Datos</h3>
         <div className="space-y-4">
-          <div className="flex items-center justify-between">
-            <label htmlFor="personalizationEnabled" className="text-gray-700">Habilitar Personalización (recomendaciones, ofertas)</label>
-            <input
-              type="checkbox"
-              id="personalizationEnabled"
-              checked={personalizationEnabled}
-              onChange={(e) => setPersonalizationEnabled(e.target.checked)}
-              className="h-5 w-5 text-blue-600 rounded focus:ring-blue-500"
-            />
-          </div>
-          <div className="flex items-center justify-between">
-            <label htmlFor="dataSharingEnabled" className="text-gray-700">Compartir Datos Anónimos para Mejoras</label>
-            <input
-              type="checkbox"
-              id="dataSharingEnabled"
-              checked={dataSharingEnabled}
-              onChange={(e) => setDataSharingEnabled(e.target.checked)}
-              className="h-5 w-5 text-blue-600 rounded focus:ring-blue-500"
-            />
-          </div>
+          {([
+            ['personalizationEnabled', 'Habilitar Personalización (recomendaciones, ofertas)'],
+            ['dataSharingEnabled', 'Compartir Datos Anónimos para Mejoras'],
+          ] as [keyof Settings, string][]).map(([key, label]) => (
+            <div key={key} className="flex items-center justify-between">
+              <label htmlFor={key} className="text-gray-700">{label}</label>
+              <input type="checkbox" id={key} checked={settings[key] as boolean}
+                onChange={(e) => set(key, e.target.checked)}
+                className="h-5 w-5 text-blue-600 rounded focus:ring-blue-500" />
+            </div>
+          ))}
         </div>
       </div>
 
@@ -141,39 +124,21 @@ const SettingsSection: React.FC = () => {
         <h3 className="text-xl font-semibold text-gray-800 mb-4">Contenido y Preferencias</h3>
         <div className="space-y-4">
           <div className="flex items-center justify-between">
-            <label htmlFor="hideMatureContent" className="text-gray-700">Ocultar Contenido para Adultos (si aplica)</label>
-            <input
-              type="checkbox"
-              id="hideMatureContent"
-              checked={hideMatureContent}
-              onChange={(e) => setHideMatureContent(e.target.checked)}
-              className="h-5 w-5 text-blue-600 rounded focus:ring-blue-500"
-            />
+            <label htmlFor="hideMatureContent" className="text-gray-700">Ocultar Contenido para Adultos</label>
+            <input type="checkbox" id="hideMatureContent" checked={settings.hideMatureContent}
+              onChange={(e) => set('hideMatureContent', e.target.checked)}
+              className="h-5 w-5 text-blue-600 rounded focus:ring-blue-500" />
           </div>
           <div>
-            <label htmlFor="preferredCategories" className="block text-gray-700 text-sm font-medium mb-1">Categorías de Interés (para recomendaciones)</label>
-            <select
-              id="preferredCategories"
-              multiple
-              value={preferredCategories}
-              onChange={(e) =>
-                setPreferredCategories(
-                  Array.from(e.target.selectedOptions, (option) => option.value)
-                )
-              }
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm h-24"
-            >
-              <option value="Libros">Libros</option>
-              <option value="Café">Café</option>
-              <option value="Vinos">Vinos</option>
-              <option value="Quesos">Quesos</option>
-              <option value="Belleza">Belleza</option>
-              <option value="Plantas">Plantas</option>
-              <option value="Mascotas">Mascotas</option>
-              <option value="Gourmet">Gourmet</option>
-              <option value="Arte">Arte</option>
+            <label htmlFor="preferredCategories" className="block text-gray-700 text-sm font-medium mb-1">Categorías de Interés</label>
+            <select id="preferredCategories" multiple value={settings.preferredCategories}
+              onChange={(e) => set('preferredCategories', Array.from(e.target.selectedOptions, o => o.value))}
+              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm h-24">
+              {['Libros','Café','Vinos','Quesos','Belleza','Plantas','Mascotas','Gourmet','Arte'].map(cat => (
+                <option key={cat} value={cat}>{cat}</option>
+              ))}
             </select>
-            <p className="text-xs text-gray-500 mt-1">Mantén Ctrl/Cmd para seleccionar múltiples.</p>
+            <p className="text-xs text-gray-500 mt-1">Mantené Ctrl/Cmd para seleccionar múltiples.</p>
           </div>
         </div>
       </div>
@@ -183,25 +148,18 @@ const SettingsSection: React.FC = () => {
         <div className="space-y-4">
           <div className="flex items-center justify-between">
             <label htmlFor="autoRenewSubscriptions" className="text-gray-700">Renovar Suscripciones Automáticamente</label>
-            <input
-              type="checkbox"
-              id="autoRenewSubscriptions"
-              checked={autoRenewSubscriptions}
-              onChange={(e) => setAutoRenewSubscriptions(e.target.checked)}
-              className="h-5 w-5 text-blue-600 rounded focus:ring-blue-500"
-            />
+            <input type="checkbox" id="autoRenewSubscriptions" checked={settings.autoRenewSubscriptions}
+              onChange={(e) => set('autoRenewSubscriptions', e.target.checked)}
+              className="h-5 w-5 text-blue-600 rounded focus:ring-blue-500" />
           </div>
           <div>
             <label htmlFor="defaultPaymentMethod" className="block text-gray-700 text-sm font-medium mb-1">Método de Pago por Defecto</label>
-            <select
-              id="defaultPaymentMethod"
-              value={defaultPaymentMethod}
-              onChange={(e) => setDefaultPaymentMethod(e.target.value)}
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
-            >
+            <select id="defaultPaymentMethod" value={settings.defaultPaymentMethod}
+              onChange={(e) => set('defaultPaymentMethod', e.target.value)}
+              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm">
               <option value="MercadoPago">MercadoPago</option>
               <option value="CreditCard">Tarjeta de Crédito/Débito</option>
-              <option value="PayPal">PayPal (si aplica)</option>
+              <option value="PayPal">PayPal</option>
             </select>
           </div>
         </div>
@@ -212,22 +170,14 @@ const SettingsSection: React.FC = () => {
         <div className="space-y-4">
           <div className="flex items-center justify-between">
             <label htmlFor="highContrastMode" className="text-gray-700">Modo de Alto Contraste</label>
-            <input
-              type="checkbox"
-              id="highContrastMode"
-              checked={highContrastMode}
-              onChange={(e) => setHighContrastMode(e.target.checked)}
-              className="h-5 w-5 text-blue-600 rounded focus:ring-blue-500"
-            />
+            <input type="checkbox" id="highContrastMode" checked={settings.highContrastMode}
+              onChange={(e) => set('highContrastMode', e.target.checked)}
+              className="h-5 w-5 text-blue-600 rounded focus:ring-blue-500" />
           </div>
           <div>
             <label htmlFor="fontSize" className="block text-gray-700 text-sm font-medium mb-1">Tamaño de Fuente</label>
-            <select
-              id="fontSize"
-              value={fontSize}
-              onChange={(e) => setFontSize(e.target.value)}
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
-            >
+            <select id="fontSize" value={settings.fontSize} onChange={(e) => set('fontSize', e.target.value)}
+              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm">
               <option value="small">Pequeño</option>
               <option value="medium">Mediano</option>
               <option value="large">Grande</option>
@@ -236,10 +186,8 @@ const SettingsSection: React.FC = () => {
         </div>
       </div>
 
-      <button
-        onClick={handleSaveChanges}
-        className="mt-6 bg-green-600 text-white px-6 py-3 rounded-md hover:bg-green-700 transition-colors duration-200 font-semibold"
-      >
+      <button onClick={handleSaveChanges}
+        className="mt-6 bg-green-600 text-white px-6 py-3 rounded-md hover:bg-green-700 transition-colors duration-200 font-semibold">
         Guardar Cambios
       </button>
     </div>

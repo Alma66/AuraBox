@@ -300,6 +300,7 @@ const UserProfileContent: React.FC<UserProfileContentProps> = ({ activeSection, 
               details={user.addressDetails || user.details || ''}
               onSave={handleSaveLocation}
               isEntrepreneurProfile={false}
+              userRole="customer"
             />
           </div>
         );

@@ -251,6 +251,7 @@ const EntrepreneurProfileContent: React.FC<EntrepreneurProfileContentProps> = ({
               details={user.details || ''}
               onSave={handleSaveLocation}
               isEntrepreneurProfile={true}
+              userRole="entrepreneur"
             />
           </div>
         );
