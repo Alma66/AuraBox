@@ -1,5 +1,4 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
 
 interface ExploreClubCardProps {
   id: string;
@@ -12,31 +11,43 @@ interface ExploreClubCardProps {
 }
 
 const ExploreClubCard: React.FC<ExploreClubCardProps> = ({
-  id,
   name,
-  category,
-  description,
   image,
   rating,
-  reviewsCount,
 }) => {
+  const displayRating = rating ? rating.toFixed(1) : '—';
+
   return (
-    <Link to={`/club/${id}`} className="block">
-      <div className="bg-white rounded-xl shadow-lg overflow-hidden transform transition-transform duration-300 hover:scale-105 hover:shadow-xl cursor-pointer h-full flex flex-col">
-        <img src={image} alt={name} className="w-full h-48 object-cover" />
-        <div className="p-6 flex flex-col flex-grow">
-          <span className="inline-block bg-purple-100 text-purple-800 text-xs font-semibold px-2.5 py-0.5 rounded-full mb-2 self-start">
-            {category}
-          </span>
-          <h3 className="font-bold text-xl text-gray-900 mb-2 line-clamp-2">{name}</h3>
-          <p className="text-gray-600 text-sm mb-4 line-clamp-3 flex-grow">{description}</p>
-          <div className="flex items-center mt-auto">
-            <span className="text-yellow-500 font-bold text-lg mr-1">{rating}</span>
-            <span className="text-gray-500 text-sm">({reviewsCount} reseñas)</span>
-          </div>
+    <div className="group relative aspect-square w-full overflow-hidden rounded-xl shadow-md
+                    bg-gray-100 cursor-pointer transition-all duration-300 hover:shadow-2xl">
+      {/* Imagen / Logo de fondo */}
+      <img
+        src={image}
+        alt={name}
+        className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+      />
+
+      {/* Overlay oscuro inferior siempre visible (estilo IG) */}
+      <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent p-3 pt-10">
+        <h3 className="text-white font-bold text-base truncate">{name}</h3>
+        <div className="flex items-center gap-1 mt-1">
+          <span className="text-yellow-400 text-sm">⭐</span>
+          <span className="text-white text-sm font-semibold">{displayRating}</span>
         </div>
       </div>
-    </Link>
+
+      {/* Overlay completo en hover con botón */}
+      <div className="absolute inset-0 bg-black/0 group-hover:bg-black/50 transition-colors duration-300
+                      flex items-center justify-center">
+        <button
+          className="opacity-0 group-hover:opacity-100 translate-y-2 group-hover:translate-y-0
+                     transition-all duration-300 bg-white text-gray-900 font-semibold
+                     px-5 py-2 rounded-full shadow-lg hover:bg-purple-600 hover:text-white"
+        >
+          Ver Club
+        </button>
+      </div>
+    </div>
   );
 };
 

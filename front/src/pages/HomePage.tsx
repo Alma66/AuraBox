@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import ClubCard from '../components/club/ClubCard';
 import HeroBanner from '../components/shared/HeroBanner';
 import AlternatingContent from '../components/shared/AlternatingContent';
 import TestimonialCard from '../components/shared/TestimonialCard';
@@ -42,6 +41,50 @@ const testimonialsData = [
   },
 ];
 
+/* ---------- Card de Club Destacado ---------- */
+interface FeaturedClubCardProps {
+  id: string | number;
+  name: string;
+  slogan?: string;
+  logoUrl?: string;
+  averageRating?: number | null;
+}
+
+const FeaturedClubCard: React.FC<FeaturedClubCardProps> = ({ id, name, slogan, logoUrl, averageRating }) => {
+  const rating = averageRating ? Number(averageRating).toFixed(1) : '—';
+
+  return (
+    <Link
+      to={`/club/${id}`}
+      className="group block bg-white rounded-2xl shadow-md hover:shadow-2xl border border-gray-100
+                 transition-all duration-300 hover:-translate-y-2 p-6 text-center h-full"
+    >
+      <div className="flex justify-center mb-4">
+        <div className="w-24 h-24 rounded-full overflow-hidden border-4 border-purple-100
+                        group-hover:border-purple-300 transition-colors duration-300 shadow-sm">
+          <img
+            src={logoUrl || '/assets/default-club.jpg'}
+            alt={name}
+            className="w-full h-full object-cover"
+          />
+        </div>
+      </div>
+
+      <h3 className="text-xl font-bold text-gray-900 mb-1 truncate">{name}</h3>
+
+      <p className="text-gray-500 text-sm mb-4 italic min-h-[2.5rem] line-clamp-2">
+        {slogan ? `"${slogan}"` : ''}
+      </p>
+
+      <div className="inline-flex items-center gap-1 bg-yellow-50 text-yellow-600 font-semibold
+                      px-3 py-1 rounded-full text-sm">
+        <span>⭐</span>
+        <span>{rating}</span>
+      </div>
+    </Link>
+  );
+};
+
 const HomePage: React.FC = () => {
   const [featuredClubs, setFeaturedClubs] = useState<Club[]>([]);
   const [loading, setLoading] = useState(true);
@@ -60,28 +103,6 @@ const HomePage: React.FC = () => {
     };
     fetchFeatured();
   }, []);
-
-  const clubsForCarousel: Club[] = featuredClubs.length > 0 && featuredClubs.length < 4
-    ? [...featuredClubs, ...featuredClubs, ...featuredClubs]
-    : featuredClubs;
-
-  const slidesToShow = Math.min(featuredClubs.length || 1, 3);
-
-  const clubCarouselSettings = {
-    dots: true,
-    infinite: true,
-    speed: 500,
-    slidesToShow: slidesToShow,
-    slidesToScroll: 1,
-    autoplay: true,
-    autoplaySpeed: 3000,
-    pauseOnHover: true,
-    responsive: [
-      { breakpoint: 1280, settings: { slidesToShow: Math.min(slidesToShow, 3) } },
-      { breakpoint: 1024, settings: { slidesToShow: Math.min(slidesToShow, 2) } },
-      { breakpoint: 768, settings: { slidesToShow: 1 } }
-    ]
-  };
 
   const testimonialCarouselSettings = {
     dots: true,
@@ -109,27 +130,32 @@ const HomePage: React.FC = () => {
       />
       <div className="container mx-auto px-4 py-8 flex-grow">
         <section className="mb-16">
-          <h2 className="text-4xl font-bold text-gray-800 mb-10 text-center animate-fadeInUp">Clubes Destacados</h2>
+          <h2 className="text-4xl font-bold text-gray-800 mb-2 text-center animate-fadeInUp">
+            Clubes Destacados
+          </h2>
+          <p className="text-center text-gray-500 mb-10">
+            Los clubes mejor calificados por nuestra comunidad
+          </p>
+
           {loading ? (
             <div className="text-center py-8">Cargando clubes...</div>
           ) : featuredClubs.length === 0 ? (
-            <div className="text-center py-8 text-gray-500">No hay clubes destacados disponibles aún.</div>
+            <div className="text-center py-8 text-gray-500">
+              No hay clubes destacados disponibles aún.
+            </div>
           ) : (
-            <Slider {...clubCarouselSettings}>
-              {clubsForCarousel.map((club: Club, index: number) => (
-                <div key={`${club.id}-${index}`} className="px-2">
-                  <ClubCard
-                    id={String(club.id)}
-                    name={club.name}
-                    category={club.category || ''}
-                    description={club.shortDescription || ''}
-                    image={club.logoUrl || '/assets/default-club.jpg'}
-                    rating={club.averageRating || 0}
-                    reviewsCount={club.totalReviews || 0}
-                  />
-                </div>
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-6">
+              {featuredClubs.map((club) => (
+                <FeaturedClubCard
+                  key={club.id}
+                  id={club.id}
+                  name={club.name}
+                  slogan={club.slogan}
+                  logoUrl={club.logoUrl}
+                  averageRating={club.averageRating}
+                />
               ))}
-            </Slider>
+            </div>
           )}
         </section>
 

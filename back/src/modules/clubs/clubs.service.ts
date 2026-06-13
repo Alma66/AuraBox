@@ -108,7 +108,7 @@ export class ClubsService {
       if (b.averageRating !== a.averageRating) return b.averageRating - a.averageRating;
       return b.totalReviews - a.totalReviews;
     });
-    return sorted.slice(0, 3).map(sanitizeClub);
+    return sorted.slice(0, 5).map(sanitizeClub);
   }
 
   async update(id: number, userId: number, userRole: string, dto: UpdateClubDto) {
