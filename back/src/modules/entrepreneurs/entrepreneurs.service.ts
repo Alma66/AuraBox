@@ -1,4 +1,4 @@
-import { Injectable, ConflictException, NotFoundException } from '@nestjs/common';
+import { Injectable, ConflictException, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
 import { CreateEntrepreneurDto } from './dto/create-entrepreneurs.dto';
 import { UpdateEntrepreneurDto } from './dto/update-entrepreneurs.dto';
@@ -6,9 +6,13 @@ import * as bcrypt from 'bcryptjs';
 
 function sanitize(entrepreneur: any) {
   if (!entrepreneur) return entrepreneur;
-  if (entrepreneur.registrationDate instanceof Date) entrepreneur.registrationDate = entrepreneur.registrationDate.toISOString();
-  if (entrepreneur.birthDate instanceof Date) entrepreneur.birthDate = entrepreneur.birthDate.toISOString();
-  return entrepreneur;
+  const { passwordHash, ...rest } = entrepreneur;
+  if (rest.registrationDate instanceof Date) rest.registrationDate = rest.registrationDate.toISOString();
+  if (rest.birthDate instanceof Date) rest.birthDate = rest.birthDate.toISOString();
+  if (rest.cuitCuil !== undefined && rest.cuitCuil !== null) {
+    rest.cuitCuil = rest.cuitCuil.toString();
+  }
+  return rest;
 }
 
 @Injectable()
@@ -20,9 +24,7 @@ export class EntrepreneursService {
       where: { OR: [{ email: dto.email }, { documentNumber: dto.documentNumber }] },
     });
     if (exists) throw new ConflictException('Email o documento ya registrado');
-
     const passwordHash = await bcrypt.hash(dto.password, 10);
-
     const created = await this.prisma.entrepreneurs.create({
       data: {
         firstName: dto.firstName,
@@ -44,9 +46,7 @@ export class EntrepreneursService {
   }
 
   async findAll() {
-    const entrepreneurs = await this.prisma.entrepreneurs.findMany({
-      orderBy: { id: 'asc' },
-    });
+    const entrepreneurs = await this.prisma.entrepreneurs.findMany({ orderBy: { id: 'asc' } });
     return entrepreneurs.map(sanitize);
   }
 
@@ -63,39 +63,34 @@ export class EntrepreneursService {
   async update(id: number, dto: UpdateEntrepreneurDto) {
     const entrepreneur = await this.prisma.entrepreneurs.findUnique({ where: { id } });
     if (!entrepreneur) throw new NotFoundException('Emprendedor no encontrado');
-
-    if ((dto as any).password) {
-      (dto as any).passwordHash = await bcrypt.hash((dto as any).password, 10);
-      delete (dto as any).password;
-    }
-
     const data: any = { ...dto };
-    if (data.birthDate) {
-      data.birthDate = new Date(data.birthDate);
+    if (data.password) {
+      data.passwordHash = await bcrypt.hash(data.password, 10);
+      delete data.password;
     }
-
-    const updated = await this.prisma.entrepreneurs.update({
-      where: { id },
-      data,
-    });
+    if (data.birthDate) data.birthDate = new Date(data.birthDate);
+    const updated = await this.prisma.entrepreneurs.update({ where: { id }, data });
     return sanitize(updated);
+  }
+
+  async verifyPassword(id: number, password: string) {
+    const ent = await this.prisma.entrepreneurs.findUnique({ where: { id } });
+    if (!ent) throw new NotFoundException('Emprendedor no encontrado');
+    const ok = await bcrypt.compare(password, ent.passwordHash);
+    if (!ok) throw new UnauthorizedException('Contraseña incorrecta');
+    return { ok: true };
   }
 
   async deactivate(id: number) {
     const entrepreneur = await this.prisma.entrepreneurs.findUnique({ where: { id } });
     if (!entrepreneur) throw new NotFoundException('Emprendedor no encontrado');
-
-    const updated = await this.prisma.entrepreneurs.update({
-      where: { id },
-      data: { active: false },
-    });
+    const updated = await this.prisma.entrepreneurs.update({ where: { id }, data: { active: false } });
     return sanitize(updated);
   }
 
   async remove(id: number) {
     const entrepreneur = await this.prisma.entrepreneurs.findUnique({ where: { id } });
     if (!entrepreneur) throw new NotFoundException('Emprendedor no encontrado');
-
     await this.prisma.entrepreneurs.delete({ where: { id } });
     return { message: 'Emprendedor eliminado correctamente' };
   }

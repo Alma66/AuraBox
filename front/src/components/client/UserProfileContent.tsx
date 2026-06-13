@@ -11,6 +11,7 @@ import EditPhoneField from '../common/EditPhoneField';
 import SettingsSection from '../common/SettingsSection';
 import { User } from '../../types/user';
 import rawSubscriptionsData from '../../data/subscriptions.json';
+import api, { getResponseData } from '../../api/config';
 
 const subscriptionsData: Subscription[] = rawSubscriptionsData as Subscription[];
 
@@ -43,19 +44,21 @@ interface LocationData {
 interface UserProfileContentProps {
   activeSection: string;
   user: User;
+  onUserUpdate: () => void;
 }
 
-const UserProfileContent: React.FC<UserProfileContentProps> = ({ activeSection, user }) => {
+const UserProfileContent: React.FC<UserProfileContentProps> = ({ activeSection, user, onUserUpdate }) => {
   const [userSubscriptions, setUserSubscriptions] = useState<Subscription[]>([]);
   const [selectedSubscriptionId, setSelectedSubscriptionId] = useState<string | null>(null);
-  const [selectedSubscriptionDetails, setSelectedSubscriptionDetails] =
-    useState<ClientSubscriptionDetail | null>(null);
+  const [selectedSubscriptionDetails, setSelectedSubscriptionDetails] = useState<ClientSubscriptionDetail | null>(null);
 
   const [isEditingName, setIsEditingName] = useState(false);
   const [editedFirstName, setEditedFirstName] = useState(user.firstName || '');
   const [editedLastName, setEditedLastName] = useState(user.lastName || '');
+
   const [isEditingGender, setIsEditingGender] = useState(false);
   const [editedGender, setEditedGender] = useState(user.gender || '');
+
   const [isEditingBirthDate, setIsEditingBirthDate] = useState(false);
   const [editedBirthDate, setEditedBirthDate] = useState(user.birthDate || '');
 
@@ -63,17 +66,25 @@ const UserProfileContent: React.FC<UserProfileContentProps> = ({ activeSection, 
   const [profilePassword, setProfilePassword] = useState('');
   const [profilePasswordError, setProfilePasswordError] = useState('');
 
+  const [saveError, setSaveError] = useState('');
+  const [saveSuccess, setSaveSuccess] = useState('');
+
   useEffect(() => {
     setEditedFirstName(user.firstName || '');
     setEditedLastName(user.lastName || '');
     setEditedGender(user.gender || '');
     setEditedBirthDate(user.birthDate || '');
+    setShowSensitiveProfileInfo(false);
+    setProfilePassword('');
+    setProfilePasswordError('');
+    setSaveError('');
+    setSaveSuccess('');
 
     const filteredSubscriptions = subscriptionsData.filter(
       (sub) => sub.userId === user.id && sub.status === 'active'
     );
     setUserSubscriptions(filteredSubscriptions);
-  }, [user]);
+  }, [user, activeSection]);
 
   useEffect(() => {
     if (selectedSubscriptionId) {
@@ -86,196 +97,170 @@ const UserProfileContent: React.FC<UserProfileContentProps> = ({ activeSection, 
     }
   }, [selectedSubscriptionId]);
 
-  const handleViewSubscription = (subId: string) => {
-    setSelectedSubscriptionId(subId);
+  const showFeedback = (success?: string, error?: string) => {
+    setSaveSuccess(success || '');
+    setSaveError(error || '');
+    if (success) setTimeout(() => setSaveSuccess(''), 3000);
   };
 
-  const handleBackToSubscriptions = () => {
-    setSelectedSubscriptionId(null);
-    setSelectedSubscriptionDetails(null);
-  };
-
-  const handleSaveName = () => {
-    const newFirstName = editedFirstName.trim();
-    const newLastName = editedLastName.trim();
-    console.log('Nombre y Apellido guardados:', newFirstName, newLastName);
-    setIsEditingName(false);
+  const handleSaveName = async () => {
+    try {
+      await api.patch('/users/me', {
+        firstName: editedFirstName.trim(),
+        lastName: editedLastName.trim(),
+      });
+      setIsEditingName(false);
+      showFeedback('Nombre guardado correctamente');
+      onUserUpdate();
+    } catch {
+      showFeedback(undefined, 'Error al guardar el nombre');
+    }
   };
 
   const handleSaveGender = (newGender: string) => {
-    console.log('Género guardado:', newGender);
+    // gender no está en el schema actual — se guarda localmente
     setEditedGender(newGender);
     setIsEditingGender(false);
   };
 
-  const handleSaveBirthDate = () => {
-    console.log('Fecha de Nacimiento guardada:', editedBirthDate);
-    setIsEditingBirthDate(false);
+  const handleSaveBirthDate = async () => {
+    try {
+      await api.patch('/users/me', { birthDate: editedBirthDate });
+      setIsEditingBirthDate(false);
+      showFeedback('Fecha de nacimiento guardada');
+      onUserUpdate();
+    } catch {
+      showFeedback(undefined, 'Error al guardar la fecha');
+    }
   };
 
-  const handleSavePhoneNumber = (newNumber: string) => {
-    console.log('Número de teléfono guardado:', newNumber);
+  const handleSavePhoneNumber = async (newNumber: string) => {
+    try {
+      await api.patch('/users/me', { phoneNumber: newNumber ? parseInt(newNumber) : null });
+      showFeedback('Teléfono guardado correctamente');
+      onUserUpdate();
+    } catch {
+      showFeedback(undefined, 'Error al guardar el teléfono');
+    }
   };
 
-  const handleProfilePasswordCheck = () => {
-    if (profilePassword === 'password123') {
+  const handleProfilePasswordCheck = async () => {
+    try {
+      await api.post('/users/me/verify-password', { password: profilePassword });
       setShowSensitiveProfileInfo(true);
       setProfilePasswordError('');
-    } else {
+    } catch {
       setProfilePasswordError('Contraseña incorrecta. Intenta de nuevo.');
+    }
+  };
+
+  const handleSaveLocation = async (locationData: LocationData) => {
+    try {
+      await api.patch('/users/me', {
+        streetAddress: locationData.street,
+        addressNumber: locationData.streetNumber ? parseInt(locationData.streetNumber) : null,
+        floorNumber: locationData.floor,
+        addressDetails: locationData.details,
+        city: locationData.city,
+        province: locationData.locality || locationData.city,
+        postalCode: locationData.postalCode,
+      });
+      showFeedback('Ubicación guardada correctamente');
+      onUserUpdate();
+    } catch {
+      showFeedback(undefined, 'Error al guardar la ubicación');
     }
   };
 
   const renderSubscriptionCard = (subscription: Subscription) => {
     const club = (clubsData as Club[]).find((c) => c.id === subscription.clubId);
     if (!club) return null;
-
-   const plan = club.subscriptionPlans?.find(
-  (p: SubscriptionPlan) => p.planId === subscription.planId
-);
+    const plan = club.subscriptionPlans?.find((p: SubscriptionPlan) => p.planId === subscription.planId);
     const planName = plan ? plan.name : 'Plan Desconocido';
     const planImage = plan ? plan.image : club.mainImage || '/assets/default-club-image.jpg';
-
     return (
-      <div
-        key={subscription.id}
-        className="bg-gray-50 rounded-lg shadow-md p-4 flex flex-col items-center text-center transition-transform duration-200 hover:scale-105"
-      >
-        <img
-          src={planImage}
-          alt={planName}
-          className="w-32 h-32 object-cover rounded-full mb-4 border-2 border-blue-300"
-        />
+      <div key={subscription.id} className="bg-gray-50 rounded-lg shadow-md p-4 flex flex-col items-center text-center transition-transform duration-200 hover:scale-105">
+        <img src={planImage} alt={planName} className="w-32 h-32 object-cover rounded-full mb-4 border-2 border-blue-300" />
         <h3 className="text-xl font-semibold text-gray-800 mb-1">{club.name}</h3>
         <p className="text-md text-gray-600 mb-2">{planName}</p>
         <p className="text-sm text-gray-500">Desde: {new Date(subscription.startDate).toLocaleDateString()}</p>
-        <button
-          onClick={() => handleViewSubscription(subscription.id)}
-          className="mt-4 bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors duration-200"
-        >
+        <button onClick={() => setSelectedSubscriptionId(subscription.id)} className="mt-4 bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors duration-200">
           Ver Suscripción
         </button>
       </div>
     );
   };
 
-  const renderBoxContentDetails = (details: BoxContentDetail) => {
-    return (
-      <div key={details.month} className="bg-gray-100 p-4 rounded-lg shadow-sm mb-4">
-        <h4 className="text-lg font-semibold text-gray-800 mb-2">Caja de {details.month}</h4>
-        <p className="text-gray-700 mb-2">Contenido: {details.boxContent}</p>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div>
-            <h5 className="font-medium text-gray-700 mb-1">Detalles Generales:</h5>
-            <ul className="list-disc list-inside text-gray-600">
-              {details.details.generic.map((item, idx) => (
-                <li key={idx}>
-                  <strong>{item.label}:</strong> {item.value}
-                </li>
-              ))}
-            </ul>
-          </div>
-          <div>
-            <h5 className="font-medium text-gray-700 mb-1">Detalles Particulares:</h5>
-            <ul className="list-disc list-inside text-gray-600">
-              {details.details.particular.map((item, idx) => (
-                <li key={idx}>
-                  <strong>{item.label}:</strong> {item.value}
-                </li>
-              ))}
-            </ul>
-          </div>
+  const renderBoxContentDetails = (details: BoxContentDetail) => (
+    <div key={details.month} className="bg-gray-100 p-4 rounded-lg shadow-sm mb-4">
+      <h4 className="text-lg font-semibold text-gray-800 mb-2">Caja de {details.month}</h4>
+      <p className="text-gray-700 mb-2">Contenido: {details.boxContent}</p>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
+          <h5 className="font-medium text-gray-700 mb-1">Detalles Generales:</h5>
+          <ul className="list-disc list-inside text-gray-600">
+            {details.details.generic.map((item, idx) => <li key={idx}><strong>{item.label}:</strong> {item.value}</li>)}
+          </ul>
         </div>
-        <p className="text-sm text-gray-500 mt-2">Valoración: {details.rating} estrellas</p>
+        <div>
+          <h5 className="font-medium text-gray-700 mb-1">Detalles Particulares:</h5>
+          <ul className="list-disc list-inside text-gray-600">
+            {details.details.particular.map((item, idx) => <li key={idx}><strong>{item.label}:</strong> {item.value}</li>)}
+          </ul>
+        </div>
       </div>
-    );
-  };
+      <p className="text-sm text-gray-500 mt-2">Valoración: {details.rating} estrellas</p>
+    </div>
+  );
+
+  const Feedback = () => (
+    <>
+      {saveSuccess && <p className="text-green-600 text-sm mb-4 bg-green-50 p-2 rounded">{saveSuccess}</p>}
+      {saveError && <p className="text-red-600 text-sm mb-4 bg-red-50 p-2 rounded">{saveError}</p>}
+    </>
+  );
 
   const renderContent = () => {
-    if (!user) {
-      return <p className="text-gray-600">Cargando información del perfil...</p>;
-    }
+    if (!user) return <p className="text-gray-600">Cargando información del perfil...</p>;
 
     switch (activeSection) {
       case 'profile':
         return (
           <div>
             <h2 className="text-2xl font-bold text-gray-800 mb-4">Mi Perfil</h2>
+            <Feedback />
             <div className="space-y-4">
               <EditProfileField
                 label="Nombre y Apellido"
                 value={`${editedFirstName} ${editedLastName}`}
                 isEditing={isEditingName}
                 onEdit={() => setIsEditingName(true)}
-                onCancel={() => {
-                  setEditedFirstName(user.firstName || '');
-                  setEditedLastName(user.lastName || '');
-                  setIsEditingName(false);
-                }}
+                onCancel={() => { setEditedFirstName(user.firstName || ''); setEditedLastName(user.lastName || ''); setIsEditingName(false); }}
               >
                 <div className="flex space-x-4">
                   <div className="flex-1">
                     <label className="block text-sm font-medium text-gray-700">Nombre:</label>
-                    <input
-                      type="text"
-                      value={editedFirstName}
-                      onChange={(e) => setEditedFirstName(e.target.value)}
-                      className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
-                    />
+                    <input type="text" value={editedFirstName} onChange={(e) => setEditedFirstName(e.target.value)} className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm" />
                   </div>
                   <div className="flex-1">
                     <label className="block text-sm font-medium text-gray-700">Apellido:</label>
-                    <input
-                      type="text"
-                      value={editedLastName}
-                      onChange={(e) => setEditedLastName(e.target.value)}
-                      className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
-                    />
+                    <input type="text" value={editedLastName} onChange={(e) => setEditedLastName(e.target.value)} className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm" />
                   </div>
                 </div>
-                <button
-                  onClick={handleSaveName}
-                  className="mt-4 bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors duration-200"
-                >
-                  Guardar Nombre
-                </button>
+                <button onClick={handleSaveName} className="mt-4 bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors duration-200">Guardar Nombre</button>
               </EditProfileField>
 
-              <EditGenderField
-                label="Género"
-                value={editedGender}
-                isEditing={isEditingGender}
-                onEdit={() => setIsEditingGender(true)}
-                onCancel={() => {
-                  setEditedGender(user.gender || '');
-                  setIsEditingGender(false);
-                }}
-                onSave={handleSaveGender}
-              />
+              <EditGenderField label="Género" value={editedGender} isEditing={isEditingGender} onEdit={() => setIsEditingGender(true)} onCancel={() => { setEditedGender(user.gender || ''); setIsEditingGender(false); }} onSave={handleSaveGender} />
 
               <EditProfileField
                 label="Fecha de Nacimiento"
                 value={editedBirthDate}
                 isEditing={isEditingBirthDate}
                 onEdit={() => setIsEditingBirthDate(true)}
-                onCancel={() => {
-                  setEditedBirthDate(user.birthDate || '');
-                  setIsEditingBirthDate(false);
-                }}
+                onCancel={() => { setEditedBirthDate(user.birthDate || ''); setIsEditingBirthDate(false); }}
               >
-                <input
-                  type="date"
-                  value={editedBirthDate}
-                  onChange={(e) => setEditedBirthDate(e.target.value)}
-                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
-                  max={new Date(new Date().setFullYear(new Date().getFullYear() - 18)).toISOString().split('T')[0]}
-                />
-                <button
-                  onClick={handleSaveBirthDate}
-                  className="mt-4 bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors duration-200"
-                >
-                  Guardar Fecha de Nacimiento
-                </button>
+                <input type="date" value={editedBirthDate} onChange={(e) => setEditedBirthDate(e.target.value)} className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm" max={new Date(new Date().setFullYear(new Date().getFullYear() - 18)).toISOString().split('T')[0]} />
+                <button onClick={handleSaveBirthDate} className="mt-4 bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors duration-200">Guardar Fecha de Nacimiento</button>
               </EditProfileField>
 
               <div className="relative bg-gray-100 p-6 rounded-lg shadow-md mt-8">
@@ -283,49 +268,16 @@ const UserProfileContent: React.FC<UserProfileContentProps> = ({ activeSection, 
                 {!showSensitiveProfileInfo && (
                   <div className="absolute inset-0 bg-gray-200 bg-opacity-90 flex flex-col items-center justify-center rounded-lg z-10">
                     <p className="text-lg font-semibold text-gray-700 mb-4">Contenido sensible oculto</p>
-                    <p className="text-gray-800 mb-2 text-center">
-                      Para ver o editar esta información, por favor, ingresa tu contraseña:
-                    </p>
-                    <input
-                      type="password"
-                      className="mt-1 block mx-auto w-full max-w-xs rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm text-center"
-                      value={profilePassword}
-                      onChange={(e) => setProfilePassword(e.target.value)}
-                      placeholder="Contraseña"
-                    />
+                    <p className="text-gray-800 mb-2 text-center">Para ver o editar esta información, ingresá tu contraseña:</p>
+                    <input type="password" className="mt-1 block mx-auto w-full max-w-xs rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm text-center" value={profilePassword} onChange={(e) => setProfilePassword(e.target.value)} placeholder="Contraseña" onKeyDown={(e) => e.key === 'Enter' && handleProfilePasswordCheck()} />
                     {profilePasswordError && <p className="text-red-500 text-sm mt-2">{profilePasswordError}</p>}
-                    <button
-                      onClick={handleProfilePasswordCheck}
-                      className="mt-4 bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors duration-200"
-                    >
-                      Verificar
-                    </button>
+                    <button onClick={handleProfilePasswordCheck} className="mt-4 bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors duration-200">Verificar</button>
                   </div>
                 )}
                 <div className={`space-y-6 ${!showSensitiveProfileInfo ? 'blur-sm pointer-events-none' : ''}`}>
-                  <EditProfileField
-                    label="Tipo de Documento y Número"
-                    value={`${user.documentType || 'N/A'}: ${user.documentNumber || 'N/A'}`}
-                    isEditing={false}
-                    onEdit={() => {}}
-                    onCancel={() => {}}
-                    isLocked={true}
-                  >
-                    <></>
-                  </EditProfileField>
-
-                  <EditProfileField
-                    label="Email"
-                    value={user.email}
-                    isEditing={false}
-                    onEdit={() => {}}
-                    onCancel={() => {}}
-                    isLocked={true}
-                  >
-                    <></>
-                  </EditProfileField>
-
-                  <EditPhoneField label="Número de Teléfono" value={user.phoneNumber || ''} onSave={handleSavePhoneNumber} />
+                  <EditProfileField label="Tipo de Documento y Número" value={`${user.documentType || 'N/A'}: ${user.documentNumber || 'N/A'}`} isEditing={false} onEdit={() => {}} onCancel={() => {}} isLocked={true}><></></EditProfileField>
+                  <EditProfileField label="Email" value={user.email} isEditing={false} onEdit={() => {}} onCancel={() => {}} isLocked={true}><></></EditProfileField>
+                  <EditPhoneField label="Número de Teléfono" value={user.phoneNumber ? String(user.phoneNumber) : ''} onSave={handleSavePhoneNumber} />
                 </div>
               </div>
             </div>
@@ -336,18 +288,17 @@ const UserProfileContent: React.FC<UserProfileContentProps> = ({ activeSection, 
         return (
           <div>
             <h2 className="text-2xl font-bold text-gray-800 mb-4">Ubicación</h2>
+            <Feedback />
             <LocationSection
               country={user.country || ''}
               city={user.city || ''}
               locality={user.locality || ''}
               postalCode={user.postalCode || ''}
-              street={user.street || ''}
-              streetNumber={user.streetNumber || ''}
-              floor={user.floor || ''}
-              details={user.details || ''}
-              onSave={(locationData: LocationData) => {
-                console.log('Ubicación guardada:', locationData);
-              }}
+              street={user.streetAddress || user.street || ''}
+              streetNumber={user.addressNumber ? String(user.addressNumber) : (user.streetNumber || '')}
+              floor={user.floorNumber || user.floor || ''}
+              details={user.addressDetails || user.details || ''}
+              onSave={handleSaveLocation}
               isEntrepreneurProfile={false}
             />
           </div>
@@ -358,37 +309,24 @@ const UserProfileContent: React.FC<UserProfileContentProps> = ({ activeSection, 
           <div>
             {selectedSubscriptionId ? (
               <div>
-                <button
-                  onClick={handleBackToSubscriptions}
-                  className="mb-6 flex items-center text-blue-600 hover:text-blue-800 transition-colors duration-200 transform hover:translate-x-1"
-                >
-                  <svg
-                    className="w-5 h-5 mr-2"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
-                  </svg>
+                <button onClick={() => { setSelectedSubscriptionId(null); setSelectedSubscriptionDetails(null); }} className="mb-6 flex items-center text-blue-600 hover:text-blue-800 transition-colors duration-200">
+                  <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" /></svg>
                   Volver a Mis Suscripciones
                 </button>
                 <h2 className="text-2xl font-bold text-gray-800 mb-4">Detalles de Suscripción</h2>
                 {selectedSubscriptionDetails ? (
                   <div className="space-y-6">{selectedSubscriptionDetails.history.map(renderBoxContentDetails)}</div>
                 ) : (
-                  <p className="text-gray-600">Cargando detalles de la suscripción...</p>
+                  <p className="text-gray-600">Cargando detalles...</p>
                 )}
               </div>
             ) : (
               <div>
                 <h2 className="text-2xl font-bold text-gray-800 mb-4">Mis Suscripciones Activas</h2>
                 {userSubscriptions.length > 0 ? (
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    {userSubscriptions.map(renderSubscriptionCard)}
-                  </div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">{userSubscriptions.map(renderSubscriptionCard)}</div>
                 ) : (
-                  <p className="text-gray-600">No tienes suscripciones activas en este momento.</p>
+                  <p className="text-gray-600">No tenés suscripciones activas en este momento.</p>
                 )}
               </div>
             )}
@@ -400,10 +338,7 @@ const UserProfileContent: React.FC<UserProfileContentProps> = ({ activeSection, 
           <div>
             <h2 className="text-2xl font-bold text-gray-800 mb-4">Mis Envíos</h2>
             <p className="text-gray-600">Aquí verás el historial y estado de tus envíos.</p>
-            <div className="bg-blue-50 border-l-4 border-blue-400 text-blue-800 p-4 mt-4" role="alert">
-              <p className="font-bold">Próximamente:</p>
-              <p>Funcionalidad de seguimiento de envíos en tiempo real.</p>
-            </div>
+            <div className="bg-blue-50 border-l-4 border-blue-400 text-blue-800 p-4 mt-4"><p className="font-bold">Próximamente:</p><p>Seguimiento de envíos en tiempo real.</p></div>
           </div>
         );
 
@@ -412,10 +347,7 @@ const UserProfileContent: React.FC<UserProfileContentProps> = ({ activeSection, 
           <div>
             <h2 className="text-2xl font-bold text-gray-800 mb-4">Pagos y Facturación</h2>
             <p className="text-gray-600">Aquí podrás gestionar tus métodos de pago y ver tu historial de facturas.</p>
-            <div className="bg-blue-50 border-l-4 border-blue-400 text-blue-800 p-4 mt-4" role="alert">
-              <p className="font-bold">Próximamente:</p>
-              <p>Gestión de tarjetas e historial de pagos detallado.</p>
-            </div>
+            <div className="bg-blue-50 border-l-4 border-blue-400 text-blue-800 p-4 mt-4"><p className="font-bold">Próximamente:</p><p>Gestión de tarjetas e historial de pagos detallado.</p></div>
           </div>
         );
 
@@ -426,7 +358,7 @@ const UserProfileContent: React.FC<UserProfileContentProps> = ({ activeSection, 
         return <SettingsSection />;
 
       default:
-        return <p className="text-gray-600">Selecciona una sección del menú.</p>;
+        return <p className="text-gray-600">Seleccioná una sección del menú.</p>;
     }
   };
 

@@ -1,25 +1,43 @@
-import { Injectable, BadRequestException, NotFoundException } from '@nestjs/common';
+import { Injectable, BadRequestException, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import * as bcrypt from 'bcryptjs';
 import { Prisma, DocumentType } from '@prisma/client';
 
+const USER_SELECT = {
+  id: true,
+  firstName: true,
+  lastName: true,
+  email: true,
+  documentType: true,
+  documentNumber: true,
+  registrationDate: true,
+  birthDate: true,
+  balanceAvailable: true,
+  phoneNumber: true,
+  streetAddress: true,
+  addressNumber: true,
+  floorNumber: true,
+  addressDetails: true,
+  city: true,
+  province: true,
+  postalCode: true,
+  active: true,
+};
+
 function sanitizeUser(user: any) {
   if (!user) return user;
   const { passwordHash, ...rest } = user as any;
-
   if (rest.registrationDate instanceof Date) {
     rest.registrationDate = rest.registrationDate.toISOString();
   }
-
-  if (rest.balanceAvailable !== undefined && rest.balanceAvailable !== null) {
-    try {
-      rest.balanceAvailable = (rest.balanceAvailable as any).toString();
-    } catch {
-    }
+  if (rest.birthDate instanceof Date) {
+    rest.birthDate = rest.birthDate.toISOString();
   }
-
+  if (rest.balanceAvailable !== undefined && rest.balanceAvailable !== null) {
+    try { rest.balanceAvailable = (rest.balanceAvailable as any).toString(); } catch {}
+  }
   return rest;
 }
 
@@ -29,7 +47,6 @@ export class UsersService {
 
   async create(dto: CreateUserDto) {
     const hashed = await bcrypt.hash(dto.password, 10);
-
     const data: Prisma.UserCreateInput = {
       firstName: dto.firstName,
       lastName: dto.lastName,
@@ -37,8 +54,9 @@ export class UsersService {
       passwordHash: hashed,
       documentType: dto.documentType as DocumentType,
       documentNumber: dto.documentNumber,
+      phoneNumber: dto.phoneNumber ?? null,
+      birthDate: dto.birthDate ? new Date(dto.birthDate) : null,
     };
-
     try {
       const user = await this.prisma.user.create({ data });
       return sanitizeUser(user);
@@ -51,55 +69,12 @@ export class UsersService {
   }
 
   async findAll() {
-    const users = await this.prisma.user.findMany({
-      select: {
-        id: true,
-        firstName: true,
-        lastName: true,
-        email: true,
-        documentType: true,
-        documentNumber: true,
-        registrationDate: true,
-        balanceAvailable: true,
-        phoneNumber: true,
-        streetAddress: true,
-        addressNumber: true,
-        floorNumber: true,
-        addressDetails: true,
-        city: true,
-        province: true,
-        postalCode: true,
-        active: true,
-      },
-    });
-
-    return users.map((u) => sanitizeUser(u));
+    const users = await this.prisma.user.findMany({ select: USER_SELECT });
+    return users.map(sanitizeUser);
   }
 
   async findById(id: number) {
-    const user = await this.prisma.user.findUnique({
-      where: { id },
-      select: {
-        id: true,
-        firstName: true,
-        lastName: true,
-        email: true,
-        documentType: true,
-        documentNumber: true,
-        registrationDate: true,
-        balanceAvailable: true,
-        phoneNumber: true,
-        streetAddress: true,
-        addressNumber: true,
-        floorNumber: true,
-        addressDetails: true,
-        city: true,
-        province: true,
-        postalCode: true,
-        active: true,
-      },
-    });
-
+    const user = await this.prisma.user.findUnique({ where: { id }, select: USER_SELECT });
     if (!user) throw new NotFoundException('Usuario no encontrado');
     return sanitizeUser(user);
   }
@@ -110,36 +85,23 @@ export class UsersService {
 
   async update(id: number, dto: UpdateUserDto) {
     const data: any = {};
-    if (dto.firstName !== undefined) data.firstName = dto.firstName;
-    if (dto.lastName !== undefined) data.lastName = dto.lastName;
-    if (dto.password) data.passwordHash = await bcrypt.hash(dto.password, 10);
-    if (dto.documentType !== undefined) data.documentType = dto.documentType as DocumentType;
+    if (dto.firstName !== undefined)     data.firstName     = dto.firstName;
+    if (dto.lastName !== undefined)      data.lastName      = dto.lastName;
+    if (dto.password)                    data.passwordHash  = await bcrypt.hash(dto.password, 10);
+    if (dto.documentType !== undefined)  data.documentType  = dto.documentType as DocumentType;
     if (dto.documentNumber !== undefined) data.documentNumber = dto.documentNumber;
+    if (dto.phoneNumber !== undefined)   data.phoneNumber   = dto.phoneNumber;
+    if (dto.birthDate !== undefined)     data.birthDate     = new Date(dto.birthDate);
+    if (dto.streetAddress !== undefined) data.streetAddress = dto.streetAddress;
+    if (dto.addressNumber !== undefined) data.addressNumber = dto.addressNumber;
+    if (dto.floorNumber !== undefined)   data.floorNumber   = dto.floorNumber;
+    if (dto.addressDetails !== undefined) data.addressDetails = dto.addressDetails;
+    if (dto.city !== undefined)          data.city          = dto.city;
+    if (dto.province !== undefined)      data.province      = dto.province;
+    if (dto.postalCode !== undefined)    data.postalCode    = dto.postalCode;
 
     try {
-      const updated = await this.prisma.user.update({
-        where: { id },
-        data,
-        select: {
-          id: true,
-          firstName: true,
-          lastName: true,
-          email: true,
-          documentType: true,
-          documentNumber: true,
-          registrationDate: true,
-          balanceAvailable: true,
-          phoneNumber: true,
-          streetAddress: true,
-          addressNumber: true,
-          floorNumber: true,
-          addressDetails: true,
-          city: true,
-          province: true,
-          postalCode: true,
-          active: true,
-        },
-      });
+      const updated = await this.prisma.user.update({ where: { id }, data, select: USER_SELECT });
       return sanitizeUser(updated);
     } catch (err: any) {
       if (err instanceof Prisma.PrismaClientKnownRequestError && err.code === 'P2025') {
@@ -147,6 +109,14 @@ export class UsersService {
       }
       throw err;
     }
+  }
+
+  async verifyPassword(id: number, password: string) {
+    const user = await this.prisma.user.findUnique({ where: { id } });
+    if (!user) throw new NotFoundException('Usuario no encontrado');
+    const ok = await bcrypt.compare(password, user.passwordHash);
+    if (!ok) throw new UnauthorizedException('Contraseña incorrecta');
+    return { ok: true };
   }
 
   async remove(id: number) {

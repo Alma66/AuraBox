@@ -7,9 +7,12 @@ import {
   ParseIntPipe,
   Post,
   Put,
+  Patch,
   UseGuards,
   UsePipes,
   ValidationPipe,
+  Request,
+  ForbiddenException,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
@@ -29,6 +32,24 @@ export class UsersController {
     return this.usersService.create(dto);
   }
 
+  // Endpoint que usa UserProfilePage
+  @Get('me')
+  async getMe(@Request() req: any) {
+    return this.usersService.findById(req.user.id);
+  }
+
+  // Verifica contraseña para mostrar datos sensibles
+  @Post('me/verify-password')
+  async verifyPassword(@Request() req: any, @Body() body: { password: string }) {
+    return this.usersService.verifyPassword(req.user.id, body.password);
+  }
+
+  @Patch('me')
+  @UsePipes(new ValidationPipe({ whitelist: true, transform: true }))
+  async updateMe(@Request() req: any, @Body() dto: UpdateUserDto) {
+    return this.usersService.update(req.user.id, dto);
+  }
+
   @Get()
   @UseGuards(RolesGuard)
   @Roles('ADMIN')
@@ -39,7 +60,10 @@ export class UsersController {
   @Get(':id')
   @UseGuards(RolesGuard)
   @Roles('ADMIN', 'CUSTOMER')
-  async findOne(@Param('id', ParseIntPipe) id: number) {
+  async findOne(@Param('id', ParseIntPipe) id: number, @Request() req: any) {
+    if (req.user.role !== 'admin' && req.user.id !== id) {
+      throw new ForbiddenException('No autorizado');
+    }
     return this.usersService.findById(id);
   }
 
@@ -47,7 +71,10 @@ export class UsersController {
   @UseGuards(RolesGuard)
   @Roles('ADMIN', 'CUSTOMER')
   @UsePipes(new ValidationPipe({ whitelist: true, transform: true }))
-  async update(@Param('id', ParseIntPipe) id: number, @Body() dto: UpdateUserDto) {
+  async update(@Param('id', ParseIntPipe) id: number, @Body() dto: UpdateUserDto, @Request() req: any) {
+    if (req.user.role !== 'admin' && req.user.id !== id) {
+      throw new ForbiddenException('No autorizado');
+    }
     return this.usersService.update(id, dto);
   }
 

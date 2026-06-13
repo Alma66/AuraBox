@@ -1,4 +1,4 @@
-import { IsEnum, IsInt, IsOptional, IsString, MinLength } from 'class-validator';
+import { IsEnum, IsInt, IsOptional, IsString, MinLength, IsDateString } from 'class-validator';
 import { Transform } from 'class-transformer';
 import { DocumentType } from '@prisma/client';
 
@@ -26,4 +26,42 @@ export class UpdateUserDto {
   @Transform(({ value }) => (value === null || value === undefined ? value : parseInt(String(value), 10)))
   @IsInt()
   documentNumber?: number;
+
+  @IsOptional()
+  @Transform(({ value }) => (value === null || value === undefined ? value : parseInt(String(value), 10)))
+  @IsInt()
+  phoneNumber?: number;
+
+  @IsOptional()
+  @IsDateString()
+  birthDate?: string;
+
+  @IsOptional()
+  @IsString()
+  streetAddress?: string;
+
+  @IsOptional()
+  @Transform(({ value }) => (value === null || value === undefined ? value : parseInt(String(value), 10)))
+  @IsInt()
+  addressNumber?: number;
+
+  @IsOptional()
+  @IsString()
+  floorNumber?: string;
+
+  @IsOptional()
+  @IsString()
+  addressDetails?: string;
+
+  @IsOptional()
+  @IsString()
+  city?: string;
+
+  @IsOptional()
+  @IsString()
+  province?: string;
+
+  @IsOptional()
+  @IsString()
+  postalCode?: string;
 }

@@ -32,6 +32,24 @@ export class EntrepreneursController {
     return this.entrepreneursService.create(dto);
   }
 
+  // Endpoint que usa EntrepreneurProfilePage
+  @Get('me')
+  async getMe(@Request() req: any) {
+    return this.entrepreneursService.findOne(req.user.id);
+  }
+
+  // Verifica contraseña para mostrar datos sensibles
+  @Post('me/verify-password')
+  async verifyPassword(@Request() req: any, @Body() body: { password: string }) {
+    return this.entrepreneursService.verifyPassword(req.user.id, body.password);
+  }
+
+  @Patch('me')
+  @UsePipes(new ValidationPipe({ whitelist: true, transform: true }))
+  async updateMe(@Request() req: any, @Body() dto: UpdateEntrepreneurDto) {
+    return this.entrepreneursService.update(req.user.id, dto);
+  }
+
   @UseGuards(RolesGuard)
   @Roles('ADMIN')
   @Get()
@@ -40,16 +58,16 @@ export class EntrepreneursController {
   }
 
   @Get(':id')
-  async findOne(@Param('id', ParseIntPipe) id: number, @Request() req) {
-    if (req.user.id !== id && req.user.role !== 'ADMIN') {
+  async findOne(@Param('id', ParseIntPipe) id: number, @Request() req: any) {
+    if (req.user.id !== id && req.user.role !== 'admin') {
       throw new ForbiddenException('No autorizado para ver este emprendedor');
     }
     return this.entrepreneursService.findOne(id);
   }
 
   @Patch(':id')
-  async update(@Param('id', ParseIntPipe) id: number, @Body() dto: UpdateEntrepreneurDto, @Request() req) {
-    if (req.user.id !== id && req.user.role !== 'ADMIN') {
+  async update(@Param('id', ParseIntPipe) id: number, @Body() dto: UpdateEntrepreneurDto, @Request() req: any) {
+    if (req.user.id !== id && req.user.role !== 'admin') {
       throw new ForbiddenException('No autorizado para actualizar este emprendedor');
     }
     return this.entrepreneursService.update(id, dto);

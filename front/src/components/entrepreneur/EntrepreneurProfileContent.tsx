@@ -6,6 +6,7 @@ import SecuritySection from '../common/SecuritySection';
 import LocationSection from '../common/LocationSection';
 import EditPhoneField from '../common/EditPhoneField';
 import SettingsSection from '../common/SettingsSection';
+import api from '../../api/config';
 
 interface LocationData {
   country: string;
@@ -21,182 +22,171 @@ interface LocationData {
 interface EntrepreneurProfileContentProps {
   activeSection: string;
   user: User;
+  onUserUpdate: () => void;
 }
 
-const EntrepreneurProfileContent: React.FC<EntrepreneurProfileContentProps> = ({ activeSection, user }) => {
+const EntrepreneurProfileContent: React.FC<EntrepreneurProfileContentProps> = ({ activeSection, user, onUserUpdate }) => {
   const [isEditingName, setIsEditingName] = useState(false);
   const [editedFirstName, setEditedFirstName] = useState(user.firstName || '');
   const [editedLastName, setEditedLastName] = useState(user.lastName || '');
+
   const [isEditingGender, setIsEditingGender] = useState(false);
   const [editedGender, setEditedGender] = useState(user.gender || '');
+
   const [isEditingBirthDate, setIsEditingBirthDate] = useState(false);
   const [editedBirthDate, setEditedBirthDate] = useState(user.birthDate || '');
 
-  const [isEditingLegalName, setIsEditingLegalName] = useState(false);
-  const [editedLegalName, setEditedLegalName] = useState(user.legalName || '');
   const [isEditingTaxId, setIsEditingTaxId] = useState(false);
-  const [editedTaxId, setEditedTaxId] = useState(user.taxId || '');
-  const [isEditingBusinessAddress, setIsEditingBusinessAddress] = useState(false);
-  const [editedBusinessAddress, setEditedBusinessAddress] = useState(user.businessAddress || '');
-  const [isEditingBusinessDetails, setIsEditingBusinessDetails] = useState(false);
-  const [editedBusinessDetails, setEditedBusinessDetails] = useState(user.businessDetails || '');
+  const [editedTaxId, setEditedTaxId] = useState(user.taxId || user.cuitCuil || '');
 
   const [showSensitiveProfileInfo, setShowSensitiveProfileInfo] = useState(false);
   const [profilePassword, setProfilePassword] = useState('');
   const [profilePasswordError, setProfilePasswordError] = useState('');
+
+  const [saveError, setSaveError] = useState('');
+  const [saveSuccess, setSaveSuccess] = useState('');
 
   useEffect(() => {
     setEditedFirstName(user.firstName || '');
     setEditedLastName(user.lastName || '');
     setEditedGender(user.gender || '');
     setEditedBirthDate(user.birthDate || '');
-    setEditedLegalName(user.legalName || '');
-    setEditedTaxId(user.taxId || '');
-    setEditedBusinessAddress(user.businessAddress || '');
-    setEditedBusinessDetails(user.businessDetails || '');
+    setEditedTaxId(user.taxId || user.cuitCuil || '');
     setShowSensitiveProfileInfo(false);
     setProfilePassword('');
     setProfilePasswordError('');
+    setSaveError('');
+    setSaveSuccess('');
   }, [user, activeSection]);
 
-  const handleSaveName = () => {
-    const newFirstName = editedFirstName.trim();
-    const newLastName = editedLastName.trim();
-    console.log('Nombre y Apellido de emprendedor guardados:', newFirstName, newLastName);
-    setIsEditingName(false);
+  const showFeedback = (success?: string, error?: string) => {
+    setSaveSuccess(success || '');
+    setSaveError(error || '');
+    if (success) setTimeout(() => setSaveSuccess(''), 3000);
+  };
+
+  const handleSaveName = async () => {
+    try {
+      await api.patch('/entrepreneurs/me', {
+        firstName: editedFirstName.trim(),
+        lastName: editedLastName.trim(),
+      });
+      setIsEditingName(false);
+      showFeedback('Nombre guardado correctamente');
+      onUserUpdate();
+    } catch {
+      showFeedback(undefined, 'Error al guardar el nombre');
+    }
   };
 
   const handleSaveGender = (newGender: string) => {
-    console.log('Género de emprendedor guardado:', newGender);
     setEditedGender(newGender);
     setIsEditingGender(false);
   };
 
-  const handleSaveBirthDate = () => {
-    console.log('Fecha de Nacimiento de emprendedor guardada:', editedBirthDate);
-    setIsEditingBirthDate(false);
-  };
-
-  const handleSavePhoneNumber = (newNumber: string) => {
-    console.log('Número de teléfono de emprendedor guardado:', newNumber);
-  };
-
-  const handleSaveBusinessInfo = (field: string, value: string) => {
-    console.log(`Información de negocio (${field}) guardada:`, value);
-    switch (field) {
-      case 'legalName':
-        setIsEditingLegalName(false);
-        break;
-      case 'taxId':
-        setIsEditingTaxId(false);
-        break;
-      case 'businessAddress':
-        setIsEditingBusinessAddress(false);
-        break;
-      case 'businessDetails':
-        setIsEditingBusinessDetails(false);
-        break;
+  const handleSaveBirthDate = async () => {
+    try {
+      await api.patch('/entrepreneurs/me', { birthDate: editedBirthDate });
+      setIsEditingBirthDate(false);
+      showFeedback('Fecha de nacimiento guardada');
+      onUserUpdate();
+    } catch {
+      showFeedback(undefined, 'Error al guardar la fecha');
     }
   };
 
-  const handleSaveLocation = (locationData: LocationData) => {
-    console.log('Ubicación del negocio guardada:', locationData);
+  const handleSavePhoneNumber = async (newNumber: string) => {
+    try {
+      await api.patch('/entrepreneurs/me', { phoneNumber: newNumber ? parseInt(newNumber) : null });
+      showFeedback('Teléfono guardado correctamente');
+      onUserUpdate();
+    } catch {
+      showFeedback(undefined, 'Error al guardar el teléfono');
+    }
   };
 
-  const handleProfilePasswordCheck = () => {
-    if (profilePassword === 'password123') {
+  const handleSaveTaxId = async () => {
+    try {
+      await api.patch('/entrepreneurs/me', { cuitCuil: editedTaxId ? parseInt(editedTaxId) : null });
+      setIsEditingTaxId(false);
+      showFeedback('CUIT/CUIL guardado correctamente');
+      onUserUpdate();
+    } catch {
+      showFeedback(undefined, 'Error al guardar el CUIT/CUIL');
+    }
+  };
+
+  const handleProfilePasswordCheck = async () => {
+    try {
+      await api.post('/entrepreneurs/me/verify-password', { password: profilePassword });
       setShowSensitiveProfileInfo(true);
       setProfilePasswordError('');
-    } else {
+    } catch {
       setProfilePasswordError('Contraseña incorrecta. Intenta de nuevo.');
     }
   };
 
-  const renderContent = () => {
-    if (!user) {
-      return <p className="text-gray-600">Cargando información del perfil...</p>;
+  const handleSaveLocation = async (locationData: LocationData) => {
+    try {
+      await api.patch('/entrepreneurs/me', {
+        city: locationData.city,
+        province: locationData.locality || locationData.city,
+      });
+      showFeedback('Ubicación guardada correctamente');
+      onUserUpdate();
+    } catch {
+      showFeedback(undefined, 'Error al guardar la ubicación');
     }
+  };
+
+  const Feedback = () => (
+    <>
+      {saveSuccess && <p className="text-green-600 text-sm mb-4 bg-green-50 p-2 rounded">{saveSuccess}</p>}
+      {saveError && <p className="text-red-600 text-sm mb-4 bg-red-50 p-2 rounded">{saveError}</p>}
+    </>
+  );
+
+  const renderContent = () => {
+    if (!user) return <p className="text-gray-600">Cargando información del perfil...</p>;
 
     switch (activeSection) {
       case 'profile':
         return (
           <div>
             <h2 className="text-2xl font-bold text-gray-800 mb-4">Mi Perfil Personal</h2>
+            <Feedback />
             <div className="space-y-4">
               <EditProfileField
                 label="Nombre y Apellido"
                 value={`${editedFirstName} ${editedLastName}`}
                 isEditing={isEditingName}
                 onEdit={() => setIsEditingName(true)}
-                onCancel={() => {
-                  setEditedFirstName(user.firstName || '');
-                  setEditedLastName(user.lastName || '');
-                  setIsEditingName(false);
-                }}
+                onCancel={() => { setEditedFirstName(user.firstName || ''); setEditedLastName(user.lastName || ''); setIsEditingName(false); }}
               >
                 <div className="flex space-x-4">
                   <div className="flex-1">
                     <label className="block text-sm font-medium text-gray-700">Nombre:</label>
-                    <input
-                      type="text"
-                      value={editedFirstName}
-                      onChange={(e) => setEditedFirstName(e.target.value)}
-                      className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
-                    />
+                    <input type="text" value={editedFirstName} onChange={(e) => setEditedFirstName(e.target.value)} className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm" />
                   </div>
                   <div className="flex-1">
                     <label className="block text-sm font-medium text-gray-700">Apellido:</label>
-                    <input
-                      type="text"
-                      value={editedLastName}
-                      onChange={(e) => setEditedLastName(e.target.value)}
-                      className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
-                    />
+                    <input type="text" value={editedLastName} onChange={(e) => setEditedLastName(e.target.value)} className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm" />
                   </div>
                 </div>
-                <button
-                  onClick={handleSaveName}
-                  className="mt-4 bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors duration-200"
-                >
-                  Guardar Nombre
-                </button>
+                <button onClick={handleSaveName} className="mt-4 bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors duration-200">Guardar Nombre</button>
               </EditProfileField>
 
-              <EditGenderField
-                label="Género"
-                value={editedGender}
-                isEditing={isEditingGender}
-                onEdit={() => setIsEditingGender(true)}
-                onCancel={() => {
-                  setEditedGender(user.gender || '');
-                  setIsEditingGender(false);
-                }}
-                onSave={handleSaveGender}
-              />
+              <EditGenderField label="Género" value={editedGender} isEditing={isEditingGender} onEdit={() => setIsEditingGender(true)} onCancel={() => { setEditedGender(user.gender || ''); setIsEditingGender(false); }} onSave={handleSaveGender} />
 
               <EditProfileField
                 label="Fecha de Nacimiento"
                 value={editedBirthDate}
                 isEditing={isEditingBirthDate}
                 onEdit={() => setIsEditingBirthDate(true)}
-                onCancel={() => {
-                  setEditedBirthDate(user.birthDate || '');
-                  setIsEditingBirthDate(false);
-                }}
+                onCancel={() => { setEditedBirthDate(user.birthDate || ''); setIsEditingBirthDate(false); }}
               >
-                <input
-                  type="date"
-                  value={editedBirthDate}
-                  onChange={(e) => setEditedBirthDate(e.target.value)}
-                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
-                  max={new Date(new Date().setFullYear(new Date().getFullYear() - 18)).toISOString().split('T')[0]}
-                />
-                <button
-                  onClick={handleSaveBirthDate}
-                  className="mt-4 bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors duration-200"
-                >
-                  Guardar Fecha de Nacimiento
-                </button>
+                <input type="date" value={editedBirthDate} onChange={(e) => setEditedBirthDate(e.target.value)} className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm" max={new Date(new Date().setFullYear(new Date().getFullYear() - 18)).toISOString().split('T')[0]} />
+                <button onClick={handleSaveBirthDate} className="mt-4 bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors duration-200">Guardar Fecha de Nacimiento</button>
               </EditProfileField>
 
               <div className="relative bg-gray-100 p-6 rounded-lg shadow-md mt-8">
@@ -204,49 +194,16 @@ const EntrepreneurProfileContent: React.FC<EntrepreneurProfileContentProps> = ({
                 {!showSensitiveProfileInfo && (
                   <div className="absolute inset-0 bg-gray-200 bg-opacity-90 flex flex-col items-center justify-center rounded-lg z-10">
                     <p className="text-lg font-semibold text-gray-700 mb-4">Contenido sensible oculto</p>
-                    <p className="text-gray-800 mb-2 text-center">
-                      Para ver o editar esta información, por favor, ingresa tu contraseña:
-                    </p>
-                    <input
-                      type="password"
-                      className="mt-1 block mx-auto w-full max-w-xs rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm text-center"
-                      value={profilePassword}
-                      onChange={(e) => setProfilePassword(e.target.value)}
-                      placeholder="Contraseña"
-                    />
+                    <p className="text-gray-800 mb-2 text-center">Para ver o editar esta información, ingresá tu contraseña:</p>
+                    <input type="password" className="mt-1 block mx-auto w-full max-w-xs rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm text-center" value={profilePassword} onChange={(e) => setProfilePassword(e.target.value)} placeholder="Contraseña" onKeyDown={(e) => e.key === 'Enter' && handleProfilePasswordCheck()} />
                     {profilePasswordError && <p className="text-red-500 text-sm mt-2">{profilePasswordError}</p>}
-                    <button
-                      onClick={handleProfilePasswordCheck}
-                      className="mt-4 bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors duration-200"
-                    >
-                      Verificar
-                    </button>
+                    <button onClick={handleProfilePasswordCheck} className="mt-4 bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors duration-200">Verificar</button>
                   </div>
                 )}
                 <div className={`space-y-6 ${!showSensitiveProfileInfo ? 'blur-sm pointer-events-none' : ''}`}>
-                  <EditProfileField
-                    label="Tipo de Documento y Número"
-                    value={`${user.documentType || 'N/A'}: ${user.documentNumber || 'N/A'}`}
-                    isEditing={false}
-                    onEdit={() => {}}
-                    onCancel={() => {}}
-                    isLocked={true}
-                  >
-                    <></>
-                  </EditProfileField>
-
-                  <EditProfileField
-                    label="Email"
-                    value={user.email}
-                    isEditing={false}
-                    onEdit={() => {}}
-                    onCancel={() => {}}
-                    isLocked={true}
-                  >
-                    <></>
-                  </EditProfileField>
-
-                  <EditPhoneField label="Número de Teléfono" value={user.phoneNumber || ''} onSave={handleSavePhoneNumber} />
+                  <EditProfileField label="Tipo de Documento y Número" value={`${user.documentType || 'N/A'}: ${user.documentNumber || 'N/A'}`} isEditing={false} onEdit={() => {}} onCancel={() => {}} isLocked={true}><></></EditProfileField>
+                  <EditProfileField label="Email" value={user.email} isEditing={false} onEdit={() => {}} onCancel={() => {}} isLocked={true}><></></EditProfileField>
+                  <EditPhoneField label="Número de Teléfono" value={user.phoneNumber ? String(user.phoneNumber) : ''} onSave={handleSavePhoneNumber} />
                 </div>
               </div>
             </div>
@@ -257,102 +214,23 @@ const EntrepreneurProfileContent: React.FC<EntrepreneurProfileContentProps> = ({
         return (
           <div>
             <h2 className="text-2xl font-bold text-gray-800 mb-4">Información del Negocio</h2>
+            <Feedback />
             <div className="space-y-4">
               <EditProfileField
-                label="Razón Social / Nombre Legal"
-                value={editedLegalName}
-                isEditing={isEditingLegalName}
-                onEdit={() => setIsEditingLegalName(true)}
-                onCancel={() => {
-                  setEditedLegalName(user.legalName || '');
-                  setIsEditingLegalName(false);
-                }}
-              >
-                <input
-                  type="text"
-                  value={editedLegalName}
-                  onChange={(e) => setEditedLegalName(e.target.value)}
-                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
-                />
-                <button
-                  onClick={() => handleSaveBusinessInfo('legalName', editedLegalName)}
-                  className="mt-4 bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors duration-200"
-                >
-                  Guardar Razón Social
-                </button>
-              </EditProfileField>
-
-              <EditProfileField
-                label="CUIT / Identificación Fiscal"
+                label="CUIT / CUIL"
                 value={editedTaxId}
                 isEditing={isEditingTaxId}
                 onEdit={() => setIsEditingTaxId(true)}
-                onCancel={() => {
-                  setEditedTaxId(user.taxId || '');
-                  setIsEditingTaxId(false);
-                }}
+                onCancel={() => { setEditedTaxId(user.taxId || user.cuitCuil || ''); setIsEditingTaxId(false); }}
               >
-                <input
-                  type="text"
-                  value={editedTaxId}
-                  onChange={(e) => setEditedTaxId(e.target.value)}
-                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
-                />
-                <button
-                  onClick={() => handleSaveBusinessInfo('taxId', editedTaxId)}
-                  className="mt-4 bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors duration-200"
-                >
-                  Guardar CUIT
-                </button>
+                <input type="text" value={editedTaxId} onChange={(e) => setEditedTaxId(e.target.value)} className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm" placeholder="Ej: 20123456789" />
+                <button onClick={handleSaveTaxId} className="mt-4 bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors duration-200">Guardar CUIT/CUIL</button>
               </EditProfileField>
 
-              <EditProfileField
-                label="Dirección Legal del Negocio"
-                value={editedBusinessAddress}
-                isEditing={isEditingBusinessAddress}
-                onEdit={() => setIsEditingBusinessAddress(true)}
-                onCancel={() => {
-                  setEditedBusinessAddress(user.businessAddress || '');
-                  setIsEditingBusinessAddress(false);
-                }}
-              >
-                <input
-                  type="text"
-                  value={editedBusinessAddress}
-                  onChange={(e) => setEditedBusinessAddress(e.target.value)}
-                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
-                />
-                <button
-                  onClick={() => handleSaveBusinessInfo('businessAddress', editedBusinessAddress)}
-                  className="mt-4 bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors duration-200"
-                >
-                  Guardar Dirección Legal
-                </button>
-              </EditProfileField>
-
-              <EditProfileField
-                label="Detalles del Negocio"
-                value={editedBusinessDetails}
-                isEditing={isEditingBusinessDetails}
-                onEdit={() => setIsEditingBusinessDetails(true)}
-                onCancel={() => {
-                  setEditedBusinessDetails(user.businessDetails || '');
-                  setIsEditingBusinessDetails(false);
-                }}
-              >
-                <textarea
-                  value={editedBusinessDetails}
-                  onChange={(e) => setEditedBusinessDetails(e.target.value)}
-                  rows={3}
-                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
-                ></textarea>
-                <button
-                  onClick={() => handleSaveBusinessInfo('businessDetails', editedBusinessDetails)}
-                  className="mt-4 bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors duration-200"
-                >
-                  Guardar Detalles
-                </button>
-              </EditProfileField>
+              <div className="bg-blue-50 border-l-4 border-blue-400 text-blue-800 p-4 mt-4">
+                <p className="font-bold">Nota:</p>
+                <p>La razón social, dirección legal y detalles del negocio se gestionan desde la sección de tu Club.</p>
+              </div>
             </div>
           </div>
         );
@@ -360,11 +238,12 @@ const EntrepreneurProfileContent: React.FC<EntrepreneurProfileContentProps> = ({
       case 'location':
         return (
           <div>
-            <h2 className="text-2xl font-bold text-gray-800 mb-4">Ubicación del Negocio</h2>
+            <h2 className="text-2xl font-bold text-gray-800 mb-4">Ubicación</h2>
+            <Feedback />
             <LocationSection
-              country={user.country || ''}
+              country={user.country || 'Argentina'}
               city={user.city || ''}
-              locality={user.locality || ''}
+              locality={user.locality || user.province || ''}
               postalCode={user.postalCode || ''}
               street={user.street || ''}
               streetNumber={user.streetNumber || ''}
@@ -381,13 +260,10 @@ const EntrepreneurProfileContent: React.FC<EntrepreneurProfileContentProps> = ({
           <div>
             <h2 className="text-2xl font-bold text-gray-800 mb-4">Cumplimiento Legal</h2>
             <div className="space-y-4">
-              <p className="text-gray-600">
-                Aquí podrás gestionar documentos legales, términos y condiciones específicos de tu negocio,
-                y políticas de privacidad.
-              </p>
-              <div className="bg-blue-50 border-l-4 border-blue-400 text-blue-800 p-4 mt-4" role="alert">
+              <p className="text-gray-600">Aquí podrás gestionar documentos legales y licencias de tu negocio.</p>
+              <div className="bg-blue-50 border-l-4 border-blue-400 text-blue-800 p-4 mt-4">
                 <p className="font-bold">Próximamente:</p>
-                <p>Subida y gestión de documentos (ej. habilitaciones, certificados), aceptación de términos de AuraBox.</p>
+                <p>Subida y gestión de documentos (habilitaciones, certificados), aceptación de términos de AuraBox.</p>
               </div>
             </div>
           </div>
@@ -400,7 +276,7 @@ const EntrepreneurProfileContent: React.FC<EntrepreneurProfileContentProps> = ({
         return <SettingsSection />;
 
       default:
-        return <p className="text-gray-600">Selecciona una sección del menú.</p>;
+        return <p className="text-gray-600">Seleccioná una sección del menú.</p>;
     }
   };
 
