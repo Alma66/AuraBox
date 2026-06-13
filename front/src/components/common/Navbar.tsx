@@ -181,11 +181,11 @@ const Navbar: React.FC<NavbarProps> = ({ userRole, isAuthenticated, onLogout }) 
     );
   };
 
-  const isEntrepreneur = isAuthenticated && userRole === 'entrepreneur' && !!user?.managedClubId;
+  const isEntrepreneur = isAuthenticated && userRole === 'entrepreneur';
 
   const renderEntrepreneurDesktopMenus = () => {
     if (!isEntrepreneur) return null;
-    const clubId = user!.managedClubId;
+    const clubId = user?.managedClubId ?? '';
     return (
       <>
         <div className="relative" ref={clubMenuRef}>
@@ -287,7 +287,7 @@ const Navbar: React.FC<NavbarProps> = ({ userRole, isAuthenticated, onLogout }) 
 
   const renderEntrepreneurMobileMenus = () => {
     if (!isEntrepreneur) return null;
-    const clubId = user!.managedClubId;
+    const clubId = user?.managedClubId ?? '';
     return (
       <>
         <button onClick={() => toggleMobileSubMenu('club')} className="flex items-center justify-between w-full text-gray-700 hover:bg-gray-50 hover:text-blue-600 px-3 py-2 rounded-md text-base font-medium">
