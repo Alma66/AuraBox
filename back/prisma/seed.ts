@@ -1928,7 +1928,7 @@ await Promise.all([
   });
 
   const passUser2 = await bcrypt.hash('User1234!', 10);
-  await prisma.user.create({
+  const user2 = await prisma.user.create({
     data: {
       firstName: 'Tomás',
       lastName: 'Herrera',
@@ -1950,7 +1950,7 @@ await Promise.all([
   });
 
   const passUser3 = await bcrypt.hash('User1234!', 10);
-  await prisma.user.create({
+  const user3 = await prisma.user.create({
     data: {
       firstName: 'Micaela',
       lastName: 'López',
@@ -1972,7 +1972,7 @@ await Promise.all([
   });
 
   const passUser4 = await bcrypt.hash('User1234!', 10);
-  await prisma.user.create({
+  const user4 = await prisma.user.create({
     data: {
       firstName: 'Martín',
       lastName: 'Fernández',
@@ -1994,7 +1994,7 @@ await Promise.all([
   });
 
   const passUser5 = await bcrypt.hash('User1234!', 10);
-  await prisma.user.create({
+  const user5 = await prisma.user.create({
     data: {
       firstName: 'Valentina',
       lastName: 'Castro',
@@ -2016,7 +2016,7 @@ await Promise.all([
   });
 
   const passUser6 = await bcrypt.hash('User1234!', 10);
-  await prisma.user.create({
+  const user6 = await prisma.user.create({
     data: {
       firstName: 'Agustín',
       lastName: 'Morales',
@@ -2038,7 +2038,7 @@ await Promise.all([
   });
 
   const passUser7 = await bcrypt.hash('User1234!', 10);
-  await prisma.user.create({
+  const user7 = await prisma.user.create({
     data: {
       firstName: 'Camila',
       lastName: 'Torres',
@@ -2060,7 +2060,7 @@ await Promise.all([
   });
 
   const passUser8 = await bcrypt.hash('User1234!', 10);
-  await prisma.user.create({
+  const user8 = await prisma.user.create({
     data: {
       firstName: 'Federico',
       lastName: 'Romero',
@@ -2082,7 +2082,7 @@ await Promise.all([
   });
 
   const passUser9 = await bcrypt.hash('User1234!', 10);
-  await prisma.user.create({
+  const user9 = await prisma.user.create({
     data: {
       firstName: 'Sofía',
       lastName: 'Núñez',
@@ -2104,7 +2104,7 @@ await Promise.all([
   });
 
   const passUser10 = await bcrypt.hash('User1234!', 10);
-  await prisma.user.create({
+  const user10 = await prisma.user.create({
     data: {
       firstName: 'Nicolás',
       lastName: 'Gutiérrez',
@@ -2126,224 +2126,224 @@ await Promise.all([
   });
 
   const passUser11 = await bcrypt.hash('User1234!', 10);
-await prisma.user.create({
-  data: {
-    firstName: 'Florencia',
-    lastName: 'Méndez',
-    email: 'florencia.mendez@gmail.com',
-    passwordHash: passUser11,
-    documentType: DocumentType.DNI,
-    documentNumber: 44123789,
-    phoneNumber: 1166778,
-    birthDate: new Date('2003-01-25'),
-    streetAddress: 'Calle Mitre',
-    addressNumber: 450,
-    floorNumber: '1B',
-    city: 'Mar del Plata',
-    province: 'Buenos Aires',
-    postalCode: '7600',
-    balanceAvailable: 0,
-    active: true,
-  },
-});
+  const user11 = await prisma.user.create({
+    data: {
+      firstName: 'Florencia',
+      lastName: 'Méndez',
+      email: 'florencia.mendez@gmail.com',
+      passwordHash: passUser11,
+      documentType: DocumentType.DNI,
+      documentNumber: 44123789,
+      phoneNumber: 1166778,
+      birthDate: new Date('2003-01-25'),
+      streetAddress: 'Calle Mitre',
+      addressNumber: 450,
+      floorNumber: '1B',
+      city: 'Mar del Plata',
+      province: 'Buenos Aires',
+      postalCode: '7600',
+      balanceAvailable: 0,
+      active: true,
+    },
+  });
 
-const passUser12 = await bcrypt.hash('User1234!', 10);
-await prisma.user.create({
-  data: {
-    firstName: 'Rodrigo',
-    lastName: 'Acosta',
-    email: 'rodrigo.acosta@gmail.com',
-    passwordHash: passUser12,
-    documentType: DocumentType.DNI,
-    documentNumber: 31456123,
-    phoneNumber: 3834422,
-    birthDate: new Date('1984-08-12'),
-    streetAddress: 'Av. San Martín',
-    addressNumber: 1780,
-    floorNumber: '3A',
-    city: 'San Juan',
-    province: 'San Juan',
-    postalCode: '5400',
-    balanceAvailable: 400,
-    active: true,
-  },
-});
+  const passUser12 = await bcrypt.hash('User1234!', 10);
+  const user12 = await prisma.user.create({
+    data: {
+      firstName: 'Rodrigo',
+      lastName: 'Acosta',
+      email: 'rodrigo.acosta@gmail.com',
+      passwordHash: passUser12,
+      documentType: DocumentType.DNI,
+      documentNumber: 31456123,
+      phoneNumber: 3834422,
+      birthDate: new Date('1984-08-12'),
+      streetAddress: 'Av. San Martín',
+      addressNumber: 1780,
+      floorNumber: '3A',
+      city: 'San Juan',
+      province: 'San Juan',
+      postalCode: '5400',
+      balanceAvailable: 400,
+      active: true,
+    },
+  });
 
-const passUser13 = await bcrypt.hash('User1234!', 10);
-await prisma.user.create({
-  data: {
-    firstName: 'Julieta',
-    lastName: 'Vega',
-    email: 'julieta.vega@hotmail.com',
-    passwordHash: passUser13,
-    documentType: DocumentType.DNI,
-    documentNumber: 40987321,
-    phoneNumber: 2664433,
-    birthDate: new Date('1999-05-03'),
-    streetAddress: 'Calle Rivadavia',
-    addressNumber: 920,
-    floorNumber: '2D',
-    city: 'San Luis',
-    province: 'San Luis',
-    postalCode: '5700',
-    balanceAvailable: 150,
-    active: true,
-  },
-});
+  const passUser13 = await bcrypt.hash('User1234!', 10);
+  const user13 = await prisma.user.create({
+    data: {
+      firstName: 'Julieta',
+      lastName: 'Vega',
+      email: 'julieta.vega@hotmail.com',
+      passwordHash: passUser13,
+      documentType: DocumentType.DNI,
+      documentNumber: 40987321,
+      phoneNumber: 2664433,
+      birthDate: new Date('1999-05-03'),
+      streetAddress: 'Calle Rivadavia',
+      addressNumber: 920,
+      floorNumber: '2D',
+      city: 'San Luis',
+      province: 'San Luis',
+      postalCode: '5700',
+      balanceAvailable: 150,
+      active: true,
+    },
+  });
 
-const passUser14 = await bcrypt.hash('User1234!', 10);
-await prisma.user.create({
-  data: {
-    firstName: 'Ignacio',
-    lastName: 'Blanco',
-    email: 'ignacio.blanco@gmail.com',
-    passwordHash: passUser14,
-    documentType: DocumentType.DNI,
-    documentNumber: 34567891,
-    phoneNumber: 3834411,
-    birthDate: new Date('1988-03-19'),
-    streetAddress: 'Av. Libertad',
-    addressNumber: 345,
-    floorNumber: 'PB',
-    city: 'Resistencia',
-    province: 'Chaco',
-    postalCode: '3500',
-    balanceAvailable: 0,
-    active: true,
-  },
-});
+  const passUser14 = await bcrypt.hash('User1234!', 10);
+  const user14 = await prisma.user.create({
+    data: {
+      firstName: 'Ignacio',
+      lastName: 'Blanco',
+      email: 'ignacio.blanco@gmail.com',
+      passwordHash: passUser14,
+      documentType: DocumentType.DNI,
+      documentNumber: 34567891,
+      phoneNumber: 3834411,
+      birthDate: new Date('1988-03-19'),
+      streetAddress: 'Av. Libertad',
+      addressNumber: 345,
+      floorNumber: 'PB',
+      city: 'Resistencia',
+      province: 'Chaco',
+      postalCode: '3500',
+      balanceAvailable: 0,
+      active: true,
+    },
+  });
 
-const passUser15 = await bcrypt.hash('User1234!', 10);
-await prisma.user.create({
-  data: {
-    firstName: 'Antonella',
-    lastName: 'Ríos',
-    email: 'antonella.rios@outlook.com',
-    passwordHash: passUser15,
-    documentType: DocumentType.DNI,
-    documentNumber: 45678901,
-    phoneNumber: 3794455,
-    birthDate: new Date('2004-11-17'),
-    streetAddress: 'Calle Belgrano',
-    addressNumber: 678,
-    floorNumber: '4C',
-    city: 'Corrientes',
-    province: 'Corrientes',
-    postalCode: '3400',
-    balanceAvailable: 0,
-    active: true,
-  },
-});
+  const passUser15 = await bcrypt.hash('User1234!', 10);
+  const user15 = await prisma.user.create({
+    data: {
+      firstName: 'Antonella',
+      lastName: 'Ríos',
+      email: 'antonella.rios@outlook.com',
+      passwordHash: passUser15,
+      documentType: DocumentType.DNI,
+      documentNumber: 45678901,
+      phoneNumber: 3794455,
+      birthDate: new Date('2004-11-17'),
+      streetAddress: 'Calle Belgrano',
+      addressNumber: 678,
+      floorNumber: '4C',
+      city: 'Corrientes',
+      province: 'Corrientes',
+      postalCode: '3400',
+      balanceAvailable: 0,
+      active: true,
+    },
+  });
 
-const passUser16 = await bcrypt.hash('User1234!', 10);
-await prisma.user.create({
-  data: {
-    firstName: 'Emiliano',
-    lastName: 'Peralta',
-    email: 'emiliano.peralta@gmail.com',
-    passwordHash: passUser16,
-    documentType: DocumentType.DNI,
-    documentNumber: 38123456,
-    phoneNumber: 2664422,
-    birthDate: new Date('1991-07-04'),
-    streetAddress: 'Av. Presidente Perón',
-    addressNumber: 2345,
-    floorNumber: '6B',
-    city: 'Bahía Blanca',
-    province: 'Buenos Aires',
-    postalCode: '8000',
-    balanceAvailable: 600,
-    active: true,
-  },
-});
+  const passUser16 = await bcrypt.hash('User1234!', 10);
+  const user16 = await prisma.user.create({
+    data: {
+      firstName: 'Emiliano',
+      lastName: 'Peralta',
+      email: 'emiliano.peralta@gmail.com',
+      passwordHash: passUser16,
+      documentType: DocumentType.DNI,
+      documentNumber: 38123456,
+      phoneNumber: 2664422,
+      birthDate: new Date('1991-07-04'),
+      streetAddress: 'Av. Presidente Perón',
+      addressNumber: 2345,
+      floorNumber: '6B',
+      city: 'Bahía Blanca',
+      province: 'Buenos Aires',
+      postalCode: '8000',
+      balanceAvailable: 600,
+      active: true,
+    },
+  });
 
-const passUser17 = await bcrypt.hash('User1234!', 10);
-await prisma.user.create({
-  data: {
-    firstName: 'Luciana',
-    lastName: 'Suárez',
-    email: 'luciana.suarez@yahoo.com',
-    passwordHash: passUser17,
-    documentType: DocumentType.DNI,
-    documentNumber: 32890123,
-    phoneNumber: 3884433,
-    birthDate: new Date('1985-09-28'),
-    streetAddress: 'Calle Urquiza',
-    addressNumber: 1120,
-    floorNumber: '1A',
-    city: 'Paraná',
-    province: 'Entre Ríos',
-    postalCode: '3100',
-    balanceAvailable: 0,
-    active: true,
-  },
-});
+  const passUser17 = await bcrypt.hash('User1234!', 10);
+  const user17 = await prisma.user.create({
+    data: {
+      firstName: 'Luciana',
+      lastName: 'Suárez',
+      email: 'luciana.suarez@yahoo.com',
+      passwordHash: passUser17,
+      documentType: DocumentType.DNI,
+      documentNumber: 32890123,
+      phoneNumber: 3884433,
+      birthDate: new Date('1985-09-28'),
+      streetAddress: 'Calle Urquiza',
+      addressNumber: 1120,
+      floorNumber: '1A',
+      city: 'Paraná',
+      province: 'Entre Ríos',
+      postalCode: '3100',
+      balanceAvailable: 0,
+      active: true,
+    },
+  });
 
-const passUser18 = await bcrypt.hash('User1234!', 10);
-await prisma.user.create({
-  data: {
-    firstName: 'Braian',
-    lastName: 'Ojeda',
-    email: 'braian.ojeda@gmail.com',
-    passwordHash: passUser18,
-    documentType: DocumentType.DNI,
-    documentNumber: 41890234,
-    phoneNumber: 3624411,
-    birthDate: new Date('2000-02-14'),
-    streetAddress: 'Av. Chacabuco',
-    addressNumber: 890,
-    floorNumber: '2B',
-    city: 'Santiago del Estero',
-    province: 'Santiago del Estero',
-    postalCode: '4200',
-    balanceAvailable: 0,
-    active: true,
-  },
-});
+  const passUser18 = await bcrypt.hash('User1234!', 10);
+  const user18 = await prisma.user.create({
+    data: {
+      firstName: 'Braian',
+      lastName: 'Ojeda',
+      email: 'braian.ojeda@gmail.com',
+      passwordHash: passUser18,
+      documentType: DocumentType.DNI,
+      documentNumber: 41890234,
+      phoneNumber: 3624411,
+      birthDate: new Date('2000-02-14'),
+      streetAddress: 'Av. Chacabuco',
+      addressNumber: 890,
+      floorNumber: '2B',
+      city: 'Santiago del Estero',
+      province: 'Santiago del Estero',
+      postalCode: '4200',
+      balanceAvailable: 0,
+      active: true,
+    },
+  });
 
-const passUser19 = await bcrypt.hash('User1234!', 10);
-await prisma.user.create({
-  data: {
-    firstName: 'Mariana',
-    lastName: 'Ibáñez',
-    email: 'mariana.ibanez@gmail.com',
-    passwordHash: passUser19,
-    documentType: DocumentType.DNI,
-    documentNumber: 36234567,
-    phoneNumber: 2944422,
-    birthDate: new Date('1990-12-01'),
-    streetAddress: 'Calle Belgrano',
-    addressNumber: 234,
-    floorNumber: '3C',
-    city: 'Cipolletti',
-    province: 'Río Negro',
-    postalCode: '8324',
-    balanceAvailable: 900,
-    active: true,
-  },
-});
+  const passUser19 = await bcrypt.hash('User1234!', 10);
+  const user19 = await prisma.user.create({
+    data: {
+      firstName: 'Mariana',
+      lastName: 'Ibáñez',
+      email: 'mariana.ibanez@gmail.com',
+      passwordHash: passUser19,
+      documentType: DocumentType.DNI,
+      documentNumber: 36234567,
+      phoneNumber: 2944422,
+      birthDate: new Date('1990-12-01'),
+      streetAddress: 'Calle Belgrano',
+      addressNumber: 234,
+      floorNumber: '3C',
+      city: 'Cipolletti',
+      province: 'Río Negro',
+      postalCode: '8324',
+      balanceAvailable: 900,
+      active: true,
+    },
+  });
 
-const passUser20 = await bcrypt.hash('User1234!', 10);
-await prisma.user.create({
-  data: {
-    firstName: 'Sebastián',
-    lastName: 'Quiroga',
-    email: 'sebastian.quiroga@hotmail.com',
-    passwordHash: passUser20,
-    documentType: DocumentType.DNI,
-    documentNumber: 29876543,
-    phoneNumber: 3854433,
-    birthDate: new Date('1980-06-30'),
-    streetAddress: 'Av. Independencia',
-    addressNumber: 1560,
-    floorNumber: '5D',
-    city: 'La Rioja',
-    province: 'La Rioja',
-    postalCode: '5300',
-    balanceAvailable: 1500,
-    active: true,
-  },
-});
+  const passUser20 = await bcrypt.hash('User1234!', 10);
+  const user20 = await prisma.user.create({
+    data: {
+      firstName: 'Sebastián',
+      lastName: 'Quiroga',
+      email: 'sebastian.quiroga@hotmail.com',
+      passwordHash: passUser20,
+      documentType: DocumentType.DNI,
+      documentNumber: 29876543,
+      phoneNumber: 3854433,
+      birthDate: new Date('1980-06-30'),
+      streetAddress: 'Av. Independencia',
+      addressNumber: 1560,
+      floorNumber: '5D',
+      city: 'La Rioja',
+      province: 'La Rioja',
+      postalCode: '5300',
+      balanceAvailable: 1500,
+      active: true,
+    },
+  });
 //#endregion
 
 //#region 6. ENTREPRENEURS 
@@ -3770,28 +3770,25 @@ const licSENASAVegetalesProcesados = await prisma.license_Types.create({
       active: true,
     },
   });
-
+  
   const payMethodTarjetaCredito = await prisma.payment_Methods.create({
     data: {
       method: 'Tarjeta de Crédito',
       active: true,
     },
   });
-  
   const payMethodTarjetaDebito = await prisma.payment_Methods.create({
     data: {
       method: 'Tarjeta de Débito',
       active: true,
     },
   });
-  
   const payMethodPayPal = await prisma.payment_Methods.create({
     data: {
       method: 'PayPal',
       active: true,
     },
   });
-  
   const payMethodEfectivo = await prisma.payment_Methods.create({
     data: {
       method: 'Efectivo',
@@ -3801,773 +3798,748 @@ const licSENASAVegetalesProcesados = await prisma.license_Types.create({
 //#endregion
 
   // 10. PLATFORM_RULES
-  await prisma.platform_Rules.create({
-    data: {
-      title: 'Términos y Condiciones',
-      content: 'Al usar AuraBox aceptás los presentes términos y condiciones.',
-      version: '1.0',
-      active: true,
-      ruleType: 'Terminos',
-    },
-  });
 
 //#region 11. CLUBS
 
-//#region 11.1 Libros y Lectura
-const clubManjarLiterario = await prisma.club.create({
-  data: {
-    name: 'Manjar Literario',
-    logoUrl: 'https://placehold.co/200x200?text=ManjarLiterario',
-    slogan: 'Un libro, una experiencia, una magia',
-    history: 'Nació en Buenos Aires con la misión de acercar la lectura a más personas a través de cajas curadas con amor.',
-    shortDescription: 'Club mensual de libros con productos literarios curados.',
-    contactEmail: 'hola@manjarliterario.com',
-    whatsappContact: '+5491155667788',
-    clubStatus: ClubStatus.APROBADO,
-    averageRating: 4.8,
-    totalReviews: 320,
-  },
-});
+  //#region 11.1 Libros y Lectura
+  const clubManjarLiterario = await prisma.club.create({
+    data: {
+      name: 'Manjar Literario',
+      logoUrl: '',
+      slogan: 'Un libro, una experiencia, una magia',
+      history: 'Nació en Buenos Aires con la misión de acercar la lectura a más personas a través de cajas curadas con amor.',
+      shortDescription: 'Club mensual de libros con productos literarios curados.',
+      contactEmail: 'hola@manjarliterario.com',
+      whatsappContact: '+5491155667788',
+      clubStatus: ClubStatus.APROBADO,
+      averageRating: 4.8,
+      totalReviews: 320,
+    },
+  });
+  const clubBookerly = await prisma.club.create({
+    data: {
+      name: 'Bookerly',
+      logoUrl: '',
+      slogan: 'Tu próxima lectura favorita te está esperando',
+      history: 'Bookerly nació del amor por los libros y la idea de que cada mes debería traer una nueva historia.',
+      shortDescription: 'Suscripción mensual de libros con recomendaciones editoriales seleccionadas.',
+      contactEmail: 'contacto@bookerly.com.ar',
+      whatsappContact: '+5491166778899',
+      clubStatus: ClubStatus.APROBADO,
+      averageRating: 4.6,
+      totalReviews: 210,
+    },
+  });
+  const clubClubWoopy = await prisma.club.create({
+    data: {
+      name: 'Club Woopy',
+      logoUrl: '',
+      slogan: 'El primer programa de suscripción literaria de Argentina',
+      history: 'Club Woopy es pionero en el mundo de las cajas literarias en Argentina, con años de trayectoria y miles de lectores fidelizados.',
+      shortDescription: 'Cajas literarias mensuales con libros y artículos temáticos.',
+      contactEmail: 'info@clubwoopy.com.ar',
+      whatsappContact: '+5491144556677',
+      clubStatus: ClubStatus.APROBADO,
+      averageRating: 4.7,
+      totalReviews: 480,
+    },
+  });
+  const clubEncantadaLibros = await prisma.club.create({
+    data: {
+      name: 'Encantada Libros',
+      logoUrl: '',
+      slogan: 'Cajas llenas de magia literaria',
+      history: 'Encantada Libros es una librería juvenil online que transformó su propuesta en cajas sorpresa para amantes de la lectura.',
+      shortDescription: 'Cajas literarias con libros juveniles y artículos coleccionables.',
+      contactEmail: 'hola@encantadalibros.com.ar',
+      whatsappContact: '+5491177889900',
+      clubStatus: ClubStatus.APROBADO,
+      averageRating: 4.5,
+      totalReviews: 175,
+    },
+  });
+  //#endregion
+  
+  //#region 11.2 Vinos
+  const clubBonvivir = await prisma.club.create({
+    data: {
+      name: 'Bonvivir',
+      logoUrl: '',
+      slogan: 'El club de vinos más grande de Argentina',
+      history: 'Fundado en 2010, Bonvivir es el club de vinos más grande de Argentina con más de 25.000 suscriptores y casi 1.500.000 botellas entregadas por año.',
+      shortDescription: 'Club mensual de vinos seleccionados con envío a todo el país.',
+      contactEmail: 'socios@bonvivir.com',
+      whatsappContact: '+5491122334455',
+      clubStatus: ClubStatus.APROBADO,
+      averageRating: 4.9,
+      totalReviews: 1240,
+    },
+  });
+  const clubWinexperts = await prisma.club.create({
+    data: {
+      name: 'Winexperts',
+      logoUrl: '',
+      slogan: 'Descubrí el vino con expertos',
+      history: 'Winexperts nació para acercar el mundo del vino a personas curiosas que quieren aprender y disfrutar al mismo tiempo.',
+      shortDescription: 'Club de vinos boutique con notas de cata y maridaje incluidos.',
+      contactEmail: 'hola@winexperts.com.ar',
+      whatsappContact: '+5491133445566',
+      clubStatus: ClubStatus.APROBADO,
+      averageRating: 4.7,
+      totalReviews: 390,
+    },
+  });
+  const clubBodegaPrivada = await prisma.club.create({
+    data: {
+      name: 'Bodega Privada',
+      logoUrl: '',
+      slogan: 'Acceso exclusivo a vinos de autor',
+      history: 'Bodega Privada conecta directamente a pequeños productores con amantes del vino, sin intermediarios.',
+      shortDescription: 'Vinos de bodegas boutique y producción limitada enviados mensualmente.',
+      contactEmail: 'info@bodegaprivada.com.ar',
+      whatsappContact: '+5491144556688',
+      clubStatus: ClubStatus.APROBADO,
+      averageRating: 4.8,
+      totalReviews: 290,
+    },
+  });
+  const clubWineOClock = await prisma.club.create({
+    data: {
+      name: "Wine O'Clock",
+      logoUrl: '',
+      slogan: 'Siempre es hora de un buen vino',
+      history: "Wine O'Clock nació con la premisa de que el vino debe ser accesible, divertido y lleno de sorpresas.",
+      shortDescription: 'Club mensual de vinos con sorpresas y maridajes temáticos.',
+      contactEmail: 'hola@wineoclock.com.ar',
+      whatsappContact: '+5491155443322',
+      clubStatus: ClubStatus.APROBADO,
+      averageRating: 4.6,
+      totalReviews: 215,
+    },
+  });
+  //#endregion
+  
+  //#region 11.3 Café
+  const clubMrCoffeeClub = await prisma.club.create({
+    data: {
+      name: 'Mr. Coffee Club',
+      logoUrl: '',
+      slogan: 'Café de especialidad directo a tu puerta',
+      history: 'Mr. Coffee Club nació del amor por el café de origen único y la misión de hacer llegar los mejores granos a los hogares argentinos.',
+      shortDescription: 'Café de especialidad de origen único entregado mensualmente.',
+      contactEmail: 'info@mrcoffeeclub.com.ar',
+      whatsappContact: '+5491166554433',
+      clubStatus: ClubStatus.APROBADO,
+      averageRating: 4.8,
+      totalReviews: 310,
+    },
+  });
+  const clubCafeSelecto = await prisma.club.create({
+    data: {
+      name: 'Café Selecto',
+      logoUrl: '',
+      slogan: 'El mejor café del mundo, en tu taza cada mes',
+      history: 'Café Selecto trabaja directamente con productores de Colombia, Etiopía y Brasil para traer los mejores granos a Argentina.',
+      shortDescription: 'Suscripción mensual de café de especialidad con granos de origen único.',
+      contactEmail: 'hola@cafeselecto.com.ar',
+      whatsappContact: '+5491177665544',
+      clubStatus: ClubStatus.APROBADO,
+      averageRating: 4.7,
+      totalReviews: 195,
+    },
+  });
+  //#endregion
+  
+  //#region 11.4 Cerveza Artesanal
+  const clubBlackBox = await prisma.club.create({
+    data: {
+      name: 'Black Box',
+      logoUrl: '',
+      slogan: 'La mejor cerveza artesanal en una caja misteriosa',
+      history: 'Black Box reúne las mejores cervezas artesanales de todo el país en una caja sorpresa mensual para los verdaderos amantes del craft beer.',
+      shortDescription: 'Caja sorpresa mensual con cervezas artesanales seleccionadas de toda Argentina.',
+      contactEmail: 'info@blackbox.com.ar',
+      whatsappContact: '+5491188776655',
+      clubStatus: ClubStatus.APROBADO,
+      averageRating: 4.7,
+      totalReviews: 430,
+    },
+  });
+  const clubCerveceroClub = await prisma.club.create({
+    data: {
+      name: 'Cervecero Club',
+      logoUrl: '',
+      slogan: 'Craft beer de autor para paladares exigentes',
+      history: 'Cervecero Club nació en Córdoba con la visión de conectar cervecerías artesanales locales con fanáticos del craft beer de todo el país.',
+      shortDescription: 'Selección mensual de cervezas artesanales de productores independientes.',
+      contactEmail: 'hola@cerveceroclub.com.ar',
+      whatsappContact: '+5491199887766',
+      clubStatus: ClubStatus.APROBADO,
+      averageRating: 4.6,
+      totalReviews: 280,
+    },
+  });
+  //#endregion
+  
+  //#region 11.5 Quesos
+  const clubElClubDeLosQuesos = await prisma.club.create({
+    data: {
+      name: 'El Club de los Quesos',
+      logoUrl: '',
+      slogan: 'El primer club de membresía de quesos de Argentina',
+      history: 'Fundado en 2004, El Club de los Quesos lleva más de 20 años acercando quesos artesanales exclusivos a sus socios con fermentos europeos y leche nacional.',
+      shortDescription: 'Club mensual de quesos artesanales exclusivos con producción limitada.',
+      contactEmail: 'socios@clubdelosquesos.com.ar',
+      whatsappContact: '+5491111223344',
+      clubStatus: ClubStatus.APROBADO,
+      averageRating: 4.9,
+      totalReviews: 890,
+    },
+  });
+  //#endregion
 
-const clubBookerly = await prisma.club.create({
-  data: {
-    name: 'Bookerly',
-    logoUrl: 'https://placehold.co/200x200?text=Bookerly',
-    slogan: 'Tu próxima lectura favorita te está esperando',
-    history: 'Bookerly nació del amor por los libros y la idea de que cada mes debería traer una nueva historia.',
-    shortDescription: 'Suscripción mensual de libros con recomendaciones editoriales seleccionadas.',
-    contactEmail: 'contacto@bookerly.com.ar',
-    whatsappContact: '+5491166778899',
-    clubStatus: ClubStatus.APROBADO,
-    averageRating: 4.6,
-    totalReviews: 210,
-  },
-});
+  //#region 11.6  Té e Infusiones 
+  const clubTeaBlends = await prisma.club.create({
+    data: {
+      name: 'Tea Blends Club',
+      logoUrl: '',
+      slogan: 'El mundo del té en tu taza cada mes',
+      history: 'Tea Blends Club nació del amor por las infusiones y el deseo de compartir blends únicos con personas que valoran el ritual del té.',
+      shortDescription: 'Blends de té exclusivos y accesorios para los amantes de las infusiones.',
+      contactEmail: 'hola@teablendsclub.com.ar',
+      whatsappContact: '+5491122114433',
+      clubStatus: ClubStatus.APROBADO,
+      averageRating: 4.6,
+      totalReviews: 190,
+    },
+  });
+  const clubYerbaClub = await prisma.club.create({
+    data: {
+      name: 'Yerba Club',
+      logoUrl: '',
+      slogan: 'La mejor yerba del mundo, con identidad argentina',
+      history: 'Yerba Club nació para reivindicar la yerba mate como producto gourmet, explorando orígenes, blends y marcas artesanales de toda la región.',
+      shortDescription: 'Club mensual de yerbas mate artesanales y accesorios de mate.',
+      contactEmail: 'info@yerbaclub.com.ar',
+      whatsappContact: '+5491133225544',
+      clubStatus: ClubStatus.APROBADO,
+      averageRating: 4.5,
+      totalReviews: 145,
+    },
+  });
+  //#endregion
+  
+  //#region 11.7  Belleza y Skincare 
+  const clubAlmaBox = await prisma.club.create({
+    data: {
+      name: 'Alma Box',
+      logoUrl: '',
+      slogan: 'Belleza consciente, productos que cuidan tu piel y el planeta',
+      history: 'Alma Box nació con la misión de hacer accesible la cosmética natural y sustentable, curada por especialistas en skincare.',
+      shortDescription: 'Caja mensual de belleza con cosméticos naturales y orgánicos seleccionados.',
+      contactEmail: 'hola@almabox.com.ar',
+      whatsappContact: '+5491144336677',
+      clubStatus: ClubStatus.APROBADO,
+      averageRating: 4.8,
+      totalReviews: 520,
+    },
+  });
+  const clubGlossyBox = await prisma.club.create({
+    data: {
+      name: 'Glossybox Argentina',
+      logoUrl: '',
+      slogan: 'Las mejores marcas de belleza en tu puerta',
+      history: 'Glossybox es una de las marcas de beauty boxes más reconocidas del mundo, con presencia en Argentina para acercar productos premium de belleza.',
+      shortDescription: 'Beauty box mensual con productos de marcas internacionales de cosmética.',
+      contactEmail: 'argentina@glossybox.com',
+      whatsappContact: '+5491155447788',
+      clubStatus: ClubStatus.APROBADO,
+      averageRating: 4.7,
+      totalReviews: 680,
+    },
+  });
+  const clubSkincareNatural = await prisma.club.create({
+    data: {
+      name: 'Skincare Natural',
+      logoUrl: '',
+      slogan: 'Tu rutina de skincare, curada con amor',
+      history: 'Skincare Natural surgió para democratizar el acceso a productos de cuidado personal de alta calidad, sin químicos agresivos.',
+      shortDescription: 'Caja mensual de skincare natural con productos cruelty-free y sin parabenos.',
+      contactEmail: 'info@skincarenatural.com.ar',
+      whatsappContact: '+5491166558899',
+      clubStatus: ClubStatus.APROBADO,
+      averageRating: 4.6,
+      totalReviews: 310,
+    },
+  });
+  //#endregion
+  
+  //#region 11.8  Bienestar y Salud 
+  const clubWellnessBox = await prisma.club.create({
+    data: {
+      name: 'Wellness Box',
+      logoUrl: '',
+      slogan: 'Bienestar integral en una caja',
+      history: 'Wellness Box nació para reunir los mejores productos de bienestar, desde suplementos hasta accesorios de meditación y yoga.',
+      shortDescription: 'Caja mensual de bienestar con suplementos, accesorios y productos wellness.',
+      contactEmail: 'hola@wellnessbox.com.ar',
+      whatsappContact: '+5491177559900',
+      clubStatus: ClubStatus.APROBADO,
+      averageRating: 4.5,
+      totalReviews: 220,
+    },
+  });
+  const clubYogaBox = await prisma.club.create({
+    data: {
+      name: 'Yoga Box',
+      logoUrl: '',
+      slogan: 'Todo lo que necesitás para tu práctica de yoga',
+      history: 'Yoga Box nació para acompañar la práctica del yoga con productos de calidad, desde aceites hasta accesorios y libros de meditación.',
+      shortDescription: 'Caja mensual con productos para la práctica de yoga y meditación.',
+      contactEmail: 'namaste@yogabox.com.ar',
+      whatsappContact: '+5491188660011',
+      clubStatus: ClubStatus.APROBADO,
+      averageRating: 4.7,
+      totalReviews: 185,
+    },
+  });
+  //#endregion
+  
+  //#region 11.9  Dulces y Golosinas 
+  const clubSweetBox = await prisma.club.create({
+    data: {
+      name: 'Sweet Box',
+      logoUrl: '',
+      slogan: 'Una sorpresa dulce cada mes',
+      history: 'Sweet Box nació para los amantes de las golosinas y los dulces, reuniendo lo mejor de la confitería artesanal e importada.',
+      shortDescription: 'Caja mensual llena de golosinas, dulces y snacks dulces sorpresa.',
+      contactEmail: 'info@sweetbox.com.ar',
+      whatsappContact: '+5491199001122',
+      clubStatus: ClubStatus.APROBADO,
+      averageRating: 4.6,
+      totalReviews: 340,
+    },
+  });
+  //#endregion
+  
+  //#region 11.10  Chocolate 
+  const clubChocolateBox = await prisma.club.create({
+    data: {
+      name: 'Chocolate Box',
+      logoUrl: '',
+      slogan: 'Los mejores chocolates del mundo en tu puerta',
+      history: 'Chocolate Box nació de la pasión por el cacao y la misión de acercar chocolates bean to bar de productores artesanales argentinos e internacionales.',
+      shortDescription: 'Club mensual de chocolates artesanales y bean to bar seleccionados.',
+      contactEmail: 'hola@chocolatebox.com.ar',
+      whatsappContact: '+5491100112233',
+      clubStatus: ClubStatus.APROBADO,
+      averageRating: 4.8,
+      totalReviews: 270,
+    },
+  });
+  //#endregion
+  
+  //#region 11.11  Snacks Internacionales 
+  const clubSnackBox = await prisma.club.create({
+    data: {
+      name: 'Snack Box',
+      logoUrl: '',
+      slogan: 'Snacks de todo el mundo directo a tu casa',
+      history: 'Snack Box importa y cuida snacks de más de 15 países para que puedas viajar con el paladar sin salir de casa.',
+      shortDescription: 'Caja mensual con snacks importados de distintos países del mundo.',
+      contactEmail: 'info@snackbox.com.ar',
+      whatsappContact: '+5491111334455',
+      clubStatus: ClubStatus.APROBADO,
+      averageRating: 4.7,
+      totalReviews: 415,
+    },
+  });
+  //#endregion
+  
+  //#region 11.12  Especias y Condimentos 
+  const clubEspeciasClub = await prisma.club.create({
+    data: {
+      name: 'Especias Club',
+      logoUrl: '',
+      slogan: 'Dale sabor a tu cocina con especias del mundo',
+      history: 'Especias Club trabaja con productores locales e internacionales para acercar las especias más exóticas y de mejor calidad a los hogares argentinos.',
+      shortDescription: 'Suscripción mensual de especias, condimentos y salsas gourmet.',
+      contactEmail: 'hola@especiasclub.com.ar',
+      whatsappContact: '+5491122445566',
+      clubStatus: ClubStatus.APROBADO,
+      averageRating: 4.6,
+      totalReviews: 160,
+    },
+  });
+  //#endregion
+  
+  //#region 11.13  Mascotas 
+  const clubMyPetBox = await prisma.club.create({
+    data: {
+      name: 'My Pet Box',
+      logoUrl: '',
+      slogan: 'Porque tus mascotas también merecen sorpresas',
+      history: 'My Pet Box nació del amor por los animales y la convicción de que las mascotas merecen los mejores productos cada mes.',
+      shortDescription: 'Caja mensual con juguetes, snacks y accesorios para perros y gatos.',
+      contactEmail: 'info@mypetbox.com.ar',
+      whatsappContact: '+5491133556677',
+      clubStatus: ClubStatus.APROBADO,
+      averageRating: 4.8,
+      totalReviews: 490,
+    },
+  });
+  const clubBeerBox = await prisma.club.create({
+    data: {
+      name: 'Beer Box',
+      logoUrl: '',
+      slogan: 'El mejor craft beer, curado por expertos',
+      history: 'Beer Box es la primera caja de cervezas artesanales de Argentina, con una comunidad de más de 10.000 suscriptores apasionados por el craft beer.',
+      shortDescription: 'Caja mensual de cervezas artesanales premium seleccionadas por expertos.',
+      contactEmail: 'hola@beerbox.com.ar',
+      whatsappContact: '+5491144667788',
+      clubStatus: ClubStatus.APROBADO,
+      averageRating: 4.7,
+      totalReviews: 560,
+    },
+  });
+  //#endregion
+  
+  //#region 11.14  Plantas y Jardín 
+  const clubBotanicaBox = await prisma.club.create({
+    data: {
+      name: 'Botánica Box',
+      logoUrl: '',
+      slogan: 'Una planta nueva en tu hogar cada mes',
+      history: 'Botánica Box nació para acercar el mundo de las plantas y la jardinería a personas que viven en la ciudad y quieren llenar sus espacios de verde.',
+      shortDescription: 'Club mensual de plantas, suculentas, semillas y accesorios de jardín.',
+      contactEmail: 'hola@botanicabox.com.ar',
+      whatsappContact: '+5491155778899',
+      clubStatus: ClubStatus.APROBADO,
+      averageRating: 4.7,
+      totalReviews: 380,
+    },
+  });
+  const clubSuculentasClub = await prisma.club.create({
+    data: {
+      name: 'Suculentas Club',
+      logoUrl: '',
+      slogan: 'Pequeñas, hermosas e indestructibles',
+      history: 'Suculentas Club está dedicado exclusivamente al mundo de las suculentas y cactáceas, con variedades raras y difíciles de conseguir en viveros comunes.',
+      shortDescription: 'Suscripción mensual de suculentas y cactus con fichas informativas.',
+      contactEmail: 'info@suculentasclub.com.ar',
+      whatsappContact: '+5491166889900',
+      clubStatus: ClubStatus.APROBADO,
+      averageRating: 4.6,
+      totalReviews: 200,
+    },
+  });
+  //#endregion
+  
+  //#region 11.15  Papelería y Stationery 
+  const clubPapeleriaBox = await prisma.club.create({
+    data: {
+      name: 'Papelería Box',
+      logoUrl: '',
+      slogan: 'Para los que aman escribir, dibujar y organizar',
+      history: 'Papelería Box nació para los amantes de la papelería de calidad, reuniendo productos de diseño, cuadernos, plumas y artículos únicos cada mes.',
+      shortDescription: 'Caja mensual de papelería de calidad con artículos de diseño y escritura.',
+      contactEmail: 'hola@papeleriabox.com.ar',
+      whatsappContact: '+5491177990011',
+      clubStatus: ClubStatus.APROBADO,
+      averageRating: 4.7,
+      totalReviews: 250,
+    },
+  });
+  //#endregion
 
-const clubClubWoopy = await prisma.club.create({
-  data: {
-    name: 'Club Woopy',
-    logoUrl: 'https://placehold.co/200x200?text=ClubWoopy',
-    slogan: 'El primer programa de suscripción literaria de Argentina',
-    history: 'Club Woopy es pionero en el mundo de las cajas literarias en Argentina, con años de trayectoria y miles de lectores fidelizados.',
-    shortDescription: 'Cajas literarias mensuales con libros y artículos temáticos.',
-    contactEmail: 'info@clubwoopy.com.ar',
-    whatsappContact: '+5491144556677',
-    clubStatus: ClubStatus.APROBADO,
-    averageRating: 4.7,
-    totalReviews: 480,
-  },
-});
+  //#region 11.16  Arte y Manualidades 
+  const clubArteBox = await prisma.club.create({
+    data: {
+      name: 'Arte Box',
+      logoUrl: '',
+      slogan: 'Materiales de arte para despertar tu creatividad',
+      history: 'Arte Box nació para artistas en formación y aficionados al arte, reuniendo materiales de calidad y proyectos guiados cada mes.',
+      shortDescription: 'Caja mensual con materiales artísticos, proyectos DIY y guías creativas.',
+      contactEmail: 'hola@artebox.com.ar',
+      whatsappContact: '+5491188001122',
+      clubStatus: ClubStatus.APROBADO,
+      averageRating: 4.5,
+      totalReviews: 180,
+    },
+  });
+  //#endregion
+  
+  //#region 11.17  Gaming y Geek 
+  const clubLootCrateAR = await prisma.club.create({
+    data: {
+      name: 'Loot Crate AR',
+      logoUrl: '',
+      slogan: 'Merchandising épico para fans épicos',
+      history: 'Loot Crate AR es la versión local del famoso club de cultura geek, adaptado al mercado argentino con productos de gaming, cine y series.',
+      shortDescription: 'Caja mensual de merchandising geek de videojuegos, cine y series.',
+      contactEmail: 'hola@lootcrate.com.ar',
+      whatsappContact: '+5491199112233',
+      clubStatus: ClubStatus.APROBADO,
+      averageRating: 4.8,
+      totalReviews: 720,
+    },
+  });
+  const clubGamingBox = await prisma.club.create({
+    data: {
+      name: 'Gaming Box',
+      logoUrl: '',
+      slogan: 'Accesorios y coleccionables para gamers',
+      history: 'Gaming Box nació para la comunidad gamer argentina, con accesorios, figuras y coleccionables de los mejores títulos de videojuegos.',
+      shortDescription: 'Caja mensual de accesorios y coleccionables para gamers.',
+      contactEmail: 'info@gamingbox.com.ar',
+      whatsappContact: '+5491100223344',
+      clubStatus: ClubStatus.APROBADO,
+      averageRating: 4.6,
+      totalReviews: 390,
+    },
+  });
+  //#endregion
+  
+  //#region 11.18  Anime y Manga 
+  const clubAnimeBox = await prisma.club.create({
+    data: {
+      name: 'Anime Box',
+      logoUrl: '',
+      slogan: 'Tu dosis mensual de cultura otaku',
+      history: 'Anime Box nació para la comunidad otaku argentina, reuniendo figuras, mangas, accesorios y productos de cultura japonesa cada mes.',
+      shortDescription: 'Caja mensual con productos de anime, manga y cultura japonesa.',
+      contactEmail: 'hola@animebox.com.ar',
+      whatsappContact: '+5491111334466',
+      clubStatus: ClubStatus.APROBADO,
+      averageRating: 4.7,
+      totalReviews: 445,
+    },
+  });
+  //#endregion
+  
+  //#region 11.19  Joyería y Bisutería 
+  const clubJoyeriaBox = await prisma.club.create({
+    data: {
+      name: 'Joyería Box',
+      logoUrl: '',
+      slogan: 'Una joya nueva para brillar cada mes',
+      history: 'Joyería Box trabaja con artesanos joyeros independientes de toda Argentina para acercar piezas únicas y de autor a sus suscriptoras.',
+      shortDescription: 'Caja mensual con joyas artesanales y bisutería de diseñadores independientes.',
+      contactEmail: 'info@joyeriabox.com.ar',
+      whatsappContact: '+5491122446688',
+      clubStatus: ClubStatus.APROBADO,
+      averageRating: 4.7,
+      totalReviews: 230,
+    },
+  });
+  //#endregion
+  
+  //#region 11.20  Esotérico y Espiritual 
+  const clubTarotBox = await prisma.club.create({
+    data: {
+      name: 'Tarot Box',
+      logoUrl: '',
+      slogan: 'El universo en una caja cada mes',
+      history: 'Tarot Box nació para quienes buscan conexión espiritual, reuniendo cartas de tarot, cristales, inciensos y artículos esotéricos curados con intención.',
+      shortDescription: 'Caja mensual de tarot, astrología, rituales y productos esotéricos.',
+      contactEmail: 'hola@tarotbox.com.ar',
+      whatsappContact: '+5491133557799',
+      clubStatus: ClubStatus.APROBADO,
+      averageRating: 4.6,
+      totalReviews: 310,
+    },
+  });
+  //#endregion
 
-const clubEncantadaLibros = await prisma.club.create({
-  data: {
-    name: 'Encantada Libros',
-    logoUrl: 'https://placehold.co/200x200?text=EncantadaLibros',
-    slogan: 'Cajas llenas de magia literaria',
-    history: 'Encantada Libros es una librería juvenil online que transformó su propuesta en cajas sorpresa para amantes de la lectura.',
-    shortDescription: 'Cajas literarias con libros juveniles y artículos coleccionables.',
-    contactEmail: 'hola@encantadalibros.com.ar',
-    whatsappContact: '+5491177889900',
-    clubStatus: ClubStatus.APROBADO,
-    averageRating: 4.5,
-    totalReviews: 175,
-  },
-});
-//#endregion
+  //#region 11.21  Cristales y Piedras 
+  const clubCristalesClub = await prisma.club.create({
+    data: {
+      name: 'Cristales Club',
+      logoUrl: '',
+      slogan: 'Piedras y cristales con energía genuina',
+      history: 'Cristales Club nació para llevar al mundo de los cristales y las piedras preciosas a personas que buscan equilibrio y conexión energética.',
+      shortDescription: 'Club mensual de cristales, gemas y piedras energéticas seleccionadas.',
+      contactEmail: 'info@cristalesclub.com.ar',
+      whatsappContact: '+5491144668800',
+      clubStatus: ClubStatus.APROBADO,
+      averageRating: 4.5,
+      totalReviews: 170,
+    },
+  });
+  //#endregion
+  
+  //#region 11.22  Velas y Aromaterapia 
+  const clubVelasAromaticas = await prisma.club.create({
+    data: {
+      name: 'Velas Aromáticas Club',
+      logoUrl: '',
+      slogan: 'Iluminá tu hogar con aromas únicos',
+      history: 'Velas Aromáticas Club nació del arte de crear velas artesanales con aromas únicos, aceites esenciales y ceras naturales.',
+      shortDescription: 'Caja mensual de velas artesanales, difusores y aceites esenciales.',
+      contactEmail: 'hola@velasaromaticas.com.ar',
+      whatsappContact: '+5491155779911',
+      clubStatus: ClubStatus.APROBADO,
+      averageRating: 4.8,
+      totalReviews: 295,
+    },
+  });
+  //#endregion
+  
+  //#region 11.23  Niños y Juguetes 
+  const clubKiwiCoAR = await prisma.club.create({
+    data: {
+      name: 'KiwiCo Argentina',
+      logoUrl: '',
+      slogan: 'Aprendizaje creativo para mentes curiosas',
+      history: 'KiwiCo Argentina trae al país la propuesta educativa internacional de kits STEM, adaptados al currículo y el contexto argentino.',
+      shortDescription: 'Caja mensual educativa con kits STEM y actividades creativas para niños.',
+      contactEmail: 'hola@kiwico.com.ar',
+      whatsappContact: '+5491166880022',
+      clubStatus: ClubStatus.APROBADO,
+      averageRating: 4.9,
+      totalReviews: 610,
+    },
+  });
+  const clubNinosBox = await prisma.club.create({
+    data: {
+      name: 'Niños Box',
+      logoUrl: '',
+      slogan: 'Juguetes y libros para niños felices',
+      history: 'Niños Box nació para facilitar la vida de las familias con una selección mensual de juguetes educativos y libros infantiles curados por pedagogos.',
+      shortDescription: 'Caja mensual con juguetes educativos y libros infantiles seleccionados.',
+      contactEmail: 'info@ninosbox.com.ar',
+      whatsappContact: '+5491177991133',
+      clubStatus: ClubStatus.APROBADO,
+      averageRating: 4.8,
+      totalReviews: 420,
+    },
+  });
+  //#endregion
+  
+  //#region 11.24  Outdoor y Aventura 
+  const clubOutdoorBox = await prisma.club.create({
+    data: {
+      name: 'Outdoor Box',
+      logoUrl: '',
+      slogan: 'Equipate para tu próxima aventura',
+      history: 'Outdoor Box nació para los amantes del trekking, el camping y la vida al aire libre, con equipamiento y accesorios seleccionados por expertos.',
+      shortDescription: 'Caja mensual con accesorios de camping, trekking y vida al aire libre.',
+      contactEmail: 'hola@outdoorbox.com.ar',
+      whatsappContact: '+5491188002244',
+      clubStatus: ClubStatus.APROBADO,
+      averageRating: 4.6,
+      totalReviews: 235,
+    },
+  });
+  //#endregion
+  
+  //#region 11.25  Moda y Accesorios 
+  const clubModaBox = await prisma.club.create({
+    data: {
+      name: 'Moda Box',
+      logoUrl: '',
+      slogan: 'Tu estilo personal, curado cada mes',
+      history: 'Moda Box trabaja con diseñadores independientes argentinos para acercar prendas y accesorios de moda únicos a sus suscriptoras.',
+      shortDescription: 'Caja mensual con ropa y accesorios de diseñadores independientes argentinos.',
+      contactEmail: 'hola@modabox.com.ar',
+      whatsappContact: '+5491199113355',
+      clubStatus: ClubStatus.APROBADO,
+      averageRating: 4.5,
+      totalReviews: 275,
+    },
+  });
+  //#endregion
 
-//#region 11.2 Vinos
-const clubBonvivir = await prisma.club.create({
-  data: {
-    name: 'Bonvivir',
-    logoUrl: 'https://placehold.co/200x200?text=Bonvivir',
-    slogan: 'El club de vinos más grande de Argentina',
-    history: 'Fundado en 2010, Bonvivir es el club de vinos más grande de Argentina con más de 25.000 suscriptores y casi 1.500.000 botellas entregadas por año.',
-    shortDescription: 'Club mensual de vinos seleccionados con envío a todo el país.',
-    contactEmail: 'socios@bonvivir.com',
-    whatsappContact: '+5491122334455',
-    clubStatus: ClubStatus.APROBADO,
-    averageRating: 4.9,
-    totalReviews: 1240,
-  },
-});
-
-const clubWinexperts = await prisma.club.create({
-  data: {
-    name: 'Winexperts',
-    logoUrl: 'https://placehold.co/200x200?text=Winexperts',
-    slogan: 'Descubrí el vino con expertos',
-    history: 'Winexperts nació para acercar el mundo del vino a personas curiosas que quieren aprender y disfrutar al mismo tiempo.',
-    shortDescription: 'Club de vinos boutique con notas de cata y maridaje incluidos.',
-    contactEmail: 'hola@winexperts.com.ar',
-    whatsappContact: '+5491133445566',
-    clubStatus: ClubStatus.APROBADO,
-    averageRating: 4.7,
-    totalReviews: 390,
-  },
-});
-
-const clubBodegaPrivada = await prisma.club.create({
-  data: {
-    name: 'Bodega Privada',
-    logoUrl: 'https://placehold.co/200x200?text=BodegaPrivada',
-    slogan: 'Acceso exclusivo a vinos de autor',
-    history: 'Bodega Privada conecta directamente a pequeños productores con amantes del vino, sin intermediarios.',
-    shortDescription: 'Vinos de bodegas boutique y producción limitada enviados mensualmente.',
-    contactEmail: 'info@bodegaprivada.com.ar',
-    whatsappContact: '+5491144556688',
-    clubStatus: ClubStatus.APROBADO,
-    averageRating: 4.8,
-    totalReviews: 290,
-  },
-});
-
-const clubWineOClock = await prisma.club.create({
-  data: {
-    name: "Wine O'Clock",
-    logoUrl: "https://placehold.co/200x200?text=WineOClock",
-    slogan: 'Siempre es hora de un buen vino',
-    history: "Wine O'Clock nació con la premisa de que el vino debe ser accesible, divertido y lleno de sorpresas.",
-    shortDescription: 'Club mensual de vinos con sorpresas y maridajes temáticos.',
-    contactEmail: 'hola@wineoclock.com.ar',
-    whatsappContact: '+5491155443322',
-    clubStatus: ClubStatus.APROBADO,
-    averageRating: 4.6,
-    totalReviews: 215,
-  },
-});
-//#endregion
-
-//#region 11.3 Café 
-const clubMrCoffeeClub = await prisma.club.create({
-  data: {
-    name: 'Mr. Coffee Club',
-    logoUrl: 'https://placehold.co/200x200?text=MrCoffeeClub',
-    slogan: 'Café de especialidad directo a tu puerta',
-    history: 'Mr. Coffee Club nació del amor por el café de origen único y la misión de hacer llegar los mejores granos a los hogares argentinos.',
-    shortDescription: 'Café de especialidad de origen único entregado mensualmente.',
-    contactEmail: 'info@mrcoffeeclub.com.ar',
-    whatsappContact: '+5491166554433',
-    clubStatus: ClubStatus.APROBADO,
-    averageRating: 4.8,
-    totalReviews: 310,
-  },
-});
-
-const clubCafeSelecto = await prisma.club.create({
-  data: {
-    name: 'Café Selecto',
-    logoUrl: 'https://placehold.co/200x200?text=CafeSelecto',
-    slogan: 'El mejor café del mundo, en tu taza cada mes',
-    history: 'Café Selecto trabaja directamente con productores de Colombia, Etiopía y Brasil para traer los mejores granos a Argentina.',
-    shortDescription: 'Suscripción mensual de café de especialidad con granos de origen único.',
-    contactEmail: 'hola@cafeselecto.com.ar',
-    whatsappContact: '+5491177665544',
-    clubStatus: ClubStatus.APROBADO,
-    averageRating: 4.7,
-    totalReviews: 195,
-  },
-});
-//#endregion
-
-//#region 11.4  Cerveza Artesanal 
-const clubBlackBox = await prisma.club.create({
-  data: {
-    name: 'Black Box',
-    logoUrl: 'https://placehold.co/200x200?text=BlackBox',
-    slogan: 'La mejor cerveza artesanal en una caja misteriosa',
-    history: 'Black Box reúne las mejores cervezas artesanales de todo el país en una caja sorpresa mensual para los verdaderos amantes del craft beer.',
-    shortDescription: 'Caja sorpresa mensual con cervezas artesanales seleccionadas de toda Argentina.',
-    contactEmail: 'info@blackbox.com.ar',
-    whatsappContact: '+5491188776655',
-    clubStatus: ClubStatus.APROBADO,
-    averageRating: 4.7,
-    totalReviews: 430,
-  },
-});
-
-const clubCerveceroClub = await prisma.club.create({
-  data: {
-    name: 'Cervecero Club',
-    logoUrl: 'https://placehold.co/200x200?text=CerveceroClub',
-    slogan: 'Craft beer de autor para paladares exigentes',
-    history: 'Cervecero Club nació en Córdoba con la visión de conectar cervecerías artesanales locales con fanáticos del craft beer de todo el país.',
-    shortDescription: 'Selección mensual de cervezas artesanales de productores independientes.',
-    contactEmail: 'hola@cerveceroclub.com.ar',
-    whatsappContact: '+5491199887766',
-    clubStatus: ClubStatus.APROBADO,
-    averageRating: 4.6,
-    totalReviews: 280,
-  },
-});
-//#endregion
-
-//#region 11.5  Quesos 
-const clubElClubDeLosQuesos = await prisma.club.create({
-  data: {
-    name: 'El Club de los Quesos',
-    logoUrl: 'https://placehold.co/200x200?text=ClubQuesos',
-    slogan: 'El primer club de membresía de quesos de Argentina',
-    history: 'Fundado en 2004, El Club de los Quesos lleva más de 20 años acercando quesos artesanales exclusivos a sus socios con fermentos europeos y leche nacional.',
-    shortDescription: 'Club mensual de quesos artesanales exclusivos con producción limitada.',
-    contactEmail: 'socios@clubdelosquesos.com.ar',
-    whatsappContact: '+5491111223344',
-    clubStatus: ClubStatus.APROBADO,
-    averageRating: 4.9,
-    totalReviews: 890,
-  },
-});
-//#endregion
-
-//#region 11.6  Té e Infusiones 
-const clubTeaBlends = await prisma.club.create({
-  data: {
-    name: 'Tea Blends Club',
-    logoUrl: 'https://placehold.co/200x200?text=TeaBlendsClub',
-    slogan: 'El mundo del té en tu taza cada mes',
-    history: 'Tea Blends Club nació del amor por las infusiones y el deseo de compartir blends únicos con personas que valoran el ritual del té.',
-    shortDescription: 'Blends de té exclusivos y accesorios para los amantes de las infusiones.',
-    contactEmail: 'hola@teablendsclub.com.ar',
-    whatsappContact: '+5491122114433',
-    clubStatus: ClubStatus.APROBADO,
-    averageRating: 4.6,
-    totalReviews: 190,
-  },
-});
-
-const clubYerbaClub = await prisma.club.create({
-  data: {
-    name: 'Yerba Club',
-    logoUrl: 'https://placehold.co/200x200?text=YerbaClub',
-    slogan: 'La mejor yerba del mundo, con identidad argentina',
-    history: 'Yerba Club nació para reivindicar la yerba mate como producto gourmet, explorando orígenes, blends y marcas artesanales de toda la región.',
-    shortDescription: 'Club mensual de yerbas mate artesanales y accesorios de mate.',
-    contactEmail: 'info@yerbaclub.com.ar',
-    whatsappContact: '+5491133225544',
-    clubStatus: ClubStatus.APROBADO,
-    averageRating: 4.5,
-    totalReviews: 145,
-  },
-});
-//#endregion
-
-//#region 11.7  Belleza y Skincare 
-const clubAlmaBox = await prisma.club.create({
-  data: {
-    name: 'Alma Box',
-    logoUrl: 'https://placehold.co/200x200?text=AlmaBox',
-    slogan: 'Belleza consciente, productos que cuidan tu piel y el planeta',
-    history: 'Alma Box nació con la misión de hacer accesible la cosmética natural y sustentable, curada por especialistas en skincare.',
-    shortDescription: 'Caja mensual de belleza con cosméticos naturales y orgánicos seleccionados.',
-    contactEmail: 'hola@almabox.com.ar',
-    whatsappContact: '+5491144336677',
-    clubStatus: ClubStatus.APROBADO,
-    averageRating: 4.8,
-    totalReviews: 520,
-  },
-});
-
-const clubGlossyBox = await prisma.club.create({
-  data: {
-    name: 'Glossybox Argentina',
-    logoUrl: 'https://placehold.co/200x200?text=GlossyBox',
-    slogan: 'Las mejores marcas de belleza en tu puerta',
-    history: 'Glossybox es una de las marcas de beauty boxes más reconocidas del mundo, con presencia en Argentina para acercar productos premium de belleza.',
-    shortDescription: 'Beauty box mensual con productos de marcas internacionales de cosmética.',
-    contactEmail: 'argentina@glossybox.com',
-    whatsappContact: '+5491155447788',
-    clubStatus: ClubStatus.APROBADO,
-    averageRating: 4.7,
-    totalReviews: 680,
-  },
-});
-
-const clubSkincareNatural = await prisma.club.create({
-  data: {
-    name: 'Skincare Natural',
-    logoUrl: 'https://placehold.co/200x200?text=SkincareNatural',
-    slogan: 'Tu rutina de skincare, curada con amor',
-    history: 'Skincare Natural surgió para democratizar el acceso a productos de cuidado personal de alta calidad, sin químicos agresivos.',
-    shortDescription: 'Caja mensual de skincare natural con productos cruelty-free y sin parabenos.',
-    contactEmail: 'info@skincarenatural.com.ar',
-    whatsappContact: '+5491166558899',
-    clubStatus: ClubStatus.APROBADO,
-    averageRating: 4.6,
-    totalReviews: 310,
-  },
-});
-//#endregion
-
-//#region 11.8  Bienestar y Salud 
-const clubWellnessBox = await prisma.club.create({
-  data: {
-    name: 'Wellness Box',
-    logoUrl: 'https://placehold.co/200x200?text=WellnessBox',
-    slogan: 'Bienestar integral en una caja',
-    history: 'Wellness Box nació para reunir los mejores productos de bienestar, desde suplementos hasta accesorios de meditación y yoga.',
-    shortDescription: 'Caja mensual de bienestar con suplementos, accesorios y productos wellness.',
-    contactEmail: 'hola@wellnessbox.com.ar',
-    whatsappContact: '+5491177559900',
-    clubStatus: ClubStatus.APROBADO,
-    averageRating: 4.5,
-    totalReviews: 220,
-  },
-});
-
-const clubYogaBox = await prisma.club.create({
-  data: {
-    name: 'Yoga Box',
-    logoUrl: 'https://placehold.co/200x200?text=YogaBox',
-    slogan: 'Todo lo que necesitás para tu práctica de yoga',
-    history: 'Yoga Box nació para acompañar la práctica del yoga con productos de calidad, desde aceites hasta accesorios y libros de meditación.',
-    shortDescription: 'Caja mensual con productos para la práctica de yoga y meditación.',
-    contactEmail: 'namaste@yogabox.com.ar',
-    whatsappContact: '+5491188660011',
-    clubStatus: ClubStatus.APROBADO,
-    averageRating: 4.7,
-    totalReviews: 185,
-  },
-});
-//#endregion
-
-//#region 11.9  Dulces y Golosinas 
-const clubSweetBox = await prisma.club.create({
-  data: {
-    name: 'Sweet Box',
-    logoUrl: 'https://placehold.co/200x200?text=SweetBox',
-    slogan: 'Una sorpresa dulce cada mes',
-    history: 'Sweet Box nació para los amantes de las golosinas y los dulces, reuniendo lo mejor de la confitería artesanal e importada.',
-    shortDescription: 'Caja mensual llena de golosinas, dulces y snacks dulces sorpresa.',
-    contactEmail: 'info@sweetbox.com.ar',
-    whatsappContact: '+5491199001122',
-    clubStatus: ClubStatus.APROBADO,
-    averageRating: 4.6,
-    totalReviews: 340,
-  },
-});
-//#endregion
-
-//#region 11.10  Chocolate 
-const clubChocolateBox = await prisma.club.create({
-  data: {
-    name: 'Chocolate Box',
-    logoUrl: 'https://placehold.co/200x200?text=ChocolateBox',
-    slogan: 'Los mejores chocolates del mundo en tu puerta',
-    history: 'Chocolate Box nació de la pasión por el cacao y la misión de acercar chocolates bean to bar de productores artesanales argentinos e internacionales.',
-    shortDescription: 'Club mensual de chocolates artesanales y bean to bar seleccionados.',
-    contactEmail: 'hola@chocolatebox.com.ar',
-    whatsappContact: '+5491100112233',
-    clubStatus: ClubStatus.APROBADO,
-    averageRating: 4.8,
-    totalReviews: 270,
-  },
-});
-//#endregion
-
-//#region 11.11  Snacks Internacionales 
-const clubSnackBox = await prisma.club.create({
-  data: {
-    name: 'Snack Box',
-    logoUrl: 'https://placehold.co/200x200?text=SnackBox',
-    slogan: 'Snacks de todo el mundo directo a tu casa',
-    history: 'Snack Box importa y cuida snacks de más de 15 países para que puedas viajar con el paladar sin salir de casa.',
-    shortDescription: 'Caja mensual con snacks importados de distintos países del mundo.',
-    contactEmail: 'info@snackbox.com.ar',
-    whatsappContact: '+5491111334455',
-    clubStatus: ClubStatus.APROBADO,
-    averageRating: 4.7,
-    totalReviews: 415,
-  },
-});
-//#endregion
-
-//#region 11.12  Especias y Condimentos 
-const clubEspeciasClub = await prisma.club.create({
-  data: {
-    name: 'Especias Club',
-    logoUrl: 'https://placehold.co/200x200?text=EspeciasClub',
-    slogan: 'Dale sabor a tu cocina con especias del mundo',
-    history: 'Especias Club trabaja con productores locales e internacionales para acercar las especias más exóticas y de mejor calidad a los hogares argentinos.',
-    shortDescription: 'Suscripción mensual de especias, condimentos y salsas gourmet.',
-    contactEmail: 'hola@especiasclub.com.ar',
-    whatsappContact: '+5491122445566',
-    clubStatus: ClubStatus.APROBADO,
-    averageRating: 4.6,
-    totalReviews: 160,
-  },
-});
-//#endregion
-
-//#region 11.13  Mascotas 
-const clubMyPetBox = await prisma.club.create({
-  data: {
-    name: 'My Pet Box',
-    logoUrl: 'https://placehold.co/200x200?text=MyPetBox',
-    slogan: 'Porque tus mascotas también merecen sorpresas',
-    history: 'My Pet Box nació del amor por los animales y la convicción de que las mascotas merecen los mejores productos cada mes.',
-    shortDescription: 'Caja mensual con juguetes, snacks y accesorios para perros y gatos.',
-    contactEmail: 'info@mypetbox.com.ar',
-    whatsappContact: '+5491133556677',
-    clubStatus: ClubStatus.APROBADO,
-    averageRating: 4.8,
-    totalReviews: 490,
-  },
-});
-
-const clubBeerBox = await prisma.club.create({
-  data: {
-    name: 'Beer Box',
-    logoUrl: 'https://placehold.co/200x200?text=BeerBox',
-    slogan: 'El mejor craft beer, curado por expertos',
-    history: 'Beer Box es la primera caja de cervezas artesanales de Argentina, con una comunidad de más de 10.000 suscriptores apasionados por el craft beer.',
-    shortDescription: 'Caja mensual de cervezas artesanales premium seleccionadas por expertos.',
-    contactEmail: 'hola@beerbox.com.ar',
-    whatsappContact: '+5491144667788',
-    clubStatus: ClubStatus.APROBADO,
-    averageRating: 4.7,
-    totalReviews: 560,
-  },
-});
-//#endregion
-
-//#region 11.14  Plantas y Jardín 
-const clubBotanicaBox = await prisma.club.create({
-  data: {
-    name: 'Botánica Box',
-    logoUrl: 'https://placehold.co/200x200?text=BotanicaBox',
-    slogan: 'Una planta nueva en tu hogar cada mes',
-    history: 'Botánica Box nació para acercar el mundo de las plantas y la jardinería a personas que viven en la ciudad y quieren llenar sus espacios de verde.',
-    shortDescription: 'Club mensual de plantas, suculentas, semillas y accesorios de jardín.',
-    contactEmail: 'hola@botanicabox.com.ar',
-    whatsappContact: '+5491155778899',
-    clubStatus: ClubStatus.APROBADO,
-    averageRating: 4.7,
-    totalReviews: 380,
-  },
-});
-
-const clubSuculentasClub = await prisma.club.create({
-  data: {
-    name: 'Suculentas Club',
-    logoUrl: 'https://placehold.co/200x200?text=SuculentasClub',
-    slogan: 'Pequeñas, hermosas e indestructibles',
-    history: 'Suculentas Club está dedicado exclusivamente al mundo de las suculentas y cactáceas, con variedades raras y difíciles de conseguir en viveros comunes.',
-    shortDescription: 'Suscripción mensual de suculentas y cactus con fichas informativas.',
-    contactEmail: 'info@suculentasclub.com.ar',
-    whatsappContact: '+5491166889900',
-    clubStatus: ClubStatus.APROBADO,
-    averageRating: 4.6,
-    totalReviews: 200,
-  },
-});
-//#endregion
-
-//#region 11.15  Papelería y Stationery 
-const clubPapeleriaBox = await prisma.club.create({
-  data: {
-    name: 'Papelería Box',
-    logoUrl: 'https://placehold.co/200x200?text=PapeleriaBox',
-    slogan: 'Para los que aman escribir, dibujar y organizar',
-    history: 'Papelería Box nació para los amantes de la papelería de calidad, reuniendo productos de diseño, cuadernos, plumas y artículos únicos cada mes.',
-    shortDescription: 'Caja mensual de papelería de calidad con artículos de diseño y escritura.',
-    contactEmail: 'hola@papeleriabox.com.ar',
-    whatsappContact: '+5491177990011',
-    clubStatus: ClubStatus.APROBADO,
-    averageRating: 4.7,
-    totalReviews: 250,
-  },
-});
-//#endregion
-
-//#region 11.16  Arte y Manualidades 
-const clubArteBox = await prisma.club.create({
-  data: {
-    name: 'Arte Box',
-    logoUrl: 'https://placehold.co/200x200?text=ArteBox',
-    slogan: 'Materiales de arte para despertar tu creatividad',
-    history: 'Arte Box nació para artistas en formación y aficionados al arte, reuniendo materiales de calidad y proyectos guiados cada mes.',
-    shortDescription: 'Caja mensual con materiales artísticos, proyectos DIY y guías creativas.',
-    contactEmail: 'hola@artebox.com.ar',
-    whatsappContact: '+5491188001122',
-    clubStatus: ClubStatus.APROBADO,
-    averageRating: 4.5,
-    totalReviews: 180,
-  },
-});
-//#endregion
-
-//#region 11.17  Gaming y Geek 
-const clubLootCrateAR = await prisma.club.create({
-  data: {
-    name: 'Loot Crate AR',
-    logoUrl: 'https://placehold.co/200x200?text=LootCrateAR',
-    slogan: 'Merchandising épico para fans épicos',
-    history: 'Loot Crate AR es la versión local del famoso club de cultura geek, adaptado al mercado argentino con productos de gaming, cine y series.',
-    shortDescription: 'Caja mensual de merchandising geek de videojuegos, cine y series.',
-    contactEmail: 'hola@lootcrate.com.ar',
-    whatsappContact: '+5491199112233',
-    clubStatus: ClubStatus.APROBADO,
-    averageRating: 4.8,
-    totalReviews: 720,
-  },
-});
-
-const clubGamingBox = await prisma.club.create({
-  data: {
-    name: 'Gaming Box',
-    logoUrl: 'https://placehold.co/200x200?text=GamingBox',
-    slogan: 'Accesorios y coleccionables para gamers',
-    history: 'Gaming Box nació para la comunidad gamer argentina, con accesorios, figuras y coleccionables de los mejores títulos de videojuegos.',
-    shortDescription: 'Caja mensual de accesorios y coleccionables para gamers.',
-    contactEmail: 'info@gamingbox.com.ar',
-    whatsappContact: '+5491100223344',
-    clubStatus: ClubStatus.APROBADO,
-    averageRating: 4.6,
-    totalReviews: 390,
-  },
-});
-//#endregion
-
-//#region 11.18  Anime y Manga 
-const clubAnimeBox = await prisma.club.create({
-  data: {
-    name: 'Anime Box',
-    logoUrl: 'https://placehold.co/200x200?text=AnimeBox',
-    slogan: 'Tu dosis mensual de cultura otaku',
-    history: 'Anime Box nació para la comunidad otaku argentina, reuniendo figuras, mangas, accesorios y productos de cultura japonesa cada mes.',
-    shortDescription: 'Caja mensual con productos de anime, manga y cultura japonesa.',
-    contactEmail: 'hola@animebox.com.ar',
-    whatsappContact: '+5491111334466',
-    clubStatus: ClubStatus.APROBADO,
-    averageRating: 4.7,
-    totalReviews: 445,
-  },
-});
-//#endregion
-
-//#region 11.19  Joyería y Bisutería 
-const clubJoyeriaBox = await prisma.club.create({
-  data: {
-    name: 'Joyería Box',
-    logoUrl: 'https://placehold.co/200x200?text=JoyeriaBox',
-    slogan: 'Una joya nueva para brillar cada mes',
-    history: 'Joyería Box trabaja con artesanos joyeros independientes de toda Argentina para acercar piezas únicas y de autor a sus suscriptoras.',
-    shortDescription: 'Caja mensual con joyas artesanales y bisutería de diseñadores independientes.',
-    contactEmail: 'info@joyeriabox.com.ar',
-    whatsappContact: '+5491122446688',
-    clubStatus: ClubStatus.APROBADO,
-    averageRating: 4.7,
-    totalReviews: 230,
-  },
-});
-//#endregion
-
-//#region 11.20  Esotérico y Espiritual 
-const clubTarotBox = await prisma.club.create({
-  data: {
-    name: 'Tarot Box',
-    logoUrl: 'https://placehold.co/200x200?text=TarotBox',
-    slogan: 'El universo en una caja cada mes',
-    history: 'Tarot Box nació para quienes buscan conexión espiritual, reuniendo cartas de tarot, cristales, inciensos y artículos esotéricos curados con intención.',
-    shortDescription: 'Caja mensual de tarot, astrología, rituales y productos esotéricos.',
-    contactEmail: 'hola@tarotbox.com.ar',
-    whatsappContact: '+5491133557799',
-    clubStatus: ClubStatus.APROBADO,
-    averageRating: 4.6,
-    totalReviews: 310,
-  },
-});
-//#endregion
-
-//#region 11.21  Cristales y Piedras 
-const clubCristalesClub = await prisma.club.create({
-  data: {
-    name: 'Cristales Club',
-    logoUrl: 'https://placehold.co/200x200?text=CristalesClub',
-    slogan: 'Piedras y cristales con energía genuina',
-    history: 'Cristales Club nació para llevar al mundo de los cristales y las piedras preciosas a personas que buscan equilibrio y conexión energética.',
-    shortDescription: 'Club mensual de cristales, gemas y piedras energéticas seleccionadas.',
-    contactEmail: 'info@cristalesclub.com.ar',
-    whatsappContact: '+5491144668800',
-    clubStatus: ClubStatus.APROBADO,
-    averageRating: 4.5,
-    totalReviews: 170,
-  },
-});
-//#endregion
-
-//#region 11.22  Velas y Aromaterapia 
-const clubVelasAromaticas = await prisma.club.create({
-  data: {
-    name: 'Velas Aromáticas Club',
-    logoUrl: 'https://placehold.co/200x200?text=VelasAromaticas',
-    slogan: 'Iluminá tu hogar con aromas únicos',
-    history: 'Velas Aromáticas Club nació del arte de crear velas artesanales con aromas únicos, aceites esenciales y ceras naturales.',
-    shortDescription: 'Caja mensual de velas artesanales, difusores y aceites esenciales.',
-    contactEmail: 'hola@velasaromaticas.com.ar',
-    whatsappContact: '+5491155779911',
-    clubStatus: ClubStatus.APROBADO,
-    averageRating: 4.8,
-    totalReviews: 295,
-  },
-});
-//#endregion
-
-//#region 11.23  Niños y Juguetes 
-const clubKiwiCoAR = await prisma.club.create({
-  data: {
-    name: 'KiwiCo Argentina',
-    logoUrl: 'https://placehold.co/200x200?text=KiwiCoAR',
-    slogan: 'Aprendizaje creativo para mentes curiosas',
-    history: 'KiwiCo Argentina trae al país la propuesta educativa internacional de kits STEM, adaptados al currículo y el contexto argentino.',
-    shortDescription: 'Caja mensual educativa con kits STEM y actividades creativas para niños.',
-    contactEmail: 'hola@kiwico.com.ar',
-    whatsappContact: '+5491166880022',
-    clubStatus: ClubStatus.APROBADO,
-    averageRating: 4.9,
-    totalReviews: 610,
-  },
-});
-
-const clubNinosBox = await prisma.club.create({
-  data: {
-    name: 'Niños Box',
-    logoUrl: 'https://placehold.co/200x200?text=NinosBox',
-    slogan: 'Juguetes y libros para niños felices',
-    history: 'Niños Box nació para facilitar la vida de las familias con una selección mensual de juguetes educativos y libros infantiles curados por pedagogos.',
-    shortDescription: 'Caja mensual con juguetes educativos y libros infantiles seleccionados.',
-    contactEmail: 'info@ninosbox.com.ar',
-    whatsappContact: '+5491177991133',
-    clubStatus: ClubStatus.APROBADO,
-    averageRating: 4.8,
-    totalReviews: 420,
-  },
-});
-//#endregion
-
-//#region 11.24  Outdoor y Aventura 
-const clubOutdoorBox = await prisma.club.create({
-  data: {
-    name: 'Outdoor Box',
-    logoUrl: 'https://placehold.co/200x200?text=OutdoorBox',
-    slogan: 'Equipate para tu próxima aventura',
-    history: 'Outdoor Box nació para los amantes del trekking, el camping y la vida al aire libre, con equipamiento y accesorios seleccionados por expertos.',
-    shortDescription: 'Caja mensual con accesorios de camping, trekking y vida al aire libre.',
-    contactEmail: 'hola@outdoorbox.com.ar',
-    whatsappContact: '+5491188002244',
-    clubStatus: ClubStatus.APROBADO,
-    averageRating: 4.6,
-    totalReviews: 235,
-  },
-});
-//#endregion
-
-//#region 11.25  Moda y Accesorios 
-const clubModaBox = await prisma.club.create({
-  data: {
-    name: 'Moda Box',
-    logoUrl: 'https://placehold.co/200x200?text=ModaBox',
-    slogan: 'Tu estilo personal, curado cada mes',
-    history: 'Moda Box trabaja con diseñadores independientes argentinos para acercar prendas y accesorios de moda únicos a sus suscriptoras.',
-    shortDescription: 'Caja mensual con ropa y accesorios de diseñadores independientes argentinos.',
-    contactEmail: 'hola@modabox.com.ar',
-    whatsappContact: '+5491199113355',
-    clubStatus: ClubStatus.APROBADO,
-    averageRating: 4.5,
-    totalReviews: 275,
-  },
-});
-//#endregion
-
-//#region 11.26  Medias y Calcetines 
-const clubMediasClub = await prisma.club.create({
-  data: {
-    name: 'Medias Club',
-    logoUrl: 'https://placehold.co/200x200?text=MediasClub',
-    slogan: 'Las medias más divertidas del mundo en tu cajón',
-    history: 'Medias Club nació con la idea de que las medias pueden ser una forma de expresión personal, con diseños únicos y ediciones limitadas cada mes.',
-    shortDescription: 'Club mensual de medias y calcetines con diseños exclusivos y divertidos.',
-    contactEmail: 'hola@mediasclub.com.ar',
-    whatsappContact: '+5491100224466',
-    clubStatus: ClubStatus.APROBADO,
-    averageRating: 4.7,
-    totalReviews: 320,
-  },
-});
-//#endregion
-
-//#region 11.27  Destilados y Cocktails
-const clubGinTonicClub = await prisma.club.create({
-  data: {
-    name: 'Gin Tonic Club',
-    logoUrl: 'https://placehold.co/200x200?text=GinTonicClub',
-    slogan: 'El arte del gin tonic en tu casa',
-    history: 'Gin Tonic Club nació para los amantes del gin tonic, acercando gins artesanales, tónicas premium y accesorios para preparar el perfect serve en casa.',
-    shortDescription: 'Club mensual de gins artesanales, tónicas y accesorios para cocktails.',
-    contactEmail: 'info@gintonicclub.com.ar',
-    whatsappContact: '+5491111335577',
-    clubStatus: ClubStatus.APROBADO,
-    averageRating: 4.8,
-    totalReviews: 360,
-  },
-});
-//#endregion
-
-//#region 11.28  Fósiles y Curiosidades 
-const clubFosilesClub = await prisma.club.create({
-  data: {
-    name: 'Fósiles Club',
-    logoUrl: 'https://placehold.co/200x200?text=FosilesClub',
-    slogan: 'Viajá millones de años atrás con cada caja',
-    history: 'Fósiles Club nació para científicos en formación y curiosos del mundo natural, acercando fósiles auténticos, minerales y especímenes únicos cada mes.',
-    shortDescription: 'Club mensual de fósiles auténticos, minerales y curiosidades científicas.',
-    contactEmail: 'hola@fosilesclub.com.ar',
-    whatsappContact: '+5491122446600',
-    clubStatus: ClubStatus.APROBADO,
-    averageRating: 4.9,
-    totalReviews: 155,
-  },
-});
-//#endregion
-
-//#region 11.29  Embutidos y Charcutería 
-const clubCharcuterieBox = await prisma.club.create({
-  data: {
-    name: 'Charcuterie Box',
-    logoUrl: 'https://placehold.co/200x200?text=CharcuterieBox',
-    slogan: 'La mejor tabla de charcutería, en tu casa',
-    history: 'Charcuterie Box nació para los amantes de los fiambres artesanales y las carnes curadas, trabajando con productores locales de todo el país.',
-    shortDescription: 'Caja mensual de embutidos artesanales, fiambres y productos de charcutería.',
-    contactEmail: 'info@charcuteriebox.com.ar',
-    whatsappContact: '+5491133557711',
-    clubStatus: ClubStatus.APROBADO,
-    averageRating: 4.7,
-    totalReviews: 205,
-  },
-});
-//#endregion
-
-//#region 11.30  Ropa Interior y Lencería 
-const clubRopaInteriorBox = await prisma.club.create({
-  data: {
-    name: 'Íntima Box',
-    logoUrl: 'https://placehold.co/200x200?text=IntimaBox',
-    slogan: 'Comodidad y estilo en tu día a día',
-    history: 'Íntima Box nació para hacer del momento de elegir ropa interior una experiencia de cuidado personal, con prendas de calidad y diseño seleccionadas cada mes.',
-    shortDescription: 'Club mensual de ropa interior y loungewear de marcas independientes.',
-    contactEmail: 'hola@intimabox.com.ar',
-    whatsappContact: '+5491144668822',
-    clubStatus: ClubStatus.APROBADO,
-    averageRating: 4.5,
-    totalReviews: 190,
-  },
-});
-//#endregion
-
-//#region 11.31 Bienestar / Gastronomía saludable
+  //#region 11.26  Medias y Calcetines 
+  const clubMediasClub = await prisma.club.create({
+    data: {
+      name: 'Medias Club',
+      logoUrl: '',
+      slogan: 'Las medias más divertidas del mundo en tu cajón',
+      history: 'Medias Club nació con la idea de que las medias pueden ser una forma de expresión personal, con diseños únicos y ediciones limitadas cada mes.',
+      shortDescription: 'Club mensual de medias y calcetines con diseños exclusivos y divertidos.',
+      contactEmail: 'hola@mediasclub.com.ar',
+      whatsappContact: '+5491100224466',
+      clubStatus: ClubStatus.APROBADO,
+      averageRating: 4.7,
+      totalReviews: 320,
+    },
+  });
+  //#endregion
+  
+  //#region 11.27  Destilados y Cocktails
+  const clubGinTonicClub = await prisma.club.create({
+    data: {
+      name: 'Gin Tonic Club',
+      logoUrl: '',
+      slogan: 'El arte del gin tonic en tu casa',
+      history: 'Gin Tonic Club nació para los amantes del gin tonic, acercando gins artesanales, tónicas premium y accesorios para preparar el perfect serve en casa.',
+      shortDescription: 'Club mensual de gins artesanales, tónicas y accesorios para cocktails.',
+      contactEmail: 'info@gintonicclub.com.ar',
+      whatsappContact: '+5491111335577',
+      clubStatus: ClubStatus.APROBADO,
+      averageRating: 4.8,
+      totalReviews: 360,
+    },
+  });
+  //#endregion
+  
+  //#region 11.28  Fósiles y Curiosidades 
+  const clubFosilesClub = await prisma.club.create({
+    data: {
+      name: 'Fósiles Club',
+      logoUrl: '',
+      slogan: 'Viajá millones de años atrás con cada caja',
+      history: 'Fósiles Club nació para científicos en formación y curiosos del mundo natural, acercando fósiles auténticos, minerales y especímenes únicos cada mes.',
+      shortDescription: 'Club mensual de fósiles auténticos, minerales y curiosidades científicas.',
+      contactEmail: 'hola@fosilesclub.com.ar',
+      whatsappContact: '+5491122446600',
+      clubStatus: ClubStatus.APROBADO,
+      averageRating: 4.9,
+      totalReviews: 155,
+    },
+  });
+  //#endregion
+  
+  //#region 11.29  Embutidos y Charcutería 
+  const clubCharcuterieBox = await prisma.club.create({
+    data: {
+      name: 'Charcuterie Box',
+      logoUrl: '',
+      slogan: 'La mejor tabla de charcutería, en tu casa',
+      history: 'Charcuterie Box nació para los amantes de los fiambres artesanales y las carnes curadas, trabajando con productores locales de todo el país.',
+      shortDescription: 'Caja mensual de embutidos artesanales, fiambres y productos de charcutería.',
+      contactEmail: 'info@charcuteriebox.com.ar',
+      whatsappContact: '+5491133557711',
+      clubStatus: ClubStatus.APROBADO,
+      averageRating: 4.7,
+      totalReviews: 205,
+    },
+  });
+  //#endregion
+  
+  //#region 11.30  Ropa Interior y Lencería 
+  const clubRopaInteriorBox = await prisma.club.create({
+    data: {
+      name: 'Íntima Box',
+      logoUrl: '',
+      slogan: 'Comodidad y estilo en tu día a día',
+      history: 'Íntima Box nació para hacer del momento de elegir ropa interior una experiencia de cuidado personal, con prendas de calidad y diseño seleccionadas cada mes.',
+      shortDescription: 'Club mensual de ropa interior y loungewear de marcas independientes.',
+      contactEmail: 'hola@intimabox.com.ar',
+      whatsappContact: '+5491144668822',
+      clubStatus: ClubStatus.APROBADO,
+      averageRating: 4.5,
+      totalReviews: 190,
+    },
+  });
+  //#endregion
+  
+  //#region 11.31 Bienestar / Gastronomía saludable
 const clubHolaVeggie = await prisma.club.create({
   data: {
     name: 'Hola Veggie',
-    logoUrl: 'https://placehold.co/200x200?text=HolaVeggie',
+    logoUrl: '',
     slogan: 'Comé rico, comé verde',
     history: 'Hola Veggie nació para facilitar la transición a una alimentación basada en plantas, enviando kits de comida vegetal fresca en CABA y GBA.',
     shortDescription: 'Club mensual de kits de comida vegetal fresca con recetas incluidas.',
@@ -4579,7 +4551,6 @@ const clubHolaVeggie = await prisma.club.create({
   },
 });
 //#endregion
-
 //#endregion
 
 //#region 12. CLUB_CATEGORIES
@@ -6457,14 +6428,6 @@ for (const club of clubsConEfectivo) {
 //#endregion
 
   // 18. IMAGE_CLUB
-  await prisma.image_Club.create({
-    data: {
-      idClub: clubManjarLiterario.id,
-      imageUrl: 'https://ejemplo.com/images/manjar-caja.jpg',
-      description: 'Foto de la caja del mes de enero',
-      contentType: ContentType.Imagen,
-    },
-  });
 
 //#region 19. SUBSCRIPTION_TYPES
 
@@ -17378,7 +17341,7 @@ for (const club of clubsConEfectivo) {
         idSubscriptionTypes: holaVeggieKitPara4.id,
         deliveryMonthYear: '2026-04',
         productName: 'Kit Para 4 Abril: Sopa de Tomate Asado + Hamburguesas de Garbanzos',
-        productDescription: 'Receta 1: Sopa cremosa de tomate asado y pimiento (tiempo: 50 minutos). Ingredientes para 4: tomates 1kg, pimiento rojo 2 unidades, cebolla, ajo, caldo de verduras 400ml, crema de coco 100ml, albahaca fresca, aceite de oliva y pan de ajo tostado (2 baguettes veganas). Receta 2: Hamburguesas de garbanzos y avena con salsa chipotle (tiempo: 40 minutos). Ingredientes: garbanzos 600g, avena arrollada 80g, cebolla, ajo, comino, pimentón, ají chipotle en lata, mayonesa vegana 100g, 4 panes de hamburguesa, lechuga, tomate y pepino.',
+        productDescription: 'Receta 1: Sopa cremosa de tomate asado y pimiento (tiempo: 50 minutos). Ingredientes para 4: tomates 1kg, pimiento rojo 2 unidades, cebolla, ajo, caldo de verduras 400ml, crema de coco 100ml, albahaca fresca, aceite de oliva y pan de ajo tostado baguettes veganas). Receta 2: Hamburguesas de garbanzos y avena con salsa chipotle (tiempo: 40 minutos). Ingredientes: garbanzos 600g, avena arrollada 80g, cebolla, ajo, comino, pimentón, ají chipotle en lata, mayonesa vegana 100g, 4 panes de hamburguesa, lechuga, tomate y pepino.',
         usageInstructions: 'Sopa: asar los tomates y pimientos a 200°C 25 minutos. Licuar con el caldo. Calentar con la crema de coco y albahaca. Servir con el pan de ajo. Hamburguesas: procesar los garbanzos parcialmente (dejar textura). Mezclar con la avena y especias. Formar hamburguesas de 1.5cm y cocinar en sartén con poco aceite 5 minutos por lado.',
         additionalNotes: 'Contiene gluten (avena arrollada, panes de hamburguesa y baguettes). Contiene soja (mayonesa vegana). El chipotle en lata puede ser muy picante: usar con moderación y probar antes. Las hamburguesas de garbanzos son más frágiles que las de carne: no aplastar durante la cocción.',
         publicationDate: new Date('2026-04-01'),
@@ -17400,8 +17363,10 @@ for (const club of clubsConEfectivo) {
   //#endregion
 //#endregion 
 
-// 21. USER_SUBSCRIPTIONS — usamos user.id (el primero que guardamos)
-  const userSub = await prisma.user_Subscriptions.create({
+//#region 21. USER_SUBSCRIPTIONS
+
+  //#region 21.1. - Lucía Ramírez 
+  const user1Sub1 = await prisma.user_Subscriptions.create({
     data: {
       idUser: user.id,
       idPaymentMethods: payMethodMercadoPago.id,
@@ -17411,89 +17376,2927 @@ for (const club of clubsConEfectivo) {
       subscriptionStatus: SubscriptionStatus.Activa,
       lastPaymentDate: new Date('2025-04-01'),
       nextPaymentDate: new Date('2025-05-01'),
-      monthlyAmountPaid: 26500,
+      monthlyAmountPaid: 29900,  
     },
   });
 
-  // 22. PAYMENT
-  await prisma.payment.create({
+  const user1Sub2 = await prisma.user_Subscriptions.create({
     data: {
-      idUserSubscription: userSub.id,
       idUser: user.id,
-      idClub: clubManjarLiterario.id,
+      idPaymentMethods: payMethodEfectivo.id,
+      idSubscriptionTypes: cafeSelectoOrigenDelMes.id,
+      startDate: new Date('2025-02-01'),
+      expectedEndDate: new Date('2025-12-31'),
+      subscriptionStatus: SubscriptionStatus.Activa,
+      lastPaymentDate: new Date('2025-04-01'),
+      nextPaymentDate: new Date('2025-05-01'),
+      monthlyAmountPaid: Math.round(17000 * (1 - 7 / 100)), // cashDiscount 7% 
+    },
+  });
+  //#endregion
+
+  //#region 21.2 - Tomás Herrera 
+  const user2Sub1 = await prisma.user_Subscriptions.create({
+    data: {
+      idUser: user2.id,
+      idPaymentMethods: payMethodTarjetaCredito.id,
+      idSubscriptionTypes: bonvivirSeleccionExclusiva.id,
+      startDate: new Date('2025-01-01'),
+      expectedEndDate: new Date('2025-12-31'),
+      subscriptionStatus: SubscriptionStatus.Activa,
+      lastPaymentDate: new Date('2025-04-01'),
+      nextPaymentDate: new Date('2025-05-01'),
+      monthlyAmountPaid: 38000, 
+    },
+  });
+
+  const user2Sub2 = await prisma.user_Subscriptions.create({
+    data: {
+      idUser: user2.id,
       idPaymentMethods: payMethodMercadoPago.id,
-      idGatewayTransaction: 'MP-TXN-00001',
-      totalAmountPaid: 26500,
-      clubAmount: 24925,
-      commissionAmount: 1575,
-      paymentStatus: PaymentStatus.Exitoso,
+      idSubscriptionTypes: encantadaLiterariaMensual.id,
+      startDate: new Date('2025-02-01'),
+      expectedEndDate: new Date('2025-12-31'),
+      subscriptionStatus: SubscriptionStatus.Activa,
+      lastPaymentDate: new Date('2025-04-01'),
+      nextPaymentDate: new Date('2025-05-01'),
+      monthlyAmountPaid: Math.round(48000 * (1 - 5 / 100)), // transferDiscount 5%
     },
   });
 
-  // 23. TRANSACTION_HISTORY
-  await prisma.transaction_History.create({
+  const user2Sub3 = await prisma.user_Subscriptions.create({
     data: {
-      idUser: user.id,
-      idUserSubscriptions: userSub.id,
-      idClub: clubManjarLiterario.id,
+      idUser: user2.id,
+      idPaymentMethods: payMethodPayPal.id,
+      idSubscriptionTypes: blackBoxCajaMisteriosa.id,
+      startDate: new Date('2025-03-01'),
+      expectedEndDate: new Date('2025-12-31'),
+      subscriptionStatus: SubscriptionStatus.Activa,
+      lastPaymentDate: new Date('2025-04-01'),
+      nextPaymentDate: new Date('2025-05-01'),
+      monthlyAmountPaid: 22000, 
+    },
+  });
+  //#endregion
+
+  //#region 21.3 - Micaela López 
+  const user3Sub1 = await prisma.user_Subscriptions.create({
+    data: {
+      idUser: user3.id,
+      idPaymentMethods: payMethodEfectivo.id,
+      idSubscriptionTypes: cerveceroClubPlanArtesanal.id,
+      startDate: new Date('2025-01-01'),
+      expectedEndDate: new Date('2025-12-31'),
+      subscriptionStatus: SubscriptionStatus.Activa,
+      lastPaymentDate: new Date('2025-04-01'),
+      nextPaymentDate: new Date('2025-05-01'),
+      monthlyAmountPaid: Math.round(19500 * (1 - 6 / 100)), // cashDiscount 6% 
+    },
+  });
+
+  const user3Sub2 = await prisma.user_Subscriptions.create({
+    data: {
+      idUser: user3.id,
+      idPaymentMethods: payMethodTarjetaDebito.id,
+      idSubscriptionTypes: teaBlendsInfusionDelMes.id,
+      startDate: new Date('2025-02-01'),
+      expectedEndDate: new Date('2025-12-31'),
+      subscriptionStatus: SubscriptionStatus.Activa,
+      lastPaymentDate: new Date('2025-04-01'),
+      nextPaymentDate: new Date('2025-05-01'),
+      monthlyAmountPaid: 14500,  
+    },
+  });
+  //#endregion
+
+  //#region 21.4 - Martín Fernández 
+  const user4Sub1 = await prisma.user_Subscriptions.create({
+    data: {
+      idUser: user4.id,
       idPaymentMethods: payMethodMercadoPago.id,
-      idGatewayTransaction: 'MP-TXN-00001',
-      totalAmountPaid: 26500,
-      clubAmount: 24925,
-      commissionAmount: 1575,
-      paymentStatus: PaymentStatus.Exitoso,
-      paymentNotes: 'Pago automático mensual',
+      idSubscriptionTypes: winexpertsPlanSommelier.id,
+      startDate: new Date('2025-01-01'),
+      expectedEndDate: new Date('2025-12-31'),
+      subscriptionStatus: SubscriptionStatus.Activa,
+      lastPaymentDate: new Date('2025-04-01'),
+      nextPaymentDate: new Date('2025-05-01'),
+      monthlyAmountPaid: Math.round(52000 * (1 - 5 / 100)), // transferDiscount 5% 
     },
   });
+  //#endregion
 
-  // 24. SHIPMENTS
-  await prisma.shipments.create({
+  //#region 21.5 - Valentina Castro 
+  const user5Sub1 = await prisma.user_Subscriptions.create({
     data: {
-      idUser: user.id,
-      idUserSubscriptions: userSub.id,
-      idClub: clubManjarLiterario.id,
-      boxMonthYear: '2025-04',
-      estimatedDeliveryStartDate: new Date('2025-04-10'),
-      estimatedDeliveryEndDate: new Date('2025-04-15'),
-      actualDeliveryDate: new Date('2025-04-13'),
-      shipmentStatus: ShipmentStatus.Entregado,
-      trackingNumber: 'OCA-987654321',
-      logisticsCompany: 'OCA',
-      shippingCost: 1500,
-      shippingNotes: 'Entregar en horario de tarde',
+      idUser: user5.id,
+      idPaymentMethods: payMethodTarjetaCredito.id,
+      idSubscriptionTypes: glossyboxMensual.id,
+      startDate: new Date('2025-01-01'),
+      expectedEndDate: new Date('2025-12-31'),
+      subscriptionStatus: SubscriptionStatus.Activa,
+      lastPaymentDate: new Date('2025-04-01'),
+      nextPaymentDate: new Date('2025-05-01'),
+      monthlyAmountPaid: 35000, 
     },
   });
 
-  // 25. REVIEWS
+  const user5Sub2 = await prisma.user_Subscriptions.create({
+    data: {
+      idUser: user5.id,
+      idPaymentMethods: payMethodMercadoPago.id,
+      idSubscriptionTypes: almaBoxCajaNatural.id,
+      startDate: new Date('2025-02-01'),
+      expectedEndDate: new Date('2025-12-31'),
+      subscriptionStatus: SubscriptionStatus.Activa,
+      lastPaymentDate: new Date('2025-04-01'),
+      nextPaymentDate: new Date('2025-05-01'),
+      monthlyAmountPaid: Math.round(28000 * (1 - 8 / 100)), // transferDiscount 8% 
+    },
+  });
+
+  const user5Sub3 = await prisma.user_Subscriptions.create({
+    data: {
+      idUser: user5.id,
+      idPaymentMethods: payMethodPayPal.id,
+      idSubscriptionTypes: sweetBoxDulceSorpresa.id,
+      startDate: new Date('2025-03-01'),
+      expectedEndDate: new Date('2025-12-31'),
+      subscriptionStatus: SubscriptionStatus.Activa,
+      lastPaymentDate: new Date('2025-04-01'),
+      nextPaymentDate: new Date('2025-05-01'),
+      monthlyAmountPaid: 15500, 
+    },
+  });
+  //#endregion
+
+  //#region 21.6 - Agustín Morales 
+  const user6Sub1 = await prisma.user_Subscriptions.create({
+    data: {
+      idUser: user6.id,
+      idPaymentMethods: payMethodEfectivo.id,
+      idSubscriptionTypes: cafeSelectoCajaGourmet.id,
+      startDate: new Date('2025-01-01'),
+      expectedEndDate: new Date('2025-12-31'),
+      subscriptionStatus: SubscriptionStatus.Activa,
+      lastPaymentDate: new Date('2025-04-01'),
+      nextPaymentDate: new Date('2025-05-01'),
+      monthlyAmountPaid: Math.round(29500 * (1 - 7 / 100)), // cashDiscount 7% 
+    },
+  });
+
+  const user6Sub2 = await prisma.user_Subscriptions.create({
+    data: {
+      idUser: user6.id,
+      idPaymentMethods: payMethodTarjetaDebito.id,
+      idSubscriptionTypes: lootCrateARGeekMensual.id,
+      startDate: new Date('2025-02-01'),
+      expectedEndDate: new Date('2025-12-31'),
+      subscriptionStatus: SubscriptionStatus.Activa,
+      lastPaymentDate: new Date('2025-04-01'),
+      nextPaymentDate: new Date('2025-05-01'),
+      monthlyAmountPaid: 32000, 
+    },
+  });
+  //#endregion
+  
+  //#region 21.7 - Camila Torres 
+  const user7Sub1 = await prisma.user_Subscriptions.create({
+    data: {
+      idUser: user7.id,
+      idPaymentMethods: payMethodMercadoPago.id,
+      idSubscriptionTypes: bodegaPrivadaAccesoPrivado.id,
+      startDate: new Date('2025-01-01'),
+      expectedEndDate: new Date('2025-12-31'),
+      subscriptionStatus: SubscriptionStatus.Activa,
+      lastPaymentDate: new Date('2025-04-01'),
+      nextPaymentDate: new Date('2025-05-01'),
+      monthlyAmountPaid: Math.round(47000 * (1 - 8 / 100)), // transferDiscount 8% 
+    },
+  });
+  //#endregion
+  
+  //#region 21.8 - Federico Romero 
+  const user8Sub1 = await prisma.user_Subscriptions.create({
+    data: {
+      idUser: user8.id,
+      idPaymentMethods: payMethodTarjetaCredito.id,
+      idSubscriptionTypes: beerBoxSixPack.id,
+      startDate: new Date('2025-01-01'),
+      expectedEndDate: new Date('2025-12-31'),
+      subscriptionStatus: SubscriptionStatus.Activa,
+      lastPaymentDate: new Date('2025-04-01'),
+      nextPaymentDate: new Date('2025-05-01'),
+      monthlyAmountPaid: 24000, 
+    },
+  });
+
+  const user8Sub2 = await prisma.user_Subscriptions.create({
+    data: {
+      idUser: user8.id,
+      idPaymentMethods: payMethodEfectivo.id,
+      idSubscriptionTypes: gamingBoxControllerPack.id,
+      startDate: new Date('2025-02-01'),
+      expectedEndDate: new Date('2025-12-31'),
+      subscriptionStatus: SubscriptionStatus.Activa,
+      lastPaymentDate: new Date('2025-04-01'),
+      nextPaymentDate: new Date('2025-05-01'),
+      monthlyAmountPaid: Math.round(21000 * (1 - 8 / 100)), // cashDiscount 8% 
+    },
+  });
+
+  const user8Sub3 = await prisma.user_Subscriptions.create({
+    data: {
+      idUser: user8.id,
+      idPaymentMethods: payMethodPayPal.id,
+      idSubscriptionTypes: snackBoxViajeDeSabores.id,
+      startDate: new Date('2025-03-01'),
+      expectedEndDate: new Date('2025-12-31'),
+      subscriptionStatus: SubscriptionStatus.Activa,
+      lastPaymentDate: new Date('2025-04-01'),
+      nextPaymentDate: new Date('2025-05-01'),
+      monthlyAmountPaid: 22000, 
+    },
+  });
+  //#endregion
+  
+  //#region 21.9 - Sofía Núñez 
+  const user9Sub1 = await prisma.user_Subscriptions.create({
+    data: {
+      idUser: user9.id,
+      idPaymentMethods: payMethodMercadoPago.id,
+      idSubscriptionTypes: animeBoxOtakuMensual.id,
+      startDate: new Date('2025-01-01'),
+      expectedEndDate: new Date('2025-12-31'),
+      subscriptionStatus: SubscriptionStatus.Activa,
+      lastPaymentDate: new Date('2025-04-01'),
+      nextPaymentDate: new Date('2025-05-01'),
+      monthlyAmountPaid: Math.round(24500 * (1 - 6 / 100)), // transferDiscount 6% 
+    },
+  });
+
+  const user9Sub2 = await prisma.user_Subscriptions.create({
+    data: {
+      idUser: user9.id,
+      idPaymentMethods: payMethodTarjetaDebito.id,
+      idSubscriptionTypes: manjarPoesia.id,
+      startDate: new Date('2025-02-01'),
+      expectedEndDate: new Date('2025-12-31'),
+      subscriptionStatus: SubscriptionStatus.Activa,
+      lastPaymentDate: new Date('2025-04-01'),
+      nextPaymentDate: new Date('2025-05-01'),
+      monthlyAmountPaid: 22500, 
+    },
+  });
+  //#endregion
+  
+  //#region 21.10 - Nicolás Gutiérrez 
+  const user10Sub1 = await prisma.user_Subscriptions.create({
+    data: {
+      idUser: user10.id,
+      idPaymentMethods: payMethodEfectivo.id,
+      idSubscriptionTypes: outdoorBoxExplorerPro.id,
+      startDate: new Date('2025-01-01'),
+      expectedEndDate: new Date('2025-12-31'),
+      subscriptionStatus: SubscriptionStatus.Activa,
+      lastPaymentDate: new Date('2025-04-01'),
+      nextPaymentDate: new Date('2025-05-01'),
+      monthlyAmountPaid: Math.round(45000 * (1 - 5 / 100)), // cashDiscount 5% 
+    },
+  });
+  //#endregion
+  
+  //#region 21.11 - Florencia Méndez 
+  const user11Sub1 = await prisma.user_Subscriptions.create({
+    data: {
+      idUser: user11.id,
+      idPaymentMethods: payMethodTarjetaCredito.id,
+      idSubscriptionTypes: bookerlyMensual.id,
+      startDate: new Date('2025-01-01'),
+      expectedEndDate: new Date('2025-12-31'),
+      subscriptionStatus: SubscriptionStatus.Activa,
+      lastPaymentDate: new Date('2025-04-01'),
+      nextPaymentDate: new Date('2025-05-01'),
+      monthlyAmountPaid: 31900, 
+    },
+  });
+
+  const user11Sub2 = await prisma.user_Subscriptions.create({
+    data: {
+      idUser: user11.id,
+      idPaymentMethods: payMethodMercadoPago.id,
+      idSubscriptionTypes: cristalesClubEnergiaMensual.id,
+      startDate: new Date('2025-02-01'),
+      expectedEndDate: new Date('2025-12-31'),
+      subscriptionStatus: SubscriptionStatus.Activa,
+      lastPaymentDate: new Date('2025-04-01'),
+      nextPaymentDate: new Date('2025-05-01'),
+      monthlyAmountPaid: Math.round(16000 * (1 - 5 / 100)), // transferDiscount 5% 
+    },
+  });
+
+  const user11Sub3 = await prisma.user_Subscriptions.create({
+    data: {
+      idUser: user11.id,
+      idPaymentMethods: payMethodPayPal.id,
+      idSubscriptionTypes: tarotBoxLunaMensual.id,
+      startDate: new Date('2025-03-01'),
+      expectedEndDate: new Date('2025-12-31'),
+      subscriptionStatus: SubscriptionStatus.Activa,
+      lastPaymentDate: new Date('2025-04-01'),
+      nextPaymentDate: new Date('2025-05-01'),
+      monthlyAmountPaid: 18500, 
+    },
+  });
+  //#endregion
+  
+  //#region 21.12 - Rodrigo Acosta 
+  const user12Sub1 = await prisma.user_Subscriptions.create({
+    data: {
+      idUser: user12.id,
+      idPaymentMethods: payMethodEfectivo.id,
+      idSubscriptionTypes: yerbaClubCajaMateroCompleta.id,
+      startDate: new Date('2025-01-01'),
+      expectedEndDate: new Date('2025-12-31'),
+      subscriptionStatus: SubscriptionStatus.Activa,
+      lastPaymentDate: new Date('2025-04-01'),
+      nextPaymentDate: new Date('2025-05-01'),
+      monthlyAmountPaid: Math.round(20500 * (1 - 5 / 100)), // cashDiscount 5% 
+    },
+  });
+
+  const user12Sub2 = await prisma.user_Subscriptions.create({
+    data: {
+      idUser: user12.id,
+      idPaymentMethods: payMethodTarjetaDebito.id,
+      idSubscriptionTypes: bonvivirSeleccionPuroMalbec.id,
+      startDate: new Date('2025-02-01'),
+      expectedEndDate: new Date('2025-12-31'),
+      subscriptionStatus: SubscriptionStatus.Activa,
+      lastPaymentDate: new Date('2025-04-01'),
+      nextPaymentDate: new Date('2025-05-01'),
+      monthlyAmountPaid: 42000, 
+    },
+  });
+  //#endregion
+  
+  //#region 21.13 - Julieta Vega 
+  const user13Sub1 = await prisma.user_Subscriptions.create({
+    data: {
+      idUser: user13.id,
+      idPaymentMethods: payMethodMercadoPago.id,
+      idSubscriptionTypes: ginTonicClubPerfectServeMensual.id,
+      startDate: new Date('2025-01-01'),
+      expectedEndDate: new Date('2025-12-31'),
+      subscriptionStatus: SubscriptionStatus.Activa,
+      lastPaymentDate: new Date('2025-04-01'),
+      nextPaymentDate: new Date('2025-05-01'),
+      monthlyAmountPaid: Math.round(38000 * (1 - 8 / 100)), // transferDiscount 8% 
+    },
+  });
+
+  const user13Sub2 = await prisma.user_Subscriptions.create({
+    data: {
+      idUser: user13.id,
+      idPaymentMethods: payMethodTarjetaCredito.id,
+      idSubscriptionTypes: chocolateBoxCacaoDelMes.id,
+      startDate: new Date('2025-02-01'),
+      expectedEndDate: new Date('2025-12-31'),
+      subscriptionStatus: SubscriptionStatus.Activa,
+      lastPaymentDate: new Date('2025-04-01'),
+      nextPaymentDate: new Date('2025-05-01'),
+      monthlyAmountPaid: 18000,  
+    },
+  });
+  //#endregion
+  
+  //#region 21.14 - Ignacio Blanco 
+  const user14Sub1 = await prisma.user_Subscriptions.create({
+    data: {
+      idUser: user14.id,
+      idPaymentMethods: payMethodEfectivo.id,
+      idSubscriptionTypes: skincareNaturalRutinaMensual.id,
+      startDate: new Date('2025-01-01'),
+      expectedEndDate: new Date('2025-12-31'),
+      subscriptionStatus: SubscriptionStatus.Activa,
+      lastPaymentDate: new Date('2025-04-01'),
+      nextPaymentDate: new Date('2025-05-01'),
+      monthlyAmountPaid: Math.round(22000 * (1 - 6 / 100)), // cashDiscount 6% 
+    },
+  });
+  //#endregion
+  
+  //#region 21.15 - Antonella Ríos 
+  const user15Sub1 = await prisma.user_Subscriptions.create({
+    data: {
+      idUser: user15.id,
+      idPaymentMethods: payMethodTarjetaDebito.id,
+      idSubscriptionTypes: wellnessBoxCajaBienestar.id,
+      startDate: new Date('2025-01-01'),
+      expectedEndDate: new Date('2025-12-31'),
+      subscriptionStatus: SubscriptionStatus.Activa,
+      lastPaymentDate: new Date('2025-04-01'),
+      nextPaymentDate: new Date('2025-05-01'),
+      monthlyAmountPaid: 24000,  
+    },
+  });
+
+  const user15Sub2 = await prisma.user_Subscriptions.create({
+    data: {
+      idUser: user15.id,
+      idPaymentMethods: payMethodMercadoPago.id,
+      idSubscriptionTypes: suculentasClubSuculentaDelMes.id,
+      startDate: new Date('2025-02-01'),
+      expectedEndDate: new Date('2025-12-31'),
+      subscriptionStatus: SubscriptionStatus.Activa,
+      lastPaymentDate: new Date('2025-04-01'),
+      nextPaymentDate: new Date('2025-05-01'),
+      monthlyAmountPaid: Math.round(16000 * (1 - 5 / 100)), // transferDiscount 5% 
+    },
+  });
+
+  const user15Sub3 = await prisma.user_Subscriptions.create({
+    data: {
+      idUser: user15.id,
+      idPaymentMethods: payMethodPayPal.id,
+      idSubscriptionTypes: papeleriaBoxStationery.id,
+      startDate: new Date('2025-03-01'),
+      expectedEndDate: new Date('2025-12-31'),
+      subscriptionStatus: SubscriptionStatus.Activa,
+      lastPaymentDate: new Date('2025-04-01'),
+      nextPaymentDate: new Date('2025-05-01'),
+      monthlyAmountPaid: 17500, 
+    },
+  });
+  //#endregion
+  
+  //#region 21.16 - Emiliano Peralta 
+  const user16Sub1 = await prisma.user_Subscriptions.create({
+    data: {
+      idUser: user16.id,
+      idPaymentMethods: payMethodEfectivo.id,
+      idSubscriptionTypes: especiasClubCajaDelChef.id,
+      startDate: new Date('2025-01-01'),
+      expectedEndDate: new Date('2025-12-31'),
+      subscriptionStatus: SubscriptionStatus.Activa,
+      lastPaymentDate: new Date('2025-04-01'),
+      nextPaymentDate: new Date('2025-05-01'),
+      monthlyAmountPaid: Math.round(23500 * (1 - 5 / 100)), // cashDiscount 5% 
+    },
+  });
+
+  const user16Sub2 = await prisma.user_Subscriptions.create({
+    data: {
+      idUser: user16.id,
+      idPaymentMethods: payMethodTarjetaCredito.id,
+      idSubscriptionTypes: woopyMensual.id,
+      startDate: new Date('2025-02-01'),
+      expectedEndDate: new Date('2025-12-31'),
+      subscriptionStatus: SubscriptionStatus.Activa,
+      lastPaymentDate: new Date('2025-04-01'),
+      nextPaymentDate: new Date('2025-05-01'),
+      monthlyAmountPaid: 36300, 
+    },
+  });
+  //#endregion
+  
+  //#region 21.17 - Luciana Suárez 
+  const user17Sub1 = await prisma.user_Subscriptions.create({
+    data: {
+      idUser: user17.id,
+      idPaymentMethods: payMethodMercadoPago.id,
+      idSubscriptionTypes: mrCoffeeBarista.id,
+      startDate: new Date('2025-01-01'),
+      expectedEndDate: new Date('2025-12-31'),
+      subscriptionStatus: SubscriptionStatus.Activa,
+      lastPaymentDate: new Date('2025-04-01'),
+      nextPaymentDate: new Date('2025-05-01'),
+      monthlyAmountPaid: Math.round(31000 * (1 - 5 / 100)), // transferDiscount 5% 
+    },
+  });
+  //#endregion
+  
+  //#region 21.18 - Braian Ojeda  
+  const user18Sub1 = await prisma.user_Subscriptions.create({
+    data: {
+      idUser: user18.id,
+      idPaymentMethods: payMethodTarjetaDebito.id,
+      idSubscriptionTypes: myPetBoxCajaPerro.id,
+      startDate: new Date('2025-01-01'),
+      expectedEndDate: new Date('2025-12-31'),
+      subscriptionStatus: SubscriptionStatus.Activa,
+      lastPaymentDate: new Date('2025-04-01'),
+      nextPaymentDate: new Date('2025-05-01'),
+      monthlyAmountPaid: 18000, 
+    },
+  });
+
+  const user18Sub2 = await prisma.user_Subscriptions.create({
+    data: {
+      idUser: user18.id,
+      idPaymentMethods: payMethodEfectivo.id,
+      idSubscriptionTypes: mediasClubCollector.id,
+      startDate: new Date('2025-02-01'),
+      expectedEndDate: new Date('2025-12-31'),
+      subscriptionStatus: SubscriptionStatus.Activa,
+      lastPaymentDate: new Date('2025-04-01'),
+      nextPaymentDate: new Date('2025-05-01'),
+      monthlyAmountPaid: Math.round(21000 * (1 - 5 / 100)), // cashDiscount 5% 
+    },
+  });
+  //#endregion
+  
+  //#region 21.19 - Mariana Ibáñez  
+  const user19Sub1 = await prisma.user_Subscriptions.create({
+    data: {
+      idUser: user19.id,
+      idPaymentMethods: payMethodMercadoPago.id,
+      idSubscriptionTypes: bodegaPrivadaColeccionReserva.id,
+      startDate: new Date('2025-01-01'),
+      expectedEndDate: new Date('2025-12-31'),
+      subscriptionStatus: SubscriptionStatus.Activa,
+      lastPaymentDate: new Date('2025-04-01'),
+      nextPaymentDate: new Date('2025-05-01'),
+      monthlyAmountPaid: Math.round(78000 * (1 - 8 / 100)), // transferDiscount 8% 
+    },
+  });
+
+  const user19Sub2 = await prisma.user_Subscriptions.create({
+    data: {
+      idUser: user19.id,
+      idPaymentMethods: payMethodPayPal.id,
+      idSubscriptionTypes: yogaBoxNamasteBox.id,
+      startDate: new Date('2025-02-01'),
+      expectedEndDate: new Date('2025-12-31'),
+      subscriptionStatus: SubscriptionStatus.Activa,
+      lastPaymentDate: new Date('2025-04-01'),
+      nextPaymentDate: new Date('2025-05-01'),
+      monthlyAmountPaid: 26500, 
+    },
+  });
+
+  const user19Sub3 = await prisma.user_Subscriptions.create({
+    data: {
+      idUser: user19.id,
+      idPaymentMethods: payMethodTarjetaCredito.id,
+      idSubscriptionTypes: charcuterieBoxTableraMensual.id,
+      startDate: new Date('2025-03-01'),
+      expectedEndDate: new Date('2025-12-31'),
+      subscriptionStatus: SubscriptionStatus.Activa,
+      lastPaymentDate: new Date('2025-04-01'),
+      nextPaymentDate: new Date('2025-05-01'),
+      monthlyAmountPaid: 29000, 
+    },
+  });
+  //#endregion
+  
+  //#region 21.20 - Sebastián Quiroga  
+  const user20Sub1 = await prisma.user_Subscriptions.create({
+    data: {
+      idUser: user20.id,
+      idPaymentMethods: payMethodEfectivo.id,
+      idSubscriptionTypes: fosilesClubPaleontologoMensual.id,
+      startDate: new Date('2025-01-01'),
+      expectedEndDate: new Date('2025-12-31'),
+      subscriptionStatus: SubscriptionStatus.Activa,
+      lastPaymentDate: new Date('2025-04-01'),
+      nextPaymentDate: new Date('2025-05-01'),
+      monthlyAmountPaid: Math.round(38500 * (1 - 7 / 100)), // cashDiscount 7% 
+    },
+  });
+
+  const user20Sub2 = await prisma.user_Subscriptions.create({
+    data: {
+      idUser: user20.id,
+      idPaymentMethods: payMethodMercadoPago.id,
+      idSubscriptionTypes: bonvivirOliva.id,
+      startDate: new Date('2025-01-01'),
+      expectedEndDate: new Date('2025-04-01'), // trimestral
+      subscriptionStatus: SubscriptionStatus.Activa,
+      lastPaymentDate: new Date('2025-01-01'),
+      nextPaymentDate: new Date('2025-04-01'),
+      monthlyAmountPaid: 72000,  
+    },
+  });
+  //#endregion
+
+//#endregion
+
+// 22. PAYMENT
+  
+//#region 23. TRANSACTION_HISTORY
+
+  //#region 23.1. Lucía Ramírez 
+    //#region 23.1.1. user1Sub1 - 18 pagos 
+    await prisma.transaction_History.create({ data: { idUser: user.id, idUserSubscriptions: user1Sub1.id, idClub: clubManjarLiterario.id, idPaymentMethods: payMethodMercadoPago.id, idGatewayTransaction: 'MP-TXN-00001', totalAmountPaid: 29900, commissionAmount: 200, clubAmount: 29700, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual enero 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user.id, idUserSubscriptions: user1Sub1.id, idClub: clubManjarLiterario.id, idPaymentMethods: payMethodMercadoPago.id, idGatewayTransaction: 'MP-TXN-00002', totalAmountPaid: 29900, commissionAmount: 200, clubAmount: 29700, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual febrero 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user.id, idUserSubscriptions: user1Sub1.id, idClub: clubManjarLiterario.id, idPaymentMethods: payMethodMercadoPago.id, idGatewayTransaction: 'MP-TXN-00003', totalAmountPaid: 29900, commissionAmount: 200, clubAmount: 29700, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual marzo 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user.id, idUserSubscriptions: user1Sub1.id, idClub: clubManjarLiterario.id, idPaymentMethods: payMethodMercadoPago.id, idGatewayTransaction: 'MP-TXN-00004', totalAmountPaid: 29900, commissionAmount: 200, clubAmount: 29700, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual abril 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user.id, idUserSubscriptions: user1Sub1.id, idClub: clubManjarLiterario.id, idPaymentMethods: payMethodMercadoPago.id, idGatewayTransaction: 'MP-TXN-00005', totalAmountPaid: 29900, commissionAmount: 200, clubAmount: 29700, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual mayo 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user.id, idUserSubscriptions: user1Sub1.id, idClub: clubManjarLiterario.id, idPaymentMethods: payMethodMercadoPago.id, idGatewayTransaction: 'MP-TXN-00006', totalAmountPaid: 29900, commissionAmount: 200, clubAmount: 29700, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual junio 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user.id, idUserSubscriptions: user1Sub1.id, idClub: clubManjarLiterario.id, idPaymentMethods: payMethodMercadoPago.id, idGatewayTransaction: 'MP-TXN-00007', totalAmountPaid: 29900, commissionAmount: 200, clubAmount: 29700, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual julio 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user.id, idUserSubscriptions: user1Sub1.id, idClub: clubManjarLiterario.id, idPaymentMethods: payMethodMercadoPago.id, idGatewayTransaction: 'MP-TXN-00008', totalAmountPaid: 29900, commissionAmount: 200, clubAmount: 29700, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual agosto 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user.id, idUserSubscriptions: user1Sub1.id, idClub: clubManjarLiterario.id, idPaymentMethods: payMethodMercadoPago.id, idGatewayTransaction: 'MP-TXN-00009', totalAmountPaid: 29900, commissionAmount: 200, clubAmount: 29700, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual septiembre 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user.id, idUserSubscriptions: user1Sub1.id, idClub: clubManjarLiterario.id, idPaymentMethods: payMethodMercadoPago.id, idGatewayTransaction: 'MP-TXN-00010', totalAmountPaid: 29900, commissionAmount: 200, clubAmount: 29700, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual octubre 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user.id, idUserSubscriptions: user1Sub1.id, idClub: clubManjarLiterario.id, idPaymentMethods: payMethodMercadoPago.id, idGatewayTransaction: 'MP-TXN-00011', totalAmountPaid: 29900, commissionAmount: 200, clubAmount: 29700, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual noviembre 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user.id, idUserSubscriptions: user1Sub1.id, idClub: clubManjarLiterario.id, idPaymentMethods: payMethodMercadoPago.id, idGatewayTransaction: 'MP-TXN-00012', totalAmountPaid: 29900, commissionAmount: 200, clubAmount: 29700, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual diciembre 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user.id, idUserSubscriptions: user1Sub1.id, idClub: clubManjarLiterario.id, idPaymentMethods: payMethodMercadoPago.id, idGatewayTransaction: 'MP-TXN-00013', totalAmountPaid: 29900, commissionAmount: 200, clubAmount: 29700, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual enero 2026' } });
+    await prisma.transaction_History.create({ data: { idUser: user.id, idUserSubscriptions: user1Sub1.id, idClub: clubManjarLiterario.id, idPaymentMethods: payMethodMercadoPago.id, idGatewayTransaction: 'MP-TXN-00014', totalAmountPaid: 29900, commissionAmount: 200, clubAmount: 29700, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual febrero 2026' } });
+    await prisma.transaction_History.create({ data: { idUser: user.id, idUserSubscriptions: user1Sub1.id, idClub: clubManjarLiterario.id, idPaymentMethods: payMethodMercadoPago.id, idGatewayTransaction: 'MP-TXN-00015', totalAmountPaid: 29900, commissionAmount: 200, clubAmount: 29700, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual marzo 2026' } });
+    await prisma.transaction_History.create({ data: { idUser: user.id, idUserSubscriptions: user1Sub1.id, idClub: clubManjarLiterario.id, idPaymentMethods: payMethodMercadoPago.id, idGatewayTransaction: 'MP-TXN-00016', totalAmountPaid: 29900, commissionAmount: 200, clubAmount: 29700, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual abril 2026' } });
+    await prisma.transaction_History.create({ data: { idUser: user.id, idUserSubscriptions: user1Sub1.id, idClub: clubManjarLiterario.id, idPaymentMethods: payMethodMercadoPago.id, idGatewayTransaction: 'MP-TXN-00017', totalAmountPaid: 29900, commissionAmount: 200, clubAmount: 29700, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual mayo 2026' } });
+    await prisma.transaction_History.create({ data: { idUser: user.id, idUserSubscriptions: user1Sub1.id, idClub: clubManjarLiterario.id, idPaymentMethods: payMethodMercadoPago.id, idGatewayTransaction: 'MP-TXN-00018', totalAmountPaid: 29900, commissionAmount: 200, clubAmount: 29700, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual junio 2026' } });
+    //#endregion
+
+    //#region 23.1.2. user1Sub2 - 17 pagos 
+    await prisma.transaction_History.create({ data: { idUser: user.id, idUserSubscriptions: user1Sub2.id, idClub: clubCafeSelecto.id, idPaymentMethods: payMethodEfectivo.id, idGatewayTransaction: 'EF-TXN-00019', totalAmountPaid: 15810, commissionAmount: 200, clubAmount: 15610, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual febrero 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user.id, idUserSubscriptions: user1Sub2.id, idClub: clubCafeSelecto.id, idPaymentMethods: payMethodEfectivo.id, idGatewayTransaction: 'EF-TXN-00020', totalAmountPaid: 15810, commissionAmount: 200, clubAmount: 15610, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual marzo 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user.id, idUserSubscriptions: user1Sub2.id, idClub: clubCafeSelecto.id, idPaymentMethods: payMethodEfectivo.id, idGatewayTransaction: 'EF-TXN-00021', totalAmountPaid: 15810, commissionAmount: 200, clubAmount: 15610, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual abril 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user.id, idUserSubscriptions: user1Sub2.id, idClub: clubCafeSelecto.id, idPaymentMethods: payMethodEfectivo.id, idGatewayTransaction: 'EF-TXN-00022', totalAmountPaid: 15810, commissionAmount: 200, clubAmount: 15610, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual mayo 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user.id, idUserSubscriptions: user1Sub2.id, idClub: clubCafeSelecto.id, idPaymentMethods: payMethodEfectivo.id, idGatewayTransaction: 'EF-TXN-00023', totalAmountPaid: 15810, commissionAmount: 200, clubAmount: 15610, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual junio 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user.id, idUserSubscriptions: user1Sub2.id, idClub: clubCafeSelecto.id, idPaymentMethods: payMethodEfectivo.id, idGatewayTransaction: 'EF-TXN-00024', totalAmountPaid: 15810, commissionAmount: 200, clubAmount: 15610, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual julio 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user.id, idUserSubscriptions: user1Sub2.id, idClub: clubCafeSelecto.id, idPaymentMethods: payMethodEfectivo.id, idGatewayTransaction: 'EF-TXN-00025', totalAmountPaid: 15810, commissionAmount: 200, clubAmount: 15610, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual agosto 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user.id, idUserSubscriptions: user1Sub2.id, idClub: clubCafeSelecto.id, idPaymentMethods: payMethodEfectivo.id, idGatewayTransaction: 'EF-TXN-00026', totalAmountPaid: 15810, commissionAmount: 200, clubAmount: 15610, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual septiembre 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user.id, idUserSubscriptions: user1Sub2.id, idClub: clubCafeSelecto.id, idPaymentMethods: payMethodEfectivo.id, idGatewayTransaction: 'EF-TXN-00027', totalAmountPaid: 15810, commissionAmount: 200, clubAmount: 15610, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual octubre 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user.id, idUserSubscriptions: user1Sub2.id, idClub: clubCafeSelecto.id, idPaymentMethods: payMethodEfectivo.id, idGatewayTransaction: 'EF-TXN-00028', totalAmountPaid: 15810, commissionAmount: 200, clubAmount: 15610, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual noviembre 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user.id, idUserSubscriptions: user1Sub2.id, idClub: clubCafeSelecto.id, idPaymentMethods: payMethodEfectivo.id, idGatewayTransaction: 'EF-TXN-00029', totalAmountPaid: 15810, commissionAmount: 200, clubAmount: 15610, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual diciembre 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user.id, idUserSubscriptions: user1Sub2.id, idClub: clubCafeSelecto.id, idPaymentMethods: payMethodEfectivo.id, idGatewayTransaction: 'EF-TXN-00030', totalAmountPaid: 15810, commissionAmount: 200, clubAmount: 15610, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual enero 2026' } });
+    await prisma.transaction_History.create({ data: { idUser: user.id, idUserSubscriptions: user1Sub2.id, idClub: clubCafeSelecto.id, idPaymentMethods: payMethodEfectivo.id, idGatewayTransaction: 'EF-TXN-00031', totalAmountPaid: 15810, commissionAmount: 200, clubAmount: 15610, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual febrero 2026' } });
+    await prisma.transaction_History.create({ data: { idUser: user.id, idUserSubscriptions: user1Sub2.id, idClub: clubCafeSelecto.id, idPaymentMethods: payMethodEfectivo.id, idGatewayTransaction: 'EF-TXN-00032', totalAmountPaid: 15810, commissionAmount: 200, clubAmount: 15610, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual marzo 2026' } });
+    await prisma.transaction_History.create({ data: { idUser: user.id, idUserSubscriptions: user1Sub2.id, idClub: clubCafeSelecto.id, idPaymentMethods: payMethodEfectivo.id, idGatewayTransaction: 'EF-TXN-00033', totalAmountPaid: 15810, commissionAmount: 200, clubAmount: 15610, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual abril 2026' } });
+    await prisma.transaction_History.create({ data: { idUser: user.id, idUserSubscriptions: user1Sub2.id, idClub: clubCafeSelecto.id, idPaymentMethods: payMethodEfectivo.id, idGatewayTransaction: 'EF-TXN-00034', totalAmountPaid: 15810, commissionAmount: 200, clubAmount: 15610, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual mayo 2026' } });
+    await prisma.transaction_History.create({ data: { idUser: user.id, idUserSubscriptions: user1Sub2.id, idClub: clubCafeSelecto.id, idPaymentMethods: payMethodEfectivo.id, idGatewayTransaction: 'EF-TXN-00035', totalAmountPaid: 15810, commissionAmount: 200, clubAmount: 15610, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual junio 2026' } });
+    //#endregion
+  //#endregion
+
+  //#region 23.2. Tomás Herrera 
+    //#region 23.2.1. user2Sub1 - 18 pagos
+    await prisma.transaction_History.create({ data: { idUser: user2.id, idUserSubscriptions: user2Sub1.id, idClub: clubBonvivir.id, idPaymentMethods: payMethodTarjetaCredito.id, idGatewayTransaction: 'TC-TXN-00036', totalAmountPaid: 38000, commissionAmount: 200, clubAmount: 37800, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual enero 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user2.id, idUserSubscriptions: user2Sub1.id, idClub: clubBonvivir.id, idPaymentMethods: payMethodTarjetaCredito.id, idGatewayTransaction: 'TC-TXN-00037', totalAmountPaid: 38000, commissionAmount: 200, clubAmount: 37800, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual febrero 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user2.id, idUserSubscriptions: user2Sub1.id, idClub: clubBonvivir.id, idPaymentMethods: payMethodTarjetaCredito.id, idGatewayTransaction: 'TC-TXN-00038', totalAmountPaid: 38000, commissionAmount: 200, clubAmount: 37800, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual marzo 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user2.id, idUserSubscriptions: user2Sub1.id, idClub: clubBonvivir.id, idPaymentMethods: payMethodTarjetaCredito.id, idGatewayTransaction: 'TC-TXN-00039', totalAmountPaid: 38000, commissionAmount: 200, clubAmount: 37800, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual abril 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user2.id, idUserSubscriptions: user2Sub1.id, idClub: clubBonvivir.id, idPaymentMethods: payMethodTarjetaCredito.id, idGatewayTransaction: 'TC-TXN-00040', totalAmountPaid: 38000, commissionAmount: 200, clubAmount: 37800, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual mayo 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user2.id, idUserSubscriptions: user2Sub1.id, idClub: clubBonvivir.id, idPaymentMethods: payMethodTarjetaCredito.id, idGatewayTransaction: 'TC-TXN-00041', totalAmountPaid: 38000, commissionAmount: 200, clubAmount: 37800, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual junio 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user2.id, idUserSubscriptions: user2Sub1.id, idClub: clubBonvivir.id, idPaymentMethods: payMethodTarjetaCredito.id, idGatewayTransaction: 'TC-TXN-00042', totalAmountPaid: 38000, commissionAmount: 200, clubAmount: 37800, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual julio 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user2.id, idUserSubscriptions: user2Sub1.id, idClub: clubBonvivir.id, idPaymentMethods: payMethodTarjetaCredito.id, idGatewayTransaction: 'TC-TXN-00043', totalAmountPaid: 38000, commissionAmount: 200, clubAmount: 37800, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual agosto 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user2.id, idUserSubscriptions: user2Sub1.id, idClub: clubBonvivir.id, idPaymentMethods: payMethodTarjetaCredito.id, idGatewayTransaction: 'TC-TXN-00044', totalAmountPaid: 38000, commissionAmount: 200, clubAmount: 37800, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual septiembre 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user2.id, idUserSubscriptions: user2Sub1.id, idClub: clubBonvivir.id, idPaymentMethods: payMethodTarjetaCredito.id, idGatewayTransaction: 'TC-TXN-00045', totalAmountPaid: 38000, commissionAmount: 200, clubAmount: 37800, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual octubre 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user2.id, idUserSubscriptions: user2Sub1.id, idClub: clubBonvivir.id, idPaymentMethods: payMethodTarjetaCredito.id, idGatewayTransaction: 'TC-TXN-00046', totalAmountPaid: 38000, commissionAmount: 200, clubAmount: 37800, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual noviembre 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user2.id, idUserSubscriptions: user2Sub1.id, idClub: clubBonvivir.id, idPaymentMethods: payMethodTarjetaCredito.id, idGatewayTransaction: 'TC-TXN-00047', totalAmountPaid: 38000, commissionAmount: 200, clubAmount: 37800, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual diciembre 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user2.id, idUserSubscriptions: user2Sub1.id, idClub: clubBonvivir.id, idPaymentMethods: payMethodTarjetaCredito.id, idGatewayTransaction: 'TC-TXN-00048', totalAmountPaid: 38000, commissionAmount: 200, clubAmount: 37800, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual enero 2026' } });
+    await prisma.transaction_History.create({ data: { idUser: user2.id, idUserSubscriptions: user2Sub1.id, idClub: clubBonvivir.id, idPaymentMethods: payMethodTarjetaCredito.id, idGatewayTransaction: 'TC-TXN-00049', totalAmountPaid: 38000, commissionAmount: 200, clubAmount: 37800, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual febrero 2026' } });
+    await prisma.transaction_History.create({ data: { idUser: user2.id, idUserSubscriptions: user2Sub1.id, idClub: clubBonvivir.id, idPaymentMethods: payMethodTarjetaCredito.id, idGatewayTransaction: 'TC-TXN-00050', totalAmountPaid: 38000, commissionAmount: 200, clubAmount: 37800, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual marzo 2026' } });
+    await prisma.transaction_History.create({ data: { idUser: user2.id, idUserSubscriptions: user2Sub1.id, idClub: clubBonvivir.id, idPaymentMethods: payMethodTarjetaCredito.id, idGatewayTransaction: 'TC-TXN-00051', totalAmountPaid: 38000, commissionAmount: 200, clubAmount: 37800, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual abril 2026' } });
+    await prisma.transaction_History.create({ data: { idUser: user2.id, idUserSubscriptions: user2Sub1.id, idClub: clubBonvivir.id, idPaymentMethods: payMethodTarjetaCredito.id, idGatewayTransaction: 'TC-TXN-00052', totalAmountPaid: 38000, commissionAmount: 200, clubAmount: 37800, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual mayo 2026' } });
+    await prisma.transaction_History.create({ data: { idUser: user2.id, idUserSubscriptions: user2Sub1.id, idClub: clubBonvivir.id, idPaymentMethods: payMethodTarjetaCredito.id, idGatewayTransaction: 'TC-TXN-00053', totalAmountPaid: 38000, commissionAmount: 200, clubAmount: 37800, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual junio 2026' } });
+    //#endregion
+
+    //#region 23.2.2. user2Sub2 - 17 pagos
+    await prisma.transaction_History.create({ data: { idUser: user2.id, idUserSubscriptions: user2Sub2.id, idClub: clubEncantadaLibros.id, idPaymentMethods: payMethodMercadoPago.id, idGatewayTransaction: 'MP-TXN-00054', totalAmountPaid: 45600, commissionAmount: 200, clubAmount: 45400, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual febrero 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user2.id, idUserSubscriptions: user2Sub2.id, idClub: clubEncantadaLibros.id, idPaymentMethods: payMethodMercadoPago.id, idGatewayTransaction: 'MP-TXN-00055', totalAmountPaid: 45600, commissionAmount: 200, clubAmount: 45400, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual marzo 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user2.id, idUserSubscriptions: user2Sub2.id, idClub: clubEncantadaLibros.id, idPaymentMethods: payMethodMercadoPago.id, idGatewayTransaction: 'MP-TXN-00056', totalAmountPaid: 45600, commissionAmount: 200, clubAmount: 45400, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual abril 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user2.id, idUserSubscriptions: user2Sub2.id, idClub: clubEncantadaLibros.id, idPaymentMethods: payMethodMercadoPago.id, idGatewayTransaction: 'MP-TXN-00057', totalAmountPaid: 45600, commissionAmount: 200, clubAmount: 45400, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual mayo 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user2.id, idUserSubscriptions: user2Sub2.id, idClub: clubEncantadaLibros.id, idPaymentMethods: payMethodMercadoPago.id, idGatewayTransaction: 'MP-TXN-00058', totalAmountPaid: 45600, commissionAmount: 200, clubAmount: 45400, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual junio 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user2.id, idUserSubscriptions: user2Sub2.id, idClub: clubEncantadaLibros.id, idPaymentMethods: payMethodMercadoPago.id, idGatewayTransaction: 'MP-TXN-00059', totalAmountPaid: 45600, commissionAmount: 200, clubAmount: 45400, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual julio 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user2.id, idUserSubscriptions: user2Sub2.id, idClub: clubEncantadaLibros.id, idPaymentMethods: payMethodMercadoPago.id, idGatewayTransaction: 'MP-TXN-00060', totalAmountPaid: 45600, commissionAmount: 200, clubAmount: 45400, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual agosto 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user2.id, idUserSubscriptions: user2Sub2.id, idClub: clubEncantadaLibros.id, idPaymentMethods: payMethodMercadoPago.id, idGatewayTransaction: 'MP-TXN-00061', totalAmountPaid: 45600, commissionAmount: 200, clubAmount: 45400, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual septiembre 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user2.id, idUserSubscriptions: user2Sub2.id, idClub: clubEncantadaLibros.id, idPaymentMethods: payMethodMercadoPago.id, idGatewayTransaction: 'MP-TXN-00062', totalAmountPaid: 45600, commissionAmount: 200, clubAmount: 45400, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual octubre 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user2.id, idUserSubscriptions: user2Sub2.id, idClub: clubEncantadaLibros.id, idPaymentMethods: payMethodMercadoPago.id, idGatewayTransaction: 'MP-TXN-00063', totalAmountPaid: 45600, commissionAmount: 200, clubAmount: 45400, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual noviembre 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user2.id, idUserSubscriptions: user2Sub2.id, idClub: clubEncantadaLibros.id, idPaymentMethods: payMethodMercadoPago.id, idGatewayTransaction: 'MP-TXN-00064', totalAmountPaid: 45600, commissionAmount: 200, clubAmount: 45400, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual diciembre 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user2.id, idUserSubscriptions: user2Sub2.id, idClub: clubEncantadaLibros.id, idPaymentMethods: payMethodMercadoPago.id, idGatewayTransaction: 'MP-TXN-00065', totalAmountPaid: 45600, commissionAmount: 200, clubAmount: 45400, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual enero 2026' } });
+    await prisma.transaction_History.create({ data: { idUser: user2.id, idUserSubscriptions: user2Sub2.id, idClub: clubEncantadaLibros.id, idPaymentMethods: payMethodMercadoPago.id, idGatewayTransaction: 'MP-TXN-00066', totalAmountPaid: 45600, commissionAmount: 200, clubAmount: 45400, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual febrero 2026' } });
+    await prisma.transaction_History.create({ data: { idUser: user2.id, idUserSubscriptions: user2Sub2.id, idClub: clubEncantadaLibros.id, idPaymentMethods: payMethodMercadoPago.id, idGatewayTransaction: 'MP-TXN-00067', totalAmountPaid: 45600, commissionAmount: 200, clubAmount: 45400, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual marzo 2026' } });
+    await prisma.transaction_History.create({ data: { idUser: user2.id, idUserSubscriptions: user2Sub2.id, idClub: clubEncantadaLibros.id, idPaymentMethods: payMethodMercadoPago.id, idGatewayTransaction: 'MP-TXN-00068', totalAmountPaid: 45600, commissionAmount: 200, clubAmount: 45400, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual abril 2026' } });
+    await prisma.transaction_History.create({ data: { idUser: user2.id, idUserSubscriptions: user2Sub2.id, idClub: clubEncantadaLibros.id, idPaymentMethods: payMethodMercadoPago.id, idGatewayTransaction: 'MP-TXN-00069', totalAmountPaid: 45600, commissionAmount: 200, clubAmount: 45400, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual mayo 2026' } });
+    await prisma.transaction_History.create({ data: { idUser: user2.id, idUserSubscriptions: user2Sub2.id, idClub: clubEncantadaLibros.id, idPaymentMethods: payMethodMercadoPago.id, idGatewayTransaction: 'MP-TXN-00070', totalAmountPaid: 45600, commissionAmount: 200, clubAmount: 45400, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual junio 2026' } });
+    //#endregion
+
+    //#region 23.2.3. user2Sub3 - 16 pagos
+    await prisma.transaction_History.create({ data: { idUser: user2.id, idUserSubscriptions: user2Sub3.id, idClub: clubBlackBox.id, idPaymentMethods: payMethodPayPal.id, idGatewayTransaction: 'PP-TXN-00071', totalAmountPaid: 22000, commissionAmount: 200, clubAmount: 21800, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual marzo 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user2.id, idUserSubscriptions: user2Sub3.id, idClub: clubBlackBox.id, idPaymentMethods: payMethodPayPal.id, idGatewayTransaction: 'PP-TXN-00072', totalAmountPaid: 22000, commissionAmount: 200, clubAmount: 21800, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual abril 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user2.id, idUserSubscriptions: user2Sub3.id, idClub: clubBlackBox.id, idPaymentMethods: payMethodPayPal.id, idGatewayTransaction: 'PP-TXN-00073', totalAmountPaid: 22000, commissionAmount: 200, clubAmount: 21800, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual mayo 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user2.id, idUserSubscriptions: user2Sub3.id, idClub: clubBlackBox.id, idPaymentMethods: payMethodPayPal.id, idGatewayTransaction: 'PP-TXN-00074', totalAmountPaid: 22000, commissionAmount: 200, clubAmount: 21800, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual junio 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user2.id, idUserSubscriptions: user2Sub3.id, idClub: clubBlackBox.id, idPaymentMethods: payMethodPayPal.id, idGatewayTransaction: 'PP-TXN-00075', totalAmountPaid: 22000, commissionAmount: 200, clubAmount: 21800, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual julio 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user2.id, idUserSubscriptions: user2Sub3.id, idClub: clubBlackBox.id, idPaymentMethods: payMethodPayPal.id, idGatewayTransaction: 'PP-TXN-00076', totalAmountPaid: 22000, commissionAmount: 200, clubAmount: 21800, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual agosto 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user2.id, idUserSubscriptions: user2Sub3.id, idClub: clubBlackBox.id, idPaymentMethods: payMethodPayPal.id, idGatewayTransaction: 'PP-TXN-00077', totalAmountPaid: 22000, commissionAmount: 200, clubAmount: 21800, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual septiembre 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user2.id, idUserSubscriptions: user2Sub3.id, idClub: clubBlackBox.id, idPaymentMethods: payMethodPayPal.id, idGatewayTransaction: 'PP-TXN-00078', totalAmountPaid: 22000, commissionAmount: 200, clubAmount: 21800, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual octubre 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user2.id, idUserSubscriptions: user2Sub3.id, idClub: clubBlackBox.id, idPaymentMethods: payMethodPayPal.id, idGatewayTransaction: 'PP-TXN-00079', totalAmountPaid: 22000, commissionAmount: 200, clubAmount: 21800, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual noviembre 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user2.id, idUserSubscriptions: user2Sub3.id, idClub: clubBlackBox.id, idPaymentMethods: payMethodPayPal.id, idGatewayTransaction: 'PP-TXN-00080', totalAmountPaid: 22000, commissionAmount: 200, clubAmount: 21800, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual diciembre 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user2.id, idUserSubscriptions: user2Sub3.id, idClub: clubBlackBox.id, idPaymentMethods: payMethodPayPal.id, idGatewayTransaction: 'PP-TXN-00081', totalAmountPaid: 22000, commissionAmount: 200, clubAmount: 21800, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual enero 2026' } });
+    await prisma.transaction_History.create({ data: { idUser: user2.id, idUserSubscriptions: user2Sub3.id, idClub: clubBlackBox.id, idPaymentMethods: payMethodPayPal.id, idGatewayTransaction: 'PP-TXN-00082', totalAmountPaid: 22000, commissionAmount: 200, clubAmount: 21800, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual febrero 2026' } });
+    await prisma.transaction_History.create({ data: { idUser: user2.id, idUserSubscriptions: user2Sub3.id, idClub: clubBlackBox.id, idPaymentMethods: payMethodPayPal.id, idGatewayTransaction: 'PP-TXN-00083', totalAmountPaid: 22000, commissionAmount: 200, clubAmount: 21800, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual marzo 2026' } });
+    await prisma.transaction_History.create({ data: { idUser: user2.id, idUserSubscriptions: user2Sub3.id, idClub: clubBlackBox.id, idPaymentMethods: payMethodPayPal.id, idGatewayTransaction: 'PP-TXN-00084', totalAmountPaid: 22000, commissionAmount: 200, clubAmount: 21800, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual abril 2026' } });
+    await prisma.transaction_History.create({ data: { idUser: user2.id, idUserSubscriptions: user2Sub3.id, idClub: clubBlackBox.id, idPaymentMethods: payMethodPayPal.id, idGatewayTransaction: 'PP-TXN-00085', totalAmountPaid: 22000, commissionAmount: 200, clubAmount: 21800, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual mayo 2026' } });
+    await prisma.transaction_History.create({ data: { idUser: user2.id, idUserSubscriptions: user2Sub3.id, idClub: clubBlackBox.id, idPaymentMethods: payMethodPayPal.id, idGatewayTransaction: 'PP-TXN-00086', totalAmountPaid: 22000, commissionAmount: 200, clubAmount: 21800, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual junio 2026' } });
+    //#endregion
+  //#endregion
+
+  //#region 23.3. Micaela López 
+    //#region 23.3.1. user3Sub1 - 18 pagos
+    await prisma.transaction_History.create({ data: { idUser: user3.id, idUserSubscriptions: user3Sub1.id, idClub: clubCerveceroClub.id, idPaymentMethods: payMethodEfectivo.id, idGatewayTransaction: 'EF-TXN-00087', totalAmountPaid: 18330, commissionAmount: 200, clubAmount: 18130, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual enero 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user3.id, idUserSubscriptions: user3Sub1.id, idClub: clubCerveceroClub.id, idPaymentMethods: payMethodEfectivo.id, idGatewayTransaction: 'EF-TXN-00088', totalAmountPaid: 18330, commissionAmount: 200, clubAmount: 18130, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual febrero 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user3.id, idUserSubscriptions: user3Sub1.id, idClub: clubCerveceroClub.id, idPaymentMethods: payMethodEfectivo.id, idGatewayTransaction: 'EF-TXN-00089', totalAmountPaid: 18330, commissionAmount: 200, clubAmount: 18130, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual marzo 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user3.id, idUserSubscriptions: user3Sub1.id, idClub: clubCerveceroClub.id, idPaymentMethods: payMethodEfectivo.id, idGatewayTransaction: 'EF-TXN-00090', totalAmountPaid: 18330, commissionAmount: 200, clubAmount: 18130, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual abril 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user3.id, idUserSubscriptions: user3Sub1.id, idClub: clubCerveceroClub.id, idPaymentMethods: payMethodEfectivo.id, idGatewayTransaction: 'EF-TXN-00091', totalAmountPaid: 18330, commissionAmount: 200, clubAmount: 18130, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual mayo 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user3.id, idUserSubscriptions: user3Sub1.id, idClub: clubCerveceroClub.id, idPaymentMethods: payMethodEfectivo.id, idGatewayTransaction: 'EF-TXN-00092', totalAmountPaid: 18330, commissionAmount: 200, clubAmount: 18130, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual junio 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user3.id, idUserSubscriptions: user3Sub1.id, idClub: clubCerveceroClub.id, idPaymentMethods: payMethodEfectivo.id, idGatewayTransaction: 'EF-TXN-00093', totalAmountPaid: 18330, commissionAmount: 200, clubAmount: 18130, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual julio 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user3.id, idUserSubscriptions: user3Sub1.id, idClub: clubCerveceroClub.id, idPaymentMethods: payMethodEfectivo.id, idGatewayTransaction: 'EF-TXN-00094', totalAmountPaid: 18330, commissionAmount: 200, clubAmount: 18130, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual agosto 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user3.id, idUserSubscriptions: user3Sub1.id, idClub: clubCerveceroClub.id, idPaymentMethods: payMethodEfectivo.id, idGatewayTransaction: 'EF-TXN-00095', totalAmountPaid: 18330, commissionAmount: 200, clubAmount: 18130, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual septiembre 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user3.id, idUserSubscriptions: user3Sub1.id, idClub: clubCerveceroClub.id, idPaymentMethods: payMethodEfectivo.id, idGatewayTransaction: 'EF-TXN-00096', totalAmountPaid: 18330, commissionAmount: 200, clubAmount: 18130, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual octubre 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user3.id, idUserSubscriptions: user3Sub1.id, idClub: clubCerveceroClub.id, idPaymentMethods: payMethodEfectivo.id, idGatewayTransaction: 'EF-TXN-00097', totalAmountPaid: 18330, commissionAmount: 200, clubAmount: 18130, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual noviembre 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user3.id, idUserSubscriptions: user3Sub1.id, idClub: clubCerveceroClub.id, idPaymentMethods: payMethodEfectivo.id, idGatewayTransaction: 'EF-TXN-00098', totalAmountPaid: 18330, commissionAmount: 200, clubAmount: 18130, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual diciembre 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user3.id, idUserSubscriptions: user3Sub1.id, idClub: clubCerveceroClub.id, idPaymentMethods: payMethodEfectivo.id, idGatewayTransaction: 'EF-TXN-00099', totalAmountPaid: 18330, commissionAmount: 200, clubAmount: 18130, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual enero 2026' } });
+    await prisma.transaction_History.create({ data: { idUser: user3.id, idUserSubscriptions: user3Sub1.id, idClub: clubCerveceroClub.id, idPaymentMethods: payMethodEfectivo.id, idGatewayTransaction: 'EF-TXN-00100', totalAmountPaid: 18330, commissionAmount: 200, clubAmount: 18130, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual febrero 2026' } });
+    await prisma.transaction_History.create({ data: { idUser: user3.id, idUserSubscriptions: user3Sub1.id, idClub: clubCerveceroClub.id, idPaymentMethods: payMethodEfectivo.id, idGatewayTransaction: 'EF-TXN-00101', totalAmountPaid: 18330, commissionAmount: 200, clubAmount: 18130, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual marzo 2026' } });
+    await prisma.transaction_History.create({ data: { idUser: user3.id, idUserSubscriptions: user3Sub1.id, idClub: clubCerveceroClub.id, idPaymentMethods: payMethodEfectivo.id, idGatewayTransaction: 'EF-TXN-00102', totalAmountPaid: 18330, commissionAmount: 200, clubAmount: 18130, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual abril 2026' } });
+    await prisma.transaction_History.create({ data: { idUser: user3.id, idUserSubscriptions: user3Sub1.id, idClub: clubCerveceroClub.id, idPaymentMethods: payMethodEfectivo.id, idGatewayTransaction: 'EF-TXN-00103', totalAmountPaid: 18330, commissionAmount: 200, clubAmount: 18130, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual mayo 2026' } });
+    await prisma.transaction_History.create({ data: { idUser: user3.id, idUserSubscriptions: user3Sub1.id, idClub: clubCerveceroClub.id, idPaymentMethods: payMethodEfectivo.id, idGatewayTransaction: 'EF-TXN-00104', totalAmountPaid: 18330, commissionAmount: 200, clubAmount: 18130, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual junio 2026' } });
+    //#endregion
+
+    //#region 23.3.2. user3Sub2 - 17 pagos
+    await prisma.transaction_History.create({ data: { idUser: user3.id, idUserSubscriptions: user3Sub2.id, idClub: clubTeaBlends.id, idPaymentMethods: payMethodTarjetaDebito.id, idGatewayTransaction: 'TD-TXN-00105', totalAmountPaid: 14500, commissionAmount: 200, clubAmount: 14300, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual febrero 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user3.id, idUserSubscriptions: user3Sub2.id, idClub: clubTeaBlends.id, idPaymentMethods: payMethodTarjetaDebito.id, idGatewayTransaction: 'TD-TXN-00106', totalAmountPaid: 14500, commissionAmount: 200, clubAmount: 14300, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual marzo 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user3.id, idUserSubscriptions: user3Sub2.id, idClub: clubTeaBlends.id, idPaymentMethods: payMethodTarjetaDebito.id, idGatewayTransaction: 'TD-TXN-00107', totalAmountPaid: 14500, commissionAmount: 200, clubAmount: 14300, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual abril 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user3.id, idUserSubscriptions: user3Sub2.id, idClub: clubTeaBlends.id, idPaymentMethods: payMethodTarjetaDebito.id, idGatewayTransaction: 'TD-TXN-00108', totalAmountPaid: 14500, commissionAmount: 200, clubAmount: 14300, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual mayo 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user3.id, idUserSubscriptions: user3Sub2.id, idClub: clubTeaBlends.id, idPaymentMethods: payMethodTarjetaDebito.id, idGatewayTransaction: 'TD-TXN-00109', totalAmountPaid: 14500, commissionAmount: 200, clubAmount: 14300, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual junio 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user3.id, idUserSubscriptions: user3Sub2.id, idClub: clubTeaBlends.id, idPaymentMethods: payMethodTarjetaDebito.id, idGatewayTransaction: 'TD-TXN-00110', totalAmountPaid: 14500, commissionAmount: 200, clubAmount: 14300, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual julio 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user3.id, idUserSubscriptions: user3Sub2.id, idClub: clubTeaBlends.id, idPaymentMethods: payMethodTarjetaDebito.id, idGatewayTransaction: 'TD-TXN-00111', totalAmountPaid: 14500, commissionAmount: 200, clubAmount: 14300, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual agosto 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user3.id, idUserSubscriptions: user3Sub2.id, idClub: clubTeaBlends.id, idPaymentMethods: payMethodTarjetaDebito.id, idGatewayTransaction: 'TD-TXN-00112', totalAmountPaid: 14500, commissionAmount: 200, clubAmount: 14300, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual septiembre 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user3.id, idUserSubscriptions: user3Sub2.id, idClub: clubTeaBlends.id, idPaymentMethods: payMethodTarjetaDebito.id, idGatewayTransaction: 'TD-TXN-00113', totalAmountPaid: 14500, commissionAmount: 200, clubAmount: 14300, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual octubre 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user3.id, idUserSubscriptions: user3Sub2.id, idClub: clubTeaBlends.id, idPaymentMethods: payMethodTarjetaDebito.id, idGatewayTransaction: 'TD-TXN-00114', totalAmountPaid: 14500, commissionAmount: 200, clubAmount: 14300, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual noviembre 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user3.id, idUserSubscriptions: user3Sub2.id, idClub: clubTeaBlends.id, idPaymentMethods: payMethodTarjetaDebito.id, idGatewayTransaction: 'TD-TXN-00115', totalAmountPaid: 14500, commissionAmount: 200, clubAmount: 14300, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual diciembre 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user3.id, idUserSubscriptions: user3Sub2.id, idClub: clubTeaBlends.id, idPaymentMethods: payMethodTarjetaDebito.id, idGatewayTransaction: 'TD-TXN-00116', totalAmountPaid: 14500, commissionAmount: 200, clubAmount: 14300, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual enero 2026' } });
+    await prisma.transaction_History.create({ data: { idUser: user3.id, idUserSubscriptions: user3Sub2.id, idClub: clubTeaBlends.id, idPaymentMethods: payMethodTarjetaDebito.id, idGatewayTransaction: 'TD-TXN-00117', totalAmountPaid: 14500, commissionAmount: 200, clubAmount: 14300, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual febrero 2026' } });
+    await prisma.transaction_History.create({ data: { idUser: user3.id, idUserSubscriptions: user3Sub2.id, idClub: clubTeaBlends.id, idPaymentMethods: payMethodTarjetaDebito.id, idGatewayTransaction: 'TD-TXN-00118', totalAmountPaid: 14500, commissionAmount: 200, clubAmount: 14300, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual marzo 2026' } });
+    await prisma.transaction_History.create({ data: { idUser: user3.id, idUserSubscriptions: user3Sub2.id, idClub: clubTeaBlends.id, idPaymentMethods: payMethodTarjetaDebito.id, idGatewayTransaction: 'TD-TXN-00119', totalAmountPaid: 14500, commissionAmount: 200, clubAmount: 14300, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual abril 2026' } });
+    await prisma.transaction_History.create({ data: { idUser: user3.id, idUserSubscriptions: user3Sub2.id, idClub: clubTeaBlends.id, idPaymentMethods: payMethodTarjetaDebito.id, idGatewayTransaction: 'TD-TXN-00120', totalAmountPaid: 14500, commissionAmount: 200, clubAmount: 14300, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual mayo 2026' } });
+    await prisma.transaction_History.create({ data: { idUser: user3.id, idUserSubscriptions: user3Sub2.id, idClub: clubTeaBlends.id, idPaymentMethods: payMethodTarjetaDebito.id, idGatewayTransaction: 'TD-TXN-00121', totalAmountPaid: 14500, commissionAmount: 200, clubAmount: 14300, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual junio 2026' } });
+    //#endregion
+  //#endregion
+
+  //#region 23.4. Martín Fernández 
+    //#region 23.4.1. user4Sub1 - 18 pagos
+    await prisma.transaction_History.create({ data: { idUser: user4.id, idUserSubscriptions: user4Sub1.id, idClub: clubWinexperts.id, idPaymentMethods: payMethodMercadoPago.id, idGatewayTransaction: 'MP-TXN-00122', totalAmountPaid: 49400, commissionAmount: 200, clubAmount: 49200, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual enero 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user4.id, idUserSubscriptions: user4Sub1.id, idClub: clubWinexperts.id, idPaymentMethods: payMethodMercadoPago.id, idGatewayTransaction: 'MP-TXN-00123', totalAmountPaid: 49400, commissionAmount: 200, clubAmount: 49200, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual febrero 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user4.id, idUserSubscriptions: user4Sub1.id, idClub: clubWinexperts.id, idPaymentMethods: payMethodMercadoPago.id, idGatewayTransaction: 'MP-TXN-00124', totalAmountPaid: 49400, commissionAmount: 200, clubAmount: 49200, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual marzo 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user4.id, idUserSubscriptions: user4Sub1.id, idClub: clubWinexperts.id, idPaymentMethods: payMethodMercadoPago.id, idGatewayTransaction: 'MP-TXN-00125', totalAmountPaid: 49400, commissionAmount: 200, clubAmount: 49200, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual abril 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user4.id, idUserSubscriptions: user4Sub1.id, idClub: clubWinexperts.id, idPaymentMethods: payMethodMercadoPago.id, idGatewayTransaction: 'MP-TXN-00126', totalAmountPaid: 49400, commissionAmount: 200, clubAmount: 49200, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual mayo 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user4.id, idUserSubscriptions: user4Sub1.id, idClub: clubWinexperts.id, idPaymentMethods: payMethodMercadoPago.id, idGatewayTransaction: 'MP-TXN-00127', totalAmountPaid: 49400, commissionAmount: 200, clubAmount: 49200, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual junio 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user4.id, idUserSubscriptions: user4Sub1.id, idClub: clubWinexperts.id, idPaymentMethods: payMethodMercadoPago.id, idGatewayTransaction: 'MP-TXN-00128', totalAmountPaid: 49400, commissionAmount: 200, clubAmount: 49200, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual julio 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user4.id, idUserSubscriptions: user4Sub1.id, idClub: clubWinexperts.id, idPaymentMethods: payMethodMercadoPago.id, idGatewayTransaction: 'MP-TXN-00129', totalAmountPaid: 49400, commissionAmount: 200, clubAmount: 49200, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual agosto 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user4.id, idUserSubscriptions: user4Sub1.id, idClub: clubWinexperts.id, idPaymentMethods: payMethodMercadoPago.id, idGatewayTransaction: 'MP-TXN-00130', totalAmountPaid: 49400, commissionAmount: 200, clubAmount: 49200, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual septiembre 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user4.id, idUserSubscriptions: user4Sub1.id, idClub: clubWinexperts.id, idPaymentMethods: payMethodMercadoPago.id, idGatewayTransaction: 'MP-TXN-00131', totalAmountPaid: 49400, commissionAmount: 200, clubAmount: 49200, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual octubre 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user4.id, idUserSubscriptions: user4Sub1.id, idClub: clubWinexperts.id, idPaymentMethods: payMethodMercadoPago.id, idGatewayTransaction: 'MP-TXN-00132', totalAmountPaid: 49400, commissionAmount: 200, clubAmount: 49200, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual noviembre 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user4.id, idUserSubscriptions: user4Sub1.id, idClub: clubWinexperts.id, idPaymentMethods: payMethodMercadoPago.id, idGatewayTransaction: 'MP-TXN-00133', totalAmountPaid: 49400, commissionAmount: 200, clubAmount: 49200, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual diciembre 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user4.id, idUserSubscriptions: user4Sub1.id, idClub: clubWinexperts.id, idPaymentMethods: payMethodMercadoPago.id, idGatewayTransaction: 'MP-TXN-00134', totalAmountPaid: 49400, commissionAmount: 200, clubAmount: 49200, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual enero 2026' } });
+    await prisma.transaction_History.create({ data: { idUser: user4.id, idUserSubscriptions: user4Sub1.id, idClub: clubWinexperts.id, idPaymentMethods: payMethodMercadoPago.id, idGatewayTransaction: 'MP-TXN-00135', totalAmountPaid: 49400, commissionAmount: 200, clubAmount: 49200, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual febrero 2026' } });
+    await prisma.transaction_History.create({ data: { idUser: user4.id, idUserSubscriptions: user4Sub1.id, idClub: clubWinexperts.id, idPaymentMethods: payMethodMercadoPago.id, idGatewayTransaction: 'MP-TXN-00136', totalAmountPaid: 49400, commissionAmount: 200, clubAmount: 49200, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual marzo 2026' } });
+    await prisma.transaction_History.create({ data: { idUser: user4.id, idUserSubscriptions: user4Sub1.id, idClub: clubWinexperts.id, idPaymentMethods: payMethodMercadoPago.id, idGatewayTransaction: 'MP-TXN-00137', totalAmountPaid: 49400, commissionAmount: 200, clubAmount: 49200, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual abril 2026' } });
+    await prisma.transaction_History.create({ data: { idUser: user4.id, idUserSubscriptions: user4Sub1.id, idClub: clubWinexperts.id, idPaymentMethods: payMethodMercadoPago.id, idGatewayTransaction: 'MP-TXN-00138', totalAmountPaid: 49400, commissionAmount: 200, clubAmount: 49200, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual mayo 2026' } });
+    await prisma.transaction_History.create({ data: { idUser: user4.id, idUserSubscriptions: user4Sub1.id, idClub: clubWinexperts.id, idPaymentMethods: payMethodMercadoPago.id, idGatewayTransaction: 'MP-TXN-00139', totalAmountPaid: 49400, commissionAmount: 200, clubAmount: 49200, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual junio 2026' } });
+    //#endregion
+  //#endregion
+
+  //#region 23.5. Valentina Castro 
+    //#region 23.5.1. user5Sub1 - 18 pagos
+    await prisma.transaction_History.create({ data: { idUser: user5.id, idUserSubscriptions: user5Sub1.id, idClub: clubGlossyBox.id, idPaymentMethods: payMethodTarjetaCredito.id, idGatewayTransaction: 'TC-TXN-00140', totalAmountPaid: 35000, commissionAmount: 200, clubAmount: 34800, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual enero 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user5.id, idUserSubscriptions: user5Sub1.id, idClub: clubGlossyBox.id, idPaymentMethods: payMethodTarjetaCredito.id, idGatewayTransaction: 'TC-TXN-00141', totalAmountPaid: 35000, commissionAmount: 200, clubAmount: 34800, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual febrero 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user5.id, idUserSubscriptions: user5Sub1.id, idClub: clubGlossyBox.id, idPaymentMethods: payMethodTarjetaCredito.id, idGatewayTransaction: 'TC-TXN-00142', totalAmountPaid: 35000, commissionAmount: 200, clubAmount: 34800, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual marzo 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user5.id, idUserSubscriptions: user5Sub1.id, idClub: clubGlossyBox.id, idPaymentMethods: payMethodTarjetaCredito.id, idGatewayTransaction: 'TC-TXN-00143', totalAmountPaid: 35000, commissionAmount: 200, clubAmount: 34800, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual abril 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user5.id, idUserSubscriptions: user5Sub1.id, idClub: clubGlossyBox.id, idPaymentMethods: payMethodTarjetaCredito.id, idGatewayTransaction: 'TC-TXN-00144', totalAmountPaid: 35000, commissionAmount: 200, clubAmount: 34800, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual mayo 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user5.id, idUserSubscriptions: user5Sub1.id, idClub: clubGlossyBox.id, idPaymentMethods: payMethodTarjetaCredito.id, idGatewayTransaction: 'TC-TXN-00145', totalAmountPaid: 35000, commissionAmount: 200, clubAmount: 34800, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual junio 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user5.id, idUserSubscriptions: user5Sub1.id, idClub: clubGlossyBox.id, idPaymentMethods: payMethodTarjetaCredito.id, idGatewayTransaction: 'TC-TXN-00146', totalAmountPaid: 35000, commissionAmount: 200, clubAmount: 34800, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual julio 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user5.id, idUserSubscriptions: user5Sub1.id, idClub: clubGlossyBox.id, idPaymentMethods: payMethodTarjetaCredito.id, idGatewayTransaction: 'TC-TXN-00147', totalAmountPaid: 35000, commissionAmount: 200, clubAmount: 34800, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual agosto 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user5.id, idUserSubscriptions: user5Sub1.id, idClub: clubGlossyBox.id, idPaymentMethods: payMethodTarjetaCredito.id, idGatewayTransaction: 'TC-TXN-00148', totalAmountPaid: 35000, commissionAmount: 200, clubAmount: 34800, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual septiembre 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user5.id, idUserSubscriptions: user5Sub1.id, idClub: clubGlossyBox.id, idPaymentMethods: payMethodTarjetaCredito.id, idGatewayTransaction: 'TC-TXN-00149', totalAmountPaid: 35000, commissionAmount: 200, clubAmount: 34800, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual octubre 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user5.id, idUserSubscriptions: user5Sub1.id, idClub: clubGlossyBox.id, idPaymentMethods: payMethodTarjetaCredito.id, idGatewayTransaction: 'TC-TXN-00150', totalAmountPaid: 35000, commissionAmount: 200, clubAmount: 34800, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual noviembre 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user5.id, idUserSubscriptions: user5Sub1.id, idClub: clubGlossyBox.id, idPaymentMethods: payMethodTarjetaCredito.id, idGatewayTransaction: 'TC-TXN-00151', totalAmountPaid: 35000, commissionAmount: 200, clubAmount: 34800, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual diciembre 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user5.id, idUserSubscriptions: user5Sub1.id, idClub: clubGlossyBox.id, idPaymentMethods: payMethodTarjetaCredito.id, idGatewayTransaction: 'TC-TXN-00152', totalAmountPaid: 35000, commissionAmount: 200, clubAmount: 34800, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual enero 2026' } });
+    await prisma.transaction_History.create({ data: { idUser: user5.id, idUserSubscriptions: user5Sub1.id, idClub: clubGlossyBox.id, idPaymentMethods: payMethodTarjetaCredito.id, idGatewayTransaction: 'TC-TXN-00153', totalAmountPaid: 35000, commissionAmount: 200, clubAmount: 34800, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual febrero 2026' } });
+    await prisma.transaction_History.create({ data: { idUser: user5.id, idUserSubscriptions: user5Sub1.id, idClub: clubGlossyBox.id, idPaymentMethods: payMethodTarjetaCredito.id, idGatewayTransaction: 'TC-TXN-00154', totalAmountPaid: 35000, commissionAmount: 200, clubAmount: 34800, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual marzo 2026' } });
+    await prisma.transaction_History.create({ data: { idUser: user5.id, idUserSubscriptions: user5Sub1.id, idClub: clubGlossyBox.id, idPaymentMethods: payMethodTarjetaCredito.id, idGatewayTransaction: 'TC-TXN-00155', totalAmountPaid: 35000, commissionAmount: 200, clubAmount: 34800, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual abril 2026' } });
+    await prisma.transaction_History.create({ data: { idUser: user5.id, idUserSubscriptions: user5Sub1.id, idClub: clubGlossyBox.id, idPaymentMethods: payMethodTarjetaCredito.id, idGatewayTransaction: 'TC-TXN-00156', totalAmountPaid: 35000, commissionAmount: 200, clubAmount: 34800, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual mayo 2026' } });
+    await prisma.transaction_History.create({ data: { idUser: user5.id, idUserSubscriptions: user5Sub1.id, idClub: clubGlossyBox.id, idPaymentMethods: payMethodTarjetaCredito.id, idGatewayTransaction: 'TC-TXN-00157', totalAmountPaid: 35000, commissionAmount: 200, clubAmount: 34800, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual junio 2026' } });
+    //#endregion
+
+    //#region 23.5.2. user5Sub2 - 17 pagos
+    await prisma.transaction_History.create({ data: { idUser: user5.id, idUserSubscriptions: user5Sub2.id, idClub: clubAlmaBox.id, idPaymentMethods: payMethodMercadoPago.id, idGatewayTransaction: 'MP-TXN-00158', totalAmountPaid: 25760, commissionAmount: 200, clubAmount: 25560, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual febrero 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user5.id, idUserSubscriptions: user5Sub2.id, idClub: clubAlmaBox.id, idPaymentMethods: payMethodMercadoPago.id, idGatewayTransaction: 'MP-TXN-00159', totalAmountPaid: 25760, commissionAmount: 200, clubAmount: 25560, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual marzo 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user5.id, idUserSubscriptions: user5Sub2.id, idClub: clubAlmaBox.id, idPaymentMethods: payMethodMercadoPago.id, idGatewayTransaction: 'MP-TXN-00160', totalAmountPaid: 25760, commissionAmount: 200, clubAmount: 25560, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual abril 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user5.id, idUserSubscriptions: user5Sub2.id, idClub: clubAlmaBox.id, idPaymentMethods: payMethodMercadoPago.id, idGatewayTransaction: 'MP-TXN-00161', totalAmountPaid: 25760, commissionAmount: 200, clubAmount: 25560, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual mayo 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user5.id, idUserSubscriptions: user5Sub2.id, idClub: clubAlmaBox.id, idPaymentMethods: payMethodMercadoPago.id, idGatewayTransaction: 'MP-TXN-00162', totalAmountPaid: 25760, commissionAmount: 200, clubAmount: 25560, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual junio 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user5.id, idUserSubscriptions: user5Sub2.id, idClub: clubAlmaBox.id, idPaymentMethods: payMethodMercadoPago.id, idGatewayTransaction: 'MP-TXN-00163', totalAmountPaid: 25760, commissionAmount: 200, clubAmount: 25560, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual julio 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user5.id, idUserSubscriptions: user5Sub2.id, idClub: clubAlmaBox.id, idPaymentMethods: payMethodMercadoPago.id, idGatewayTransaction: 'MP-TXN-00164', totalAmountPaid: 25760, commissionAmount: 200, clubAmount: 25560, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual agosto 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user5.id, idUserSubscriptions: user5Sub2.id, idClub: clubAlmaBox.id, idPaymentMethods: payMethodMercadoPago.id, idGatewayTransaction: 'MP-TXN-00165', totalAmountPaid: 25760, commissionAmount: 200, clubAmount: 25560, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual septiembre 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user5.id, idUserSubscriptions: user5Sub2.id, idClub: clubAlmaBox.id, idPaymentMethods: payMethodMercadoPago.id, idGatewayTransaction: 'MP-TXN-00166', totalAmountPaid: 25760, commissionAmount: 200, clubAmount: 25560, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual octubre 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user5.id, idUserSubscriptions: user5Sub2.id, idClub: clubAlmaBox.id, idPaymentMethods: payMethodMercadoPago.id, idGatewayTransaction: 'MP-TXN-00167', totalAmountPaid: 25760, commissionAmount: 200, clubAmount: 25560, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual noviembre 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user5.id, idUserSubscriptions: user5Sub2.id, idClub: clubAlmaBox.id, idPaymentMethods: payMethodMercadoPago.id, idGatewayTransaction: 'MP-TXN-00168', totalAmountPaid: 25760, commissionAmount: 200, clubAmount: 25560, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual diciembre 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user5.id, idUserSubscriptions: user5Sub2.id, idClub: clubAlmaBox.id, idPaymentMethods: payMethodMercadoPago.id, idGatewayTransaction: 'MP-TXN-00169', totalAmountPaid: 25760, commissionAmount: 200, clubAmount: 25560, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual enero 2026' } });
+    await prisma.transaction_History.create({ data: { idUser: user5.id, idUserSubscriptions: user5Sub2.id, idClub: clubAlmaBox.id, idPaymentMethods: payMethodMercadoPago.id, idGatewayTransaction: 'MP-TXN-00170', totalAmountPaid: 25760, commissionAmount: 200, clubAmount: 25560, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual febrero 2026' } });
+    await prisma.transaction_History.create({ data: { idUser: user5.id, idUserSubscriptions: user5Sub2.id, idClub: clubAlmaBox.id, idPaymentMethods: payMethodMercadoPago.id, idGatewayTransaction: 'MP-TXN-00171', totalAmountPaid: 25760, commissionAmount: 200, clubAmount: 25560, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual marzo 2026' } });
+    await prisma.transaction_History.create({ data: { idUser: user5.id, idUserSubscriptions: user5Sub2.id, idClub: clubAlmaBox.id, idPaymentMethods: payMethodMercadoPago.id, idGatewayTransaction: 'MP-TXN-00172', totalAmountPaid: 25760, commissionAmount: 200, clubAmount: 25560, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual abril 2026' } });
+    await prisma.transaction_History.create({ data: { idUser: user5.id, idUserSubscriptions: user5Sub2.id, idClub: clubAlmaBox.id, idPaymentMethods: payMethodMercadoPago.id, idGatewayTransaction: 'MP-TXN-00173', totalAmountPaid: 25760, commissionAmount: 200, clubAmount: 25560, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual mayo 2026' } });
+    await prisma.transaction_History.create({ data: { idUser: user5.id, idUserSubscriptions: user5Sub2.id, idClub: clubAlmaBox.id, idPaymentMethods: payMethodMercadoPago.id, idGatewayTransaction: 'MP-TXN-00174', totalAmountPaid: 25760, commissionAmount: 200, clubAmount: 25560, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual junio 2026' } });
+    //#endregion
+
+    //#region 23.5.3. user5Sub3 - 16 pagos
+    await prisma.transaction_History.create({ data: { idUser: user5.id, idUserSubscriptions: user5Sub3.id, idClub: clubSweetBox.id, idPaymentMethods: payMethodPayPal.id, idGatewayTransaction: 'PP-TXN-00175', totalAmountPaid: 15500, commissionAmount: 200, clubAmount: 15300, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual marzo 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user5.id, idUserSubscriptions: user5Sub3.id, idClub: clubSweetBox.id, idPaymentMethods: payMethodPayPal.id, idGatewayTransaction: 'PP-TXN-00176', totalAmountPaid: 15500, commissionAmount: 200, clubAmount: 15300, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual abril 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user5.id, idUserSubscriptions: user5Sub3.id, idClub: clubSweetBox.id, idPaymentMethods: payMethodPayPal.id, idGatewayTransaction: 'PP-TXN-00177', totalAmountPaid: 15500, commissionAmount: 200, clubAmount: 15300, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual mayo 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user5.id, idUserSubscriptions: user5Sub3.id, idClub: clubSweetBox.id, idPaymentMethods: payMethodPayPal.id, idGatewayTransaction: 'PP-TXN-00178', totalAmountPaid: 15500, commissionAmount: 200, clubAmount: 15300, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual junio 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user5.id, idUserSubscriptions: user5Sub3.id, idClub: clubSweetBox.id, idPaymentMethods: payMethodPayPal.id, idGatewayTransaction: 'PP-TXN-00179', totalAmountPaid: 15500, commissionAmount: 200, clubAmount: 15300, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual julio 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user5.id, idUserSubscriptions: user5Sub3.id, idClub: clubSweetBox.id, idPaymentMethods: payMethodPayPal.id, idGatewayTransaction: 'PP-TXN-00180', totalAmountPaid: 15500, commissionAmount: 200, clubAmount: 15300, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual agosto 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user5.id, idUserSubscriptions: user5Sub3.id, idClub: clubSweetBox.id, idPaymentMethods: payMethodPayPal.id, idGatewayTransaction: 'PP-TXN-00181', totalAmountPaid: 15500, commissionAmount: 200, clubAmount: 15300, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual septiembre 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user5.id, idUserSubscriptions: user5Sub3.id, idClub: clubSweetBox.id, idPaymentMethods: payMethodPayPal.id, idGatewayTransaction: 'PP-TXN-00182', totalAmountPaid: 15500, commissionAmount: 200, clubAmount: 15300, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual octubre 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user5.id, idUserSubscriptions: user5Sub3.id, idClub: clubSweetBox.id, idPaymentMethods: payMethodPayPal.id, idGatewayTransaction: 'PP-TXN-00183', totalAmountPaid: 15500, commissionAmount: 200, clubAmount: 15300, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual noviembre 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user5.id, idUserSubscriptions: user5Sub3.id, idClub: clubSweetBox.id, idPaymentMethods: payMethodPayPal.id, idGatewayTransaction: 'PP-TXN-00184', totalAmountPaid: 15500, commissionAmount: 200, clubAmount: 15300, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual diciembre 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user5.id, idUserSubscriptions: user5Sub3.id, idClub: clubSweetBox.id, idPaymentMethods: payMethodPayPal.id, idGatewayTransaction: 'PP-TXN-00185', totalAmountPaid: 15500, commissionAmount: 200, clubAmount: 15300, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual enero 2026' } });
+    await prisma.transaction_History.create({ data: { idUser: user5.id, idUserSubscriptions: user5Sub3.id, idClub: clubSweetBox.id, idPaymentMethods: payMethodPayPal.id, idGatewayTransaction: 'PP-TXN-00186', totalAmountPaid: 15500, commissionAmount: 200, clubAmount: 15300, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual febrero 2026' } });
+    await prisma.transaction_History.create({ data: { idUser: user5.id, idUserSubscriptions: user5Sub3.id, idClub: clubSweetBox.id, idPaymentMethods: payMethodPayPal.id, idGatewayTransaction: 'PP-TXN-00187', totalAmountPaid: 15500, commissionAmount: 200, clubAmount: 15300, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual marzo 2026' } });
+    await prisma.transaction_History.create({ data: { idUser: user5.id, idUserSubscriptions: user5Sub3.id, idClub: clubSweetBox.id, idPaymentMethods: payMethodPayPal.id, idGatewayTransaction: 'PP-TXN-00188', totalAmountPaid: 15500, commissionAmount: 200, clubAmount: 15300, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual abril 2026' } });
+    await prisma.transaction_History.create({ data: { idUser: user5.id, idUserSubscriptions: user5Sub3.id, idClub: clubSweetBox.id, idPaymentMethods: payMethodPayPal.id, idGatewayTransaction: 'PP-TXN-00189', totalAmountPaid: 15500, commissionAmount: 200, clubAmount: 15300, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual mayo 2026' } });
+    await prisma.transaction_History.create({ data: { idUser: user5.id, idUserSubscriptions: user5Sub3.id, idClub: clubSweetBox.id, idPaymentMethods: payMethodPayPal.id, idGatewayTransaction: 'PP-TXN-00190', totalAmountPaid: 15500, commissionAmount: 200, clubAmount: 15300, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual junio 2026' } });
+    //#endregion
+  //#endregion
+ 
+  //#region 23.6. Agustín Morales 
+    //#region 23.6.1. user6Sub1 - 18 pagos
+    await prisma.transaction_History.create({ data: { idUser: user6.id, idUserSubscriptions: user6Sub1.id, idClub: clubCafeSelecto.id, idPaymentMethods: payMethodEfectivo.id, idGatewayTransaction: 'EF-TXN-00191', totalAmountPaid: 27435, commissionAmount: 200, clubAmount: 27235, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual enero 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user6.id, idUserSubscriptions: user6Sub1.id, idClub: clubCafeSelecto.id, idPaymentMethods: payMethodEfectivo.id, idGatewayTransaction: 'EF-TXN-00192', totalAmountPaid: 27435, commissionAmount: 200, clubAmount: 27235, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual febrero 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user6.id, idUserSubscriptions: user6Sub1.id, idClub: clubCafeSelecto.id, idPaymentMethods: payMethodEfectivo.id, idGatewayTransaction: 'EF-TXN-00193', totalAmountPaid: 27435, commissionAmount: 200, clubAmount: 27235, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual marzo 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user6.id, idUserSubscriptions: user6Sub1.id, idClub: clubCafeSelecto.id, idPaymentMethods: payMethodEfectivo.id, idGatewayTransaction: 'EF-TXN-00194', totalAmountPaid: 27435, commissionAmount: 200, clubAmount: 27235, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual abril 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user6.id, idUserSubscriptions: user6Sub1.id, idClub: clubCafeSelecto.id, idPaymentMethods: payMethodEfectivo.id, idGatewayTransaction: 'EF-TXN-00195', totalAmountPaid: 27435, commissionAmount: 200, clubAmount: 27235, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual mayo 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user6.id, idUserSubscriptions: user6Sub1.id, idClub: clubCafeSelecto.id, idPaymentMethods: payMethodEfectivo.id, idGatewayTransaction: 'EF-TXN-00196', totalAmountPaid: 27435, commissionAmount: 200, clubAmount: 27235, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual junio 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user6.id, idUserSubscriptions: user6Sub1.id, idClub: clubCafeSelecto.id, idPaymentMethods: payMethodEfectivo.id, idGatewayTransaction: 'EF-TXN-00197', totalAmountPaid: 27435, commissionAmount: 200, clubAmount: 27235, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual julio 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user6.id, idUserSubscriptions: user6Sub1.id, idClub: clubCafeSelecto.id, idPaymentMethods: payMethodEfectivo.id, idGatewayTransaction: 'EF-TXN-00198', totalAmountPaid: 27435, commissionAmount: 200, clubAmount: 27235, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual agosto 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user6.id, idUserSubscriptions: user6Sub1.id, idClub: clubCafeSelecto.id, idPaymentMethods: payMethodEfectivo.id, idGatewayTransaction: 'EF-TXN-00199', totalAmountPaid: 27435, commissionAmount: 200, clubAmount: 27235, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual septiembre 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user6.id, idUserSubscriptions: user6Sub1.id, idClub: clubCafeSelecto.id, idPaymentMethods: payMethodEfectivo.id, idGatewayTransaction: 'EF-TXN-00200', totalAmountPaid: 27435, commissionAmount: 200, clubAmount: 27235, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual octubre 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user6.id, idUserSubscriptions: user6Sub1.id, idClub: clubCafeSelecto.id, idPaymentMethods: payMethodEfectivo.id, idGatewayTransaction: 'EF-TXN-00201', totalAmountPaid: 27435, commissionAmount: 200, clubAmount: 27235, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual noviembre 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user6.id, idUserSubscriptions: user6Sub1.id, idClub: clubCafeSelecto.id, idPaymentMethods: payMethodEfectivo.id, idGatewayTransaction: 'EF-TXN-00202', totalAmountPaid: 27435, commissionAmount: 200, clubAmount: 27235, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual diciembre 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user6.id, idUserSubscriptions: user6Sub1.id, idClub: clubCafeSelecto.id, idPaymentMethods: payMethodEfectivo.id, idGatewayTransaction: 'EF-TXN-00203', totalAmountPaid: 27435, commissionAmount: 200, clubAmount: 27235, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual enero 2026' } });
+    await prisma.transaction_History.create({ data: { idUser: user6.id, idUserSubscriptions: user6Sub1.id, idClub: clubCafeSelecto.id, idPaymentMethods: payMethodEfectivo.id, idGatewayTransaction: 'EF-TXN-00204', totalAmountPaid: 27435, commissionAmount: 200, clubAmount: 27235, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual febrero 2026' } });
+    await prisma.transaction_History.create({ data: { idUser: user6.id, idUserSubscriptions: user6Sub1.id, idClub: clubCafeSelecto.id, idPaymentMethods: payMethodEfectivo.id, idGatewayTransaction: 'EF-TXN-00205', totalAmountPaid: 27435, commissionAmount: 200, clubAmount: 27235, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual marzo 2026' } });
+    await prisma.transaction_History.create({ data: { idUser: user6.id, idUserSubscriptions: user6Sub1.id, idClub: clubCafeSelecto.id, idPaymentMethods: payMethodEfectivo.id, idGatewayTransaction: 'EF-TXN-00206', totalAmountPaid: 27435, commissionAmount: 200, clubAmount: 27235, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual abril 2026' } });
+    await prisma.transaction_History.create({ data: { idUser: user6.id, idUserSubscriptions: user6Sub1.id, idClub: clubCafeSelecto.id, idPaymentMethods: payMethodEfectivo.id, idGatewayTransaction: 'EF-TXN-00207', totalAmountPaid: 27435, commissionAmount: 200, clubAmount: 27235, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual mayo 2026' } });
+    await prisma.transaction_History.create({ data: { idUser: user6.id, idUserSubscriptions: user6Sub1.id, idClub: clubCafeSelecto.id, idPaymentMethods: payMethodEfectivo.id, idGatewayTransaction: 'EF-TXN-00208', totalAmountPaid: 27435, commissionAmount: 200, clubAmount: 27235, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual junio 2026' } });
+    //#endregion
+
+    //#region 23.6.2. user6Sub2 - 17 pagos
+    await prisma.transaction_History.create({ data: { idUser: user6.id, idUserSubscriptions: user6Sub2.id, idClub: clubLootCrateAR.id, idPaymentMethods: payMethodTarjetaDebito.id, idGatewayTransaction: 'TD-TXN-00209', totalAmountPaid: 32000, commissionAmount: 200, clubAmount: 31800, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual febrero 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user6.id, idUserSubscriptions: user6Sub2.id, idClub: clubLootCrateAR.id, idPaymentMethods: payMethodTarjetaDebito.id, idGatewayTransaction: 'TD-TXN-00210', totalAmountPaid: 32000, commissionAmount: 200, clubAmount: 31800, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual marzo 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user6.id, idUserSubscriptions: user6Sub2.id, idClub: clubLootCrateAR.id, idPaymentMethods: payMethodTarjetaDebito.id, idGatewayTransaction: 'TD-TXN-00211', totalAmountPaid: 32000, commissionAmount: 200, clubAmount: 31800, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual abril 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user6.id, idUserSubscriptions: user6Sub2.id, idClub: clubLootCrateAR.id, idPaymentMethods: payMethodTarjetaDebito.id, idGatewayTransaction: 'TD-TXN-00212', totalAmountPaid: 32000, commissionAmount: 200, clubAmount: 31800, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual mayo 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user6.id, idUserSubscriptions: user6Sub2.id, idClub: clubLootCrateAR.id, idPaymentMethods: payMethodTarjetaDebito.id, idGatewayTransaction: 'TD-TXN-00213', totalAmountPaid: 32000, commissionAmount: 200, clubAmount: 31800, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual junio 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user6.id, idUserSubscriptions: user6Sub2.id, idClub: clubLootCrateAR.id, idPaymentMethods: payMethodTarjetaDebito.id, idGatewayTransaction: 'TD-TXN-00214', totalAmountPaid: 32000, commissionAmount: 200, clubAmount: 31800, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual julio 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user6.id, idUserSubscriptions: user6Sub2.id, idClub: clubLootCrateAR.id, idPaymentMethods: payMethodTarjetaDebito.id, idGatewayTransaction: 'TD-TXN-00215', totalAmountPaid: 32000, commissionAmount: 200, clubAmount: 31800, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual agosto 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user6.id, idUserSubscriptions: user6Sub2.id, idClub: clubLootCrateAR.id, idPaymentMethods: payMethodTarjetaDebito.id, idGatewayTransaction: 'TD-TXN-00216', totalAmountPaid: 32000, commissionAmount: 200, clubAmount: 31800, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual septiembre 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user6.id, idUserSubscriptions: user6Sub2.id, idClub: clubLootCrateAR.id, idPaymentMethods: payMethodTarjetaDebito.id, idGatewayTransaction: 'TD-TXN-00217', totalAmountPaid: 32000, commissionAmount: 200, clubAmount: 31800, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual octubre 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user6.id, idUserSubscriptions: user6Sub2.id, idClub: clubLootCrateAR.id, idPaymentMethods: payMethodTarjetaDebito.id, idGatewayTransaction: 'TD-TXN-00218', totalAmountPaid: 32000, commissionAmount: 200, clubAmount: 31800, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual noviembre 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user6.id, idUserSubscriptions: user6Sub2.id, idClub: clubLootCrateAR.id, idPaymentMethods: payMethodTarjetaDebito.id, idGatewayTransaction: 'TD-TXN-00219', totalAmountPaid: 32000, commissionAmount: 200, clubAmount: 31800, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual diciembre 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user6.id, idUserSubscriptions: user6Sub2.id, idClub: clubLootCrateAR.id, idPaymentMethods: payMethodTarjetaDebito.id, idGatewayTransaction: 'TD-TXN-00220', totalAmountPaid: 32000, commissionAmount: 200, clubAmount: 31800, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual enero 2026' } });
+    await prisma.transaction_History.create({ data: { idUser: user6.id, idUserSubscriptions: user6Sub2.id, idClub: clubLootCrateAR.id, idPaymentMethods: payMethodTarjetaDebito.id, idGatewayTransaction: 'TD-TXN-00221', totalAmountPaid: 32000, commissionAmount: 200, clubAmount: 31800, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual febrero 2026' } });
+    await prisma.transaction_History.create({ data: { idUser: user6.id, idUserSubscriptions: user6Sub2.id, idClub: clubLootCrateAR.id, idPaymentMethods: payMethodTarjetaDebito.id, idGatewayTransaction: 'TD-TXN-00222', totalAmountPaid: 32000, commissionAmount: 200, clubAmount: 31800, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual marzo 2026' } });
+    await prisma.transaction_History.create({ data: { idUser: user6.id, idUserSubscriptions: user6Sub2.id, idClub: clubLootCrateAR.id, idPaymentMethods: payMethodTarjetaDebito.id, idGatewayTransaction: 'TD-TXN-00223', totalAmountPaid: 32000, commissionAmount: 200, clubAmount: 31800, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual abril 2026' } });
+    await prisma.transaction_History.create({ data: { idUser: user6.id, idUserSubscriptions: user6Sub2.id, idClub: clubLootCrateAR.id, idPaymentMethods: payMethodTarjetaDebito.id, idGatewayTransaction: 'TD-TXN-00224', totalAmountPaid: 32000, commissionAmount: 200, clubAmount: 31800, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual mayo 2026' } });
+    await prisma.transaction_History.create({ data: { idUser: user6.id, idUserSubscriptions: user6Sub2.id, idClub: clubLootCrateAR.id, idPaymentMethods: payMethodTarjetaDebito.id, idGatewayTransaction: 'TD-TXN-00225', totalAmountPaid: 32000, commissionAmount: 200, clubAmount: 31800, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual junio 2026' } });
+    //#endregion
+  //#endregion
+
+  //#region 23.7. Camila Torres 
+    //#region 23.7.1. user7Sub1 - 18 pagos
+    await prisma.transaction_History.create({ data: { idUser: user7.id, idUserSubscriptions: user7Sub1.id, idClub: clubBodegaPrivada.id, idPaymentMethods: payMethodMercadoPago.id, idGatewayTransaction: 'MP-TXN-00226', totalAmountPaid: 43240, commissionAmount: 200, clubAmount: 43040, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual enero 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user7.id, idUserSubscriptions: user7Sub1.id, idClub: clubBodegaPrivada.id, idPaymentMethods: payMethodMercadoPago.id, idGatewayTransaction: 'MP-TXN-00227', totalAmountPaid: 43240, commissionAmount: 200, clubAmount: 43040, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual febrero 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user7.id, idUserSubscriptions: user7Sub1.id, idClub: clubBodegaPrivada.id, idPaymentMethods: payMethodMercadoPago.id, idGatewayTransaction: 'MP-TXN-00228', totalAmountPaid: 43240, commissionAmount: 200, clubAmount: 43040, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual marzo 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user7.id, idUserSubscriptions: user7Sub1.id, idClub: clubBodegaPrivada.id, idPaymentMethods: payMethodMercadoPago.id, idGatewayTransaction: 'MP-TXN-00229', totalAmountPaid: 43240, commissionAmount: 200, clubAmount: 43040, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual abril 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user7.id, idUserSubscriptions: user7Sub1.id, idClub: clubBodegaPrivada.id, idPaymentMethods: payMethodMercadoPago.id, idGatewayTransaction: 'MP-TXN-00230', totalAmountPaid: 43240, commissionAmount: 200, clubAmount: 43040, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual mayo 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user7.id, idUserSubscriptions: user7Sub1.id, idClub: clubBodegaPrivada.id, idPaymentMethods: payMethodMercadoPago.id, idGatewayTransaction: 'MP-TXN-00231', totalAmountPaid: 43240, commissionAmount: 200, clubAmount: 43040, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual junio 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user7.id, idUserSubscriptions: user7Sub1.id, idClub: clubBodegaPrivada.id, idPaymentMethods: payMethodMercadoPago.id, idGatewayTransaction: 'MP-TXN-00232', totalAmountPaid: 43240, commissionAmount: 200, clubAmount: 43040, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual julio 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user7.id, idUserSubscriptions: user7Sub1.id, idClub: clubBodegaPrivada.id, idPaymentMethods: payMethodMercadoPago.id, idGatewayTransaction: 'MP-TXN-00233', totalAmountPaid: 43240, commissionAmount: 200, clubAmount: 43040, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual agosto 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user7.id, idUserSubscriptions: user7Sub1.id, idClub: clubBodegaPrivada.id, idPaymentMethods: payMethodMercadoPago.id, idGatewayTransaction: 'MP-TXN-00234', totalAmountPaid: 43240, commissionAmount: 200, clubAmount: 43040, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual septiembre 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user7.id, idUserSubscriptions: user7Sub1.id, idClub: clubBodegaPrivada.id, idPaymentMethods: payMethodMercadoPago.id, idGatewayTransaction: 'MP-TXN-00235', totalAmountPaid: 43240, commissionAmount: 200, clubAmount: 43040, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual octubre 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user7.id, idUserSubscriptions: user7Sub1.id, idClub: clubBodegaPrivada.id, idPaymentMethods: payMethodMercadoPago.id, idGatewayTransaction: 'MP-TXN-00236', totalAmountPaid: 43240, commissionAmount: 200, clubAmount: 43040, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual noviembre 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user7.id, idUserSubscriptions: user7Sub1.id, idClub: clubBodegaPrivada.id, idPaymentMethods: payMethodMercadoPago.id, idGatewayTransaction: 'MP-TXN-00237', totalAmountPaid: 43240, commissionAmount: 200, clubAmount: 43040, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual diciembre 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user7.id, idUserSubscriptions: user7Sub1.id, idClub: clubBodegaPrivada.id, idPaymentMethods: payMethodMercadoPago.id, idGatewayTransaction: 'MP-TXN-00238', totalAmountPaid: 43240, commissionAmount: 200, clubAmount: 43040, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual enero 2026' } });
+    await prisma.transaction_History.create({ data: { idUser: user7.id, idUserSubscriptions: user7Sub1.id, idClub: clubBodegaPrivada.id, idPaymentMethods: payMethodMercadoPago.id, idGatewayTransaction: 'MP-TXN-00239', totalAmountPaid: 43240, commissionAmount: 200, clubAmount: 43040, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual febrero 2026' } });
+    await prisma.transaction_History.create({ data: { idUser: user7.id, idUserSubscriptions: user7Sub1.id, idClub: clubBodegaPrivada.id, idPaymentMethods: payMethodMercadoPago.id, idGatewayTransaction: 'MP-TXN-00240', totalAmountPaid: 43240, commissionAmount: 200, clubAmount: 43040, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual marzo 2026' } });
+    await prisma.transaction_History.create({ data: { idUser: user7.id, idUserSubscriptions: user7Sub1.id, idClub: clubBodegaPrivada.id, idPaymentMethods: payMethodMercadoPago.id, idGatewayTransaction: 'MP-TXN-00241', totalAmountPaid: 43240, commissionAmount: 200, clubAmount: 43040, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual abril 2026' } });
+    await prisma.transaction_History.create({ data: { idUser: user7.id, idUserSubscriptions: user7Sub1.id, idClub: clubBodegaPrivada.id, idPaymentMethods: payMethodMercadoPago.id, idGatewayTransaction: 'MP-TXN-00242', totalAmountPaid: 43240, commissionAmount: 200, clubAmount: 43040, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual mayo 2026' } });
+    await prisma.transaction_History.create({ data: { idUser: user7.id, idUserSubscriptions: user7Sub1.id, idClub: clubBodegaPrivada.id, idPaymentMethods: payMethodMercadoPago.id, idGatewayTransaction: 'MP-TXN-00243', totalAmountPaid: 43240, commissionAmount: 200, clubAmount: 43040, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual junio 2026' } });
+    //#endregion
+  //#endregion
+
+  //#region 23.8. Federico Romero 
+    //#region 23.8.1. user8Sub1 - 18 pagos
+    await prisma.transaction_History.create({ data: { idUser: user8.id, idUserSubscriptions: user8Sub1.id, idClub: clubBeerBox.id, idPaymentMethods: payMethodTarjetaCredito.id, idGatewayTransaction: 'TC-TXN-00244', totalAmountPaid: 24000, commissionAmount: 200, clubAmount: 23800, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual enero 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user8.id, idUserSubscriptions: user8Sub1.id, idClub: clubBeerBox.id, idPaymentMethods: payMethodTarjetaCredito.id, idGatewayTransaction: 'TC-TXN-00245', totalAmountPaid: 24000, commissionAmount: 200, clubAmount: 23800, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual febrero 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user8.id, idUserSubscriptions: user8Sub1.id, idClub: clubBeerBox.id, idPaymentMethods: payMethodTarjetaCredito.id, idGatewayTransaction: 'TC-TXN-00246', totalAmountPaid: 24000, commissionAmount: 200, clubAmount: 23800, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual marzo 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user8.id, idUserSubscriptions: user8Sub1.id, idClub: clubBeerBox.id, idPaymentMethods: payMethodTarjetaCredito.id, idGatewayTransaction: 'TC-TXN-00247', totalAmountPaid: 24000, commissionAmount: 200, clubAmount: 23800, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual abril 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user8.id, idUserSubscriptions: user8Sub1.id, idClub: clubBeerBox.id, idPaymentMethods: payMethodTarjetaCredito.id, idGatewayTransaction: 'TC-TXN-00248', totalAmountPaid: 24000, commissionAmount: 200, clubAmount: 23800, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual mayo 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user8.id, idUserSubscriptions: user8Sub1.id, idClub: clubBeerBox.id, idPaymentMethods: payMethodTarjetaCredito.id, idGatewayTransaction: 'TC-TXN-00249', totalAmountPaid: 24000, commissionAmount: 200, clubAmount: 23800, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual junio 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user8.id, idUserSubscriptions: user8Sub1.id, idClub: clubBeerBox.id, idPaymentMethods: payMethodTarjetaCredito.id, idGatewayTransaction: 'TC-TXN-00250', totalAmountPaid: 24000, commissionAmount: 200, clubAmount: 23800, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual julio 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user8.id, idUserSubscriptions: user8Sub1.id, idClub: clubBeerBox.id, idPaymentMethods: payMethodTarjetaCredito.id, idGatewayTransaction: 'TC-TXN-00251', totalAmountPaid: 24000, commissionAmount: 200, clubAmount: 23800, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual agosto 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user8.id, idUserSubscriptions: user8Sub1.id, idClub: clubBeerBox.id, idPaymentMethods: payMethodTarjetaCredito.id, idGatewayTransaction: 'TC-TXN-00252', totalAmountPaid: 24000, commissionAmount: 200, clubAmount: 23800, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual septiembre 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user8.id, idUserSubscriptions: user8Sub1.id, idClub: clubBeerBox.id, idPaymentMethods: payMethodTarjetaCredito.id, idGatewayTransaction: 'TC-TXN-00253', totalAmountPaid: 24000, commissionAmount: 200, clubAmount: 23800, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual octubre 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user8.id, idUserSubscriptions: user8Sub1.id, idClub: clubBeerBox.id, idPaymentMethods: payMethodTarjetaCredito.id, idGatewayTransaction: 'TC-TXN-00254', totalAmountPaid: 24000, commissionAmount: 200, clubAmount: 23800, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual noviembre 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user8.id, idUserSubscriptions: user8Sub1.id, idClub: clubBeerBox.id, idPaymentMethods: payMethodTarjetaCredito.id, idGatewayTransaction: 'TC-TXN-00255', totalAmountPaid: 24000, commissionAmount: 200, clubAmount: 23800, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual diciembre 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user8.id, idUserSubscriptions: user8Sub1.id, idClub: clubBeerBox.id, idPaymentMethods: payMethodTarjetaCredito.id, idGatewayTransaction: 'TC-TXN-00256', totalAmountPaid: 24000, commissionAmount: 200, clubAmount: 23800, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual enero 2026' } });
+    await prisma.transaction_History.create({ data: { idUser: user8.id, idUserSubscriptions: user8Sub1.id, idClub: clubBeerBox.id, idPaymentMethods: payMethodTarjetaCredito.id, idGatewayTransaction: 'TC-TXN-00257', totalAmountPaid: 24000, commissionAmount: 200, clubAmount: 23800, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual febrero 2026' } });
+    await prisma.transaction_History.create({ data: { idUser: user8.id, idUserSubscriptions: user8Sub1.id, idClub: clubBeerBox.id, idPaymentMethods: payMethodTarjetaCredito.id, idGatewayTransaction: 'TC-TXN-00258', totalAmountPaid: 24000, commissionAmount: 200, clubAmount: 23800, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual marzo 2026' } });
+    await prisma.transaction_History.create({ data: { idUser: user8.id, idUserSubscriptions: user8Sub1.id, idClub: clubBeerBox.id, idPaymentMethods: payMethodTarjetaCredito.id, idGatewayTransaction: 'TC-TXN-00259', totalAmountPaid: 24000, commissionAmount: 200, clubAmount: 23800, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual abril 2026' } });
+    await prisma.transaction_History.create({ data: { idUser: user8.id, idUserSubscriptions: user8Sub1.id, idClub: clubBeerBox.id, idPaymentMethods: payMethodTarjetaCredito.id, idGatewayTransaction: 'TC-TXN-00260', totalAmountPaid: 24000, commissionAmount: 200, clubAmount: 23800, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual mayo 2026' } });
+    await prisma.transaction_History.create({ data: { idUser: user8.id, idUserSubscriptions: user8Sub1.id, idClub: clubBeerBox.id, idPaymentMethods: payMethodTarjetaCredito.id, idGatewayTransaction: 'TC-TXN-00261', totalAmountPaid: 24000, commissionAmount: 200, clubAmount: 23800, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual junio 2026' } });
+    //#endregion
+
+    //#region 23.8.2. user8Sub2 - 17 pagos
+    await prisma.transaction_History.create({ data: { idUser: user8.id, idUserSubscriptions: user8Sub2.id, idClub: clubGamingBox.id, idPaymentMethods: payMethodEfectivo.id, idGatewayTransaction: 'EF-TXN-00262', totalAmountPaid: 19320, commissionAmount: 200, clubAmount: 19120, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual febrero 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user8.id, idUserSubscriptions: user8Sub2.id, idClub: clubGamingBox.id, idPaymentMethods: payMethodEfectivo.id, idGatewayTransaction: 'EF-TXN-00263', totalAmountPaid: 19320, commissionAmount: 200, clubAmount: 19120, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual marzo 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user8.id, idUserSubscriptions: user8Sub2.id, idClub: clubGamingBox.id, idPaymentMethods: payMethodEfectivo.id, idGatewayTransaction: 'EF-TXN-00264', totalAmountPaid: 19320, commissionAmount: 200, clubAmount: 19120, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual abril 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user8.id, idUserSubscriptions: user8Sub2.id, idClub: clubGamingBox.id, idPaymentMethods: payMethodEfectivo.id, idGatewayTransaction: 'EF-TXN-00265', totalAmountPaid: 19320, commissionAmount: 200, clubAmount: 19120, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual mayo 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user8.id, idUserSubscriptions: user8Sub2.id, idClub: clubGamingBox.id, idPaymentMethods: payMethodEfectivo.id, idGatewayTransaction: 'EF-TXN-00266', totalAmountPaid: 19320, commissionAmount: 200, clubAmount: 19120, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual junio 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user8.id, idUserSubscriptions: user8Sub2.id, idClub: clubGamingBox.id, idPaymentMethods: payMethodEfectivo.id, idGatewayTransaction: 'EF-TXN-00267', totalAmountPaid: 19320, commissionAmount: 200, clubAmount: 19120, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual julio 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user8.id, idUserSubscriptions: user8Sub2.id, idClub: clubGamingBox.id, idPaymentMethods: payMethodEfectivo.id, idGatewayTransaction: 'EF-TXN-00268', totalAmountPaid: 19320, commissionAmount: 200, clubAmount: 19120, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual agosto 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user8.id, idUserSubscriptions: user8Sub2.id, idClub: clubGamingBox.id, idPaymentMethods: payMethodEfectivo.id, idGatewayTransaction: 'EF-TXN-00269', totalAmountPaid: 19320, commissionAmount: 200, clubAmount: 19120, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual septiembre 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user8.id, idUserSubscriptions: user8Sub2.id, idClub: clubGamingBox.id, idPaymentMethods: payMethodEfectivo.id, idGatewayTransaction: 'EF-TXN-00270', totalAmountPaid: 19320, commissionAmount: 200, clubAmount: 19120, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual octubre 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user8.id, idUserSubscriptions: user8Sub2.id, idClub: clubGamingBox.id, idPaymentMethods: payMethodEfectivo.id, idGatewayTransaction: 'EF-TXN-00271', totalAmountPaid: 19320, commissionAmount: 200, clubAmount: 19120, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual noviembre 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user8.id, idUserSubscriptions: user8Sub2.id, idClub: clubGamingBox.id, idPaymentMethods: payMethodEfectivo.id, idGatewayTransaction: 'EF-TXN-00272', totalAmountPaid: 19320, commissionAmount: 200, clubAmount: 19120, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual diciembre 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user8.id, idUserSubscriptions: user8Sub2.id, idClub: clubGamingBox.id, idPaymentMethods: payMethodEfectivo.id, idGatewayTransaction: 'EF-TXN-00273', totalAmountPaid: 19320, commissionAmount: 200, clubAmount: 19120, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual enero 2026' } });
+    await prisma.transaction_History.create({ data: { idUser: user8.id, idUserSubscriptions: user8Sub2.id, idClub: clubGamingBox.id, idPaymentMethods: payMethodEfectivo.id, idGatewayTransaction: 'EF-TXN-00274', totalAmountPaid: 19320, commissionAmount: 200, clubAmount: 19120, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual febrero 2026' } });
+    await prisma.transaction_History.create({ data: { idUser: user8.id, idUserSubscriptions: user8Sub2.id, idClub: clubGamingBox.id, idPaymentMethods: payMethodEfectivo.id, idGatewayTransaction: 'EF-TXN-00275', totalAmountPaid: 19320, commissionAmount: 200, clubAmount: 19120, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual marzo 2026' } });
+    await prisma.transaction_History.create({ data: { idUser: user8.id, idUserSubscriptions: user8Sub2.id, idClub: clubGamingBox.id, idPaymentMethods: payMethodEfectivo.id, idGatewayTransaction: 'EF-TXN-00276', totalAmountPaid: 19320, commissionAmount: 200, clubAmount: 19120, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual abril 2026' } });
+    await prisma.transaction_History.create({ data: { idUser: user8.id, idUserSubscriptions: user8Sub2.id, idClub: clubGamingBox.id, idPaymentMethods: payMethodEfectivo.id, idGatewayTransaction: 'EF-TXN-00277', totalAmountPaid: 19320, commissionAmount: 200, clubAmount: 19120, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual mayo 2026' } });
+    await prisma.transaction_History.create({ data: { idUser: user8.id, idUserSubscriptions: user8Sub2.id, idClub: clubGamingBox.id, idPaymentMethods: payMethodEfectivo.id, idGatewayTransaction: 'EF-TXN-00278', totalAmountPaid: 19320, commissionAmount: 200, clubAmount: 19120, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual junio 2026' } });
+    //#endregion
+
+    //#region 23.8.3. user8Sub3 - 16 pagos
+    await prisma.transaction_History.create({ data: { idUser: user8.id, idUserSubscriptions: user8Sub3.id, idClub: clubSnackBox.id, idPaymentMethods: payMethodPayPal.id, idGatewayTransaction: 'PP-TXN-00279', totalAmountPaid: 22000, commissionAmount: 200, clubAmount: 21800, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual marzo 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user8.id, idUserSubscriptions: user8Sub3.id, idClub: clubSnackBox.id, idPaymentMethods: payMethodPayPal.id, idGatewayTransaction: 'PP-TXN-00280', totalAmountPaid: 22000, commissionAmount: 200, clubAmount: 21800, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual abril 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user8.id, idUserSubscriptions: user8Sub3.id, idClub: clubSnackBox.id, idPaymentMethods: payMethodPayPal.id, idGatewayTransaction: 'PP-TXN-00281', totalAmountPaid: 22000, commissionAmount: 200, clubAmount: 21800, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual mayo 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user8.id, idUserSubscriptions: user8Sub3.id, idClub: clubSnackBox.id, idPaymentMethods: payMethodPayPal.id, idGatewayTransaction: 'PP-TXN-00282', totalAmountPaid: 22000, commissionAmount: 200, clubAmount: 21800, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual junio 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user8.id, idUserSubscriptions: user8Sub3.id, idClub: clubSnackBox.id, idPaymentMethods: payMethodPayPal.id, idGatewayTransaction: 'PP-TXN-00283', totalAmountPaid: 22000, commissionAmount: 200, clubAmount: 21800, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual julio 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user8.id, idUserSubscriptions: user8Sub3.id, idClub: clubSnackBox.id, idPaymentMethods: payMethodPayPal.id, idGatewayTransaction: 'PP-TXN-00284', totalAmountPaid: 22000, commissionAmount: 200, clubAmount: 21800, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual agosto 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user8.id, idUserSubscriptions: user8Sub3.id, idClub: clubSnackBox.id, idPaymentMethods: payMethodPayPal.id, idGatewayTransaction: 'PP-TXN-00285', totalAmountPaid: 22000, commissionAmount: 200, clubAmount: 21800, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual septiembre 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user8.id, idUserSubscriptions: user8Sub3.id, idClub: clubSnackBox.id, idPaymentMethods: payMethodPayPal.id, idGatewayTransaction: 'PP-TXN-00286', totalAmountPaid: 22000, commissionAmount: 200, clubAmount: 21800, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual octubre 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user8.id, idUserSubscriptions: user8Sub3.id, idClub: clubSnackBox.id, idPaymentMethods: payMethodPayPal.id, idGatewayTransaction: 'PP-TXN-00287', totalAmountPaid: 22000, commissionAmount: 200, clubAmount: 21800, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual noviembre 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user8.id, idUserSubscriptions: user8Sub3.id, idClub: clubSnackBox.id, idPaymentMethods: payMethodPayPal.id, idGatewayTransaction: 'PP-TXN-00288', totalAmountPaid: 22000, commissionAmount: 200, clubAmount: 21800, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual diciembre 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user8.id, idUserSubscriptions: user8Sub3.id, idClub: clubSnackBox.id, idPaymentMethods: payMethodPayPal.id, idGatewayTransaction: 'PP-TXN-00289', totalAmountPaid: 22000, commissionAmount: 200, clubAmount: 21800, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual enero 2026' } });
+    await prisma.transaction_History.create({ data: { idUser: user8.id, idUserSubscriptions: user8Sub3.id, idClub: clubSnackBox.id, idPaymentMethods: payMethodPayPal.id, idGatewayTransaction: 'PP-TXN-00290', totalAmountPaid: 22000, commissionAmount: 200, clubAmount: 21800, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual febrero 2026' } });
+    await prisma.transaction_History.create({ data: { idUser: user8.id, idUserSubscriptions: user8Sub3.id, idClub: clubSnackBox.id, idPaymentMethods: payMethodPayPal.id, idGatewayTransaction: 'PP-TXN-00291', totalAmountPaid: 22000, commissionAmount: 200, clubAmount: 21800, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual marzo 2026' } });
+    await prisma.transaction_History.create({ data: { idUser: user8.id, idUserSubscriptions: user8Sub3.id, idClub: clubSnackBox.id, idPaymentMethods: payMethodPayPal.id, idGatewayTransaction: 'PP-TXN-00292', totalAmountPaid: 22000, commissionAmount: 200, clubAmount: 21800, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual abril 2026' } });
+    await prisma.transaction_History.create({ data: { idUser: user8.id, idUserSubscriptions: user8Sub3.id, idClub: clubSnackBox.id, idPaymentMethods: payMethodPayPal.id, idGatewayTransaction: 'PP-TXN-00293', totalAmountPaid: 22000, commissionAmount: 200, clubAmount: 21800, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual mayo 2026' } });
+    await prisma.transaction_History.create({ data: { idUser: user8.id, idUserSubscriptions: user8Sub3.id, idClub: clubSnackBox.id, idPaymentMethods: payMethodPayPal.id, idGatewayTransaction: 'PP-TXN-00294', totalAmountPaid: 22000, commissionAmount: 200, clubAmount: 21800, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual junio 2026' } });
+    //#endregion
+  //#endregion
+
+  //#region 23.9. Sofía Núñez 
+    //#region 23.9.1. user9Sub1 - 18 pagos
+    await prisma.transaction_History.create({ data: { idUser: user9.id, idUserSubscriptions: user9Sub1.id, idClub: clubAnimeBox.id, idPaymentMethods: payMethodMercadoPago.id, idGatewayTransaction: 'MP-TXN-00295', totalAmountPaid: 23030, commissionAmount: 200, clubAmount: 22830, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual enero 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user9.id, idUserSubscriptions: user9Sub1.id, idClub: clubAnimeBox.id, idPaymentMethods: payMethodMercadoPago.id, idGatewayTransaction: 'MP-TXN-00296', totalAmountPaid: 23030, commissionAmount: 200, clubAmount: 22830, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual febrero 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user9.id, idUserSubscriptions: user9Sub1.id, idClub: clubAnimeBox.id, idPaymentMethods: payMethodMercadoPago.id, idGatewayTransaction: 'MP-TXN-00297', totalAmountPaid: 23030, commissionAmount: 200, clubAmount: 22830, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual marzo 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user9.id, idUserSubscriptions: user9Sub1.id, idClub: clubAnimeBox.id, idPaymentMethods: payMethodMercadoPago.id, idGatewayTransaction: 'MP-TXN-00298', totalAmountPaid: 23030, commissionAmount: 200, clubAmount: 22830, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual abril 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user9.id, idUserSubscriptions: user9Sub1.id, idClub: clubAnimeBox.id, idPaymentMethods: payMethodMercadoPago.id, idGatewayTransaction: 'MP-TXN-00299', totalAmountPaid: 23030, commissionAmount: 200, clubAmount: 22830, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual mayo 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user9.id, idUserSubscriptions: user9Sub1.id, idClub: clubAnimeBox.id, idPaymentMethods: payMethodMercadoPago.id, idGatewayTransaction: 'MP-TXN-00300', totalAmountPaid: 23030, commissionAmount: 200, clubAmount: 22830, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual junio 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user9.id, idUserSubscriptions: user9Sub1.id, idClub: clubAnimeBox.id, idPaymentMethods: payMethodMercadoPago.id, idGatewayTransaction: 'MP-TXN-00301', totalAmountPaid: 23030, commissionAmount: 200, clubAmount: 22830, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual julio 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user9.id, idUserSubscriptions: user9Sub1.id, idClub: clubAnimeBox.id, idPaymentMethods: payMethodMercadoPago.id, idGatewayTransaction: 'MP-TXN-00302', totalAmountPaid: 23030, commissionAmount: 200, clubAmount: 22830, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual agosto 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user9.id, idUserSubscriptions: user9Sub1.id, idClub: clubAnimeBox.id, idPaymentMethods: payMethodMercadoPago.id, idGatewayTransaction: 'MP-TXN-00303', totalAmountPaid: 23030, commissionAmount: 200, clubAmount: 22830, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual septiembre 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user9.id, idUserSubscriptions: user9Sub1.id, idClub: clubAnimeBox.id, idPaymentMethods: payMethodMercadoPago.id, idGatewayTransaction: 'MP-TXN-00304', totalAmountPaid: 23030, commissionAmount: 200, clubAmount: 22830, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual octubre 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user9.id, idUserSubscriptions: user9Sub1.id, idClub: clubAnimeBox.id, idPaymentMethods: payMethodMercadoPago.id, idGatewayTransaction: 'MP-TXN-00305', totalAmountPaid: 23030, commissionAmount: 200, clubAmount: 22830, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual noviembre 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user9.id, idUserSubscriptions: user9Sub1.id, idClub: clubAnimeBox.id, idPaymentMethods: payMethodMercadoPago.id, idGatewayTransaction: 'MP-TXN-00306', totalAmountPaid: 23030, commissionAmount: 200, clubAmount: 22830, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual diciembre 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user9.id, idUserSubscriptions: user9Sub1.id, idClub: clubAnimeBox.id, idPaymentMethods: payMethodMercadoPago.id, idGatewayTransaction: 'MP-TXN-00307', totalAmountPaid: 23030, commissionAmount: 200, clubAmount: 22830, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual enero 2026' } });
+    await prisma.transaction_History.create({ data: { idUser: user9.id, idUserSubscriptions: user9Sub1.id, idClub: clubAnimeBox.id, idPaymentMethods: payMethodMercadoPago.id, idGatewayTransaction: 'MP-TXN-00308', totalAmountPaid: 23030, commissionAmount: 200, clubAmount: 22830, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual febrero 2026' } });
+    await prisma.transaction_History.create({ data: { idUser: user9.id, idUserSubscriptions: user9Sub1.id, idClub: clubAnimeBox.id, idPaymentMethods: payMethodMercadoPago.id, idGatewayTransaction: 'MP-TXN-00309', totalAmountPaid: 23030, commissionAmount: 200, clubAmount: 22830, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual marzo 2026' } });
+    await prisma.transaction_History.create({ data: { idUser: user9.id, idUserSubscriptions: user9Sub1.id, idClub: clubAnimeBox.id, idPaymentMethods: payMethodMercadoPago.id, idGatewayTransaction: 'MP-TXN-00310', totalAmountPaid: 23030, commissionAmount: 200, clubAmount: 22830, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual abril 2026' } });
+    await prisma.transaction_History.create({ data: { idUser: user9.id, idUserSubscriptions: user9Sub1.id, idClub: clubAnimeBox.id, idPaymentMethods: payMethodMercadoPago.id, idGatewayTransaction: 'MP-TXN-00311', totalAmountPaid: 23030, commissionAmount: 200, clubAmount: 22830, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual mayo 2026' } });
+    await prisma.transaction_History.create({ data: { idUser: user9.id, idUserSubscriptions: user9Sub1.id, idClub: clubAnimeBox.id, idPaymentMethods: payMethodMercadoPago.id, idGatewayTransaction: 'MP-TXN-00312', totalAmountPaid: 23030, commissionAmount: 200, clubAmount: 22830, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual junio 2026' } });
+    //#endregion
+
+    //#region 23.9.2. user9Sub2 - 17 pagos
+    await prisma.transaction_History.create({ data: { idUser: user9.id, idUserSubscriptions: user9Sub2.id, idClub: clubManjarLiterario.id, idPaymentMethods: payMethodTarjetaDebito.id, idGatewayTransaction: 'TD-TXN-00313', totalAmountPaid: 22500, commissionAmount: 200, clubAmount: 22300, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual febrero 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user9.id, idUserSubscriptions: user9Sub2.id, idClub: clubManjarLiterario.id, idPaymentMethods: payMethodTarjetaDebito.id, idGatewayTransaction: 'TD-TXN-00314', totalAmountPaid: 22500, commissionAmount: 200, clubAmount: 22300, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual marzo 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user9.id, idUserSubscriptions: user9Sub2.id, idClub: clubManjarLiterario.id, idPaymentMethods: payMethodTarjetaDebito.id, idGatewayTransaction: 'TD-TXN-00315', totalAmountPaid: 22500, commissionAmount: 200, clubAmount: 22300, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual abril 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user9.id, idUserSubscriptions: user9Sub2.id, idClub: clubManjarLiterario.id, idPaymentMethods: payMethodTarjetaDebito.id, idGatewayTransaction: 'TD-TXN-00316', totalAmountPaid: 22500, commissionAmount: 200, clubAmount: 22300, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual mayo 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user9.id, idUserSubscriptions: user9Sub2.id, idClub: clubManjarLiterario.id, idPaymentMethods: payMethodTarjetaDebito.id, idGatewayTransaction: 'TD-TXN-00317', totalAmountPaid: 22500, commissionAmount: 200, clubAmount: 22300, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual junio 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user9.id, idUserSubscriptions: user9Sub2.id, idClub: clubManjarLiterario.id, idPaymentMethods: payMethodTarjetaDebito.id, idGatewayTransaction: 'TD-TXN-00318', totalAmountPaid: 22500, commissionAmount: 200, clubAmount: 22300, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual julio 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user9.id, idUserSubscriptions: user9Sub2.id, idClub: clubManjarLiterario.id, idPaymentMethods: payMethodTarjetaDebito.id, idGatewayTransaction: 'TD-TXN-00319', totalAmountPaid: 22500, commissionAmount: 200, clubAmount: 22300, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual agosto 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user9.id, idUserSubscriptions: user9Sub2.id, idClub: clubManjarLiterario.id, idPaymentMethods: payMethodTarjetaDebito.id, idGatewayTransaction: 'TD-TXN-00320', totalAmountPaid: 22500, commissionAmount: 200, clubAmount: 22300, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual septiembre 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user9.id, idUserSubscriptions: user9Sub2.id, idClub: clubManjarLiterario.id, idPaymentMethods: payMethodTarjetaDebito.id, idGatewayTransaction: 'TD-TXN-00321', totalAmountPaid: 22500, commissionAmount: 200, clubAmount: 22300, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual octubre 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user9.id, idUserSubscriptions: user9Sub2.id, idClub: clubManjarLiterario.id, idPaymentMethods: payMethodTarjetaDebito.id, idGatewayTransaction: 'TD-TXN-00322', totalAmountPaid: 22500, commissionAmount: 200, clubAmount: 22300, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual noviembre 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user9.id, idUserSubscriptions: user9Sub2.id, idClub: clubManjarLiterario.id, idPaymentMethods: payMethodTarjetaDebito.id, idGatewayTransaction: 'TD-TXN-00323', totalAmountPaid: 22500, commissionAmount: 200, clubAmount: 22300, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual diciembre 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user9.id, idUserSubscriptions: user9Sub2.id, idClub: clubManjarLiterario.id, idPaymentMethods: payMethodTarjetaDebito.id, idGatewayTransaction: 'TD-TXN-00324', totalAmountPaid: 22500, commissionAmount: 200, clubAmount: 22300, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual enero 2026' } });
+    await prisma.transaction_History.create({ data: { idUser: user9.id, idUserSubscriptions: user9Sub2.id, idClub: clubManjarLiterario.id, idPaymentMethods: payMethodTarjetaDebito.id, idGatewayTransaction: 'TD-TXN-00325', totalAmountPaid: 22500, commissionAmount: 200, clubAmount: 22300, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual febrero 2026' } });
+    await prisma.transaction_History.create({ data: { idUser: user9.id, idUserSubscriptions: user9Sub2.id, idClub: clubManjarLiterario.id, idPaymentMethods: payMethodTarjetaDebito.id, idGatewayTransaction: 'TD-TXN-00326', totalAmountPaid: 22500, commissionAmount: 200, clubAmount: 22300, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual marzo 2026' } });
+    await prisma.transaction_History.create({ data: { idUser: user9.id, idUserSubscriptions: user9Sub2.id, idClub: clubManjarLiterario.id, idPaymentMethods: payMethodTarjetaDebito.id, idGatewayTransaction: 'TD-TXN-00327', totalAmountPaid: 22500, commissionAmount: 200, clubAmount: 22300, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual abril 2026' } });
+    await prisma.transaction_History.create({ data: { idUser: user9.id, idUserSubscriptions: user9Sub2.id, idClub: clubManjarLiterario.id, idPaymentMethods: payMethodTarjetaDebito.id, idGatewayTransaction: 'TD-TXN-00328', totalAmountPaid: 22500, commissionAmount: 200, clubAmount: 22300, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual mayo 2026' } });
+    await prisma.transaction_History.create({ data: { idUser: user9.id, idUserSubscriptions: user9Sub2.id, idClub: clubManjarLiterario.id, idPaymentMethods: payMethodTarjetaDebito.id, idGatewayTransaction: 'TD-TXN-00329', totalAmountPaid: 22500, commissionAmount: 200, clubAmount: 22300, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual junio 2026' } });
+    //#endregion
+  //#endregion
+
+  //#region 23.10. Nicolás Gutiérrez 
+    //#region 23.10.1. user10Sub1 - 18 pagos
+    await prisma.transaction_History.create({ data: { idUser: user10.id, idUserSubscriptions: user10Sub1.id, idClub: clubOutdoorBox.id, idPaymentMethods: payMethodEfectivo.id, idGatewayTransaction: 'EF-TXN-00330', totalAmountPaid: 42750, commissionAmount: 200, clubAmount: 42550, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual enero 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user10.id, idUserSubscriptions: user10Sub1.id, idClub: clubOutdoorBox.id, idPaymentMethods: payMethodEfectivo.id, idGatewayTransaction: 'EF-TXN-00331', totalAmountPaid: 42750, commissionAmount: 200, clubAmount: 42550, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual febrero 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user10.id, idUserSubscriptions: user10Sub1.id, idClub: clubOutdoorBox.id, idPaymentMethods: payMethodEfectivo.id, idGatewayTransaction: 'EF-TXN-00332', totalAmountPaid: 42750, commissionAmount: 200, clubAmount: 42550, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual marzo 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user10.id, idUserSubscriptions: user10Sub1.id, idClub: clubOutdoorBox.id, idPaymentMethods: payMethodEfectivo.id, idGatewayTransaction: 'EF-TXN-00333', totalAmountPaid: 42750, commissionAmount: 200, clubAmount: 42550, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual abril 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user10.id, idUserSubscriptions: user10Sub1.id, idClub: clubOutdoorBox.id, idPaymentMethods: payMethodEfectivo.id, idGatewayTransaction: 'EF-TXN-00334', totalAmountPaid: 42750, commissionAmount: 200, clubAmount: 42550, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual mayo 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user10.id, idUserSubscriptions: user10Sub1.id, idClub: clubOutdoorBox.id, idPaymentMethods: payMethodEfectivo.id, idGatewayTransaction: 'EF-TXN-00335', totalAmountPaid: 42750, commissionAmount: 200, clubAmount: 42550, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual junio 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user10.id, idUserSubscriptions: user10Sub1.id, idClub: clubOutdoorBox.id, idPaymentMethods: payMethodEfectivo.id, idGatewayTransaction: 'EF-TXN-00336', totalAmountPaid: 42750, commissionAmount: 200, clubAmount: 42550, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual julio 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user10.id, idUserSubscriptions: user10Sub1.id, idClub: clubOutdoorBox.id, idPaymentMethods: payMethodEfectivo.id, idGatewayTransaction: 'EF-TXN-00337', totalAmountPaid: 42750, commissionAmount: 200, clubAmount: 42550, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual agosto 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user10.id, idUserSubscriptions: user10Sub1.id, idClub: clubOutdoorBox.id, idPaymentMethods: payMethodEfectivo.id, idGatewayTransaction: 'EF-TXN-00338', totalAmountPaid: 42750, commissionAmount: 200, clubAmount: 42550, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual septiembre 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user10.id, idUserSubscriptions: user10Sub1.id, idClub: clubOutdoorBox.id, idPaymentMethods: payMethodEfectivo.id, idGatewayTransaction: 'EF-TXN-00339', totalAmountPaid: 42750, commissionAmount: 200, clubAmount: 42550, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual octubre 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user10.id, idUserSubscriptions: user10Sub1.id, idClub: clubOutdoorBox.id, idPaymentMethods: payMethodEfectivo.id, idGatewayTransaction: 'EF-TXN-00340', totalAmountPaid: 42750, commissionAmount: 200, clubAmount: 42550, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual noviembre 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user10.id, idUserSubscriptions: user10Sub1.id, idClub: clubOutdoorBox.id, idPaymentMethods: payMethodEfectivo.id, idGatewayTransaction: 'EF-TXN-00341', totalAmountPaid: 42750, commissionAmount: 200, clubAmount: 42550, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual diciembre 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user10.id, idUserSubscriptions: user10Sub1.id, idClub: clubOutdoorBox.id, idPaymentMethods: payMethodEfectivo.id, idGatewayTransaction: 'EF-TXN-00342', totalAmountPaid: 42750, commissionAmount: 200, clubAmount: 42550, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual enero 2026' } });
+    await prisma.transaction_History.create({ data: { idUser: user10.id, idUserSubscriptions: user10Sub1.id, idClub: clubOutdoorBox.id, idPaymentMethods: payMethodEfectivo.id, idGatewayTransaction: 'EF-TXN-00343', totalAmountPaid: 42750, commissionAmount: 200, clubAmount: 42550, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual febrero 2026' } });
+    await prisma.transaction_History.create({ data: { idUser: user10.id, idUserSubscriptions: user10Sub1.id, idClub: clubOutdoorBox.id, idPaymentMethods: payMethodEfectivo.id, idGatewayTransaction: 'EF-TXN-00344', totalAmountPaid: 42750, commissionAmount: 200, clubAmount: 42550, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual marzo 2026' } });
+    await prisma.transaction_History.create({ data: { idUser: user10.id, idUserSubscriptions: user10Sub1.id, idClub: clubOutdoorBox.id, idPaymentMethods: payMethodEfectivo.id, idGatewayTransaction: 'EF-TXN-00345', totalAmountPaid: 42750, commissionAmount: 200, clubAmount: 42550, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual abril 2026' } });
+    await prisma.transaction_History.create({ data: { idUser: user10.id, idUserSubscriptions: user10Sub1.id, idClub: clubOutdoorBox.id, idPaymentMethods: payMethodEfectivo.id, idGatewayTransaction: 'EF-TXN-00346', totalAmountPaid: 42750, commissionAmount: 200, clubAmount: 42550, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual mayo 2026' } });
+    await prisma.transaction_History.create({ data: { idUser: user10.id, idUserSubscriptions: user10Sub1.id, idClub: clubOutdoorBox.id, idPaymentMethods: payMethodEfectivo.id, idGatewayTransaction: 'EF-TXN-00347', totalAmountPaid: 42750, commissionAmount: 200, clubAmount: 42550, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual junio 2026' } });
+    //#endregion
+  //#endregion
+
+  //#region 23.11. Florencia Méndez
+    //#region 23.11.1. user11Sub1 - 18 pagos
+    await prisma.transaction_History.create({ data: { idUser: user11.id, idUserSubscriptions: user11Sub1.id, idClub: clubBookerly.id, idPaymentMethods: payMethodTarjetaCredito.id, idGatewayTransaction: 'TC-TXN-00348', totalAmountPaid: 31900, commissionAmount: 200, clubAmount: 31700, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual enero 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user11.id, idUserSubscriptions: user11Sub1.id, idClub: clubBookerly.id, idPaymentMethods: payMethodTarjetaCredito.id, idGatewayTransaction: 'TC-TXN-00349', totalAmountPaid: 31900, commissionAmount: 200, clubAmount: 31700, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual febrero 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user11.id, idUserSubscriptions: user11Sub1.id, idClub: clubBookerly.id, idPaymentMethods: payMethodTarjetaCredito.id, idGatewayTransaction: 'TC-TXN-00350', totalAmountPaid: 31900, commissionAmount: 200, clubAmount: 31700, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual marzo 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user11.id, idUserSubscriptions: user11Sub1.id, idClub: clubBookerly.id, idPaymentMethods: payMethodTarjetaCredito.id, idGatewayTransaction: 'TC-TXN-00351', totalAmountPaid: 31900, commissionAmount: 200, clubAmount: 31700, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual abril 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user11.id, idUserSubscriptions: user11Sub1.id, idClub: clubBookerly.id, idPaymentMethods: payMethodTarjetaCredito.id, idGatewayTransaction: 'TC-TXN-00352', totalAmountPaid: 31900, commissionAmount: 200, clubAmount: 31700, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual mayo 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user11.id, idUserSubscriptions: user11Sub1.id, idClub: clubBookerly.id, idPaymentMethods: payMethodTarjetaCredito.id, idGatewayTransaction: 'TC-TXN-00353', totalAmountPaid: 31900, commissionAmount: 200, clubAmount: 31700, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual junio 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user11.id, idUserSubscriptions: user11Sub1.id, idClub: clubBookerly.id, idPaymentMethods: payMethodTarjetaCredito.id, idGatewayTransaction: 'TC-TXN-00354', totalAmountPaid: 31900, commissionAmount: 200, clubAmount: 31700, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual julio 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user11.id, idUserSubscriptions: user11Sub1.id, idClub: clubBookerly.id, idPaymentMethods: payMethodTarjetaCredito.id, idGatewayTransaction: 'TC-TXN-00355', totalAmountPaid: 31900, commissionAmount: 200, clubAmount: 31700, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual agosto 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user11.id, idUserSubscriptions: user11Sub1.id, idClub: clubBookerly.id, idPaymentMethods: payMethodTarjetaCredito.id, idGatewayTransaction: 'TC-TXN-00356', totalAmountPaid: 31900, commissionAmount: 200, clubAmount: 31700, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual septiembre 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user11.id, idUserSubscriptions: user11Sub1.id, idClub: clubBookerly.id, idPaymentMethods: payMethodTarjetaCredito.id, idGatewayTransaction: 'TC-TXN-00357', totalAmountPaid: 31900, commissionAmount: 200, clubAmount: 31700, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual octubre 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user11.id, idUserSubscriptions: user11Sub1.id, idClub: clubBookerly.id, idPaymentMethods: payMethodTarjetaCredito.id, idGatewayTransaction: 'TC-TXN-00358', totalAmountPaid: 31900, commissionAmount: 200, clubAmount: 31700, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual noviembre 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user11.id, idUserSubscriptions: user11Sub1.id, idClub: clubBookerly.id, idPaymentMethods: payMethodTarjetaCredito.id, idGatewayTransaction: 'TC-TXN-00359', totalAmountPaid: 31900, commissionAmount: 200, clubAmount: 31700, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual diciembre 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user11.id, idUserSubscriptions: user11Sub1.id, idClub: clubBookerly.id, idPaymentMethods: payMethodTarjetaCredito.id, idGatewayTransaction: 'TC-TXN-00360', totalAmountPaid: 31900, commissionAmount: 200, clubAmount: 31700, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual enero 2026' } });
+    await prisma.transaction_History.create({ data: { idUser: user11.id, idUserSubscriptions: user11Sub1.id, idClub: clubBookerly.id, idPaymentMethods: payMethodTarjetaCredito.id, idGatewayTransaction: 'TC-TXN-00361', totalAmountPaid: 31900, commissionAmount: 200, clubAmount: 31700, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual febrero 2026' } });
+    await prisma.transaction_History.create({ data: { idUser: user11.id, idUserSubscriptions: user11Sub1.id, idClub: clubBookerly.id, idPaymentMethods: payMethodTarjetaCredito.id, idGatewayTransaction: 'TC-TXN-00362', totalAmountPaid: 31900, commissionAmount: 200, clubAmount: 31700, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual marzo 2026' } });
+    await prisma.transaction_History.create({ data: { idUser: user11.id, idUserSubscriptions: user11Sub1.id, idClub: clubBookerly.id, idPaymentMethods: payMethodTarjetaCredito.id, idGatewayTransaction: 'TC-TXN-00363', totalAmountPaid: 31900, commissionAmount: 200, clubAmount: 31700, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual abril 2026' } });
+    await prisma.transaction_History.create({ data: { idUser: user11.id, idUserSubscriptions: user11Sub1.id, idClub: clubBookerly.id, idPaymentMethods: payMethodTarjetaCredito.id, idGatewayTransaction: 'TC-TXN-00364', totalAmountPaid: 31900, commissionAmount: 200, clubAmount: 31700, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual mayo 2026' } });
+    await prisma.transaction_History.create({ data: { idUser: user11.id, idUserSubscriptions: user11Sub1.id, idClub: clubBookerly.id, idPaymentMethods: payMethodTarjetaCredito.id, idGatewayTransaction: 'TC-TXN-00365', totalAmountPaid: 31900, commissionAmount: 200, clubAmount: 31700, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual junio 2026' } });
+    //#endregion
+    
+    //#region 23.11.2. user11Sub2 - 17 pagos
+    await prisma.transaction_History.create({ data: { idUser: user11.id, idUserSubscriptions: user11Sub2.id, idClub: clubCristalesClub.id, idPaymentMethods: payMethodMercadoPago.id, idGatewayTransaction: 'MP-TXN-00366', totalAmountPaid: 15200, commissionAmount: 200, clubAmount: 15000, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual febrero 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user11.id, idUserSubscriptions: user11Sub2.id, idClub: clubCristalesClub.id, idPaymentMethods: payMethodMercadoPago.id, idGatewayTransaction: 'MP-TXN-00367', totalAmountPaid: 15200, commissionAmount: 200, clubAmount: 15000, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual marzo 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user11.id, idUserSubscriptions: user11Sub2.id, idClub: clubCristalesClub.id, idPaymentMethods: payMethodMercadoPago.id, idGatewayTransaction: 'MP-TXN-00368', totalAmountPaid: 15200, commissionAmount: 200, clubAmount: 15000, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual abril 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user11.id, idUserSubscriptions: user11Sub2.id, idClub: clubCristalesClub.id, idPaymentMethods: payMethodMercadoPago.id, idGatewayTransaction: 'MP-TXN-00369', totalAmountPaid: 15200, commissionAmount: 200, clubAmount: 15000, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual mayo 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user11.id, idUserSubscriptions: user11Sub2.id, idClub: clubCristalesClub.id, idPaymentMethods: payMethodMercadoPago.id, idGatewayTransaction: 'MP-TXN-00370', totalAmountPaid: 15200, commissionAmount: 200, clubAmount: 15000, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual junio 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user11.id, idUserSubscriptions: user11Sub2.id, idClub: clubCristalesClub.id, idPaymentMethods: payMethodMercadoPago.id, idGatewayTransaction: 'MP-TXN-00371', totalAmountPaid: 15200, commissionAmount: 200, clubAmount: 15000, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual julio 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user11.id, idUserSubscriptions: user11Sub2.id, idClub: clubCristalesClub.id, idPaymentMethods: payMethodMercadoPago.id, idGatewayTransaction: 'MP-TXN-00372', totalAmountPaid: 15200, commissionAmount: 200, clubAmount: 15000, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual agosto 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user11.id, idUserSubscriptions: user11Sub2.id, idClub: clubCristalesClub.id, idPaymentMethods: payMethodMercadoPago.id, idGatewayTransaction: 'MP-TXN-00373', totalAmountPaid: 15200, commissionAmount: 200, clubAmount: 15000, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual septiembre 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user11.id, idUserSubscriptions: user11Sub2.id, idClub: clubCristalesClub.id, idPaymentMethods: payMethodMercadoPago.id, idGatewayTransaction: 'MP-TXN-00374', totalAmountPaid: 15200, commissionAmount: 200, clubAmount: 15000, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual octubre 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user11.id, idUserSubscriptions: user11Sub2.id, idClub: clubCristalesClub.id, idPaymentMethods: payMethodMercadoPago.id, idGatewayTransaction: 'MP-TXN-00375', totalAmountPaid: 15200, commissionAmount: 200, clubAmount: 15000, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual noviembre 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user11.id, idUserSubscriptions: user11Sub2.id, idClub: clubCristalesClub.id, idPaymentMethods: payMethodMercadoPago.id, idGatewayTransaction: 'MP-TXN-00376', totalAmountPaid: 15200, commissionAmount: 200, clubAmount: 15000, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual diciembre 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user11.id, idUserSubscriptions: user11Sub2.id, idClub: clubCristalesClub.id, idPaymentMethods: payMethodMercadoPago.id, idGatewayTransaction: 'MP-TXN-00377', totalAmountPaid: 15200, commissionAmount: 200, clubAmount: 15000, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual enero 2026' } });
+    await prisma.transaction_History.create({ data: { idUser: user11.id, idUserSubscriptions: user11Sub2.id, idClub: clubCristalesClub.id, idPaymentMethods: payMethodMercadoPago.id, idGatewayTransaction: 'MP-TXN-00378', totalAmountPaid: 15200, commissionAmount: 200, clubAmount: 15000, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual febrero 2026' } });
+    await prisma.transaction_History.create({ data: { idUser: user11.id, idUserSubscriptions: user11Sub2.id, idClub: clubCristalesClub.id, idPaymentMethods: payMethodMercadoPago.id, idGatewayTransaction: 'MP-TXN-00379', totalAmountPaid: 15200, commissionAmount: 200, clubAmount: 15000, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual marzo 2026' } });
+    await prisma.transaction_History.create({ data: { idUser: user11.id, idUserSubscriptions: user11Sub2.id, idClub: clubCristalesClub.id, idPaymentMethods: payMethodMercadoPago.id, idGatewayTransaction: 'MP-TXN-00380', totalAmountPaid: 15200, commissionAmount: 200, clubAmount: 15000, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual abril 2026' } });
+    await prisma.transaction_History.create({ data: { idUser: user11.id, idUserSubscriptions: user11Sub2.id, idClub: clubCristalesClub.id, idPaymentMethods: payMethodMercadoPago.id, idGatewayTransaction: 'MP-TXN-00381', totalAmountPaid: 15200, commissionAmount: 200, clubAmount: 15000, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual mayo 2026' } });
+    await prisma.transaction_History.create({ data: { idUser: user11.id, idUserSubscriptions: user11Sub2.id, idClub: clubCristalesClub.id, idPaymentMethods: payMethodMercadoPago.id, idGatewayTransaction: 'MP-TXN-00382', totalAmountPaid: 15200, commissionAmount: 200, clubAmount: 15000, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual junio 2026' } });
+    //#endregion
+    
+    //#region 23.11.3. user11Sub3 - 16 pagos
+    await prisma.transaction_History.create({ data: { idUser: user11.id, idUserSubscriptions: user11Sub3.id, idClub: clubTarotBox.id, idPaymentMethods: payMethodPayPal.id, idGatewayTransaction: 'PP-TXN-00383', totalAmountPaid: 18500, commissionAmount: 200, clubAmount: 18300, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual marzo 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user11.id, idUserSubscriptions: user11Sub3.id, idClub: clubTarotBox.id, idPaymentMethods: payMethodPayPal.id, idGatewayTransaction: 'PP-TXN-00384', totalAmountPaid: 18500, commissionAmount: 200, clubAmount: 18300, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual abril 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user11.id, idUserSubscriptions: user11Sub3.id, idClub: clubTarotBox.id, idPaymentMethods: payMethodPayPal.id, idGatewayTransaction: 'PP-TXN-00385', totalAmountPaid: 18500, commissionAmount: 200, clubAmount: 18300, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual mayo 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user11.id, idUserSubscriptions: user11Sub3.id, idClub: clubTarotBox.id, idPaymentMethods: payMethodPayPal.id, idGatewayTransaction: 'PP-TXN-00386', totalAmountPaid: 18500, commissionAmount: 200, clubAmount: 18300, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual junio 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user11.id, idUserSubscriptions: user11Sub3.id, idClub: clubTarotBox.id, idPaymentMethods: payMethodPayPal.id, idGatewayTransaction: 'PP-TXN-00387', totalAmountPaid: 18500, commissionAmount: 200, clubAmount: 18300, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual julio 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user11.id, idUserSubscriptions: user11Sub3.id, idClub: clubTarotBox.id, idPaymentMethods: payMethodPayPal.id, idGatewayTransaction: 'PP-TXN-00388', totalAmountPaid: 18500, commissionAmount: 200, clubAmount: 18300, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual agosto 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user11.id, idUserSubscriptions: user11Sub3.id, idClub: clubTarotBox.id, idPaymentMethods: payMethodPayPal.id, idGatewayTransaction: 'PP-TXN-00389', totalAmountPaid: 18500, commissionAmount: 200, clubAmount: 18300, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual septiembre 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user11.id, idUserSubscriptions: user11Sub3.id, idClub: clubTarotBox.id, idPaymentMethods: payMethodPayPal.id, idGatewayTransaction: 'PP-TXN-00390', totalAmountPaid: 18500, commissionAmount: 200, clubAmount: 18300, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual octubre 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user11.id, idUserSubscriptions: user11Sub3.id, idClub: clubTarotBox.id, idPaymentMethods: payMethodPayPal.id, idGatewayTransaction: 'PP-TXN-00391', totalAmountPaid: 18500, commissionAmount: 200, clubAmount: 18300, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual noviembre 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user11.id, idUserSubscriptions: user11Sub3.id, idClub: clubTarotBox.id, idPaymentMethods: payMethodPayPal.id, idGatewayTransaction: 'PP-TXN-00392', totalAmountPaid: 18500, commissionAmount: 200, clubAmount: 18300, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual diciembre 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user11.id, idUserSubscriptions: user11Sub3.id, idClub: clubTarotBox.id, idPaymentMethods: payMethodPayPal.id, idGatewayTransaction: 'PP-TXN-00393', totalAmountPaid: 18500, commissionAmount: 200, clubAmount: 18300, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual enero 2026' } });
+    await prisma.transaction_History.create({ data: { idUser: user11.id, idUserSubscriptions: user11Sub3.id, idClub: clubTarotBox.id, idPaymentMethods: payMethodPayPal.id, idGatewayTransaction: 'PP-TXN-00394', totalAmountPaid: 18500, commissionAmount: 200, clubAmount: 18300, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual febrero 2026' } });
+    await prisma.transaction_History.create({ data: { idUser: user11.id, idUserSubscriptions: user11Sub3.id, idClub: clubTarotBox.id, idPaymentMethods: payMethodPayPal.id, idGatewayTransaction: 'PP-TXN-00395', totalAmountPaid: 18500, commissionAmount: 200, clubAmount: 18300, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual marzo 2026' } });
+    await prisma.transaction_History.create({ data: { idUser: user11.id, idUserSubscriptions: user11Sub3.id, idClub: clubTarotBox.id, idPaymentMethods: payMethodPayPal.id, idGatewayTransaction: 'PP-TXN-00396', totalAmountPaid: 18500, commissionAmount: 200, clubAmount: 18300, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual abril 2026' } });
+    await prisma.transaction_History.create({ data: { idUser: user11.id, idUserSubscriptions: user11Sub3.id, idClub: clubTarotBox.id, idPaymentMethods: payMethodPayPal.id, idGatewayTransaction: 'PP-TXN-00397', totalAmountPaid: 18500, commissionAmount: 200, clubAmount: 18300, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual mayo 2026' } });
+    await prisma.transaction_History.create({ data: { idUser: user11.id, idUserSubscriptions: user11Sub3.id, idClub: clubTarotBox.id, idPaymentMethods: payMethodPayPal.id, idGatewayTransaction: 'PP-TXN-00398', totalAmountPaid: 18500, commissionAmount: 200, clubAmount: 18300, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual junio 2026' } });
+    //#endregion
+  //#endregion
+
+  //#region 23.12. Rodrigo Acosta
+    //#region 23.12.1. user12Sub1 - 18 pagos
+    await prisma.transaction_History.create({ data: { idUser: user12.id, idUserSubscriptions: user12Sub1.id, idClub: clubYerbaClub.id, idPaymentMethods: payMethodEfectivo.id, idGatewayTransaction: 'EF-TXN-00399', totalAmountPaid: 19475, commissionAmount: 200, clubAmount: 19275, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual enero 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user12.id, idUserSubscriptions: user12Sub1.id, idClub: clubYerbaClub.id, idPaymentMethods: payMethodEfectivo.id, idGatewayTransaction: 'EF-TXN-00400', totalAmountPaid: 19475, commissionAmount: 200, clubAmount: 19275, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual febrero 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user12.id, idUserSubscriptions: user12Sub1.id, idClub: clubYerbaClub.id, idPaymentMethods: payMethodEfectivo.id, idGatewayTransaction: 'EF-TXN-00401', totalAmountPaid: 19475, commissionAmount: 200, clubAmount: 19275, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual marzo 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user12.id, idUserSubscriptions: user12Sub1.id, idClub: clubYerbaClub.id, idPaymentMethods: payMethodEfectivo.id, idGatewayTransaction: 'EF-TXN-00402', totalAmountPaid: 19475, commissionAmount: 200, clubAmount: 19275, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual abril 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user12.id, idUserSubscriptions: user12Sub1.id, idClub: clubYerbaClub.id, idPaymentMethods: payMethodEfectivo.id, idGatewayTransaction: 'EF-TXN-00403', totalAmountPaid: 19475, commissionAmount: 200, clubAmount: 19275, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual mayo 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user12.id, idUserSubscriptions: user12Sub1.id, idClub: clubYerbaClub.id, idPaymentMethods: payMethodEfectivo.id, idGatewayTransaction: 'EF-TXN-00404', totalAmountPaid: 19475, commissionAmount: 200, clubAmount: 19275, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual junio 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user12.id, idUserSubscriptions: user12Sub1.id, idClub: clubYerbaClub.id, idPaymentMethods: payMethodEfectivo.id, idGatewayTransaction: 'EF-TXN-00405', totalAmountPaid: 19475, commissionAmount: 200, clubAmount: 19275, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual julio 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user12.id, idUserSubscriptions: user12Sub1.id, idClub: clubYerbaClub.id, idPaymentMethods: payMethodEfectivo.id, idGatewayTransaction: 'EF-TXN-00406', totalAmountPaid: 19475, commissionAmount: 200, clubAmount: 19275, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual agosto 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user12.id, idUserSubscriptions: user12Sub1.id, idClub: clubYerbaClub.id, idPaymentMethods: payMethodEfectivo.id, idGatewayTransaction: 'EF-TXN-00407', totalAmountPaid: 19475, commissionAmount: 200, clubAmount: 19275, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual septiembre 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user12.id, idUserSubscriptions: user12Sub1.id, idClub: clubYerbaClub.id, idPaymentMethods: payMethodEfectivo.id, idGatewayTransaction: 'EF-TXN-00408', totalAmountPaid: 19475, commissionAmount: 200, clubAmount: 19275, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual octubre 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user12.id, idUserSubscriptions: user12Sub1.id, idClub: clubYerbaClub.id, idPaymentMethods: payMethodEfectivo.id, idGatewayTransaction: 'EF-TXN-00409', totalAmountPaid: 19475, commissionAmount: 200, clubAmount: 19275, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual noviembre 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user12.id, idUserSubscriptions: user12Sub1.id, idClub: clubYerbaClub.id, idPaymentMethods: payMethodEfectivo.id, idGatewayTransaction: 'EF-TXN-00410', totalAmountPaid: 19475, commissionAmount: 200, clubAmount: 19275, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual diciembre 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user12.id, idUserSubscriptions: user12Sub1.id, idClub: clubYerbaClub.id, idPaymentMethods: payMethodEfectivo.id, idGatewayTransaction: 'EF-TXN-00411', totalAmountPaid: 19475, commissionAmount: 200, clubAmount: 19275, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual enero 2026' } });
+    await prisma.transaction_History.create({ data: { idUser: user12.id, idUserSubscriptions: user12Sub1.id, idClub: clubYerbaClub.id, idPaymentMethods: payMethodEfectivo.id, idGatewayTransaction: 'EF-TXN-00412', totalAmountPaid: 19475, commissionAmount: 200, clubAmount: 19275, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual febrero 2026' } });
+    await prisma.transaction_History.create({ data: { idUser: user12.id, idUserSubscriptions: user12Sub1.id, idClub: clubYerbaClub.id, idPaymentMethods: payMethodEfectivo.id, idGatewayTransaction: 'EF-TXN-00413', totalAmountPaid: 19475, commissionAmount: 200, clubAmount: 19275, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual marzo 2026' } });
+    await prisma.transaction_History.create({ data: { idUser: user12.id, idUserSubscriptions: user12Sub1.id, idClub: clubYerbaClub.id, idPaymentMethods: payMethodEfectivo.id, idGatewayTransaction: 'EF-TXN-00414', totalAmountPaid: 19475, commissionAmount: 200, clubAmount: 19275, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual abril 2026' } });
+    await prisma.transaction_History.create({ data: { idUser: user12.id, idUserSubscriptions: user12Sub1.id, idClub: clubYerbaClub.id, idPaymentMethods: payMethodEfectivo.id, idGatewayTransaction: 'EF-TXN-00415', totalAmountPaid: 19475, commissionAmount: 200, clubAmount: 19275, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual mayo 2026' } });
+    await prisma.transaction_History.create({ data: { idUser: user12.id, idUserSubscriptions: user12Sub1.id, idClub: clubYerbaClub.id, idPaymentMethods: payMethodEfectivo.id, idGatewayTransaction: 'EF-TXN-00416', totalAmountPaid: 19475, commissionAmount: 200, clubAmount: 19275, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual junio 2026' } });
+    //#endregion
+   
+    //#region 23.12.2. user12Sub2 - 17 pagos
+    await prisma.transaction_History.create({ data: { idUser: user12.id, idUserSubscriptions: user12Sub2.id, idClub: clubBonvivir.id, idPaymentMethods: payMethodTarjetaDebito.id, idGatewayTransaction: 'TD-TXN-00417', totalAmountPaid: 42000, commissionAmount: 200, clubAmount: 41800, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual febrero 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user12.id, idUserSubscriptions: user12Sub2.id, idClub: clubBonvivir.id, idPaymentMethods: payMethodTarjetaDebito.id, idGatewayTransaction: 'TD-TXN-00418', totalAmountPaid: 42000, commissionAmount: 200, clubAmount: 41800, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual marzo 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user12.id, idUserSubscriptions: user12Sub2.id, idClub: clubBonvivir.id, idPaymentMethods: payMethodTarjetaDebito.id, idGatewayTransaction: 'TD-TXN-00419', totalAmountPaid: 42000, commissionAmount: 200, clubAmount: 41800, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual abril 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user12.id, idUserSubscriptions: user12Sub2.id, idClub: clubBonvivir.id, idPaymentMethods: payMethodTarjetaDebito.id, idGatewayTransaction: 'TD-TXN-00420', totalAmountPaid: 42000, commissionAmount: 200, clubAmount: 41800, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual mayo 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user12.id, idUserSubscriptions: user12Sub2.id, idClub: clubBonvivir.id, idPaymentMethods: payMethodTarjetaDebito.id, idGatewayTransaction: 'TD-TXN-00421', totalAmountPaid: 42000, commissionAmount: 200, clubAmount: 41800, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual junio 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user12.id, idUserSubscriptions: user12Sub2.id, idClub: clubBonvivir.id, idPaymentMethods: payMethodTarjetaDebito.id, idGatewayTransaction: 'TD-TXN-00422', totalAmountPaid: 42000, commissionAmount: 200, clubAmount: 41800, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual julio 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user12.id, idUserSubscriptions: user12Sub2.id, idClub: clubBonvivir.id, idPaymentMethods: payMethodTarjetaDebito.id, idGatewayTransaction: 'TD-TXN-00423', totalAmountPaid: 42000, commissionAmount: 200, clubAmount: 41800, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual agosto 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user12.id, idUserSubscriptions: user12Sub2.id, idClub: clubBonvivir.id, idPaymentMethods: payMethodTarjetaDebito.id, idGatewayTransaction: 'TD-TXN-00424', totalAmountPaid: 42000, commissionAmount: 200, clubAmount: 41800, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual septiembre 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user12.id, idUserSubscriptions: user12Sub2.id, idClub: clubBonvivir.id, idPaymentMethods: payMethodTarjetaDebito.id, idGatewayTransaction: 'TD-TXN-00425', totalAmountPaid: 42000, commissionAmount: 200, clubAmount: 41800, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual octubre 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user12.id, idUserSubscriptions: user12Sub2.id, idClub: clubBonvivir.id, idPaymentMethods: payMethodTarjetaDebito.id, idGatewayTransaction: 'TD-TXN-00426', totalAmountPaid: 42000, commissionAmount: 200, clubAmount: 41800, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual noviembre 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user12.id, idUserSubscriptions: user12Sub2.id, idClub: clubBonvivir.id, idPaymentMethods: payMethodTarjetaDebito.id, idGatewayTransaction: 'TD-TXN-00427', totalAmountPaid: 42000, commissionAmount: 200, clubAmount: 41800, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual diciembre 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user12.id, idUserSubscriptions: user12Sub2.id, idClub: clubBonvivir.id, idPaymentMethods: payMethodTarjetaDebito.id, idGatewayTransaction: 'TD-TXN-00428', totalAmountPaid: 42000, commissionAmount: 200, clubAmount: 41800, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual enero 2026' } });
+    await prisma.transaction_History.create({ data: { idUser: user12.id, idUserSubscriptions: user12Sub2.id, idClub: clubBonvivir.id, idPaymentMethods: payMethodTarjetaDebito.id, idGatewayTransaction: 'TD-TXN-00429', totalAmountPaid: 42000, commissionAmount: 200, clubAmount: 41800, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual febrero 2026' } });
+    await prisma.transaction_History.create({ data: { idUser: user12.id, idUserSubscriptions: user12Sub2.id, idClub: clubBonvivir.id, idPaymentMethods: payMethodTarjetaDebito.id, idGatewayTransaction: 'TD-TXN-00430', totalAmountPaid: 42000, commissionAmount: 200, clubAmount: 41800, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual marzo 2026' } });
+    await prisma.transaction_History.create({ data: { idUser: user12.id, idUserSubscriptions: user12Sub2.id, idClub: clubBonvivir.id, idPaymentMethods: payMethodTarjetaDebito.id, idGatewayTransaction: 'TD-TXN-00431', totalAmountPaid: 42000, commissionAmount: 200, clubAmount: 41800, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual abril 2026' } });
+    await prisma.transaction_History.create({ data: { idUser: user12.id, idUserSubscriptions: user12Sub2.id, idClub: clubBonvivir.id, idPaymentMethods: payMethodTarjetaDebito.id, idGatewayTransaction: 'TD-TXN-00432', totalAmountPaid: 42000, commissionAmount: 200, clubAmount: 41800, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual mayo 2026' } });
+    await prisma.transaction_History.create({ data: { idUser: user12.id, idUserSubscriptions: user12Sub2.id, idClub: clubBonvivir.id, idPaymentMethods: payMethodTarjetaDebito.id, idGatewayTransaction: 'TD-TXN-00433', totalAmountPaid: 42000, commissionAmount: 200, clubAmount: 41800, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual junio 2026' } });
+    //#endregion
+  //#endregion
+
+  //#region 23.13. Julieta Vega
+    //#region 23.13.1. user13Sub1 - 18 pagos
+    await prisma.transaction_History.create({ data: { idUser: user13.id, idUserSubscriptions: user13Sub1.id, idClub: clubGinTonicClub.id, idPaymentMethods: payMethodMercadoPago.id, idGatewayTransaction: 'MP-TXN-00434', totalAmountPaid: 34960, commissionAmount: 200, clubAmount: 34760, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual enero 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user13.id, idUserSubscriptions: user13Sub1.id, idClub: clubGinTonicClub.id, idPaymentMethods: payMethodMercadoPago.id, idGatewayTransaction: 'MP-TXN-00435', totalAmountPaid: 34960, commissionAmount: 200, clubAmount: 34760, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual febrero 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user13.id, idUserSubscriptions: user13Sub1.id, idClub: clubGinTonicClub.id, idPaymentMethods: payMethodMercadoPago.id, idGatewayTransaction: 'MP-TXN-00436', totalAmountPaid: 34960, commissionAmount: 200, clubAmount: 34760, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual marzo 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user13.id, idUserSubscriptions: user13Sub1.id, idClub: clubGinTonicClub.id, idPaymentMethods: payMethodMercadoPago.id, idGatewayTransaction: 'MP-TXN-00437', totalAmountPaid: 34960, commissionAmount: 200, clubAmount: 34760, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual abril 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user13.id, idUserSubscriptions: user13Sub1.id, idClub: clubGinTonicClub.id, idPaymentMethods: payMethodMercadoPago.id, idGatewayTransaction: 'MP-TXN-00438', totalAmountPaid: 34960, commissionAmount: 200, clubAmount: 34760, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual mayo 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user13.id, idUserSubscriptions: user13Sub1.id, idClub: clubGinTonicClub.id, idPaymentMethods: payMethodMercadoPago.id, idGatewayTransaction: 'MP-TXN-00439', totalAmountPaid: 34960, commissionAmount: 200, clubAmount: 34760, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual junio 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user13.id, idUserSubscriptions: user13Sub1.id, idClub: clubGinTonicClub.id, idPaymentMethods: payMethodMercadoPago.id, idGatewayTransaction: 'MP-TXN-00440', totalAmountPaid: 34960, commissionAmount: 200, clubAmount: 34760, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual julio 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user13.id, idUserSubscriptions: user13Sub1.id, idClub: clubGinTonicClub.id, idPaymentMethods: payMethodMercadoPago.id, idGatewayTransaction: 'MP-TXN-00441', totalAmountPaid: 34960, commissionAmount: 200, clubAmount: 34760, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual agosto 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user13.id, idUserSubscriptions: user13Sub1.id, idClub: clubGinTonicClub.id, idPaymentMethods: payMethodMercadoPago.id, idGatewayTransaction: 'MP-TXN-00442', totalAmountPaid: 34960, commissionAmount: 200, clubAmount: 34760, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual septiembre 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user13.id, idUserSubscriptions: user13Sub1.id, idClub: clubGinTonicClub.id, idPaymentMethods: payMethodMercadoPago.id, idGatewayTransaction: 'MP-TXN-00443', totalAmountPaid: 34960, commissionAmount: 200, clubAmount: 34760, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual octubre 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user13.id, idUserSubscriptions: user13Sub1.id, idClub: clubGinTonicClub.id, idPaymentMethods: payMethodMercadoPago.id, idGatewayTransaction: 'MP-TXN-00444', totalAmountPaid: 34960, commissionAmount: 200, clubAmount: 34760, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual noviembre 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user13.id, idUserSubscriptions: user13Sub1.id, idClub: clubGinTonicClub.id, idPaymentMethods: payMethodMercadoPago.id, idGatewayTransaction: 'MP-TXN-00445', totalAmountPaid: 34960, commissionAmount: 200, clubAmount: 34760, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual diciembre 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user13.id, idUserSubscriptions: user13Sub1.id, idClub: clubGinTonicClub.id, idPaymentMethods: payMethodMercadoPago.id, idGatewayTransaction: 'MP-TXN-00446', totalAmountPaid: 34960, commissionAmount: 200, clubAmount: 34760, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual enero 2026' } });
+    await prisma.transaction_History.create({ data: { idUser: user13.id, idUserSubscriptions: user13Sub1.id, idClub: clubGinTonicClub.id, idPaymentMethods: payMethodMercadoPago.id, idGatewayTransaction: 'MP-TXN-00447', totalAmountPaid: 34960, commissionAmount: 200, clubAmount: 34760, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual febrero 2026' } });
+    await prisma.transaction_History.create({ data: { idUser: user13.id, idUserSubscriptions: user13Sub1.id, idClub: clubGinTonicClub.id, idPaymentMethods: payMethodMercadoPago.id, idGatewayTransaction: 'MP-TXN-00448', totalAmountPaid: 34960, commissionAmount: 200, clubAmount: 34760, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual marzo 2026' } });
+    await prisma.transaction_History.create({ data: { idUser: user13.id, idUserSubscriptions: user13Sub1.id, idClub: clubGinTonicClub.id, idPaymentMethods: payMethodMercadoPago.id, idGatewayTransaction: 'MP-TXN-00449', totalAmountPaid: 34960, commissionAmount: 200, clubAmount: 34760, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual abril 2026' } });
+    await prisma.transaction_History.create({ data: { idUser: user13.id, idUserSubscriptions: user13Sub1.id, idClub: clubGinTonicClub.id, idPaymentMethods: payMethodMercadoPago.id, idGatewayTransaction: 'MP-TXN-00450', totalAmountPaid: 34960, commissionAmount: 200, clubAmount: 34760, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual mayo 2026' } });
+    await prisma.transaction_History.create({ data: { idUser: user13.id, idUserSubscriptions: user13Sub1.id, idClub: clubGinTonicClub.id, idPaymentMethods: payMethodMercadoPago.id, idGatewayTransaction: 'MP-TXN-00451', totalAmountPaid: 34960, commissionAmount: 200, clubAmount: 34760, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual junio 2026' } });
+    //#endregion
+  
+    //#region 23.13.2. user13Sub2 - 17 pagos
+    await prisma.transaction_History.create({ data: { idUser: user13.id, idUserSubscriptions: user13Sub2.id, idClub: clubChocolateBox.id, idPaymentMethods: payMethodTarjetaCredito.id, idGatewayTransaction: 'TC-TXN-00452', totalAmountPaid: 18000, commissionAmount: 200, clubAmount: 17800, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual febrero 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user13.id, idUserSubscriptions: user13Sub2.id, idClub: clubChocolateBox.id, idPaymentMethods: payMethodTarjetaCredito.id, idGatewayTransaction: 'TC-TXN-00453', totalAmountPaid: 18000, commissionAmount: 200, clubAmount: 17800, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual marzo 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user13.id, idUserSubscriptions: user13Sub2.id, idClub: clubChocolateBox.id, idPaymentMethods: payMethodTarjetaCredito.id, idGatewayTransaction: 'TC-TXN-00454', totalAmountPaid: 18000, commissionAmount: 200, clubAmount: 17800, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual abril 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user13.id, idUserSubscriptions: user13Sub2.id, idClub: clubChocolateBox.id, idPaymentMethods: payMethodTarjetaCredito.id, idGatewayTransaction: 'TC-TXN-00455', totalAmountPaid: 18000, commissionAmount: 200, clubAmount: 17800, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual mayo 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user13.id, idUserSubscriptions: user13Sub2.id, idClub: clubChocolateBox.id, idPaymentMethods: payMethodTarjetaCredito.id, idGatewayTransaction: 'TC-TXN-00456', totalAmountPaid: 18000, commissionAmount: 200, clubAmount: 17800, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual junio 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user13.id, idUserSubscriptions: user13Sub2.id, idClub: clubChocolateBox.id, idPaymentMethods: payMethodTarjetaCredito.id, idGatewayTransaction: 'TC-TXN-00457', totalAmountPaid: 18000, commissionAmount: 200, clubAmount: 17800, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual julio 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user13.id, idUserSubscriptions: user13Sub2.id, idClub: clubChocolateBox.id, idPaymentMethods: payMethodTarjetaCredito.id, idGatewayTransaction: 'TC-TXN-00458', totalAmountPaid: 18000, commissionAmount: 200, clubAmount: 17800, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual agosto 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user13.id, idUserSubscriptions: user13Sub2.id, idClub: clubChocolateBox.id, idPaymentMethods: payMethodTarjetaCredito.id, idGatewayTransaction: 'TC-TXN-00459', totalAmountPaid: 18000, commissionAmount: 200, clubAmount: 17800, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual septiembre 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user13.id, idUserSubscriptions: user13Sub2.id, idClub: clubChocolateBox.id, idPaymentMethods: payMethodTarjetaCredito.id, idGatewayTransaction: 'TC-TXN-00460', totalAmountPaid: 18000, commissionAmount: 200, clubAmount: 17800, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual octubre 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user13.id, idUserSubscriptions: user13Sub2.id, idClub: clubChocolateBox.id, idPaymentMethods: payMethodTarjetaCredito.id, idGatewayTransaction: 'TC-TXN-00461', totalAmountPaid: 18000, commissionAmount: 200, clubAmount: 17800, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual noviembre 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user13.id, idUserSubscriptions: user13Sub2.id, idClub: clubChocolateBox.id, idPaymentMethods: payMethodTarjetaCredito.id, idGatewayTransaction: 'TC-TXN-00462', totalAmountPaid: 18000, commissionAmount: 200, clubAmount: 17800, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual diciembre 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user13.id, idUserSubscriptions: user13Sub2.id, idClub: clubChocolateBox.id, idPaymentMethods: payMethodTarjetaCredito.id, idGatewayTransaction: 'TC-TXN-00463', totalAmountPaid: 18000, commissionAmount: 200, clubAmount: 17800, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual enero 2026' } });
+    await prisma.transaction_History.create({ data: { idUser: user13.id, idUserSubscriptions: user13Sub2.id, idClub: clubChocolateBox.id, idPaymentMethods: payMethodTarjetaCredito.id, idGatewayTransaction: 'TC-TXN-00464', totalAmountPaid: 18000, commissionAmount: 200, clubAmount: 17800, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual febrero 2026' } });
+    await prisma.transaction_History.create({ data: { idUser: user13.id, idUserSubscriptions: user13Sub2.id, idClub: clubChocolateBox.id, idPaymentMethods: payMethodTarjetaCredito.id, idGatewayTransaction: 'TC-TXN-00465', totalAmountPaid: 18000, commissionAmount: 200, clubAmount: 17800, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual marzo 2026' } });
+    await prisma.transaction_History.create({ data: { idUser: user13.id, idUserSubscriptions: user13Sub2.id, idClub: clubChocolateBox.id, idPaymentMethods: payMethodTarjetaCredito.id, idGatewayTransaction: 'TC-TXN-00466', totalAmountPaid: 18000, commissionAmount: 200, clubAmount: 17800, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual abril 2026' } });
+    await prisma.transaction_History.create({ data: { idUser: user13.id, idUserSubscriptions: user13Sub2.id, idClub: clubChocolateBox.id, idPaymentMethods: payMethodTarjetaCredito.id, idGatewayTransaction: 'TC-TXN-00467', totalAmountPaid: 18000, commissionAmount: 200, clubAmount: 17800, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual mayo 2026' } });
+    await prisma.transaction_History.create({ data: { idUser: user13.id, idUserSubscriptions: user13Sub2.id, idClub: clubChocolateBox.id, idPaymentMethods: payMethodTarjetaCredito.id, idGatewayTransaction: 'TC-TXN-00468', totalAmountPaid: 18000, commissionAmount: 200, clubAmount: 17800, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual junio 2026' } });
+    //#endregion
+  //#endregion
+
+  //#region 23.14. Ignacio Blanco
+    //#region 23.14.1. user14Sub1 - 18 pagos
+    await prisma.transaction_History.create({ data: { idUser: user14.id, idUserSubscriptions: user14Sub1.id, idClub: clubSkincareNatural.id, idPaymentMethods: payMethodEfectivo.id, idGatewayTransaction: 'EF-TXN-00469', totalAmountPaid: 20680, commissionAmount: 200, clubAmount: 20480, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual enero 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user14.id, idUserSubscriptions: user14Sub1.id, idClub: clubSkincareNatural.id, idPaymentMethods: payMethodEfectivo.id, idGatewayTransaction: 'EF-TXN-00470', totalAmountPaid: 20680, commissionAmount: 200, clubAmount: 20480, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual febrero 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user14.id, idUserSubscriptions: user14Sub1.id, idClub: clubSkincareNatural.id, idPaymentMethods: payMethodEfectivo.id, idGatewayTransaction: 'EF-TXN-00471', totalAmountPaid: 20680, commissionAmount: 200, clubAmount: 20480, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual marzo 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user14.id, idUserSubscriptions: user14Sub1.id, idClub: clubSkincareNatural.id, idPaymentMethods: payMethodEfectivo.id, idGatewayTransaction: 'EF-TXN-00472', totalAmountPaid: 20680, commissionAmount: 200, clubAmount: 20480, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual abril 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user14.id, idUserSubscriptions: user14Sub1.id, idClub: clubSkincareNatural.id, idPaymentMethods: payMethodEfectivo.id, idGatewayTransaction: 'EF-TXN-00473', totalAmountPaid: 20680, commissionAmount: 200, clubAmount: 20480, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual mayo 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user14.id, idUserSubscriptions: user14Sub1.id, idClub: clubSkincareNatural.id, idPaymentMethods: payMethodEfectivo.id, idGatewayTransaction: 'EF-TXN-00474', totalAmountPaid: 20680, commissionAmount: 200, clubAmount: 20480, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual junio 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user14.id, idUserSubscriptions: user14Sub1.id, idClub: clubSkincareNatural.id, idPaymentMethods: payMethodEfectivo.id, idGatewayTransaction: 'EF-TXN-00475', totalAmountPaid: 20680, commissionAmount: 200, clubAmount: 20480, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual julio 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user14.id, idUserSubscriptions: user14Sub1.id, idClub: clubSkincareNatural.id, idPaymentMethods: payMethodEfectivo.id, idGatewayTransaction: 'EF-TXN-00476', totalAmountPaid: 20680, commissionAmount: 200, clubAmount: 20480, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual agosto 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user14.id, idUserSubscriptions: user14Sub1.id, idClub: clubSkincareNatural.id, idPaymentMethods: payMethodEfectivo.id, idGatewayTransaction: 'EF-TXN-00477', totalAmountPaid: 20680, commissionAmount: 200, clubAmount: 20480, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual septiembre 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user14.id, idUserSubscriptions: user14Sub1.id, idClub: clubSkincareNatural.id, idPaymentMethods: payMethodEfectivo.id, idGatewayTransaction: 'EF-TXN-00478', totalAmountPaid: 20680, commissionAmount: 200, clubAmount: 20480, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual octubre 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user14.id, idUserSubscriptions: user14Sub1.id, idClub: clubSkincareNatural.id, idPaymentMethods: payMethodEfectivo.id, idGatewayTransaction: 'EF-TXN-00479', totalAmountPaid: 20680, commissionAmount: 200, clubAmount: 20480, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual noviembre 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user14.id, idUserSubscriptions: user14Sub1.id, idClub: clubSkincareNatural.id, idPaymentMethods: payMethodEfectivo.id, idGatewayTransaction: 'EF-TXN-00480', totalAmountPaid: 20680, commissionAmount: 200, clubAmount: 20480, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual diciembre 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user14.id, idUserSubscriptions: user14Sub1.id, idClub: clubSkincareNatural.id, idPaymentMethods: payMethodEfectivo.id, idGatewayTransaction: 'EF-TXN-00481', totalAmountPaid: 20680, commissionAmount: 200, clubAmount: 20480, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual enero 2026' } });
+    await prisma.transaction_History.create({ data: { idUser: user14.id, idUserSubscriptions: user14Sub1.id, idClub: clubSkincareNatural.id, idPaymentMethods: payMethodEfectivo.id, idGatewayTransaction: 'EF-TXN-00482', totalAmountPaid: 20680, commissionAmount: 200, clubAmount: 20480, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual febrero 2026' } });
+    await prisma.transaction_History.create({ data: { idUser: user14.id, idUserSubscriptions: user14Sub1.id, idClub: clubSkincareNatural.id, idPaymentMethods: payMethodEfectivo.id, idGatewayTransaction: 'EF-TXN-00483', totalAmountPaid: 20680, commissionAmount: 200, clubAmount: 20480, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual marzo 2026' } });
+    await prisma.transaction_History.create({ data: { idUser: user14.id, idUserSubscriptions: user14Sub1.id, idClub: clubSkincareNatural.id, idPaymentMethods: payMethodEfectivo.id, idGatewayTransaction: 'EF-TXN-00484', totalAmountPaid: 20680, commissionAmount: 200, clubAmount: 20480, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual abril 2026' } });
+    await prisma.transaction_History.create({ data: { idUser: user14.id, idUserSubscriptions: user14Sub1.id, idClub: clubSkincareNatural.id, idPaymentMethods: payMethodEfectivo.id, idGatewayTransaction: 'EF-TXN-00485', totalAmountPaid: 20680, commissionAmount: 200, clubAmount: 20480, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual mayo 2026' } });
+    await prisma.transaction_History.create({ data: { idUser: user14.id, idUserSubscriptions: user14Sub1.id, idClub: clubSkincareNatural.id, idPaymentMethods: payMethodEfectivo.id, idGatewayTransaction: 'EF-TXN-00486', totalAmountPaid: 20680, commissionAmount: 200, clubAmount: 20480, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual junio 2026' } });
+    //#endregion
+  //#endregion
+
+  //#region 23.15. Antonella Ríos
+    //#region 23.15.1. user15Sub1 - 18 pagos
+    await prisma.transaction_History.create({ data: { idUser: user15.id, idUserSubscriptions: user15Sub1.id, idClub: clubWellnessBox.id, idPaymentMethods: payMethodTarjetaDebito.id, idGatewayTransaction: 'TD-TXN-00487', totalAmountPaid: 24000, commissionAmount: 200, clubAmount: 23800, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual enero 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user15.id, idUserSubscriptions: user15Sub1.id, idClub: clubWellnessBox.id, idPaymentMethods: payMethodTarjetaDebito.id, idGatewayTransaction: 'TD-TXN-00488', totalAmountPaid: 24000, commissionAmount: 200, clubAmount: 23800, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual febrero 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user15.id, idUserSubscriptions: user15Sub1.id, idClub: clubWellnessBox.id, idPaymentMethods: payMethodTarjetaDebito.id, idGatewayTransaction: 'TD-TXN-00489', totalAmountPaid: 24000, commissionAmount: 200, clubAmount: 23800, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual marzo 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user15.id, idUserSubscriptions: user15Sub1.id, idClub: clubWellnessBox.id, idPaymentMethods: payMethodTarjetaDebito.id, idGatewayTransaction: 'TD-TXN-00490', totalAmountPaid: 24000, commissionAmount: 200, clubAmount: 23800, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual abril 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user15.id, idUserSubscriptions: user15Sub1.id, idClub: clubWellnessBox.id, idPaymentMethods: payMethodTarjetaDebito.id, idGatewayTransaction: 'TD-TXN-00491', totalAmountPaid: 24000, commissionAmount: 200, clubAmount: 23800, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual mayo 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user15.id, idUserSubscriptions: user15Sub1.id, idClub: clubWellnessBox.id, idPaymentMethods: payMethodTarjetaDebito.id, idGatewayTransaction: 'TD-TXN-00492', totalAmountPaid: 24000, commissionAmount: 200, clubAmount: 23800, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual junio 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user15.id, idUserSubscriptions: user15Sub1.id, idClub: clubWellnessBox.id, idPaymentMethods: payMethodTarjetaDebito.id, idGatewayTransaction: 'TD-TXN-00493', totalAmountPaid: 24000, commissionAmount: 200, clubAmount: 23800, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual julio 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user15.id, idUserSubscriptions: user15Sub1.id, idClub: clubWellnessBox.id, idPaymentMethods: payMethodTarjetaDebito.id, idGatewayTransaction: 'TD-TXN-00494', totalAmountPaid: 24000, commissionAmount: 200, clubAmount: 23800, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual agosto 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user15.id, idUserSubscriptions: user15Sub1.id, idClub: clubWellnessBox.id, idPaymentMethods: payMethodTarjetaDebito.id, idGatewayTransaction: 'TD-TXN-00495', totalAmountPaid: 24000, commissionAmount: 200, clubAmount: 23800, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual septiembre 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user15.id, idUserSubscriptions: user15Sub1.id, idClub: clubWellnessBox.id, idPaymentMethods: payMethodTarjetaDebito.id, idGatewayTransaction: 'TD-TXN-00496', totalAmountPaid: 24000, commissionAmount: 200, clubAmount: 23800, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual octubre 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user15.id, idUserSubscriptions: user15Sub1.id, idClub: clubWellnessBox.id, idPaymentMethods: payMethodTarjetaDebito.id, idGatewayTransaction: 'TD-TXN-00497', totalAmountPaid: 24000, commissionAmount: 200, clubAmount: 23800, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual noviembre 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user15.id, idUserSubscriptions: user15Sub1.id, idClub: clubWellnessBox.id, idPaymentMethods: payMethodTarjetaDebito.id, idGatewayTransaction: 'TD-TXN-00498', totalAmountPaid: 24000, commissionAmount: 200, clubAmount: 23800, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual diciembre 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user15.id, idUserSubscriptions: user15Sub1.id, idClub: clubWellnessBox.id, idPaymentMethods: payMethodTarjetaDebito.id, idGatewayTransaction: 'TD-TXN-00499', totalAmountPaid: 24000, commissionAmount: 200, clubAmount: 23800, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual enero 2026' } });
+    await prisma.transaction_History.create({ data: { idUser: user15.id, idUserSubscriptions: user15Sub1.id, idClub: clubWellnessBox.id, idPaymentMethods: payMethodTarjetaDebito.id, idGatewayTransaction: 'TD-TXN-00500', totalAmountPaid: 24000, commissionAmount: 200, clubAmount: 23800, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual febrero 2026' } });
+    await prisma.transaction_History.create({ data: { idUser: user15.id, idUserSubscriptions: user15Sub1.id, idClub: clubWellnessBox.id, idPaymentMethods: payMethodTarjetaDebito.id, idGatewayTransaction: 'TD-TXN-00501', totalAmountPaid: 24000, commissionAmount: 200, clubAmount: 23800, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual marzo 2026' } });
+    await prisma.transaction_History.create({ data: { idUser: user15.id, idUserSubscriptions: user15Sub1.id, idClub: clubWellnessBox.id, idPaymentMethods: payMethodTarjetaDebito.id, idGatewayTransaction: 'TD-TXN-00502', totalAmountPaid: 24000, commissionAmount: 200, clubAmount: 23800, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual abril 2026' } });
+    await prisma.transaction_History.create({ data: { idUser: user15.id, idUserSubscriptions: user15Sub1.id, idClub: clubWellnessBox.id, idPaymentMethods: payMethodTarjetaDebito.id, idGatewayTransaction: 'TD-TXN-00503', totalAmountPaid: 24000, commissionAmount: 200, clubAmount: 23800, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual mayo 2026' } });
+    await prisma.transaction_History.create({ data: { idUser: user15.id, idUserSubscriptions: user15Sub1.id, idClub: clubWellnessBox.id, idPaymentMethods: payMethodTarjetaDebito.id, idGatewayTransaction: 'TD-TXN-00504', totalAmountPaid: 24000, commissionAmount: 200, clubAmount: 23800, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual junio 2026' } });
+    //#endregion
+    
+    //#region 23.15.2. user15Sub2 - 17 pagos
+    await prisma.transaction_History.create({ data: { idUser: user15.id, idUserSubscriptions: user15Sub2.id, idClub: clubSuculentasClub.id, idPaymentMethods: payMethodMercadoPago.id, idGatewayTransaction: 'MP-TXN-00505', totalAmountPaid: 15200, commissionAmount: 200, clubAmount: 15000, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual febrero 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user15.id, idUserSubscriptions: user15Sub2.id, idClub: clubSuculentasClub.id, idPaymentMethods: payMethodMercadoPago.id, idGatewayTransaction: 'MP-TXN-00506', totalAmountPaid: 15200, commissionAmount: 200, clubAmount: 15000, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual marzo 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user15.id, idUserSubscriptions: user15Sub2.id, idClub: clubSuculentasClub.id, idPaymentMethods: payMethodMercadoPago.id, idGatewayTransaction: 'MP-TXN-00507', totalAmountPaid: 15200, commissionAmount: 200, clubAmount: 15000, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual abril 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user15.id, idUserSubscriptions: user15Sub2.id, idClub: clubSuculentasClub.id, idPaymentMethods: payMethodMercadoPago.id, idGatewayTransaction: 'MP-TXN-00508', totalAmountPaid: 15200, commissionAmount: 200, clubAmount: 15000, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual mayo 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user15.id, idUserSubscriptions: user15Sub2.id, idClub: clubSuculentasClub.id, idPaymentMethods: payMethodMercadoPago.id, idGatewayTransaction: 'MP-TXN-00509', totalAmountPaid: 15200, commissionAmount: 200, clubAmount: 15000, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual junio 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user15.id, idUserSubscriptions: user15Sub2.id, idClub: clubSuculentasClub.id, idPaymentMethods: payMethodMercadoPago.id, idGatewayTransaction: 'MP-TXN-00510', totalAmountPaid: 15200, commissionAmount: 200, clubAmount: 15000, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual julio 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user15.id, idUserSubscriptions: user15Sub2.id, idClub: clubSuculentasClub.id, idPaymentMethods: payMethodMercadoPago.id, idGatewayTransaction: 'MP-TXN-00511', totalAmountPaid: 15200, commissionAmount: 200, clubAmount: 15000, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual agosto 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user15.id, idUserSubscriptions: user15Sub2.id, idClub: clubSuculentasClub.id, idPaymentMethods: payMethodMercadoPago.id, idGatewayTransaction: 'MP-TXN-00512', totalAmountPaid: 15200, commissionAmount: 200, clubAmount: 15000, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual septiembre 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user15.id, idUserSubscriptions: user15Sub2.id, idClub: clubSuculentasClub.id, idPaymentMethods: payMethodMercadoPago.id, idGatewayTransaction: 'MP-TXN-00513', totalAmountPaid: 15200, commissionAmount: 200, clubAmount: 15000, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual octubre 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user15.id, idUserSubscriptions: user15Sub2.id, idClub: clubSuculentasClub.id, idPaymentMethods: payMethodMercadoPago.id, idGatewayTransaction: 'MP-TXN-00514', totalAmountPaid: 15200, commissionAmount: 200, clubAmount: 15000, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual noviembre 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user15.id, idUserSubscriptions: user15Sub2.id, idClub: clubSuculentasClub.id, idPaymentMethods: payMethodMercadoPago.id, idGatewayTransaction: 'MP-TXN-00515', totalAmountPaid: 15200, commissionAmount: 200, clubAmount: 15000, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual diciembre 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user15.id, idUserSubscriptions: user15Sub2.id, idClub: clubSuculentasClub.id, idPaymentMethods: payMethodMercadoPago.id, idGatewayTransaction: 'MP-TXN-00516', totalAmountPaid: 15200, commissionAmount: 200, clubAmount: 15000, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual enero 2026' } });
+    await prisma.transaction_History.create({ data: { idUser: user15.id, idUserSubscriptions: user15Sub2.id, idClub: clubSuculentasClub.id, idPaymentMethods: payMethodMercadoPago.id, idGatewayTransaction: 'MP-TXN-00517', totalAmountPaid: 15200, commissionAmount: 200, clubAmount: 15000, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual febrero 2026' } });
+    await prisma.transaction_History.create({ data: { idUser: user15.id, idUserSubscriptions: user15Sub2.id, idClub: clubSuculentasClub.id, idPaymentMethods: payMethodMercadoPago.id, idGatewayTransaction: 'MP-TXN-00518', totalAmountPaid: 15200, commissionAmount: 200, clubAmount: 15000, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual marzo 2026' } });
+    await prisma.transaction_History.create({ data: { idUser: user15.id, idUserSubscriptions: user15Sub2.id, idClub: clubSuculentasClub.id, idPaymentMethods: payMethodMercadoPago.id, idGatewayTransaction: 'MP-TXN-00519', totalAmountPaid: 15200, commissionAmount: 200, clubAmount: 15000, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual abril 2026' } });
+    await prisma.transaction_History.create({ data: { idUser: user15.id, idUserSubscriptions: user15Sub2.id, idClub: clubSuculentasClub.id, idPaymentMethods: payMethodMercadoPago.id, idGatewayTransaction: 'MP-TXN-00520', totalAmountPaid: 15200, commissionAmount: 200, clubAmount: 15000, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual mayo 2026' } });
+    await prisma.transaction_History.create({ data: { idUser: user15.id, idUserSubscriptions: user15Sub2.id, idClub: clubSuculentasClub.id, idPaymentMethods: payMethodMercadoPago.id, idGatewayTransaction: 'MP-TXN-00521', totalAmountPaid: 15200, commissionAmount: 200, clubAmount: 15000, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual junio 2026' } });
+    //#endregion
+    
+    //#region 23.15.3. user15Sub3 - 16 pagos
+    await prisma.transaction_History.create({ data: { idUser: user15.id, idUserSubscriptions: user15Sub3.id, idClub: clubPapeleriaBox.id, idPaymentMethods: payMethodPayPal.id, idGatewayTransaction: 'PP-TXN-00522', totalAmountPaid: 17500, commissionAmount: 200, clubAmount: 17300, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual marzo 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user15.id, idUserSubscriptions: user15Sub3.id, idClub: clubPapeleriaBox.id, idPaymentMethods: payMethodPayPal.id, idGatewayTransaction: 'PP-TXN-00523', totalAmountPaid: 17500, commissionAmount: 200, clubAmount: 17300, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual abril 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user15.id, idUserSubscriptions: user15Sub3.id, idClub: clubPapeleriaBox.id, idPaymentMethods: payMethodPayPal.id, idGatewayTransaction: 'PP-TXN-00524', totalAmountPaid: 17500, commissionAmount: 200, clubAmount: 17300, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual mayo 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user15.id, idUserSubscriptions: user15Sub3.id, idClub: clubPapeleriaBox.id, idPaymentMethods: payMethodPayPal.id, idGatewayTransaction: 'PP-TXN-00525', totalAmountPaid: 17500, commissionAmount: 200, clubAmount: 17300, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual junio 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user15.id, idUserSubscriptions: user15Sub3.id, idClub: clubPapeleriaBox.id, idPaymentMethods: payMethodPayPal.id, idGatewayTransaction: 'PP-TXN-00526', totalAmountPaid: 17500, commissionAmount: 200, clubAmount: 17300, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual julio 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user15.id, idUserSubscriptions: user15Sub3.id, idClub: clubPapeleriaBox.id, idPaymentMethods: payMethodPayPal.id, idGatewayTransaction: 'PP-TXN-00527', totalAmountPaid: 17500, commissionAmount: 200, clubAmount: 17300, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual agosto 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user15.id, idUserSubscriptions: user15Sub3.id, idClub: clubPapeleriaBox.id, idPaymentMethods: payMethodPayPal.id, idGatewayTransaction: 'PP-TXN-00528', totalAmountPaid: 17500, commissionAmount: 200, clubAmount: 17300, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual septiembre 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user15.id, idUserSubscriptions: user15Sub3.id, idClub: clubPapeleriaBox.id, idPaymentMethods: payMethodPayPal.id, idGatewayTransaction: 'PP-TXN-00529', totalAmountPaid: 17500, commissionAmount: 200, clubAmount: 17300, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual octubre 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user15.id, idUserSubscriptions: user15Sub3.id, idClub: clubPapeleriaBox.id, idPaymentMethods: payMethodPayPal.id, idGatewayTransaction: 'PP-TXN-00530', totalAmountPaid: 17500, commissionAmount: 200, clubAmount: 17300, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual noviembre 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user15.id, idUserSubscriptions: user15Sub3.id, idClub: clubPapeleriaBox.id, idPaymentMethods: payMethodPayPal.id, idGatewayTransaction: 'PP-TXN-00531', totalAmountPaid: 17500, commissionAmount: 200, clubAmount: 17300, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual diciembre 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user15.id, idUserSubscriptions: user15Sub3.id, idClub: clubPapeleriaBox.id, idPaymentMethods: payMethodPayPal.id, idGatewayTransaction: 'PP-TXN-00532', totalAmountPaid: 17500, commissionAmount: 200, clubAmount: 17300, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual enero 2026' } });
+    await prisma.transaction_History.create({ data: { idUser: user15.id, idUserSubscriptions: user15Sub3.id, idClub: clubPapeleriaBox.id, idPaymentMethods: payMethodPayPal.id, idGatewayTransaction: 'PP-TXN-00533', totalAmountPaid: 17500, commissionAmount: 200, clubAmount: 17300, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual febrero 2026' } });
+    await prisma.transaction_History.create({ data: { idUser: user15.id, idUserSubscriptions: user15Sub3.id, idClub: clubPapeleriaBox.id, idPaymentMethods: payMethodPayPal.id, idGatewayTransaction: 'PP-TXN-00534', totalAmountPaid: 17500, commissionAmount: 200, clubAmount: 17300, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual marzo 2026' } });
+    await prisma.transaction_History.create({ data: { idUser: user15.id, idUserSubscriptions: user15Sub3.id, idClub: clubPapeleriaBox.id, idPaymentMethods: payMethodPayPal.id, idGatewayTransaction: 'PP-TXN-00535', totalAmountPaid: 17500, commissionAmount: 200, clubAmount: 17300, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual abril 2026' } });
+    await prisma.transaction_History.create({ data: { idUser: user15.id, idUserSubscriptions: user15Sub3.id, idClub: clubPapeleriaBox.id, idPaymentMethods: payMethodPayPal.id, idGatewayTransaction: 'PP-TXN-00536', totalAmountPaid: 17500, commissionAmount: 200, clubAmount: 17300, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual mayo 2026' } });
+    await prisma.transaction_History.create({ data: { idUser: user15.id, idUserSubscriptions: user15Sub3.id, idClub: clubPapeleriaBox.id, idPaymentMethods: payMethodPayPal.id, idGatewayTransaction: 'PP-TXN-00537', totalAmountPaid: 17500, commissionAmount: 200, clubAmount: 17300, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual junio 2026' } });
+    //#endregion
+  //#endregion
+  
+  //#region 23.16. Emiliano Peralta
+    //#region 23.16.1. user16Sub1 - 18 pagos
+    await prisma.transaction_History.create({ data: { idUser: user16.id, idUserSubscriptions: user16Sub1.id, idClub: clubEspeciasClub.id, idPaymentMethods: payMethodEfectivo.id, idGatewayTransaction: 'EF-TXN-00538', totalAmountPaid: 22325, commissionAmount: 200, clubAmount: 22125, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual enero 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user16.id, idUserSubscriptions: user16Sub1.id, idClub: clubEspeciasClub.id, idPaymentMethods: payMethodEfectivo.id, idGatewayTransaction: 'EF-TXN-00539', totalAmountPaid: 22325, commissionAmount: 200, clubAmount: 22125, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual febrero 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user16.id, idUserSubscriptions: user16Sub1.id, idClub: clubEspeciasClub.id, idPaymentMethods: payMethodEfectivo.id, idGatewayTransaction: 'EF-TXN-00540', totalAmountPaid: 22325, commissionAmount: 200, clubAmount: 22125, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual marzo 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user16.id, idUserSubscriptions: user16Sub1.id, idClub: clubEspeciasClub.id, idPaymentMethods: payMethodEfectivo.id, idGatewayTransaction: 'EF-TXN-00541', totalAmountPaid: 22325, commissionAmount: 200, clubAmount: 22125, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual abril 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user16.id, idUserSubscriptions: user16Sub1.id, idClub: clubEspeciasClub.id, idPaymentMethods: payMethodEfectivo.id, idGatewayTransaction: 'EF-TXN-00542', totalAmountPaid: 22325, commissionAmount: 200, clubAmount: 22125, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual mayo 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user16.id, idUserSubscriptions: user16Sub1.id, idClub: clubEspeciasClub.id, idPaymentMethods: payMethodEfectivo.id, idGatewayTransaction: 'EF-TXN-00543', totalAmountPaid: 22325, commissionAmount: 200, clubAmount: 22125, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual junio 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user16.id, idUserSubscriptions: user16Sub1.id, idClub: clubEspeciasClub.id, idPaymentMethods: payMethodEfectivo.id, idGatewayTransaction: 'EF-TXN-00544', totalAmountPaid: 22325, commissionAmount: 200, clubAmount: 22125, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual julio 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user16.id, idUserSubscriptions: user16Sub1.id, idClub: clubEspeciasClub.id, idPaymentMethods: payMethodEfectivo.id, idGatewayTransaction: 'EF-TXN-00545', totalAmountPaid: 22325, commissionAmount: 200, clubAmount: 22125, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual agosto 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user16.id, idUserSubscriptions: user16Sub1.id, idClub: clubEspeciasClub.id, idPaymentMethods: payMethodEfectivo.id, idGatewayTransaction: 'EF-TXN-00546', totalAmountPaid: 22325, commissionAmount: 200, clubAmount: 22125, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual septiembre 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user16.id, idUserSubscriptions: user16Sub1.id, idClub: clubEspeciasClub.id, idPaymentMethods: payMethodEfectivo.id, idGatewayTransaction: 'EF-TXN-00547', totalAmountPaid: 22325, commissionAmount: 200, clubAmount: 22125, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual octubre 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user16.id, idUserSubscriptions: user16Sub1.id, idClub: clubEspeciasClub.id, idPaymentMethods: payMethodEfectivo.id, idGatewayTransaction: 'EF-TXN-00548', totalAmountPaid: 22325, commissionAmount: 200, clubAmount: 22125, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual noviembre 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user16.id, idUserSubscriptions: user16Sub1.id, idClub: clubEspeciasClub.id, idPaymentMethods: payMethodEfectivo.id, idGatewayTransaction: 'EF-TXN-00549', totalAmountPaid: 22325, commissionAmount: 200, clubAmount: 22125, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual diciembre 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user16.id, idUserSubscriptions: user16Sub1.id, idClub: clubEspeciasClub.id, idPaymentMethods: payMethodEfectivo.id, idGatewayTransaction: 'EF-TXN-00550', totalAmountPaid: 22325, commissionAmount: 200, clubAmount: 22125, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual enero 2026' } });
+    await prisma.transaction_History.create({ data: { idUser: user16.id, idUserSubscriptions: user16Sub1.id, idClub: clubEspeciasClub.id, idPaymentMethods: payMethodEfectivo.id, idGatewayTransaction: 'EF-TXN-00551', totalAmountPaid: 22325, commissionAmount: 200, clubAmount: 22125, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual febrero 2026' } });
+    await prisma.transaction_History.create({ data: { idUser: user16.id, idUserSubscriptions: user16Sub1.id, idClub: clubEspeciasClub.id, idPaymentMethods: payMethodEfectivo.id, idGatewayTransaction: 'EF-TXN-00552', totalAmountPaid: 22325, commissionAmount: 200, clubAmount: 22125, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual marzo 2026' } });
+    await prisma.transaction_History.create({ data: { idUser: user16.id, idUserSubscriptions: user16Sub1.id, idClub: clubEspeciasClub.id, idPaymentMethods: payMethodEfectivo.id, idGatewayTransaction: 'EF-TXN-00553', totalAmountPaid: 22325, commissionAmount: 200, clubAmount: 22125, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual abril 2026' } });
+    await prisma.transaction_History.create({ data: { idUser: user16.id, idUserSubscriptions: user16Sub1.id, idClub: clubEspeciasClub.id, idPaymentMethods: payMethodEfectivo.id, idGatewayTransaction: 'EF-TXN-00554', totalAmountPaid: 22325, commissionAmount: 200, clubAmount: 22125, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual mayo 2026' } });
+    await prisma.transaction_History.create({ data: { idUser: user16.id, idUserSubscriptions: user16Sub1.id, idClub: clubEspeciasClub.id, idPaymentMethods: payMethodEfectivo.id, idGatewayTransaction: 'EF-TXN-00555', totalAmountPaid: 22325, commissionAmount: 200, clubAmount: 22125, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual junio 2026' } });
+    //#endregion
+  
+    //#region 23.16.2. user16Sub2 - 17 pagos
+    await prisma.transaction_History.create({ data: { idUser: user16.id, idUserSubscriptions: user16Sub2.id, idClub: clubClubWoopy.id, idPaymentMethods: payMethodTarjetaCredito.id, idGatewayTransaction: 'TC-TXN-00556', totalAmountPaid: 36300, commissionAmount: 200, clubAmount: 36100, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual febrero 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user16.id, idUserSubscriptions: user16Sub2.id, idClub: clubClubWoopy.id, idPaymentMethods: payMethodTarjetaCredito.id, idGatewayTransaction: 'TC-TXN-00557', totalAmountPaid: 36300, commissionAmount: 200, clubAmount: 36100, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual marzo 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user16.id, idUserSubscriptions: user16Sub2.id, idClub: clubClubWoopy.id, idPaymentMethods: payMethodTarjetaCredito.id, idGatewayTransaction: 'TC-TXN-00558', totalAmountPaid: 36300, commissionAmount: 200, clubAmount: 36100, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual abril 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user16.id, idUserSubscriptions: user16Sub2.id, idClub: clubClubWoopy.id, idPaymentMethods: payMethodTarjetaCredito.id, idGatewayTransaction: 'TC-TXN-00559', totalAmountPaid: 36300, commissionAmount: 200, clubAmount: 36100, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual mayo 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user16.id, idUserSubscriptions: user16Sub2.id, idClub: clubClubWoopy.id, idPaymentMethods: payMethodTarjetaCredito.id, idGatewayTransaction: 'TC-TXN-00560', totalAmountPaid: 36300, commissionAmount: 200, clubAmount: 36100, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual junio 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user16.id, idUserSubscriptions: user16Sub2.id, idClub: clubClubWoopy.id, idPaymentMethods: payMethodTarjetaCredito.id, idGatewayTransaction: 'TC-TXN-00561', totalAmountPaid: 36300, commissionAmount: 200, clubAmount: 36100, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual julio 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user16.id, idUserSubscriptions: user16Sub2.id, idClub: clubClubWoopy.id, idPaymentMethods: payMethodTarjetaCredito.id, idGatewayTransaction: 'TC-TXN-00562', totalAmountPaid: 36300, commissionAmount: 200, clubAmount: 36100, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual agosto 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user16.id, idUserSubscriptions: user16Sub2.id, idClub: clubClubWoopy.id, idPaymentMethods: payMethodTarjetaCredito.id, idGatewayTransaction: 'TC-TXN-00563', totalAmountPaid: 36300, commissionAmount: 200, clubAmount: 36100, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual septiembre 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user16.id, idUserSubscriptions: user16Sub2.id, idClub: clubClubWoopy.id, idPaymentMethods: payMethodTarjetaCredito.id, idGatewayTransaction: 'TC-TXN-00564', totalAmountPaid: 36300, commissionAmount: 200, clubAmount: 36100, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual octubre 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user16.id, idUserSubscriptions: user16Sub2.id, idClub: clubClubWoopy.id, idPaymentMethods: payMethodTarjetaCredito.id, idGatewayTransaction: 'TC-TXN-00565', totalAmountPaid: 36300, commissionAmount: 200, clubAmount: 36100, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual noviembre 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user16.id, idUserSubscriptions: user16Sub2.id, idClub: clubClubWoopy.id, idPaymentMethods: payMethodTarjetaCredito.id, idGatewayTransaction: 'TC-TXN-00566', totalAmountPaid: 36300, commissionAmount: 200, clubAmount: 36100, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual diciembre 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user16.id, idUserSubscriptions: user16Sub2.id, idClub: clubClubWoopy.id, idPaymentMethods: payMethodTarjetaCredito.id, idGatewayTransaction: 'TC-TXN-00567', totalAmountPaid: 36300, commissionAmount: 200, clubAmount: 36100, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual enero 2026' } });
+    await prisma.transaction_History.create({ data: { idUser: user16.id, idUserSubscriptions: user16Sub2.id, idClub: clubClubWoopy.id, idPaymentMethods: payMethodTarjetaCredito.id, idGatewayTransaction: 'TC-TXN-00568', totalAmountPaid: 36300, commissionAmount: 200, clubAmount: 36100, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual febrero 2026' } });
+    await prisma.transaction_History.create({ data: { idUser: user16.id, idUserSubscriptions: user16Sub2.id, idClub: clubClubWoopy.id, idPaymentMethods: payMethodTarjetaCredito.id, idGatewayTransaction: 'TC-TXN-00569', totalAmountPaid: 36300, commissionAmount: 200, clubAmount: 36100, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual marzo 2026' } });
+    await prisma.transaction_History.create({ data: { idUser: user16.id, idUserSubscriptions: user16Sub2.id, idClub: clubClubWoopy.id, idPaymentMethods: payMethodTarjetaCredito.id, idGatewayTransaction: 'TC-TXN-00570', totalAmountPaid: 36300, commissionAmount: 200, clubAmount: 36100, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual abril 2026' } });
+    await prisma.transaction_History.create({ data: { idUser: user16.id, idUserSubscriptions: user16Sub2.id, idClub: clubClubWoopy.id, idPaymentMethods: payMethodTarjetaCredito.id, idGatewayTransaction: 'TC-TXN-00571', totalAmountPaid: 36300, commissionAmount: 200, clubAmount: 36100, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual mayo 2026' } });
+    await prisma.transaction_History.create({ data: { idUser: user16.id, idUserSubscriptions: user16Sub2.id, idClub: clubClubWoopy.id, idPaymentMethods: payMethodTarjetaCredito.id, idGatewayTransaction: 'TC-TXN-00572', totalAmountPaid: 36300, commissionAmount: 200, clubAmount: 36100, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual junio 2026' } });
+    //#endregion
+  //#endregion
+
+  //#region 23.17. Luciana Suárez
+    //#region 23.17.1. user17Sub1 - 18 pagos
+    await prisma.transaction_History.create({ data: { idUser: user17.id, idUserSubscriptions: user17Sub1.id, idClub: clubMrCoffeeClub.id, idPaymentMethods: payMethodMercadoPago.id, idGatewayTransaction: 'MP-TXN-00573', totalAmountPaid: 29450, commissionAmount: 200, clubAmount: 29250, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual enero 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user17.id, idUserSubscriptions: user17Sub1.id, idClub: clubMrCoffeeClub.id, idPaymentMethods: payMethodMercadoPago.id, idGatewayTransaction: 'MP-TXN-00574', totalAmountPaid: 29450, commissionAmount: 200, clubAmount: 29250, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual febrero 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user17.id, idUserSubscriptions: user17Sub1.id, idClub: clubMrCoffeeClub.id, idPaymentMethods: payMethodMercadoPago.id, idGatewayTransaction: 'MP-TXN-00575', totalAmountPaid: 29450, commissionAmount: 200, clubAmount: 29250, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual marzo 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user17.id, idUserSubscriptions: user17Sub1.id, idClub: clubMrCoffeeClub.id, idPaymentMethods: payMethodMercadoPago.id, idGatewayTransaction: 'MP-TXN-00576', totalAmountPaid: 29450, commissionAmount: 200, clubAmount: 29250, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual abril 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user17.id, idUserSubscriptions: user17Sub1.id, idClub: clubMrCoffeeClub.id, idPaymentMethods: payMethodMercadoPago.id, idGatewayTransaction: 'MP-TXN-00577', totalAmountPaid: 29450, commissionAmount: 200, clubAmount: 29250, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual mayo 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user17.id, idUserSubscriptions: user17Sub1.id, idClub: clubMrCoffeeClub.id, idPaymentMethods: payMethodMercadoPago.id, idGatewayTransaction: 'MP-TXN-00578', totalAmountPaid: 29450, commissionAmount: 200, clubAmount: 29250, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual junio 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user17.id, idUserSubscriptions: user17Sub1.id, idClub: clubMrCoffeeClub.id, idPaymentMethods: payMethodMercadoPago.id, idGatewayTransaction: 'MP-TXN-00579', totalAmountPaid: 29450, commissionAmount: 200, clubAmount: 29250, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual julio 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user17.id, idUserSubscriptions: user17Sub1.id, idClub: clubMrCoffeeClub.id, idPaymentMethods: payMethodMercadoPago.id, idGatewayTransaction: 'MP-TXN-00580', totalAmountPaid: 29450, commissionAmount: 200, clubAmount: 29250, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual agosto 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user17.id, idUserSubscriptions: user17Sub1.id, idClub: clubMrCoffeeClub.id, idPaymentMethods: payMethodMercadoPago.id, idGatewayTransaction: 'MP-TXN-00581', totalAmountPaid: 29450, commissionAmount: 200, clubAmount: 29250, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual septiembre 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user17.id, idUserSubscriptions: user17Sub1.id, idClub: clubMrCoffeeClub.id, idPaymentMethods: payMethodMercadoPago.id, idGatewayTransaction: 'MP-TXN-00582', totalAmountPaid: 29450, commissionAmount: 200, clubAmount: 29250, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual octubre 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user17.id, idUserSubscriptions: user17Sub1.id, idClub: clubMrCoffeeClub.id, idPaymentMethods: payMethodMercadoPago.id, idGatewayTransaction: 'MP-TXN-00583', totalAmountPaid: 29450, commissionAmount: 200, clubAmount: 29250, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual noviembre 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user17.id, idUserSubscriptions: user17Sub1.id, idClub: clubMrCoffeeClub.id, idPaymentMethods: payMethodMercadoPago.id, idGatewayTransaction: 'MP-TXN-00584', totalAmountPaid: 29450, commissionAmount: 200, clubAmount: 29250, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual diciembre 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user17.id, idUserSubscriptions: user17Sub1.id, idClub: clubMrCoffeeClub.id, idPaymentMethods: payMethodMercadoPago.id, idGatewayTransaction: 'MP-TXN-00585', totalAmountPaid: 29450, commissionAmount: 200, clubAmount: 29250, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual enero 2026' } });
+    await prisma.transaction_History.create({ data: { idUser: user17.id, idUserSubscriptions: user17Sub1.id, idClub: clubMrCoffeeClub.id, idPaymentMethods: payMethodMercadoPago.id, idGatewayTransaction: 'MP-TXN-00586', totalAmountPaid: 29450, commissionAmount: 200, clubAmount: 29250, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual febrero 2026' } });
+    await prisma.transaction_History.create({ data: { idUser: user17.id, idUserSubscriptions: user17Sub1.id, idClub: clubMrCoffeeClub.id, idPaymentMethods: payMethodMercadoPago.id, idGatewayTransaction: 'MP-TXN-00587', totalAmountPaid: 29450, commissionAmount: 200, clubAmount: 29250, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual marzo 2026' } });
+    await prisma.transaction_History.create({ data: { idUser: user17.id, idUserSubscriptions: user17Sub1.id, idClub: clubMrCoffeeClub.id, idPaymentMethods: payMethodMercadoPago.id, idGatewayTransaction: 'MP-TXN-00588', totalAmountPaid: 29450, commissionAmount: 200, clubAmount: 29250, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual abril 2026' } });
+    await prisma.transaction_History.create({ data: { idUser: user17.id, idUserSubscriptions: user17Sub1.id, idClub: clubMrCoffeeClub.id, idPaymentMethods: payMethodMercadoPago.id, idGatewayTransaction: 'MP-TXN-00589', totalAmountPaid: 29450, commissionAmount: 200, clubAmount: 29250, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual mayo 2026' } });
+    await prisma.transaction_History.create({ data: { idUser: user17.id, idUserSubscriptions: user17Sub1.id, idClub: clubMrCoffeeClub.id, idPaymentMethods: payMethodMercadoPago.id, idGatewayTransaction: 'MP-TXN-00590', totalAmountPaid: 29450, commissionAmount: 200, clubAmount: 29250, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual junio 2026' } });
+    //#endregion
+  //#endregion
+
+  //#region 23.18. Braian Ojeda
+    //#region 23.18.1. user18Sub1 - 18 pagos
+    await prisma.transaction_History.create({ data: { idUser: user18.id, idUserSubscriptions: user18Sub1.id, idClub: clubMyPetBox.id, idPaymentMethods: payMethodTarjetaDebito.id, idGatewayTransaction: 'TD-TXN-00591', totalAmountPaid: 18000, commissionAmount: 200, clubAmount: 17800, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual enero 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user18.id, idUserSubscriptions: user18Sub1.id, idClub: clubMyPetBox.id, idPaymentMethods: payMethodTarjetaDebito.id, idGatewayTransaction: 'TD-TXN-00592', totalAmountPaid: 18000, commissionAmount: 200, clubAmount: 17800, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual febrero 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user18.id, idUserSubscriptions: user18Sub1.id, idClub: clubMyPetBox.id, idPaymentMethods: payMethodTarjetaDebito.id, idGatewayTransaction: 'TD-TXN-00593', totalAmountPaid: 18000, commissionAmount: 200, clubAmount: 17800, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual marzo 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user18.id, idUserSubscriptions: user18Sub1.id, idClub: clubMyPetBox.id, idPaymentMethods: payMethodTarjetaDebito.id, idGatewayTransaction: 'TD-TXN-00594', totalAmountPaid: 18000, commissionAmount: 200, clubAmount: 17800, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual abril 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user18.id, idUserSubscriptions: user18Sub1.id, idClub: clubMyPetBox.id, idPaymentMethods: payMethodTarjetaDebito.id, idGatewayTransaction: 'TD-TXN-00595', totalAmountPaid: 18000, commissionAmount: 200, clubAmount: 17800, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual mayo 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user18.id, idUserSubscriptions: user18Sub1.id, idClub: clubMyPetBox.id, idPaymentMethods: payMethodTarjetaDebito.id, idGatewayTransaction: 'TD-TXN-00596', totalAmountPaid: 18000, commissionAmount: 200, clubAmount: 17800, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual junio 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user18.id, idUserSubscriptions: user18Sub1.id, idClub: clubMyPetBox.id, idPaymentMethods: payMethodTarjetaDebito.id, idGatewayTransaction: 'TD-TXN-00597', totalAmountPaid: 18000, commissionAmount: 200, clubAmount: 17800, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual julio 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user18.id, idUserSubscriptions: user18Sub1.id, idClub: clubMyPetBox.id, idPaymentMethods: payMethodTarjetaDebito.id, idGatewayTransaction: 'TD-TXN-00598', totalAmountPaid: 18000, commissionAmount: 200, clubAmount: 17800, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual agosto 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user18.id, idUserSubscriptions: user18Sub1.id, idClub: clubMyPetBox.id, idPaymentMethods: payMethodTarjetaDebito.id, idGatewayTransaction: 'TD-TXN-00599', totalAmountPaid: 18000, commissionAmount: 200, clubAmount: 17800, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual septiembre 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user18.id, idUserSubscriptions: user18Sub1.id, idClub: clubMyPetBox.id, idPaymentMethods: payMethodTarjetaDebito.id, idGatewayTransaction: 'TD-TXN-00600', totalAmountPaid: 18000, commissionAmount: 200, clubAmount: 17800, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual octubre 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user18.id, idUserSubscriptions: user18Sub1.id, idClub: clubMyPetBox.id, idPaymentMethods: payMethodTarjetaDebito.id, idGatewayTransaction: 'TD-TXN-00601', totalAmountPaid: 18000, commissionAmount: 200, clubAmount: 17800, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual noviembre 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user18.id, idUserSubscriptions: user18Sub1.id, idClub: clubMyPetBox.id, idPaymentMethods: payMethodTarjetaDebito.id, idGatewayTransaction: 'TD-TXN-00602', totalAmountPaid: 18000, commissionAmount: 200, clubAmount: 17800, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual diciembre 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user18.id, idUserSubscriptions: user18Sub1.id, idClub: clubMyPetBox.id, idPaymentMethods: payMethodTarjetaDebito.id, idGatewayTransaction: 'TD-TXN-00603', totalAmountPaid: 18000, commissionAmount: 200, clubAmount: 17800, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual enero 2026' } });
+    await prisma.transaction_History.create({ data: { idUser: user18.id, idUserSubscriptions: user18Sub1.id, idClub: clubMyPetBox.id, idPaymentMethods: payMethodTarjetaDebito.id, idGatewayTransaction: 'TD-TXN-00604', totalAmountPaid: 18000, commissionAmount: 200, clubAmount: 17800, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual febrero 2026' } });
+    await prisma.transaction_History.create({ data: { idUser: user18.id, idUserSubscriptions: user18Sub1.id, idClub: clubMyPetBox.id, idPaymentMethods: payMethodTarjetaDebito.id, idGatewayTransaction: 'TD-TXN-00605', totalAmountPaid: 18000, commissionAmount: 200, clubAmount: 17800, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual marzo 2026' } });
+    await prisma.transaction_History.create({ data: { idUser: user18.id, idUserSubscriptions: user18Sub1.id, idClub: clubMyPetBox.id, idPaymentMethods: payMethodTarjetaDebito.id, idGatewayTransaction: 'TD-TXN-00606', totalAmountPaid: 18000, commissionAmount: 200, clubAmount: 17800, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual abril 2026' } });
+    await prisma.transaction_History.create({ data: { idUser: user18.id, idUserSubscriptions: user18Sub1.id, idClub: clubMyPetBox.id, idPaymentMethods: payMethodTarjetaDebito.id, idGatewayTransaction: 'TD-TXN-00607', totalAmountPaid: 18000, commissionAmount: 200, clubAmount: 17800, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual mayo 2026' } });
+    await prisma.transaction_History.create({ data: { idUser: user18.id, idUserSubscriptions: user18Sub1.id, idClub: clubMyPetBox.id, idPaymentMethods: payMethodTarjetaDebito.id, idGatewayTransaction: 'TD-TXN-00608', totalAmountPaid: 18000, commissionAmount: 200, clubAmount: 17800, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual junio 2026' } });
+    //#endregion
+  
+    //#region 23.18.2. user18Sub2 - 17 pagos
+    await prisma.transaction_History.create({ data: { idUser: user18.id, idUserSubscriptions: user18Sub2.id, idClub: clubMediasClub.id, idPaymentMethods: payMethodEfectivo.id, idGatewayTransaction: 'EF-TXN-00609', totalAmountPaid: 19950, commissionAmount: 200, clubAmount: 19750, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual febrero 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user18.id, idUserSubscriptions: user18Sub2.id, idClub: clubMediasClub.id, idPaymentMethods: payMethodEfectivo.id, idGatewayTransaction: 'EF-TXN-00610', totalAmountPaid: 19950, commissionAmount: 200, clubAmount: 19750, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual marzo 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user18.id, idUserSubscriptions: user18Sub2.id, idClub: clubMediasClub.id, idPaymentMethods: payMethodEfectivo.id, idGatewayTransaction: 'EF-TXN-00611', totalAmountPaid: 19950, commissionAmount: 200, clubAmount: 19750, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual abril 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user18.id, idUserSubscriptions: user18Sub2.id, idClub: clubMediasClub.id, idPaymentMethods: payMethodEfectivo.id, idGatewayTransaction: 'EF-TXN-00612', totalAmountPaid: 19950, commissionAmount: 200, clubAmount: 19750, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual mayo 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user18.id, idUserSubscriptions: user18Sub2.id, idClub: clubMediasClub.id, idPaymentMethods: payMethodEfectivo.id, idGatewayTransaction: 'EF-TXN-00613', totalAmountPaid: 19950, commissionAmount: 200, clubAmount: 19750, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual junio 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user18.id, idUserSubscriptions: user18Sub2.id, idClub: clubMediasClub.id, idPaymentMethods: payMethodEfectivo.id, idGatewayTransaction: 'EF-TXN-00614', totalAmountPaid: 19950, commissionAmount: 200, clubAmount: 19750, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual julio 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user18.id, idUserSubscriptions: user18Sub2.id, idClub: clubMediasClub.id, idPaymentMethods: payMethodEfectivo.id, idGatewayTransaction: 'EF-TXN-00615', totalAmountPaid: 19950, commissionAmount: 200, clubAmount: 19750, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual agosto 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user18.id, idUserSubscriptions: user18Sub2.id, idClub: clubMediasClub.id, idPaymentMethods: payMethodEfectivo.id, idGatewayTransaction: 'EF-TXN-00616', totalAmountPaid: 19950, commissionAmount: 200, clubAmount: 19750, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual septiembre 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user18.id, idUserSubscriptions: user18Sub2.id, idClub: clubMediasClub.id, idPaymentMethods: payMethodEfectivo.id, idGatewayTransaction: 'EF-TXN-00617', totalAmountPaid: 19950, commissionAmount: 200, clubAmount: 19750, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual octubre 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user18.id, idUserSubscriptions: user18Sub2.id, idClub: clubMediasClub.id, idPaymentMethods: payMethodEfectivo.id, idGatewayTransaction: 'EF-TXN-00618', totalAmountPaid: 19950, commissionAmount: 200, clubAmount: 19750, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual noviembre 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user18.id, idUserSubscriptions: user18Sub2.id, idClub: clubMediasClub.id, idPaymentMethods: payMethodEfectivo.id, idGatewayTransaction: 'EF-TXN-00619', totalAmountPaid: 19950, commissionAmount: 200, clubAmount: 19750, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual diciembre 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user18.id, idUserSubscriptions: user18Sub2.id, idClub: clubMediasClub.id, idPaymentMethods: payMethodEfectivo.id, idGatewayTransaction: 'EF-TXN-00620', totalAmountPaid: 19950, commissionAmount: 200, clubAmount: 19750, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual enero 2026' } });
+    await prisma.transaction_History.create({ data: { idUser: user18.id, idUserSubscriptions: user18Sub2.id, idClub: clubMediasClub.id, idPaymentMethods: payMethodEfectivo.id, idGatewayTransaction: 'EF-TXN-00621', totalAmountPaid: 19950, commissionAmount: 200, clubAmount: 19750, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual febrero 2026' } });
+    await prisma.transaction_History.create({ data: { idUser: user18.id, idUserSubscriptions: user18Sub2.id, idClub: clubMediasClub.id, idPaymentMethods: payMethodEfectivo.id, idGatewayTransaction: 'EF-TXN-00622', totalAmountPaid: 19950, commissionAmount: 200, clubAmount: 19750, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual marzo 2026' } });
+    await prisma.transaction_History.create({ data: { idUser: user18.id, idUserSubscriptions: user18Sub2.id, idClub: clubMediasClub.id, idPaymentMethods: payMethodEfectivo.id, idGatewayTransaction: 'EF-TXN-00623', totalAmountPaid: 19950, commissionAmount: 200, clubAmount: 19750, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual abril 2026' } });
+    await prisma.transaction_History.create({ data: { idUser: user18.id, idUserSubscriptions: user18Sub2.id, idClub: clubMediasClub.id, idPaymentMethods: payMethodEfectivo.id, idGatewayTransaction: 'EF-TXN-00624', totalAmountPaid: 19950, commissionAmount: 200, clubAmount: 19750, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual mayo 2026' } });
+    await prisma.transaction_History.create({ data: { idUser: user18.id, idUserSubscriptions: user18Sub2.id, idClub: clubMediasClub.id, idPaymentMethods: payMethodEfectivo.id, idGatewayTransaction: 'EF-TXN-00625', totalAmountPaid: 19950, commissionAmount: 200, clubAmount: 19750, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual junio 2026' } });
+    //#endregion
+  //#endregion
+
+  //#region 23.19. Mariana Ibáñez
+    //#region 23.19.1. user19Sub1 - 18 pagos
+    await prisma.transaction_History.create({ data: { idUser: user19.id, idUserSubscriptions: user19Sub1.id, idClub: clubBodegaPrivada.id, idPaymentMethods: payMethodMercadoPago.id, idGatewayTransaction: 'MP-TXN-00626', totalAmountPaid: 71760, commissionAmount: 200, clubAmount: 71560, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual enero 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user19.id, idUserSubscriptions: user19Sub1.id, idClub: clubBodegaPrivada.id, idPaymentMethods: payMethodMercadoPago.id, idGatewayTransaction: 'MP-TXN-00627', totalAmountPaid: 71760, commissionAmount: 200, clubAmount: 71560, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual febrero 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user19.id, idUserSubscriptions: user19Sub1.id, idClub: clubBodegaPrivada.id, idPaymentMethods: payMethodMercadoPago.id, idGatewayTransaction: 'MP-TXN-00628', totalAmountPaid: 71760, commissionAmount: 200, clubAmount: 71560, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual marzo 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user19.id, idUserSubscriptions: user19Sub1.id, idClub: clubBodegaPrivada.id, idPaymentMethods: payMethodMercadoPago.id, idGatewayTransaction: 'MP-TXN-00629', totalAmountPaid: 71760, commissionAmount: 200, clubAmount: 71560, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual abril 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user19.id, idUserSubscriptions: user19Sub1.id, idClub: clubBodegaPrivada.id, idPaymentMethods: payMethodMercadoPago.id, idGatewayTransaction: 'MP-TXN-00630', totalAmountPaid: 71760, commissionAmount: 200, clubAmount: 71560, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual mayo 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user19.id, idUserSubscriptions: user19Sub1.id, idClub: clubBodegaPrivada.id, idPaymentMethods: payMethodMercadoPago.id, idGatewayTransaction: 'MP-TXN-00631', totalAmountPaid: 71760, commissionAmount: 200, clubAmount: 71560, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual junio 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user19.id, idUserSubscriptions: user19Sub1.id, idClub: clubBodegaPrivada.id, idPaymentMethods: payMethodMercadoPago.id, idGatewayTransaction: 'MP-TXN-00632', totalAmountPaid: 71760, commissionAmount: 200, clubAmount: 71560, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual julio 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user19.id, idUserSubscriptions: user19Sub1.id, idClub: clubBodegaPrivada.id, idPaymentMethods: payMethodMercadoPago.id, idGatewayTransaction: 'MP-TXN-00633', totalAmountPaid: 71760, commissionAmount: 200, clubAmount: 71560, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual agosto 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user19.id, idUserSubscriptions: user19Sub1.id, idClub: clubBodegaPrivada.id, idPaymentMethods: payMethodMercadoPago.id, idGatewayTransaction: 'MP-TXN-00634', totalAmountPaid: 71760, commissionAmount: 200, clubAmount: 71560, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual septiembre 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user19.id, idUserSubscriptions: user19Sub1.id, idClub: clubBodegaPrivada.id, idPaymentMethods: payMethodMercadoPago.id, idGatewayTransaction: 'MP-TXN-00635', totalAmountPaid: 71760, commissionAmount: 200, clubAmount: 71560, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual octubre 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user19.id, idUserSubscriptions: user19Sub1.id, idClub: clubBodegaPrivada.id, idPaymentMethods: payMethodMercadoPago.id, idGatewayTransaction: 'MP-TXN-00636', totalAmountPaid: 71760, commissionAmount: 200, clubAmount: 71560, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual noviembre 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user19.id, idUserSubscriptions: user19Sub1.id, idClub: clubBodegaPrivada.id, idPaymentMethods: payMethodMercadoPago.id, idGatewayTransaction: 'MP-TXN-00637', totalAmountPaid: 71760, commissionAmount: 200, clubAmount: 71560, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual diciembre 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user19.id, idUserSubscriptions: user19Sub1.id, idClub: clubBodegaPrivada.id, idPaymentMethods: payMethodMercadoPago.id, idGatewayTransaction: 'MP-TXN-00638', totalAmountPaid: 71760, commissionAmount: 200, clubAmount: 71560, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual enero 2026' } });
+    await prisma.transaction_History.create({ data: { idUser: user19.id, idUserSubscriptions: user19Sub1.id, idClub: clubBodegaPrivada.id, idPaymentMethods: payMethodMercadoPago.id, idGatewayTransaction: 'MP-TXN-00639', totalAmountPaid: 71760, commissionAmount: 200, clubAmount: 71560, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual febrero 2026' } });
+    await prisma.transaction_History.create({ data: { idUser: user19.id, idUserSubscriptions: user19Sub1.id, idClub: clubBodegaPrivada.id, idPaymentMethods: payMethodMercadoPago.id, idGatewayTransaction: 'MP-TXN-00640', totalAmountPaid: 71760, commissionAmount: 200, clubAmount: 71560, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual marzo 2026' } });
+    await prisma.transaction_History.create({ data: { idUser: user19.id, idUserSubscriptions: user19Sub1.id, idClub: clubBodegaPrivada.id, idPaymentMethods: payMethodMercadoPago.id, idGatewayTransaction: 'MP-TXN-00641', totalAmountPaid: 71760, commissionAmount: 200, clubAmount: 71560, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual abril 2026' } });
+    await prisma.transaction_History.create({ data: { idUser: user19.id, idUserSubscriptions: user19Sub1.id, idClub: clubBodegaPrivada.id, idPaymentMethods: payMethodMercadoPago.id, idGatewayTransaction: 'MP-TXN-00642', totalAmountPaid: 71760, commissionAmount: 200, clubAmount: 71560, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual mayo 2026' } });
+    await prisma.transaction_History.create({ data: { idUser: user19.id, idUserSubscriptions: user19Sub1.id, idClub: clubBodegaPrivada.id, idPaymentMethods: payMethodMercadoPago.id, idGatewayTransaction: 'MP-TXN-00643', totalAmountPaid: 71760, commissionAmount: 200, clubAmount: 71560, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual junio 2026' } });
+    //#endregion
+ 
+    //#region 23.19.2. user19Sub2 - 17 pagos
+    await prisma.transaction_History.create({ data: { idUser: user19.id, idUserSubscriptions: user19Sub2.id, idClub: clubYogaBox.id, idPaymentMethods: payMethodPayPal.id, idGatewayTransaction: 'PP-TXN-00644', totalAmountPaid: 26500, commissionAmount: 200, clubAmount: 26300, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual febrero 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user19.id, idUserSubscriptions: user19Sub2.id, idClub: clubYogaBox.id, idPaymentMethods: payMethodPayPal.id, idGatewayTransaction: 'PP-TXN-00645', totalAmountPaid: 26500, commissionAmount: 200, clubAmount: 26300, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual marzo 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user19.id, idUserSubscriptions: user19Sub2.id, idClub: clubYogaBox.id, idPaymentMethods: payMethodPayPal.id, idGatewayTransaction: 'PP-TXN-00646', totalAmountPaid: 26500, commissionAmount: 200, clubAmount: 26300, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual abril 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user19.id, idUserSubscriptions: user19Sub2.id, idClub: clubYogaBox.id, idPaymentMethods: payMethodPayPal.id, idGatewayTransaction: 'PP-TXN-00647', totalAmountPaid: 26500, commissionAmount: 200, clubAmount: 26300, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual mayo 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user19.id, idUserSubscriptions: user19Sub2.id, idClub: clubYogaBox.id, idPaymentMethods: payMethodPayPal.id, idGatewayTransaction: 'PP-TXN-00648', totalAmountPaid: 26500, commissionAmount: 200, clubAmount: 26300, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual junio 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user19.id, idUserSubscriptions: user19Sub2.id, idClub: clubYogaBox.id, idPaymentMethods: payMethodPayPal.id, idGatewayTransaction: 'PP-TXN-00649', totalAmountPaid: 26500, commissionAmount: 200, clubAmount: 26300, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual julio 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user19.id, idUserSubscriptions: user19Sub2.id, idClub: clubYogaBox.id, idPaymentMethods: payMethodPayPal.id, idGatewayTransaction: 'PP-TXN-00650', totalAmountPaid: 26500, commissionAmount: 200, clubAmount: 26300, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual agosto 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user19.id, idUserSubscriptions: user19Sub2.id, idClub: clubYogaBox.id, idPaymentMethods: payMethodPayPal.id, idGatewayTransaction: 'PP-TXN-00651', totalAmountPaid: 26500, commissionAmount: 200, clubAmount: 26300, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual septiembre 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user19.id, idUserSubscriptions: user19Sub2.id, idClub: clubYogaBox.id, idPaymentMethods: payMethodPayPal.id, idGatewayTransaction: 'PP-TXN-00652', totalAmountPaid: 26500, commissionAmount: 200, clubAmount: 26300, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual octubre 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user19.id, idUserSubscriptions: user19Sub2.id, idClub: clubYogaBox.id, idPaymentMethods: payMethodPayPal.id, idGatewayTransaction: 'PP-TXN-00653', totalAmountPaid: 26500, commissionAmount: 200, clubAmount: 26300, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual noviembre 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user19.id, idUserSubscriptions: user19Sub2.id, idClub: clubYogaBox.id, idPaymentMethods: payMethodPayPal.id, idGatewayTransaction: 'PP-TXN-00654', totalAmountPaid: 26500, commissionAmount: 200, clubAmount: 26300, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual diciembre 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user19.id, idUserSubscriptions: user19Sub2.id, idClub: clubYogaBox.id, idPaymentMethods: payMethodPayPal.id, idGatewayTransaction: 'PP-TXN-00655', totalAmountPaid: 26500, commissionAmount: 200, clubAmount: 26300, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual enero 2026' } });
+    await prisma.transaction_History.create({ data: { idUser: user19.id, idUserSubscriptions: user19Sub2.id, idClub: clubYogaBox.id, idPaymentMethods: payMethodPayPal.id, idGatewayTransaction: 'PP-TXN-00656', totalAmountPaid: 26500, commissionAmount: 200, clubAmount: 26300, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual febrero 2026' } });
+    await prisma.transaction_History.create({ data: { idUser: user19.id, idUserSubscriptions: user19Sub2.id, idClub: clubYogaBox.id, idPaymentMethods: payMethodPayPal.id, idGatewayTransaction: 'PP-TXN-00657', totalAmountPaid: 26500, commissionAmount: 200, clubAmount: 26300, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual marzo 2026' } });
+    await prisma.transaction_History.create({ data: { idUser: user19.id, idUserSubscriptions: user19Sub2.id, idClub: clubYogaBox.id, idPaymentMethods: payMethodPayPal.id, idGatewayTransaction: 'PP-TXN-00658', totalAmountPaid: 26500, commissionAmount: 200, clubAmount: 26300, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual abril 2026' } });
+    await prisma.transaction_History.create({ data: { idUser: user19.id, idUserSubscriptions: user19Sub2.id, idClub: clubYogaBox.id, idPaymentMethods: payMethodPayPal.id, idGatewayTransaction: 'PP-TXN-00659', totalAmountPaid: 26500, commissionAmount: 200, clubAmount: 26300, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual mayo 2026' } });
+    await prisma.transaction_History.create({ data: { idUser: user19.id, idUserSubscriptions: user19Sub2.id, idClub: clubYogaBox.id, idPaymentMethods: payMethodPayPal.id, idGatewayTransaction: 'PP-TXN-00660', totalAmountPaid: 26500, commissionAmount: 200, clubAmount: 26300, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual junio 2026' } });
+    //#endregion
+ 
+    //#region 23.19.3. user19Sub3 - 16 pagos
+    await prisma.transaction_History.create({ data: { idUser: user19.id, idUserSubscriptions: user19Sub3.id, idClub: clubCharcuterieBox.id, idPaymentMethods: payMethodTarjetaCredito.id, idGatewayTransaction: 'TC-TXN-00661', totalAmountPaid: 29000, commissionAmount: 200, clubAmount: 28800, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual marzo 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user19.id, idUserSubscriptions: user19Sub3.id, idClub: clubCharcuterieBox.id, idPaymentMethods: payMethodTarjetaCredito.id, idGatewayTransaction: 'TC-TXN-00662', totalAmountPaid: 29000, commissionAmount: 200, clubAmount: 28800, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual abril 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user19.id, idUserSubscriptions: user19Sub3.id, idClub: clubCharcuterieBox.id, idPaymentMethods: payMethodTarjetaCredito.id, idGatewayTransaction: 'TC-TXN-00663', totalAmountPaid: 29000, commissionAmount: 200, clubAmount: 28800, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual mayo 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user19.id, idUserSubscriptions: user19Sub3.id, idClub: clubCharcuterieBox.id, idPaymentMethods: payMethodTarjetaCredito.id, idGatewayTransaction: 'TC-TXN-00664', totalAmountPaid: 29000, commissionAmount: 200, clubAmount: 28800, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual junio 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user19.id, idUserSubscriptions: user19Sub3.id, idClub: clubCharcuterieBox.id, idPaymentMethods: payMethodTarjetaCredito.id, idGatewayTransaction: 'TC-TXN-00665', totalAmountPaid: 29000, commissionAmount: 200, clubAmount: 28800, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual julio 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user19.id, idUserSubscriptions: user19Sub3.id, idClub: clubCharcuterieBox.id, idPaymentMethods: payMethodTarjetaCredito.id, idGatewayTransaction: 'TC-TXN-00666', totalAmountPaid: 29000, commissionAmount: 200, clubAmount: 28800, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual agosto 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user19.id, idUserSubscriptions: user19Sub3.id, idClub: clubCharcuterieBox.id, idPaymentMethods: payMethodTarjetaCredito.id, idGatewayTransaction: 'TC-TXN-00667', totalAmountPaid: 29000, commissionAmount: 200, clubAmount: 28800, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual septiembre 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user19.id, idUserSubscriptions: user19Sub3.id, idClub: clubCharcuterieBox.id, idPaymentMethods: payMethodTarjetaCredito.id, idGatewayTransaction: 'TC-TXN-00668', totalAmountPaid: 29000, commissionAmount: 200, clubAmount: 28800, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual octubre 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user19.id, idUserSubscriptions: user19Sub3.id, idClub: clubCharcuterieBox.id, idPaymentMethods: payMethodTarjetaCredito.id, idGatewayTransaction: 'TC-TXN-00669', totalAmountPaid: 29000, commissionAmount: 200, clubAmount: 28800, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual noviembre 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user19.id, idUserSubscriptions: user19Sub3.id, idClub: clubCharcuterieBox.id, idPaymentMethods: payMethodTarjetaCredito.id, idGatewayTransaction: 'TC-TXN-00670', totalAmountPaid: 29000, commissionAmount: 200, clubAmount: 28800, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual diciembre 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user19.id, idUserSubscriptions: user19Sub3.id, idClub: clubCharcuterieBox.id, idPaymentMethods: payMethodTarjetaCredito.id, idGatewayTransaction: 'TC-TXN-00671', totalAmountPaid: 29000, commissionAmount: 200, clubAmount: 28800, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual enero 2026' } });
+    await prisma.transaction_History.create({ data: { idUser: user19.id, idUserSubscriptions: user19Sub3.id, idClub: clubCharcuterieBox.id, idPaymentMethods: payMethodTarjetaCredito.id, idGatewayTransaction: 'TC-TXN-00672', totalAmountPaid: 29000, commissionAmount: 200, clubAmount: 28800, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual febrero 2026' } });
+    await prisma.transaction_History.create({ data: { idUser: user19.id, idUserSubscriptions: user19Sub3.id, idClub: clubCharcuterieBox.id, idPaymentMethods: payMethodTarjetaCredito.id, idGatewayTransaction: 'TC-TXN-00673', totalAmountPaid: 29000, commissionAmount: 200, clubAmount: 28800, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual marzo 2026' } });
+    await prisma.transaction_History.create({ data: { idUser: user19.id, idUserSubscriptions: user19Sub3.id, idClub: clubCharcuterieBox.id, idPaymentMethods: payMethodTarjetaCredito.id, idGatewayTransaction: 'TC-TXN-00674', totalAmountPaid: 29000, commissionAmount: 200, clubAmount: 28800, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual abril 2026' } });
+    await prisma.transaction_History.create({ data: { idUser: user19.id, idUserSubscriptions: user19Sub3.id, idClub: clubCharcuterieBox.id, idPaymentMethods: payMethodTarjetaCredito.id, idGatewayTransaction: 'TC-TXN-00675', totalAmountPaid: 29000, commissionAmount: 200, clubAmount: 28800, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual mayo 2026' } });
+    await prisma.transaction_History.create({ data: { idUser: user19.id, idUserSubscriptions: user19Sub3.id, idClub: clubCharcuterieBox.id, idPaymentMethods: payMethodTarjetaCredito.id, idGatewayTransaction: 'TC-TXN-00676', totalAmountPaid: 29000, commissionAmount: 200, clubAmount: 28800, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual junio 2026' } });
+    //#endregion
+  //#endregion
+
+  //#region 23.20. Sebastián Quiroga
+    //#region 23.20.1. user20Sub1 - 18 pagos
+    await prisma.transaction_History.create({ data: { idUser: user20.id, idUserSubscriptions: user20Sub1.id, idClub: clubFosilesClub.id, idPaymentMethods: payMethodEfectivo.id, idGatewayTransaction: 'EF-TXN-00677', totalAmountPaid: 35805, commissionAmount: 200, clubAmount: 35605, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual enero 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user20.id, idUserSubscriptions: user20Sub1.id, idClub: clubFosilesClub.id, idPaymentMethods: payMethodEfectivo.id, idGatewayTransaction: 'EF-TXN-00678', totalAmountPaid: 35805, commissionAmount: 200, clubAmount: 35605, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual febrero 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user20.id, idUserSubscriptions: user20Sub1.id, idClub: clubFosilesClub.id, idPaymentMethods: payMethodEfectivo.id, idGatewayTransaction: 'EF-TXN-00679', totalAmountPaid: 35805, commissionAmount: 200, clubAmount: 35605, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual marzo 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user20.id, idUserSubscriptions: user20Sub1.id, idClub: clubFosilesClub.id, idPaymentMethods: payMethodEfectivo.id, idGatewayTransaction: 'EF-TXN-00680', totalAmountPaid: 35805, commissionAmount: 200, clubAmount: 35605, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual abril 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user20.id, idUserSubscriptions: user20Sub1.id, idClub: clubFosilesClub.id, idPaymentMethods: payMethodEfectivo.id, idGatewayTransaction: 'EF-TXN-00681', totalAmountPaid: 35805, commissionAmount: 200, clubAmount: 35605, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual mayo 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user20.id, idUserSubscriptions: user20Sub1.id, idClub: clubFosilesClub.id, idPaymentMethods: payMethodEfectivo.id, idGatewayTransaction: 'EF-TXN-00682', totalAmountPaid: 35805, commissionAmount: 200, clubAmount: 35605, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual junio 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user20.id, idUserSubscriptions: user20Sub1.id, idClub: clubFosilesClub.id, idPaymentMethods: payMethodEfectivo.id, idGatewayTransaction: 'EF-TXN-00683', totalAmountPaid: 35805, commissionAmount: 200, clubAmount: 35605, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual julio 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user20.id, idUserSubscriptions: user20Sub1.id, idClub: clubFosilesClub.id, idPaymentMethods: payMethodEfectivo.id, idGatewayTransaction: 'EF-TXN-00684', totalAmountPaid: 35805, commissionAmount: 200, clubAmount: 35605, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual agosto 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user20.id, idUserSubscriptions: user20Sub1.id, idClub: clubFosilesClub.id, idPaymentMethods: payMethodEfectivo.id, idGatewayTransaction: 'EF-TXN-00685', totalAmountPaid: 35805, commissionAmount: 200, clubAmount: 35605, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual septiembre 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user20.id, idUserSubscriptions: user20Sub1.id, idClub: clubFosilesClub.id, idPaymentMethods: payMethodEfectivo.id, idGatewayTransaction: 'EF-TXN-00686', totalAmountPaid: 35805, commissionAmount: 200, clubAmount: 35605, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual octubre 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user20.id, idUserSubscriptions: user20Sub1.id, idClub: clubFosilesClub.id, idPaymentMethods: payMethodEfectivo.id, idGatewayTransaction: 'EF-TXN-00687', totalAmountPaid: 35805, commissionAmount: 200, clubAmount: 35605, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual noviembre 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user20.id, idUserSubscriptions: user20Sub1.id, idClub: clubFosilesClub.id, idPaymentMethods: payMethodEfectivo.id, idGatewayTransaction: 'EF-TXN-00688', totalAmountPaid: 35805, commissionAmount: 200, clubAmount: 35605, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual diciembre 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user20.id, idUserSubscriptions: user20Sub1.id, idClub: clubFosilesClub.id, idPaymentMethods: payMethodEfectivo.id, idGatewayTransaction: 'EF-TXN-00689', totalAmountPaid: 35805, commissionAmount: 200, clubAmount: 35605, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual enero 2026' } });
+    await prisma.transaction_History.create({ data: { idUser: user20.id, idUserSubscriptions: user20Sub1.id, idClub: clubFosilesClub.id, idPaymentMethods: payMethodEfectivo.id, idGatewayTransaction: 'EF-TXN-00690', totalAmountPaid: 35805, commissionAmount: 200, clubAmount: 35605, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual febrero 2026' } });
+    await prisma.transaction_History.create({ data: { idUser: user20.id, idUserSubscriptions: user20Sub1.id, idClub: clubFosilesClub.id, idPaymentMethods: payMethodEfectivo.id, idGatewayTransaction: 'EF-TXN-00691', totalAmountPaid: 35805, commissionAmount: 200, clubAmount: 35605, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual marzo 2026' } });
+    await prisma.transaction_History.create({ data: { idUser: user20.id, idUserSubscriptions: user20Sub1.id, idClub: clubFosilesClub.id, idPaymentMethods: payMethodEfectivo.id, idGatewayTransaction: 'EF-TXN-00692', totalAmountPaid: 35805, commissionAmount: 200, clubAmount: 35605, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual abril 2026' } });
+    await prisma.transaction_History.create({ data: { idUser: user20.id, idUserSubscriptions: user20Sub1.id, idClub: clubFosilesClub.id, idPaymentMethods: payMethodEfectivo.id, idGatewayTransaction: 'EF-TXN-00693', totalAmountPaid: 35805, commissionAmount: 200, clubAmount: 35605, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual mayo 2026' } });
+    await prisma.transaction_History.create({ data: { idUser: user20.id, idUserSubscriptions: user20Sub1.id, idClub: clubFosilesClub.id, idPaymentMethods: payMethodEfectivo.id, idGatewayTransaction: 'EF-TXN-00694', totalAmountPaid: 35805, commissionAmount: 200, clubAmount: 35605, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago mensual junio 2026' } });
+    //#endregion
+ 
+    //#region 23.20.2. user20Sub2 - 6 pagos 
+    await prisma.transaction_History.create({ data: { idUser: user20.id, idUserSubscriptions: user20Sub2.id, idClub: clubBonvivir.id, idPaymentMethods: payMethodMercadoPago.id, idGatewayTransaction: 'MP-TXN-00695', totalAmountPaid: 72000, commissionAmount: 200, clubAmount: 71800, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago trimestral enero 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user20.id, idUserSubscriptions: user20Sub2.id, idClub: clubBonvivir.id, idPaymentMethods: payMethodMercadoPago.id, idGatewayTransaction: 'MP-TXN-00696', totalAmountPaid: 72000, commissionAmount: 200, clubAmount: 71800, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago trimestral abril 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user20.id, idUserSubscriptions: user20Sub2.id, idClub: clubBonvivir.id, idPaymentMethods: payMethodMercadoPago.id, idGatewayTransaction: 'MP-TXN-00697', totalAmountPaid: 72000, commissionAmount: 200, clubAmount: 71800, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago trimestral julio 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user20.id, idUserSubscriptions: user20Sub2.id, idClub: clubBonvivir.id, idPaymentMethods: payMethodMercadoPago.id, idGatewayTransaction: 'MP-TXN-00698', totalAmountPaid: 72000, commissionAmount: 200, clubAmount: 71800, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago trimestral octubre 2025' } });
+    await prisma.transaction_History.create({ data: { idUser: user20.id, idUserSubscriptions: user20Sub2.id, idClub: clubBonvivir.id, idPaymentMethods: payMethodMercadoPago.id, idGatewayTransaction: 'MP-TXN-00699', totalAmountPaid: 72000, commissionAmount: 200, clubAmount: 71800, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago trimestral enero 2026' } });
+    await prisma.transaction_History.create({ data: { idUser: user20.id, idUserSubscriptions: user20Sub2.id, idClub: clubBonvivir.id, idPaymentMethods: payMethodMercadoPago.id, idGatewayTransaction: 'MP-TXN-00700', totalAmountPaid: 72000, commissionAmount: 200, clubAmount: 71800, paymentStatus: PaymentStatus.Exitoso, paymentNotes: 'Pago trimestral abril 2026' } });
+    //#endregion
+  //#endregion
+//#endregion
+
+//#region 24. SHIPMENTS
+
+  //#region 24.1. Lucía Ramírez - Buenos Aires
+    //#region 24.1.1. user1Sub1 / Manjar Narrativa - Correo Argentino - 18 envíos
+    await prisma.shipments.create({ data: { idUser: user.id, idUserSubscriptions: user1Sub1.id, idClub: clubManjarLiterario.id, boxMonthYear: '2025-01', estimatedDeliveryStartDate: new Date('2025-01-08'), estimatedDeliveryEndDate: new Date('2025-01-18'), actualDeliveryDate: new Date('2025-01-13'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000001', logisticsCompany: 'Correo Argentino', shippingCost: 1200, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user.id, idUserSubscriptions: user1Sub1.id, idClub: clubManjarLiterario.id, boxMonthYear: '2025-02', estimatedDeliveryStartDate: new Date('2025-02-08'), estimatedDeliveryEndDate: new Date('2025-02-18'), actualDeliveryDate: new Date('2025-02-11'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000002', logisticsCompany: 'Correo Argentino', shippingCost: 1200, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user.id, idUserSubscriptions: user1Sub1.id, idClub: clubManjarLiterario.id, boxMonthYear: '2025-03', estimatedDeliveryStartDate: new Date('2025-03-08'), estimatedDeliveryEndDate: new Date('2025-03-18'), actualDeliveryDate: new Date('2025-03-15'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000003', logisticsCompany: 'Correo Argentino', shippingCost: 1200, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user.id, idUserSubscriptions: user1Sub1.id, idClub: clubManjarLiterario.id, boxMonthYear: '2025-04', estimatedDeliveryStartDate: new Date('2025-04-08'), estimatedDeliveryEndDate: new Date('2025-04-18'), actualDeliveryDate: new Date('2025-04-10'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000004', logisticsCompany: 'Correo Argentino', shippingCost: 1200, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user.id, idUserSubscriptions: user1Sub1.id, idClub: clubManjarLiterario.id, boxMonthYear: '2025-05', estimatedDeliveryStartDate: new Date('2025-05-08'), estimatedDeliveryEndDate: new Date('2025-05-18'), actualDeliveryDate: new Date('2025-05-14'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000005', logisticsCompany: 'Correo Argentino', shippingCost: 1200, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user.id, idUserSubscriptions: user1Sub1.id, idClub: clubManjarLiterario.id, boxMonthYear: '2025-06', estimatedDeliveryStartDate: new Date('2025-06-08'), estimatedDeliveryEndDate: new Date('2025-06-18'), actualDeliveryDate: new Date('2025-06-12'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000006', logisticsCompany: 'Correo Argentino', shippingCost: 1200, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user.id, idUserSubscriptions: user1Sub1.id, idClub: clubManjarLiterario.id, boxMonthYear: '2025-07', estimatedDeliveryStartDate: new Date('2025-07-08'), estimatedDeliveryEndDate: new Date('2025-07-18'), actualDeliveryDate: new Date('2025-07-16'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000007', logisticsCompany: 'Correo Argentino', shippingCost: 1200, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user.id, idUserSubscriptions: user1Sub1.id, idClub: clubManjarLiterario.id, boxMonthYear: '2025-08', estimatedDeliveryStartDate: new Date('2025-08-08'), estimatedDeliveryEndDate: new Date('2025-08-18'), actualDeliveryDate: new Date('2025-08-09'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000008', logisticsCompany: 'Correo Argentino', shippingCost: 1200, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user.id, idUserSubscriptions: user1Sub1.id, idClub: clubManjarLiterario.id, boxMonthYear: '2025-09', estimatedDeliveryStartDate: new Date('2025-09-08'), estimatedDeliveryEndDate: new Date('2025-09-18'), actualDeliveryDate: new Date('2025-09-13'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000009', logisticsCompany: 'Correo Argentino', shippingCost: 1200, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user.id, idUserSubscriptions: user1Sub1.id, idClub: clubManjarLiterario.id, boxMonthYear: '2025-10', estimatedDeliveryStartDate: new Date('2025-10-08'), estimatedDeliveryEndDate: new Date('2025-10-18'), actualDeliveryDate: new Date('2025-10-17'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000010', logisticsCompany: 'Correo Argentino', shippingCost: 1200, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user.id, idUserSubscriptions: user1Sub1.id, idClub: clubManjarLiterario.id, boxMonthYear: '2025-11', estimatedDeliveryStartDate: new Date('2025-11-08'), estimatedDeliveryEndDate: new Date('2025-11-18'), actualDeliveryDate: new Date('2025-11-11'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000011', logisticsCompany: 'Correo Argentino', shippingCost: 1200, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user.id, idUserSubscriptions: user1Sub1.id, idClub: clubManjarLiterario.id, boxMonthYear: '2025-12', estimatedDeliveryStartDate: new Date('2025-12-08'), estimatedDeliveryEndDate: new Date('2025-12-18'), actualDeliveryDate: new Date('2025-12-15'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000012', logisticsCompany: 'Correo Argentino', shippingCost: 1200, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user.id, idUserSubscriptions: user1Sub1.id, idClub: clubManjarLiterario.id, boxMonthYear: '2026-01', estimatedDeliveryStartDate: new Date('2026-01-08'), estimatedDeliveryEndDate: new Date('2026-01-18'), actualDeliveryDate: new Date('2026-01-10'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000013', logisticsCompany: 'Correo Argentino', shippingCost: 1200, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user.id, idUserSubscriptions: user1Sub1.id, idClub: clubManjarLiterario.id, boxMonthYear: '2026-02', estimatedDeliveryStartDate: new Date('2026-02-08'), estimatedDeliveryEndDate: new Date('2026-02-18'), actualDeliveryDate: new Date('2026-02-14'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000014', logisticsCompany: 'Correo Argentino', shippingCost: 1200, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user.id, idUserSubscriptions: user1Sub1.id, idClub: clubManjarLiterario.id, boxMonthYear: '2026-03', estimatedDeliveryStartDate: new Date('2026-03-08'), estimatedDeliveryEndDate: new Date('2026-03-18'), actualDeliveryDate: new Date('2026-03-12'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000015', logisticsCompany: 'Correo Argentino', shippingCost: 1200, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user.id, idUserSubscriptions: user1Sub1.id, idClub: clubManjarLiterario.id, boxMonthYear: '2026-04', estimatedDeliveryStartDate: new Date('2026-04-08'), estimatedDeliveryEndDate: new Date('2026-04-18'), actualDeliveryDate: new Date('2026-04-16'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000016', logisticsCompany: 'Correo Argentino', shippingCost: 1200, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user.id, idUserSubscriptions: user1Sub1.id, idClub: clubManjarLiterario.id, boxMonthYear: '2026-05', estimatedDeliveryStartDate: new Date('2026-05-08'), estimatedDeliveryEndDate: new Date('2026-05-18'), actualDeliveryDate: new Date('2026-05-13'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000017', logisticsCompany: 'Correo Argentino', shippingCost: 1200, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user.id, idUserSubscriptions: user1Sub1.id, idClub: clubManjarLiterario.id, boxMonthYear: '2026-06', estimatedDeliveryStartDate: new Date('2026-06-08'), estimatedDeliveryEndDate: new Date('2026-06-18'), actualDeliveryDate: null, shipmentStatus: ShipmentStatus.En_Camino, trackingNumber: 'CA-000018', logisticsCompany: 'Correo Argentino', shippingCost: 1200, shippingNotes: null } });
+    //#endregion
+    
+    //#region 24.1.2. user1Sub2 / Café Selecto = Correo Argentino = 17 envíos 
+    await prisma.shipments.create({ data: { idUser: user.id, idUserSubscriptions: user1Sub2.id, idClub: clubCafeSelecto.id, boxMonthYear: '2025-02', estimatedDeliveryStartDate: new Date('2025-02-12'), estimatedDeliveryEndDate: new Date('2025-02-22'), actualDeliveryDate: new Date('2025-02-17'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000019', logisticsCompany: 'Correo Argentino', shippingCost: 1200, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user.id, idUserSubscriptions: user1Sub2.id, idClub: clubCafeSelecto.id, boxMonthYear: '2025-03', estimatedDeliveryStartDate: new Date('2025-03-12'), estimatedDeliveryEndDate: new Date('2025-03-22'), actualDeliveryDate: new Date('2025-03-19'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000020', logisticsCompany: 'Correo Argentino', shippingCost: 1200, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user.id, idUserSubscriptions: user1Sub2.id, idClub: clubCafeSelecto.id, boxMonthYear: '2025-04', estimatedDeliveryStartDate: new Date('2025-04-12'), estimatedDeliveryEndDate: new Date('2025-04-22'), actualDeliveryDate: new Date('2025-04-14'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000021', logisticsCompany: 'Correo Argentino', shippingCost: 1200, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user.id, idUserSubscriptions: user1Sub2.id, idClub: clubCafeSelecto.id, boxMonthYear: '2025-05', estimatedDeliveryStartDate: new Date('2025-05-12'), estimatedDeliveryEndDate: new Date('2025-05-22'), actualDeliveryDate: new Date('2025-05-20'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000022', logisticsCompany: 'Correo Argentino', shippingCost: 1200, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user.id, idUserSubscriptions: user1Sub2.id, idClub: clubCafeSelecto.id, boxMonthYear: '2025-06', estimatedDeliveryStartDate: new Date('2025-06-12'), estimatedDeliveryEndDate: new Date('2025-06-22'), actualDeliveryDate: new Date('2025-06-13'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000023', logisticsCompany: 'Correo Argentino', shippingCost: 1200, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user.id, idUserSubscriptions: user1Sub2.id, idClub: clubCafeSelecto.id, boxMonthYear: '2025-07', estimatedDeliveryStartDate: new Date('2025-07-12'), estimatedDeliveryEndDate: new Date('2025-07-22'), actualDeliveryDate: new Date('2025-07-18'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000024', logisticsCompany: 'Correo Argentino', shippingCost: 1200, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user.id, idUserSubscriptions: user1Sub2.id, idClub: clubCafeSelecto.id, boxMonthYear: '2025-08', estimatedDeliveryStartDate: new Date('2025-08-12'), estimatedDeliveryEndDate: new Date('2025-08-22'), actualDeliveryDate: new Date('2025-08-15'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000025', logisticsCompany: 'Correo Argentino', shippingCost: 1200, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user.id, idUserSubscriptions: user1Sub2.id, idClub: clubCafeSelecto.id, boxMonthYear: '2025-09', estimatedDeliveryStartDate: new Date('2025-09-12'), estimatedDeliveryEndDate: new Date('2025-09-22'), actualDeliveryDate: new Date('2025-09-21'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000026', logisticsCompany: 'Correo Argentino', shippingCost: 1200, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user.id, idUserSubscriptions: user1Sub2.id, idClub: clubCafeSelecto.id, boxMonthYear: '2025-10', estimatedDeliveryStartDate: new Date('2025-10-12'), estimatedDeliveryEndDate: new Date('2025-10-22'), actualDeliveryDate: new Date('2025-10-16'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000027', logisticsCompany: 'Correo Argentino', shippingCost: 1200, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user.id, idUserSubscriptions: user1Sub2.id, idClub: clubCafeSelecto.id, boxMonthYear: '2025-11', estimatedDeliveryStartDate: new Date('2025-11-12'), estimatedDeliveryEndDate: new Date('2025-11-22'), actualDeliveryDate: new Date('2025-11-20'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000028', logisticsCompany: 'Correo Argentino', shippingCost: 1200, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user.id, idUserSubscriptions: user1Sub2.id, idClub: clubCafeSelecto.id, boxMonthYear: '2025-12', estimatedDeliveryStartDate: new Date('2025-12-12'), estimatedDeliveryEndDate: new Date('2025-12-22'), actualDeliveryDate: new Date('2025-12-14'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000029', logisticsCompany: 'Correo Argentino', shippingCost: 1200, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user.id, idUserSubscriptions: user1Sub2.id, idClub: clubCafeSelecto.id, boxMonthYear: '2026-01', estimatedDeliveryStartDate: new Date('2026-01-12'), estimatedDeliveryEndDate: new Date('2026-01-22'), actualDeliveryDate: new Date('2026-01-19'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000030', logisticsCompany: 'Correo Argentino', shippingCost: 1200, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user.id, idUserSubscriptions: user1Sub2.id, idClub: clubCafeSelecto.id, boxMonthYear: '2026-02', estimatedDeliveryStartDate: new Date('2026-02-12'), estimatedDeliveryEndDate: new Date('2026-02-22'), actualDeliveryDate: new Date('2026-02-18'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000031', logisticsCompany: 'Correo Argentino', shippingCost: 1200, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user.id, idUserSubscriptions: user1Sub2.id, idClub: clubCafeSelecto.id, boxMonthYear: '2026-03', estimatedDeliveryStartDate: new Date('2026-03-12'), estimatedDeliveryEndDate: new Date('2026-03-22'), actualDeliveryDate: new Date('2026-03-13'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000032', logisticsCompany: 'Correo Argentino', shippingCost: 1200, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user.id, idUserSubscriptions: user1Sub2.id, idClub: clubCafeSelecto.id, boxMonthYear: '2026-04', estimatedDeliveryStartDate: new Date('2026-04-12'), estimatedDeliveryEndDate: new Date('2026-04-22'), actualDeliveryDate: new Date('2026-04-21'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000033', logisticsCompany: 'Correo Argentino', shippingCost: 1200, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user.id, idUserSubscriptions: user1Sub2.id, idClub: clubCafeSelecto.id, boxMonthYear: '2026-05', estimatedDeliveryStartDate: new Date('2026-05-12'), estimatedDeliveryEndDate: new Date('2026-05-22'), actualDeliveryDate: new Date('2026-05-17'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000034', logisticsCompany: 'Correo Argentino', shippingCost: 1200, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user.id, idUserSubscriptions: user1Sub2.id, idClub: clubCafeSelecto.id, boxMonthYear: '2026-06', estimatedDeliveryStartDate: new Date('2026-06-12'), estimatedDeliveryEndDate: new Date('2026-06-22'), actualDeliveryDate: null, shipmentStatus: ShipmentStatus.Pendiente, trackingNumber: 'CA-000035', logisticsCompany: 'Correo Argentino', shippingCost: 1200, shippingNotes: null } });
+    //#endregion
+  //#endregion
+
+  //#region 24.2. Tomás Herrera - Buenos Aires
+    //#region 24.2.1. user2Sub1 / Bonvivir Selección Exclusiva = OCA = 18 envíos
+    await prisma.shipments.create({ data: { idUser: user2.id, idUserSubscriptions: user2Sub1.id, idClub: clubBonvivir.id, boxMonthYear: '2025-01', estimatedDeliveryStartDate: new Date('2025-01-05'), estimatedDeliveryEndDate: new Date('2025-01-15'), actualDeliveryDate: new Date('2025-01-09'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'OCA-000001', logisticsCompany: 'OCA', shippingCost: 1800, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user2.id, idUserSubscriptions: user2Sub1.id, idClub: clubBonvivir.id, boxMonthYear: '2025-02', estimatedDeliveryStartDate: new Date('2025-02-05'), estimatedDeliveryEndDate: new Date('2025-02-15'), actualDeliveryDate: new Date('2025-02-12'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'OCA-000002', logisticsCompany: 'OCA', shippingCost: 1800, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user2.id, idUserSubscriptions: user2Sub1.id, idClub: clubBonvivir.id, boxMonthYear: '2025-03', estimatedDeliveryStartDate: new Date('2025-03-05'), estimatedDeliveryEndDate: new Date('2025-03-15'), actualDeliveryDate: new Date('2025-03-07'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'OCA-000003', logisticsCompany: 'OCA', shippingCost: 1800, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user2.id, idUserSubscriptions: user2Sub1.id, idClub: clubBonvivir.id, boxMonthYear: '2025-04', estimatedDeliveryStartDate: new Date('2025-04-05'), estimatedDeliveryEndDate: new Date('2025-04-15'), actualDeliveryDate: new Date('2025-04-13'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'OCA-000004', logisticsCompany: 'OCA', shippingCost: 1800, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user2.id, idUserSubscriptions: user2Sub1.id, idClub: clubBonvivir.id, boxMonthYear: '2025-05', estimatedDeliveryStartDate: new Date('2025-05-05'), estimatedDeliveryEndDate: new Date('2025-05-15'), actualDeliveryDate: new Date('2025-05-08'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'OCA-000005', logisticsCompany: 'OCA', shippingCost: 1800, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user2.id, idUserSubscriptions: user2Sub1.id, idClub: clubBonvivir.id, boxMonthYear: '2025-06', estimatedDeliveryStartDate: new Date('2025-06-05'), estimatedDeliveryEndDate: new Date('2025-06-15'), actualDeliveryDate: new Date('2025-06-11'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'OCA-000006', logisticsCompany: 'OCA', shippingCost: 1800, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user2.id, idUserSubscriptions: user2Sub1.id, idClub: clubBonvivir.id, boxMonthYear: '2025-07', estimatedDeliveryStartDate: new Date('2025-07-05'), estimatedDeliveryEndDate: new Date('2025-07-15'), actualDeliveryDate: new Date('2025-07-10'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'OCA-000007', logisticsCompany: 'OCA', shippingCost: 1800, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user2.id, idUserSubscriptions: user2Sub1.id, idClub: clubBonvivir.id, boxMonthYear: '2025-08', estimatedDeliveryStartDate: new Date('2025-08-05'), estimatedDeliveryEndDate: new Date('2025-08-15'), actualDeliveryDate: new Date('2025-08-06'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'OCA-000008', logisticsCompany: 'OCA', shippingCost: 1800, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user2.id, idUserSubscriptions: user2Sub1.id, idClub: clubBonvivir.id, boxMonthYear: '2025-09', estimatedDeliveryStartDate: new Date('2025-09-05'), estimatedDeliveryEndDate: new Date('2025-09-15'), actualDeliveryDate: new Date('2025-09-14'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'OCA-000009', logisticsCompany: 'OCA', shippingCost: 1800, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user2.id, idUserSubscriptions: user2Sub1.id, idClub: clubBonvivir.id, boxMonthYear: '2025-10', estimatedDeliveryStartDate: new Date('2025-10-05'), estimatedDeliveryEndDate: new Date('2025-10-15'), actualDeliveryDate: new Date('2025-10-09'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'OCA-000010', logisticsCompany: 'OCA', shippingCost: 1800, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user2.id, idUserSubscriptions: user2Sub1.id, idClub: clubBonvivir.id, boxMonthYear: '2025-11', estimatedDeliveryStartDate: new Date('2025-11-05'), estimatedDeliveryEndDate: new Date('2025-11-15'), actualDeliveryDate: new Date('2025-11-13'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'OCA-000011', logisticsCompany: 'OCA', shippingCost: 1800, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user2.id, idUserSubscriptions: user2Sub1.id, idClub: clubBonvivir.id, boxMonthYear: '2025-12', estimatedDeliveryStartDate: new Date('2025-12-05'), estimatedDeliveryEndDate: new Date('2025-12-15'), actualDeliveryDate: new Date('2025-12-07'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'OCA-000012', logisticsCompany: 'OCA', shippingCost: 1800, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user2.id, idUserSubscriptions: user2Sub1.id, idClub: clubBonvivir.id, boxMonthYear: '2026-01', estimatedDeliveryStartDate: new Date('2026-01-05'), estimatedDeliveryEndDate: new Date('2026-01-15'), actualDeliveryDate: new Date('2026-01-11'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'OCA-000013', logisticsCompany: 'OCA', shippingCost: 1800, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user2.id, idUserSubscriptions: user2Sub1.id, idClub: clubBonvivir.id, boxMonthYear: '2026-02', estimatedDeliveryStartDate: new Date('2026-02-05'), estimatedDeliveryEndDate: new Date('2026-02-15'), actualDeliveryDate: new Date('2026-02-08'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'OCA-000014', logisticsCompany: 'OCA', shippingCost: 1800, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user2.id, idUserSubscriptions: user2Sub1.id, idClub: clubBonvivir.id, boxMonthYear: '2026-03', estimatedDeliveryStartDate: new Date('2026-03-05'), estimatedDeliveryEndDate: new Date('2026-03-15'), actualDeliveryDate: new Date('2026-03-14'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'OCA-000015', logisticsCompany: 'OCA', shippingCost: 1800, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user2.id, idUserSubscriptions: user2Sub1.id, idClub: clubBonvivir.id, boxMonthYear: '2026-04', estimatedDeliveryStartDate: new Date('2026-04-05'), estimatedDeliveryEndDate: new Date('2026-04-15'), actualDeliveryDate: new Date('2026-04-06'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'OCA-000016', logisticsCompany: 'OCA', shippingCost: 1800, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user2.id, idUserSubscriptions: user2Sub1.id, idClub: clubBonvivir.id, boxMonthYear: '2026-05', estimatedDeliveryStartDate: new Date('2026-05-05'), estimatedDeliveryEndDate: new Date('2026-05-15'), actualDeliveryDate: new Date('2026-05-12'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'OCA-000017', logisticsCompany: 'OCA', shippingCost: 1800, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user2.id, idUserSubscriptions: user2Sub1.id, idClub: clubBonvivir.id, boxMonthYear: '2026-06', estimatedDeliveryStartDate: new Date('2026-06-05'), estimatedDeliveryEndDate: new Date('2026-06-15'), actualDeliveryDate: null, shipmentStatus: ShipmentStatus.En_Camino, trackingNumber: 'OCA-000018', logisticsCompany: 'OCA', shippingCost: 1800, shippingNotes: null } });
+    //#endregion
+
+    //#region 24.2.2. user2Sub2 / Encantada Libros = Correo Argentino = 17 envíos 
+    await prisma.shipments.create({ data: { idUser: user2.id, idUserSubscriptions: user2Sub2.id, idClub: clubEncantadaLibros.id, boxMonthYear: '2025-02', estimatedDeliveryStartDate: new Date('2025-02-10'), estimatedDeliveryEndDate: new Date('2025-02-20'), actualDeliveryDate: new Date('2025-02-15'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000036', logisticsCompany: 'Correo Argentino', shippingCost: 1200, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user2.id, idUserSubscriptions: user2Sub2.id, idClub: clubEncantadaLibros.id, boxMonthYear: '2025-03', estimatedDeliveryStartDate: new Date('2025-03-10'), estimatedDeliveryEndDate: new Date('2025-03-20'), actualDeliveryDate: new Date('2025-03-18'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000037', logisticsCompany: 'Correo Argentino', shippingCost: 1200, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user2.id, idUserSubscriptions: user2Sub2.id, idClub: clubEncantadaLibros.id, boxMonthYear: '2025-04', estimatedDeliveryStartDate: new Date('2025-04-10'), estimatedDeliveryEndDate: new Date('2025-04-20'), actualDeliveryDate: new Date('2025-04-11'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000038', logisticsCompany: 'Correo Argentino', shippingCost: 1200, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user2.id, idUserSubscriptions: user2Sub2.id, idClub: clubEncantadaLibros.id, boxMonthYear: '2025-05', estimatedDeliveryStartDate: new Date('2025-05-10'), estimatedDeliveryEndDate: new Date('2025-05-20'), actualDeliveryDate: new Date('2025-05-19'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000039', logisticsCompany: 'Correo Argentino', shippingCost: 1200, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user2.id, idUserSubscriptions: user2Sub2.id, idClub: clubEncantadaLibros.id, boxMonthYear: '2025-06', estimatedDeliveryStartDate: new Date('2025-06-10'), estimatedDeliveryEndDate: new Date('2025-06-20'), actualDeliveryDate: new Date('2025-06-16'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000040', logisticsCompany: 'Correo Argentino', shippingCost: 1200, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user2.id, idUserSubscriptions: user2Sub2.id, idClub: clubEncantadaLibros.id, boxMonthYear: '2025-07', estimatedDeliveryStartDate: new Date('2025-07-10'), estimatedDeliveryEndDate: new Date('2025-07-20'), actualDeliveryDate: new Date('2025-07-12'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000041', logisticsCompany: 'Correo Argentino', shippingCost: 1200, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user2.id, idUserSubscriptions: user2Sub2.id, idClub: clubEncantadaLibros.id, boxMonthYear: '2025-08', estimatedDeliveryStartDate: new Date('2025-08-10'), estimatedDeliveryEndDate: new Date('2025-08-20'), actualDeliveryDate: new Date('2025-08-18'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000042', logisticsCompany: 'Correo Argentino', shippingCost: 1200, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user2.id, idUserSubscriptions: user2Sub2.id, idClub: clubEncantadaLibros.id, boxMonthYear: '2025-09', estimatedDeliveryStartDate: new Date('2025-09-10'), estimatedDeliveryEndDate: new Date('2025-09-20'), actualDeliveryDate: new Date('2025-09-13'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000043', logisticsCompany: 'Correo Argentino', shippingCost: 1200, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user2.id, idUserSubscriptions: user2Sub2.id, idClub: clubEncantadaLibros.id, boxMonthYear: '2025-10', estimatedDeliveryStartDate: new Date('2025-10-10'), estimatedDeliveryEndDate: new Date('2025-10-20'), actualDeliveryDate: new Date('2025-10-17'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000044', logisticsCompany: 'Correo Argentino', shippingCost: 1200, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user2.id, idUserSubscriptions: user2Sub2.id, idClub: clubEncantadaLibros.id, boxMonthYear: '2025-11', estimatedDeliveryStartDate: new Date('2025-11-10'), estimatedDeliveryEndDate: new Date('2025-11-20'), actualDeliveryDate: new Date('2025-11-14'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000045', logisticsCompany: 'Correo Argentino', shippingCost: 1200, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user2.id, idUserSubscriptions: user2Sub2.id, idClub: clubEncantadaLibros.id, boxMonthYear: '2025-12', estimatedDeliveryStartDate: new Date('2025-12-10'), estimatedDeliveryEndDate: new Date('2025-12-20'), actualDeliveryDate: new Date('2025-12-19'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000046', logisticsCompany: 'Correo Argentino', shippingCost: 1200, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user2.id, idUserSubscriptions: user2Sub2.id, idClub: clubEncantadaLibros.id, boxMonthYear: '2026-01', estimatedDeliveryStartDate: new Date('2026-01-10'), estimatedDeliveryEndDate: new Date('2026-01-20'), actualDeliveryDate: new Date('2026-01-16'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000047', logisticsCompany: 'Correo Argentino', shippingCost: 1200, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user2.id, idUserSubscriptions: user2Sub2.id, idClub: clubEncantadaLibros.id, boxMonthYear: '2026-02', estimatedDeliveryStartDate: new Date('2026-02-10'), estimatedDeliveryEndDate: new Date('2026-02-20'), actualDeliveryDate: new Date('2026-02-13'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000048', logisticsCompany: 'Correo Argentino', shippingCost: 1200, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user2.id, idUserSubscriptions: user2Sub2.id, idClub: clubEncantadaLibros.id, boxMonthYear: '2026-03', estimatedDeliveryStartDate: new Date('2026-03-10'), estimatedDeliveryEndDate: new Date('2026-03-20'), actualDeliveryDate: new Date('2026-03-17'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000049', logisticsCompany: 'Correo Argentino', shippingCost: 1200, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user2.id, idUserSubscriptions: user2Sub2.id, idClub: clubEncantadaLibros.id, boxMonthYear: '2026-04', estimatedDeliveryStartDate: new Date('2026-04-10'), estimatedDeliveryEndDate: new Date('2026-04-20'), actualDeliveryDate: new Date('2026-04-12'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000050', logisticsCompany: 'Correo Argentino', shippingCost: 1200, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user2.id, idUserSubscriptions: user2Sub2.id, idClub: clubEncantadaLibros.id, boxMonthYear: '2026-05', estimatedDeliveryStartDate: new Date('2026-05-10'), estimatedDeliveryEndDate: new Date('2026-05-20'), actualDeliveryDate: new Date('2026-05-15'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000051', logisticsCompany: 'Correo Argentino', shippingCost: 1200, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user2.id, idUserSubscriptions: user2Sub2.id, idClub: clubEncantadaLibros.id, boxMonthYear: '2026-06', estimatedDeliveryStartDate: new Date('2026-06-10'), estimatedDeliveryEndDate: new Date('2026-06-20'), actualDeliveryDate: null, shipmentStatus: ShipmentStatus.Pendiente, trackingNumber: 'CA-000052', logisticsCompany: 'Correo Argentino', shippingCost: 1200, shippingNotes: null } });
+    //#endregion
+
+    //#region 24.2.3. user2Sub3 / Black Box = Correo Argentino = 16 envíos 
+    await prisma.shipments.create({ data: { idUser: user2.id, idUserSubscriptions: user2Sub3.id, idClub: clubBlackBox.id, boxMonthYear: '2025-03', estimatedDeliveryStartDate: new Date('2025-03-15'), estimatedDeliveryEndDate: new Date('2025-03-25'), actualDeliveryDate: new Date('2025-03-21'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000053', logisticsCompany: 'Correo Argentino', shippingCost: 1200, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user2.id, idUserSubscriptions: user2Sub3.id, idClub: clubBlackBox.id, boxMonthYear: '2025-04', estimatedDeliveryStartDate: new Date('2025-04-15'), estimatedDeliveryEndDate: new Date('2025-04-25'), actualDeliveryDate: new Date('2025-04-18'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000054', logisticsCompany: 'Correo Argentino', shippingCost: 1200, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user2.id, idUserSubscriptions: user2Sub3.id, idClub: clubBlackBox.id, boxMonthYear: '2025-05', estimatedDeliveryStartDate: new Date('2025-05-15'), estimatedDeliveryEndDate: new Date('2025-05-25'), actualDeliveryDate: new Date('2025-05-23'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000055', logisticsCompany: 'Correo Argentino', shippingCost: 1200, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user2.id, idUserSubscriptions: user2Sub3.id, idClub: clubBlackBox.id, boxMonthYear: '2025-06', estimatedDeliveryStartDate: new Date('2025-06-15'), estimatedDeliveryEndDate: new Date('2025-06-25'), actualDeliveryDate: new Date('2025-06-17'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000056', logisticsCompany: 'Correo Argentino', shippingCost: 1200, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user2.id, idUserSubscriptions: user2Sub3.id, idClub: clubBlackBox.id, boxMonthYear: '2025-07', estimatedDeliveryStartDate: new Date('2025-07-15'), estimatedDeliveryEndDate: new Date('2025-07-25'), actualDeliveryDate: new Date('2025-07-22'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000057', logisticsCompany: 'Correo Argentino', shippingCost: 1200, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user2.id, idUserSubscriptions: user2Sub3.id, idClub: clubBlackBox.id, boxMonthYear: '2025-08', estimatedDeliveryStartDate: new Date('2025-08-15'), estimatedDeliveryEndDate: new Date('2025-08-25'), actualDeliveryDate: new Date('2025-08-16'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000058', logisticsCompany: 'Correo Argentino', shippingCost: 1200, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user2.id, idUserSubscriptions: user2Sub3.id, idClub: clubBlackBox.id, boxMonthYear: '2025-09', estimatedDeliveryStartDate: new Date('2025-09-15'), estimatedDeliveryEndDate: new Date('2025-09-25'), actualDeliveryDate: new Date('2025-09-20'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000059', logisticsCompany: 'Correo Argentino', shippingCost: 1200, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user2.id, idUserSubscriptions: user2Sub3.id, idClub: clubBlackBox.id, boxMonthYear: '2025-10', estimatedDeliveryStartDate: new Date('2025-10-15'), estimatedDeliveryEndDate: new Date('2025-10-25'), actualDeliveryDate: new Date('2025-10-24'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000060', logisticsCompany: 'Correo Argentino', shippingCost: 1200, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user2.id, idUserSubscriptions: user2Sub3.id, idClub: clubBlackBox.id, boxMonthYear: '2025-11', estimatedDeliveryStartDate: new Date('2025-11-15'), estimatedDeliveryEndDate: new Date('2025-11-25'), actualDeliveryDate: new Date('2025-11-18'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000061', logisticsCompany: 'Correo Argentino', shippingCost: 1200, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user2.id, idUserSubscriptions: user2Sub3.id, idClub: clubBlackBox.id, boxMonthYear: '2025-12', estimatedDeliveryStartDate: new Date('2025-12-15'), estimatedDeliveryEndDate: new Date('2025-12-25'), actualDeliveryDate: new Date('2025-12-22'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000062', logisticsCompany: 'Correo Argentino', shippingCost: 1200, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user2.id, idUserSubscriptions: user2Sub3.id, idClub: clubBlackBox.id, boxMonthYear: '2026-01', estimatedDeliveryStartDate: new Date('2026-01-15'), estimatedDeliveryEndDate: new Date('2026-01-25'), actualDeliveryDate: new Date('2026-01-21'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000063', logisticsCompany: 'Correo Argentino', shippingCost: 1200, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user2.id, idUserSubscriptions: user2Sub3.id, idClub: clubBlackBox.id, boxMonthYear: '2026-02', estimatedDeliveryStartDate: new Date('2026-02-15'), estimatedDeliveryEndDate: new Date('2026-02-25'), actualDeliveryDate: new Date('2026-02-19'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000064', logisticsCompany: 'Correo Argentino', shippingCost: 1200, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user2.id, idUserSubscriptions: user2Sub3.id, idClub: clubBlackBox.id, boxMonthYear: '2026-03', estimatedDeliveryStartDate: new Date('2026-03-15'), estimatedDeliveryEndDate: new Date('2026-03-25'), actualDeliveryDate: new Date('2026-03-16'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000065', logisticsCompany: 'Correo Argentino', shippingCost: 1200, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user2.id, idUserSubscriptions: user2Sub3.id, idClub: clubBlackBox.id, boxMonthYear: '2026-04', estimatedDeliveryStartDate: new Date('2026-04-15'), estimatedDeliveryEndDate: new Date('2026-04-25'), actualDeliveryDate: new Date('2026-04-23'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000066', logisticsCompany: 'Correo Argentino', shippingCost: 1200, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user2.id, idUserSubscriptions: user2Sub3.id, idClub: clubBlackBox.id, boxMonthYear: '2026-05', estimatedDeliveryStartDate: new Date('2026-05-15'), estimatedDeliveryEndDate: new Date('2026-05-25'), actualDeliveryDate: new Date('2026-05-18'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000067', logisticsCompany: 'Correo Argentino', shippingCost: 1200, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user2.id, idUserSubscriptions: user2Sub3.id, idClub: clubBlackBox.id, boxMonthYear: '2026-06', estimatedDeliveryStartDate: new Date('2026-06-15'), estimatedDeliveryEndDate: new Date('2026-06-25'), actualDeliveryDate: null, shipmentStatus: ShipmentStatus.Pendiente, trackingNumber: 'CA-000068', logisticsCompany: 'Correo Argentino', shippingCost: 1200, shippingNotes: null } });
+    //#endregion
+  //#endregion
+
+  //#region 24.3. Micaela López - Rosario (~300km de CABA)
+    //#region 24.3.1. user3Sub1 / Cervecero Club = Correo Argentino = 18 envíos
+    await prisma.shipments.create({ data: { idUser: user3.id, idUserSubscriptions: user3Sub1.id, idClub: clubCerveceroClub.id, boxMonthYear: '2025-01', estimatedDeliveryStartDate: new Date('2025-01-07'), estimatedDeliveryEndDate: new Date('2025-01-17'), actualDeliveryDate: new Date('2025-01-14'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000069', logisticsCompany: 'Correo Argentino', shippingCost: 2700, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user3.id, idUserSubscriptions: user3Sub1.id, idClub: clubCerveceroClub.id, boxMonthYear: '2025-02', estimatedDeliveryStartDate: new Date('2025-02-07'), estimatedDeliveryEndDate: new Date('2025-02-17'), actualDeliveryDate: new Date('2025-02-10'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000070', logisticsCompany: 'Correo Argentino', shippingCost: 2700, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user3.id, idUserSubscriptions: user3Sub1.id, idClub: clubCerveceroClub.id, boxMonthYear: '2025-03', estimatedDeliveryStartDate: new Date('2025-03-07'), estimatedDeliveryEndDate: new Date('2025-03-17'), actualDeliveryDate: new Date('2025-03-16'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000071', logisticsCompany: 'Correo Argentino', shippingCost: 2700, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user3.id, idUserSubscriptions: user3Sub1.id, idClub: clubCerveceroClub.id, boxMonthYear: '2025-04', estimatedDeliveryStartDate: new Date('2025-04-07'), estimatedDeliveryEndDate: new Date('2025-04-17'), actualDeliveryDate: new Date('2025-04-09'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000072', logisticsCompany: 'Correo Argentino', shippingCost: 2700, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user3.id, idUserSubscriptions: user3Sub1.id, idClub: clubCerveceroClub.id, boxMonthYear: '2025-05', estimatedDeliveryStartDate: new Date('2025-05-07'), estimatedDeliveryEndDate: new Date('2025-05-17'), actualDeliveryDate: new Date('2025-05-13'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000073', logisticsCompany: 'Correo Argentino', shippingCost: 2700, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user3.id, idUserSubscriptions: user3Sub1.id, idClub: clubCerveceroClub.id, boxMonthYear: '2025-06', estimatedDeliveryStartDate: new Date('2025-06-07'), estimatedDeliveryEndDate: new Date('2025-06-17'), actualDeliveryDate: new Date('2025-06-11'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000074', logisticsCompany: 'Correo Argentino', shippingCost: 2700, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user3.id, idUserSubscriptions: user3Sub1.id, idClub: clubCerveceroClub.id, boxMonthYear: '2025-07', estimatedDeliveryStartDate: new Date('2025-07-07'), estimatedDeliveryEndDate: new Date('2025-07-17'), actualDeliveryDate: new Date('2025-07-15'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000075', logisticsCompany: 'Correo Argentino', shippingCost: 2700, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user3.id, idUserSubscriptions: user3Sub1.id, idClub: clubCerveceroClub.id, boxMonthYear: '2025-08', estimatedDeliveryStartDate: new Date('2025-08-07'), estimatedDeliveryEndDate: new Date('2025-08-17'), actualDeliveryDate: new Date('2025-08-08'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000076', logisticsCompany: 'Correo Argentino', shippingCost: 2700, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user3.id, idUserSubscriptions: user3Sub1.id, idClub: clubCerveceroClub.id, boxMonthYear: '2025-09', estimatedDeliveryStartDate: new Date('2025-09-07'), estimatedDeliveryEndDate: new Date('2025-09-17'), actualDeliveryDate: new Date('2025-09-12'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000077', logisticsCompany: 'Correo Argentino', shippingCost: 2700, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user3.id, idUserSubscriptions: user3Sub1.id, idClub: clubCerveceroClub.id, boxMonthYear: '2025-10', estimatedDeliveryStartDate: new Date('2025-10-07'), estimatedDeliveryEndDate: new Date('2025-10-17'), actualDeliveryDate: new Date('2025-10-16'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000078', logisticsCompany: 'Correo Argentino', shippingCost: 2700, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user3.id, idUserSubscriptions: user3Sub1.id, idClub: clubCerveceroClub.id, boxMonthYear: '2025-11', estimatedDeliveryStartDate: new Date('2025-11-07'), estimatedDeliveryEndDate: new Date('2025-11-17'), actualDeliveryDate: new Date('2025-11-10'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000079', logisticsCompany: 'Correo Argentino', shippingCost: 2700, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user3.id, idUserSubscriptions: user3Sub1.id, idClub: clubCerveceroClub.id, boxMonthYear: '2025-12', estimatedDeliveryStartDate: new Date('2025-12-07'), estimatedDeliveryEndDate: new Date('2025-12-17'), actualDeliveryDate: new Date('2025-12-13'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000080', logisticsCompany: 'Correo Argentino', shippingCost: 2700, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user3.id, idUserSubscriptions: user3Sub1.id, idClub: clubCerveceroClub.id, boxMonthYear: '2026-01', estimatedDeliveryStartDate: new Date('2026-01-07'), estimatedDeliveryEndDate: new Date('2026-01-17'), actualDeliveryDate: new Date('2026-01-14'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000081', logisticsCompany: 'Correo Argentino', shippingCost: 2700, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user3.id, idUserSubscriptions: user3Sub1.id, idClub: clubCerveceroClub.id, boxMonthYear: '2026-02', estimatedDeliveryStartDate: new Date('2026-02-07'), estimatedDeliveryEndDate: new Date('2026-02-17'), actualDeliveryDate: new Date('2026-02-11'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000082', logisticsCompany: 'Correo Argentino', shippingCost: 2700, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user3.id, idUserSubscriptions: user3Sub1.id, idClub: clubCerveceroClub.id, boxMonthYear: '2026-03', estimatedDeliveryStartDate: new Date('2026-03-07'), estimatedDeliveryEndDate: new Date('2026-03-17'), actualDeliveryDate: new Date('2026-03-09'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000083', logisticsCompany: 'Correo Argentino', shippingCost: 2700, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user3.id, idUserSubscriptions: user3Sub1.id, idClub: clubCerveceroClub.id, boxMonthYear: '2026-04', estimatedDeliveryStartDate: new Date('2026-04-07'), estimatedDeliveryEndDate: new Date('2026-04-17'), actualDeliveryDate: new Date('2026-04-15'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000084', logisticsCompany: 'Correo Argentino', shippingCost: 2700, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user3.id, idUserSubscriptions: user3Sub1.id, idClub: clubCerveceroClub.id, boxMonthYear: '2026-05', estimatedDeliveryStartDate: new Date('2026-05-07'), estimatedDeliveryEndDate: new Date('2026-05-17'), actualDeliveryDate: new Date('2026-05-10'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000085', logisticsCompany: 'Correo Argentino', shippingCost: 2700, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user3.id, idUserSubscriptions: user3Sub1.id, idClub: clubCerveceroClub.id, boxMonthYear: '2026-06', estimatedDeliveryStartDate: new Date('2026-06-07'), estimatedDeliveryEndDate: new Date('2026-06-17'), actualDeliveryDate: null, shipmentStatus: ShipmentStatus.En_Camino, trackingNumber: 'CA-000086', logisticsCompany: 'Correo Argentino', shippingCost: 2700, shippingNotes: null } });
+    //#endregion
+
+    //#region 24.3.2. user3Sub2 / Tea Blends = OCA = 17 envíos 
+    await prisma.shipments.create({ data: { idUser: user3.id, idUserSubscriptions: user3Sub2.id, idClub: clubTeaBlends.id, boxMonthYear: '2025-02', estimatedDeliveryStartDate: new Date('2025-02-20'), estimatedDeliveryEndDate: new Date('2025-02-28'), actualDeliveryDate: new Date('2025-02-25'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'OCA-000019', logisticsCompany: 'OCA', shippingCost: 3900, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user3.id, idUserSubscriptions: user3Sub2.id, idClub: clubTeaBlends.id, boxMonthYear: '2025-03', estimatedDeliveryStartDate: new Date('2025-03-20'), estimatedDeliveryEndDate: new Date('2025-03-30'), actualDeliveryDate: new Date('2025-03-27'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'OCA-000020', logisticsCompany: 'OCA', shippingCost: 3900, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user3.id, idUserSubscriptions: user3Sub2.id, idClub: clubTeaBlends.id, boxMonthYear: '2025-04', estimatedDeliveryStartDate: new Date('2025-04-20'), estimatedDeliveryEndDate: new Date('2025-04-30'), actualDeliveryDate: new Date('2025-04-22'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'OCA-000021', logisticsCompany: 'OCA', shippingCost: 3900, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user3.id, idUserSubscriptions: user3Sub2.id, idClub: clubTeaBlends.id, boxMonthYear: '2025-05', estimatedDeliveryStartDate: new Date('2025-05-20'), estimatedDeliveryEndDate: new Date('2025-05-30'), actualDeliveryDate: new Date('2025-05-28'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'OCA-000022', logisticsCompany: 'OCA', shippingCost: 3900, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user3.id, idUserSubscriptions: user3Sub2.id, idClub: clubTeaBlends.id, boxMonthYear: '2025-06', estimatedDeliveryStartDate: new Date('2025-06-20'), estimatedDeliveryEndDate: new Date('2025-06-30'), actualDeliveryDate: new Date('2025-06-24'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'OCA-000023', logisticsCompany: 'OCA', shippingCost: 3900, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user3.id, idUserSubscriptions: user3Sub2.id, idClub: clubTeaBlends.id, boxMonthYear: '2025-07', estimatedDeliveryStartDate: new Date('2025-07-20'), estimatedDeliveryEndDate: new Date('2025-07-30'), actualDeliveryDate: new Date('2025-07-21'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'OCA-000024', logisticsCompany: 'OCA', shippingCost: 3900, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user3.id, idUserSubscriptions: user3Sub2.id, idClub: clubTeaBlends.id, boxMonthYear: '2025-08', estimatedDeliveryStartDate: new Date('2025-08-20'), estimatedDeliveryEndDate: new Date('2025-08-30'), actualDeliveryDate: new Date('2025-08-29'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'OCA-000025', logisticsCompany: 'OCA', shippingCost: 3900, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user3.id, idUserSubscriptions: user3Sub2.id, idClub: clubTeaBlends.id, boxMonthYear: '2025-09', estimatedDeliveryStartDate: new Date('2025-09-20'), estimatedDeliveryEndDate: new Date('2025-09-30'), actualDeliveryDate: new Date('2025-09-23'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'OCA-000026', logisticsCompany: 'OCA', shippingCost: 3900, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user3.id, idUserSubscriptions: user3Sub2.id, idClub: clubTeaBlends.id, boxMonthYear: '2025-10', estimatedDeliveryStartDate: new Date('2025-10-20'), estimatedDeliveryEndDate: new Date('2025-10-30'), actualDeliveryDate: new Date('2025-10-26'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'OCA-000027', logisticsCompany: 'OCA', shippingCost: 3900, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user3.id, idUserSubscriptions: user3Sub2.id, idClub: clubTeaBlends.id, boxMonthYear: '2025-11', estimatedDeliveryStartDate: new Date('2025-11-20'), estimatedDeliveryEndDate: new Date('2025-11-30'), actualDeliveryDate: new Date('2025-11-22'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'OCA-000028', logisticsCompany: 'OCA', shippingCost: 3900, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user3.id, idUserSubscriptions: user3Sub2.id, idClub: clubTeaBlends.id, boxMonthYear: '2025-12', estimatedDeliveryStartDate: new Date('2025-12-20'), estimatedDeliveryEndDate: new Date('2025-12-30'), actualDeliveryDate: new Date('2025-12-28'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'OCA-000029', logisticsCompany: 'OCA', shippingCost: 3900, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user3.id, idUserSubscriptions: user3Sub2.id, idClub: clubTeaBlends.id, boxMonthYear: '2026-01', estimatedDeliveryStartDate: new Date('2026-01-20'), estimatedDeliveryEndDate: new Date('2026-01-30'), actualDeliveryDate: new Date('2026-01-25'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'OCA-000030', logisticsCompany: 'OCA', shippingCost: 3900, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user3.id, idUserSubscriptions: user3Sub2.id, idClub: clubTeaBlends.id, boxMonthYear: '2026-02', estimatedDeliveryStartDate: new Date('2026-02-20'), estimatedDeliveryEndDate: new Date('2026-02-28'), actualDeliveryDate: new Date('2026-02-24'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'OCA-000031', logisticsCompany: 'OCA', shippingCost: 3900, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user3.id, idUserSubscriptions: user3Sub2.id, idClub: clubTeaBlends.id, boxMonthYear: '2026-03', estimatedDeliveryStartDate: new Date('2026-03-20'), estimatedDeliveryEndDate: new Date('2026-03-30'), actualDeliveryDate: new Date('2026-03-21'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'OCA-000032', logisticsCompany: 'OCA', shippingCost: 3900, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user3.id, idUserSubscriptions: user3Sub2.id, idClub: clubTeaBlends.id, boxMonthYear: '2026-04', estimatedDeliveryStartDate: new Date('2026-04-20'), estimatedDeliveryEndDate: new Date('2026-04-30'), actualDeliveryDate: new Date('2026-04-27'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'OCA-000033', logisticsCompany: 'OCA', shippingCost: 3900, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user3.id, idUserSubscriptions: user3Sub2.id, idClub: clubTeaBlends.id, boxMonthYear: '2026-05', estimatedDeliveryStartDate: new Date('2026-05-20'), estimatedDeliveryEndDate: new Date('2026-05-30'), actualDeliveryDate: new Date('2026-05-23'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'OCA-000034', logisticsCompany: 'OCA', shippingCost: 3900, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user3.id, idUserSubscriptions: user3Sub2.id, idClub: clubTeaBlends.id, boxMonthYear: '2026-06', estimatedDeliveryStartDate: new Date('2026-06-20'), estimatedDeliveryEndDate: new Date('2026-06-30'), actualDeliveryDate: null, shipmentStatus: ShipmentStatus.Pendiente, trackingNumber: 'OCA-000035', logisticsCompany: 'OCA', shippingCost: 3900, shippingNotes: null } });
+    //#endregion
+  //#endregion
+
+  //#region 24.4. Martín Fernández - Córdoba (~700km de CABA)
+    //#region 24.4.1. user4Sub1 / Winexperts Plan Sommelier - Correo Argentino - 18 envíos
+    await prisma.shipments.create({ data: { idUser: user4.id, idUserSubscriptions: user4Sub1.id, idClub: clubWinexperts.id, boxMonthYear: '2025-01', estimatedDeliveryStartDate: new Date('2025-01-03'), estimatedDeliveryEndDate: new Date('2025-01-13'), actualDeliveryDate: new Date('2025-01-08'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000087', logisticsCompany: 'Correo Argentino', shippingCost: 6300, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user4.id, idUserSubscriptions: user4Sub1.id, idClub: clubWinexperts.id, boxMonthYear: '2025-02', estimatedDeliveryStartDate: new Date('2025-02-03'), estimatedDeliveryEndDate: new Date('2025-02-13'), actualDeliveryDate: new Date('2025-02-11'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000088', logisticsCompany: 'Correo Argentino', shippingCost: 6300, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user4.id, idUserSubscriptions: user4Sub1.id, idClub: clubWinexperts.id, boxMonthYear: '2025-03', estimatedDeliveryStartDate: new Date('2025-03-03'), estimatedDeliveryEndDate: new Date('2025-03-13'), actualDeliveryDate: new Date('2025-03-05'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000089', logisticsCompany: 'Correo Argentino', shippingCost: 6300, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user4.id, idUserSubscriptions: user4Sub1.id, idClub: clubWinexperts.id, boxMonthYear: '2025-04', estimatedDeliveryStartDate: new Date('2025-04-03'), estimatedDeliveryEndDate: new Date('2025-04-13'), actualDeliveryDate: new Date('2025-04-12'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000090', logisticsCompany: 'Correo Argentino', shippingCost: 6300, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user4.id, idUserSubscriptions: user4Sub1.id, idClub: clubWinexperts.id, boxMonthYear: '2025-05', estimatedDeliveryStartDate: new Date('2025-05-03'), estimatedDeliveryEndDate: new Date('2025-05-13'), actualDeliveryDate: new Date('2025-05-07'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000091', logisticsCompany: 'Correo Argentino', shippingCost: 6300, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user4.id, idUserSubscriptions: user4Sub1.id, idClub: clubWinexperts.id, boxMonthYear: '2025-06', estimatedDeliveryStartDate: new Date('2025-06-03'), estimatedDeliveryEndDate: new Date('2025-06-13'), actualDeliveryDate: new Date('2025-06-10'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000092', logisticsCompany: 'Correo Argentino', shippingCost: 6300, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user4.id, idUserSubscriptions: user4Sub1.id, idClub: clubWinexperts.id, boxMonthYear: '2025-07', estimatedDeliveryStartDate: new Date('2025-07-03'), estimatedDeliveryEndDate: new Date('2025-07-13'), actualDeliveryDate: new Date('2025-07-04'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000093', logisticsCompany: 'Correo Argentino', shippingCost: 6300, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user4.id, idUserSubscriptions: user4Sub1.id, idClub: clubWinexperts.id, boxMonthYear: '2025-08', estimatedDeliveryStartDate: new Date('2025-08-03'), estimatedDeliveryEndDate: new Date('2025-08-13'), actualDeliveryDate: new Date('2025-08-09'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000094', logisticsCompany: 'Correo Argentino', shippingCost: 6300, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user4.id, idUserSubscriptions: user4Sub1.id, idClub: clubWinexperts.id, boxMonthYear: '2025-09', estimatedDeliveryStartDate: new Date('2025-09-03'), estimatedDeliveryEndDate: new Date('2025-09-13'), actualDeliveryDate: new Date('2025-09-13'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000095', logisticsCompany: 'Correo Argentino', shippingCost: 6300, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user4.id, idUserSubscriptions: user4Sub1.id, idClub: clubWinexperts.id, boxMonthYear: '2025-10', estimatedDeliveryStartDate: new Date('2025-10-03'), estimatedDeliveryEndDate: new Date('2025-10-13'), actualDeliveryDate: new Date('2025-10-06'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000096', logisticsCompany: 'Correo Argentino', shippingCost: 6300, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user4.id, idUserSubscriptions: user4Sub1.id, idClub: clubWinexperts.id, boxMonthYear: '2025-11', estimatedDeliveryStartDate: new Date('2025-11-03'), estimatedDeliveryEndDate: new Date('2025-11-13'), actualDeliveryDate: new Date('2025-11-11'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000097', logisticsCompany: 'Correo Argentino', shippingCost: 6300, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user4.id, idUserSubscriptions: user4Sub1.id, idClub: clubWinexperts.id, boxMonthYear: '2025-12', estimatedDeliveryStartDate: new Date('2025-12-03'), estimatedDeliveryEndDate: new Date('2025-12-13'), actualDeliveryDate: new Date('2025-12-08'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000098', logisticsCompany: 'Correo Argentino', shippingCost: 6300, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user4.id, idUserSubscriptions: user4Sub1.id, idClub: clubWinexperts.id, boxMonthYear: '2026-01', estimatedDeliveryStartDate: new Date('2026-01-03'), estimatedDeliveryEndDate: new Date('2026-01-13'), actualDeliveryDate: new Date('2026-01-10'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000099', logisticsCompany: 'Correo Argentino', shippingCost: 6300, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user4.id, idUserSubscriptions: user4Sub1.id, idClub: clubWinexperts.id, boxMonthYear: '2026-02', estimatedDeliveryStartDate: new Date('2026-02-03'), estimatedDeliveryEndDate: new Date('2026-02-13'), actualDeliveryDate: new Date('2026-02-07'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000100', logisticsCompany: 'Correo Argentino', shippingCost: 6300, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user4.id, idUserSubscriptions: user4Sub1.id, idClub: clubWinexperts.id, boxMonthYear: '2026-03', estimatedDeliveryStartDate: new Date('2026-03-03'), estimatedDeliveryEndDate: new Date('2026-03-13'), actualDeliveryDate: new Date('2026-03-12'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000101', logisticsCompany: 'Correo Argentino', shippingCost: 6300, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user4.id, idUserSubscriptions: user4Sub1.id, idClub: clubWinexperts.id, boxMonthYear: '2026-04', estimatedDeliveryStartDate: new Date('2026-04-03'), estimatedDeliveryEndDate: new Date('2026-04-13'), actualDeliveryDate: new Date('2026-04-05'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000102', logisticsCompany: 'Correo Argentino', shippingCost: 6300, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user4.id, idUserSubscriptions: user4Sub1.id, idClub: clubWinexperts.id, boxMonthYear: '2026-05', estimatedDeliveryStartDate: new Date('2026-05-03'), estimatedDeliveryEndDate: new Date('2026-05-13'), actualDeliveryDate: new Date('2026-05-09'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000103', logisticsCompany: 'Correo Argentino', shippingCost: 6300, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user4.id, idUserSubscriptions: user4Sub1.id, idClub: clubWinexperts.id, boxMonthYear: '2026-06', estimatedDeliveryStartDate: new Date('2026-06-03'), estimatedDeliveryEndDate: new Date('2026-06-13'), actualDeliveryDate: null, shipmentStatus: ShipmentStatus.En_Camino, trackingNumber: 'CA-000104', logisticsCompany: 'Correo Argentino', shippingCost: 6300, shippingNotes: null } });
+    //#endregion
+  //#endregion
+
+  //#region 24.5. Valentina Castro - Mendoza (~1050km de CABA)
+    //#region 24.5.1. user5Sub1 / Glossybox Mensual - Correo Argentino - 18 envíos
+    await prisma.shipments.create({ data: { idUser: user5.id, idUserSubscriptions: user5Sub1.id, idClub: clubGlossyBox.id, boxMonthYear: '2025-01', estimatedDeliveryStartDate: new Date('2025-01-06'), estimatedDeliveryEndDate: new Date('2025-01-16'), actualDeliveryDate: new Date('2025-01-14'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000105', logisticsCompany: 'Correo Argentino', shippingCost: 9450, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user5.id, idUserSubscriptions: user5Sub1.id, idClub: clubGlossyBox.id, boxMonthYear: '2025-02', estimatedDeliveryStartDate: new Date('2025-02-06'), estimatedDeliveryEndDate: new Date('2025-02-16'), actualDeliveryDate: new Date('2025-02-09'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000106', logisticsCompany: 'Correo Argentino', shippingCost: 9450, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user5.id, idUserSubscriptions: user5Sub1.id, idClub: clubGlossyBox.id, boxMonthYear: '2025-03', estimatedDeliveryStartDate: new Date('2025-03-06'), estimatedDeliveryEndDate: new Date('2025-03-16'), actualDeliveryDate: new Date('2025-03-15'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000107', logisticsCompany: 'Correo Argentino', shippingCost: 9450, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user5.id, idUserSubscriptions: user5Sub1.id, idClub: clubGlossyBox.id, boxMonthYear: '2025-04', estimatedDeliveryStartDate: new Date('2025-04-06'), estimatedDeliveryEndDate: new Date('2025-04-16'), actualDeliveryDate: new Date('2025-04-07'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000108', logisticsCompany: 'Correo Argentino', shippingCost: 9450, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user5.id, idUserSubscriptions: user5Sub1.id, idClub: clubGlossyBox.id, boxMonthYear: '2025-05', estimatedDeliveryStartDate: new Date('2025-05-06'), estimatedDeliveryEndDate: new Date('2025-05-16'), actualDeliveryDate: new Date('2025-05-13'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000109', logisticsCompany: 'Correo Argentino', shippingCost: 9450, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user5.id, idUserSubscriptions: user5Sub1.id, idClub: clubGlossyBox.id, boxMonthYear: '2025-06', estimatedDeliveryStartDate: new Date('2025-06-06'), estimatedDeliveryEndDate: new Date('2025-06-16'), actualDeliveryDate: new Date('2025-06-11'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000110', logisticsCompany: 'Correo Argentino', shippingCost: 9450, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user5.id, idUserSubscriptions: user5Sub1.id, idClub: clubGlossyBox.id, boxMonthYear: '2025-07', estimatedDeliveryStartDate: new Date('2025-07-06'), estimatedDeliveryEndDate: new Date('2025-07-16'), actualDeliveryDate: new Date('2025-07-16'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000111', logisticsCompany: 'Correo Argentino', shippingCost: 9450, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user5.id, idUserSubscriptions: user5Sub1.id, idClub: clubGlossyBox.id, boxMonthYear: '2025-08', estimatedDeliveryStartDate: new Date('2025-08-06'), estimatedDeliveryEndDate: new Date('2025-08-16'), actualDeliveryDate: new Date('2025-08-08'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000112', logisticsCompany: 'Correo Argentino', shippingCost: 9450, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user5.id, idUserSubscriptions: user5Sub1.id, idClub: clubGlossyBox.id, boxMonthYear: '2025-09', estimatedDeliveryStartDate: new Date('2025-09-06'), estimatedDeliveryEndDate: new Date('2025-09-16'), actualDeliveryDate: new Date('2025-09-14'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000113', logisticsCompany: 'Correo Argentino', shippingCost: 9450, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user5.id, idUserSubscriptions: user5Sub1.id, idClub: clubGlossyBox.id, boxMonthYear: '2025-10', estimatedDeliveryStartDate: new Date('2025-10-06'), estimatedDeliveryEndDate: new Date('2025-10-16'), actualDeliveryDate: new Date('2025-10-10'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000114', logisticsCompany: 'Correo Argentino', shippingCost: 9450, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user5.id, idUserSubscriptions: user5Sub1.id, idClub: clubGlossyBox.id, boxMonthYear: '2025-11', estimatedDeliveryStartDate: new Date('2025-11-06'), estimatedDeliveryEndDate: new Date('2025-11-16'), actualDeliveryDate: new Date('2025-11-12'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000115', logisticsCompany: 'Correo Argentino', shippingCost: 9450, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user5.id, idUserSubscriptions: user5Sub1.id, idClub: clubGlossyBox.id, boxMonthYear: '2025-12', estimatedDeliveryStartDate: new Date('2025-12-06'), estimatedDeliveryEndDate: new Date('2025-12-16'), actualDeliveryDate: new Date('2025-12-15'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000116', logisticsCompany: 'Correo Argentino', shippingCost: 9450, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user5.id, idUserSubscriptions: user5Sub1.id, idClub: clubGlossyBox.id, boxMonthYear: '2026-01', estimatedDeliveryStartDate: new Date('2026-01-06'), estimatedDeliveryEndDate: new Date('2026-01-16'), actualDeliveryDate: new Date('2026-01-07'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000117', logisticsCompany: 'Correo Argentino', shippingCost: 9450, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user5.id, idUserSubscriptions: user5Sub1.id, idClub: clubGlossyBox.id, boxMonthYear: '2026-02', estimatedDeliveryStartDate: new Date('2026-02-06'), estimatedDeliveryEndDate: new Date('2026-02-16'), actualDeliveryDate: new Date('2026-02-14'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000118', logisticsCompany: 'Correo Argentino', shippingCost: 9450, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user5.id, idUserSubscriptions: user5Sub1.id, idClub: clubGlossyBox.id, boxMonthYear: '2026-03', estimatedDeliveryStartDate: new Date('2026-03-06'), estimatedDeliveryEndDate: new Date('2026-03-16'), actualDeliveryDate: new Date('2026-03-09'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000119', logisticsCompany: 'Correo Argentino', shippingCost: 9450, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user5.id, idUserSubscriptions: user5Sub1.id, idClub: clubGlossyBox.id, boxMonthYear: '2026-04', estimatedDeliveryStartDate: new Date('2026-04-06'), estimatedDeliveryEndDate: new Date('2026-04-16'), actualDeliveryDate: new Date('2026-04-13'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000120', logisticsCompany: 'Correo Argentino', shippingCost: 9450, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user5.id, idUserSubscriptions: user5Sub1.id, idClub: clubGlossyBox.id, boxMonthYear: '2026-05', estimatedDeliveryStartDate: new Date('2026-05-06'), estimatedDeliveryEndDate: new Date('2026-05-16'), actualDeliveryDate: new Date('2026-05-11'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000121', logisticsCompany: 'Correo Argentino', shippingCost: 9450, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user5.id, idUserSubscriptions: user5Sub1.id, idClub: clubGlossyBox.id, boxMonthYear: '2026-06', estimatedDeliveryStartDate: new Date('2026-06-06'), estimatedDeliveryEndDate: new Date('2026-06-16'), actualDeliveryDate: null, shipmentStatus: ShipmentStatus.En_Camino, trackingNumber: 'CA-000122', logisticsCompany: 'Correo Argentino', shippingCost: 9450, shippingNotes: null } });
+    //#endregion
+
+    //#region 24.5.2. user5Sub2 / Alma Box Caja Natural - OCA - 17 envíos 
+    await prisma.shipments.create({ data: { idUser: user5.id, idUserSubscriptions: user5Sub2.id, idClub: clubAlmaBox.id, boxMonthYear: '2025-02', estimatedDeliveryStartDate: new Date('2025-02-09'), estimatedDeliveryEndDate: new Date('2025-02-19'), actualDeliveryDate: new Date('2025-02-17'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'OCA-000036', logisticsCompany: 'OCA', shippingCost: 13650, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user5.id, idUserSubscriptions: user5Sub2.id, idClub: clubAlmaBox.id, boxMonthYear: '2025-03', estimatedDeliveryStartDate: new Date('2025-03-09'), estimatedDeliveryEndDate: new Date('2025-03-19'), actualDeliveryDate: new Date('2025-03-11'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'OCA-000037', logisticsCompany: 'OCA', shippingCost: 13650, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user5.id, idUserSubscriptions: user5Sub2.id, idClub: clubAlmaBox.id, boxMonthYear: '2025-04', estimatedDeliveryStartDate: new Date('2025-04-09'), estimatedDeliveryEndDate: new Date('2025-04-19'), actualDeliveryDate: new Date('2025-04-16'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'OCA-000038', logisticsCompany: 'OCA', shippingCost: 13650, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user5.id, idUserSubscriptions: user5Sub2.id, idClub: clubAlmaBox.id, boxMonthYear: '2025-05', estimatedDeliveryStartDate: new Date('2025-05-09'), estimatedDeliveryEndDate: new Date('2025-05-19'), actualDeliveryDate: new Date('2025-05-14'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'OCA-000039', logisticsCompany: 'OCA', shippingCost: 13650, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user5.id, idUserSubscriptions: user5Sub2.id, idClub: clubAlmaBox.id, boxMonthYear: '2025-06', estimatedDeliveryStartDate: new Date('2025-06-09'), estimatedDeliveryEndDate: new Date('2025-06-19'), actualDeliveryDate: new Date('2025-06-18'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'OCA-000040', logisticsCompany: 'OCA', shippingCost: 13650, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user5.id, idUserSubscriptions: user5Sub2.id, idClub: clubAlmaBox.id, boxMonthYear: '2025-07', estimatedDeliveryStartDate: new Date('2025-07-09'), estimatedDeliveryEndDate: new Date('2025-07-19'), actualDeliveryDate: new Date('2025-07-10'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'OCA-000041', logisticsCompany: 'OCA', shippingCost: 13650, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user5.id, idUserSubscriptions: user5Sub2.id, idClub: clubAlmaBox.id, boxMonthYear: '2025-08', estimatedDeliveryStartDate: new Date('2025-08-09'), estimatedDeliveryEndDate: new Date('2025-08-19'), actualDeliveryDate: new Date('2025-08-15'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'OCA-000042', logisticsCompany: 'OCA', shippingCost: 13650, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user5.id, idUserSubscriptions: user5Sub2.id, idClub: clubAlmaBox.id, boxMonthYear: '2025-09', estimatedDeliveryStartDate: new Date('2025-09-09'), estimatedDeliveryEndDate: new Date('2025-09-19'), actualDeliveryDate: new Date('2025-09-12'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'OCA-000043', logisticsCompany: 'OCA', shippingCost: 13650, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user5.id, idUserSubscriptions: user5Sub2.id, idClub: clubAlmaBox.id, boxMonthYear: '2025-10', estimatedDeliveryStartDate: new Date('2025-10-09'), estimatedDeliveryEndDate: new Date('2025-10-19'), actualDeliveryDate: new Date('2025-10-19'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'OCA-000044', logisticsCompany: 'OCA', shippingCost: 13650, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user5.id, idUserSubscriptions: user5Sub2.id, idClub: clubAlmaBox.id, boxMonthYear: '2025-11', estimatedDeliveryStartDate: new Date('2025-11-09'), estimatedDeliveryEndDate: new Date('2025-11-19'), actualDeliveryDate: new Date('2025-11-13'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'OCA-000045', logisticsCompany: 'OCA', shippingCost: 13650, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user5.id, idUserSubscriptions: user5Sub2.id, idClub: clubAlmaBox.id, boxMonthYear: '2025-12', estimatedDeliveryStartDate: new Date('2025-12-09'), estimatedDeliveryEndDate: new Date('2025-12-19'), actualDeliveryDate: new Date('2025-12-16'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'OCA-000046', logisticsCompany: 'OCA', shippingCost: 13650, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user5.id, idUserSubscriptions: user5Sub2.id, idClub: clubAlmaBox.id, boxMonthYear: '2026-01', estimatedDeliveryStartDate: new Date('2026-01-09'), estimatedDeliveryEndDate: new Date('2026-01-19'), actualDeliveryDate: new Date('2026-01-17'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'OCA-000047', logisticsCompany: 'OCA', shippingCost: 13650, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user5.id, idUserSubscriptions: user5Sub2.id, idClub: clubAlmaBox.id, boxMonthYear: '2026-02', estimatedDeliveryStartDate: new Date('2026-02-09'), estimatedDeliveryEndDate: new Date('2026-02-19'), actualDeliveryDate: new Date('2026-02-11'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'OCA-000048', logisticsCompany: 'OCA', shippingCost: 13650, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user5.id, idUserSubscriptions: user5Sub2.id, idClub: clubAlmaBox.id, boxMonthYear: '2026-03', estimatedDeliveryStartDate: new Date('2026-03-09'), estimatedDeliveryEndDate: new Date('2026-03-19'), actualDeliveryDate: new Date('2026-03-18'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'OCA-000049', logisticsCompany: 'OCA', shippingCost: 13650, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user5.id, idUserSubscriptions: user5Sub2.id, idClub: clubAlmaBox.id, boxMonthYear: '2026-04', estimatedDeliveryStartDate: new Date('2026-04-09'), estimatedDeliveryEndDate: new Date('2026-04-19'), actualDeliveryDate: new Date('2026-04-09'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'OCA-000050', logisticsCompany: 'OCA', shippingCost: 13650, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user5.id, idUserSubscriptions: user5Sub2.id, idClub: clubAlmaBox.id, boxMonthYear: '2026-05', estimatedDeliveryStartDate: new Date('2026-05-09'), estimatedDeliveryEndDate: new Date('2026-05-19'), actualDeliveryDate: new Date('2026-05-16'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'OCA-000051', logisticsCompany: 'OCA', shippingCost: 13650, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user5.id, idUserSubscriptions: user5Sub2.id, idClub: clubAlmaBox.id, boxMonthYear: '2026-06', estimatedDeliveryStartDate: new Date('2026-06-09'), estimatedDeliveryEndDate: new Date('2026-06-19'), actualDeliveryDate: null, shipmentStatus: ShipmentStatus.En_Camino, trackingNumber: 'OCA-000052', logisticsCompany: 'OCA', shippingCost: 13650, shippingNotes: null } });
+    //#endregion
+
+    //#region 24.5.3. user5Sub3 / Sweet Box Dulce Sorpresa - Correo Argentino - 16 envíos 
+    await prisma.shipments.create({ data: { idUser: user5.id, idUserSubscriptions: user5Sub3.id, idClub: clubSweetBox.id, boxMonthYear: '2025-03', estimatedDeliveryStartDate: new Date('2025-03-17'), estimatedDeliveryEndDate: new Date('2025-03-27'), actualDeliveryDate: new Date('2025-03-24'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000123', logisticsCompany: 'Correo Argentino', shippingCost: 9450, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user5.id, idUserSubscriptions: user5Sub3.id, idClub: clubSweetBox.id, boxMonthYear: '2025-04', estimatedDeliveryStartDate: new Date('2025-04-17'), estimatedDeliveryEndDate: new Date('2025-04-27'), actualDeliveryDate: new Date('2025-04-20'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000124', logisticsCompany: 'Correo Argentino', shippingCost: 9450, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user5.id, idUserSubscriptions: user5Sub3.id, idClub: clubSweetBox.id, boxMonthYear: '2025-05', estimatedDeliveryStartDate: new Date('2025-05-17'), estimatedDeliveryEndDate: new Date('2025-05-27'), actualDeliveryDate: new Date('2025-05-26'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000125', logisticsCompany: 'Correo Argentino', shippingCost: 9450, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user5.id, idUserSubscriptions: user5Sub3.id, idClub: clubSweetBox.id, boxMonthYear: '2025-06', estimatedDeliveryStartDate: new Date('2025-06-17'), estimatedDeliveryEndDate: new Date('2025-06-27'), actualDeliveryDate: new Date('2025-06-19'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000126', logisticsCompany: 'Correo Argentino', shippingCost: 9450, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user5.id, idUserSubscriptions: user5Sub3.id, idClub: clubSweetBox.id, boxMonthYear: '2025-07', estimatedDeliveryStartDate: new Date('2025-07-17'), estimatedDeliveryEndDate: new Date('2025-07-27'), actualDeliveryDate: new Date('2025-07-23'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000127', logisticsCompany: 'Correo Argentino', shippingCost: 9450, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user5.id, idUserSubscriptions: user5Sub3.id, idClub: clubSweetBox.id, boxMonthYear: '2025-08', estimatedDeliveryStartDate: new Date('2025-08-17'), estimatedDeliveryEndDate: new Date('2025-08-27'), actualDeliveryDate: new Date('2025-08-18'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000128', logisticsCompany: 'Correo Argentino', shippingCost: 9450, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user5.id, idUserSubscriptions: user5Sub3.id, idClub: clubSweetBox.id, boxMonthYear: '2025-09', estimatedDeliveryStartDate: new Date('2025-09-17'), estimatedDeliveryEndDate: new Date('2025-09-27'), actualDeliveryDate: new Date('2025-09-25'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000129', logisticsCompany: 'Correo Argentino', shippingCost: 9450, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user5.id, idUserSubscriptions: user5Sub3.id, idClub: clubSweetBox.id, boxMonthYear: '2025-10', estimatedDeliveryStartDate: new Date('2025-10-17'), estimatedDeliveryEndDate: new Date('2025-10-27'), actualDeliveryDate: new Date('2025-10-21'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000130', logisticsCompany: 'Correo Argentino', shippingCost: 9450, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user5.id, idUserSubscriptions: user5Sub3.id, idClub: clubSweetBox.id, boxMonthYear: '2025-11', estimatedDeliveryStartDate: new Date('2025-11-17'), estimatedDeliveryEndDate: new Date('2025-11-27'), actualDeliveryDate: new Date('2025-11-27'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000131', logisticsCompany: 'Correo Argentino', shippingCost: 9450, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user5.id, idUserSubscriptions: user5Sub3.id, idClub: clubSweetBox.id, boxMonthYear: '2025-12', estimatedDeliveryStartDate: new Date('2025-12-17'), estimatedDeliveryEndDate: new Date('2025-12-27'), actualDeliveryDate: new Date('2025-12-22'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000132', logisticsCompany: 'Correo Argentino', shippingCost: 9450, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user5.id, idUserSubscriptions: user5Sub3.id, idClub: clubSweetBox.id, boxMonthYear: '2026-01', estimatedDeliveryStartDate: new Date('2026-01-17'), estimatedDeliveryEndDate: new Date('2026-01-27'), actualDeliveryDate: new Date('2026-01-20'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000133', logisticsCompany: 'Correo Argentino', shippingCost: 9450, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user5.id, idUserSubscriptions: user5Sub3.id, idClub: clubSweetBox.id, boxMonthYear: '2026-02', estimatedDeliveryStartDate: new Date('2026-02-17'), estimatedDeliveryEndDate: new Date('2026-02-27'), actualDeliveryDate: new Date('2026-02-24'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000134', logisticsCompany: 'Correo Argentino', shippingCost: 9450, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user5.id, idUserSubscriptions: user5Sub3.id, idClub: clubSweetBox.id, boxMonthYear: '2026-03', estimatedDeliveryStartDate: new Date('2026-03-17'), estimatedDeliveryEndDate: new Date('2026-03-27'), actualDeliveryDate: new Date('2026-03-19'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000135', logisticsCompany: 'Correo Argentino', shippingCost: 9450, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user5.id, idUserSubscriptions: user5Sub3.id, idClub: clubSweetBox.id, boxMonthYear: '2026-04', estimatedDeliveryStartDate: new Date('2026-04-17'), estimatedDeliveryEndDate: new Date('2026-04-27'), actualDeliveryDate: new Date('2026-04-25'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000136', logisticsCompany: 'Correo Argentino', shippingCost: 9450, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user5.id, idUserSubscriptions: user5Sub3.id, idClub: clubSweetBox.id, boxMonthYear: '2026-05', estimatedDeliveryStartDate: new Date('2026-05-17'), estimatedDeliveryEndDate: new Date('2026-05-27'), actualDeliveryDate: new Date('2026-05-20'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000137', logisticsCompany: 'Correo Argentino', shippingCost: 9450, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user5.id, idUserSubscriptions: user5Sub3.id, idClub: clubSweetBox.id, boxMonthYear: '2026-06', estimatedDeliveryStartDate: new Date('2026-06-17'), estimatedDeliveryEndDate: new Date('2026-06-27'), actualDeliveryDate: null, shipmentStatus: ShipmentStatus.Pendiente, trackingNumber: 'CA-000138', logisticsCompany: 'Correo Argentino', shippingCost: 9450, shippingNotes: null } });
+    //#endregion
+  //#endregion
+
+  //#region 24.6. Agustín Morales - Neuquén (~1200km de CABA)
+    //#region 24.6.1. user6Sub1 / Café Selecto Caja Gourmet - Correo Argentino - 18 envíos
+    await prisma.shipments.create({ data: { idUser: user6.id, idUserSubscriptions: user6Sub1.id, idClub: clubCafeSelecto.id, boxMonthYear: '2025-01', estimatedDeliveryStartDate: new Date('2025-01-12'), estimatedDeliveryEndDate: new Date('2025-01-22'), actualDeliveryDate: new Date('2025-01-20'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000139', logisticsCompany: 'Correo Argentino', shippingCost: 10800, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user6.id, idUserSubscriptions: user6Sub1.id, idClub: clubCafeSelecto.id, boxMonthYear: '2025-02', estimatedDeliveryStartDate: new Date('2025-02-12'), estimatedDeliveryEndDate: new Date('2025-02-22'), actualDeliveryDate: new Date('2025-02-14'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000140', logisticsCompany: 'Correo Argentino', shippingCost: 10800, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user6.id, idUserSubscriptions: user6Sub1.id, idClub: clubCafeSelecto.id, boxMonthYear: '2025-03', estimatedDeliveryStartDate: new Date('2025-03-12'), estimatedDeliveryEndDate: new Date('2025-03-22'), actualDeliveryDate: new Date('2025-03-21'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000141', logisticsCompany: 'Correo Argentino', shippingCost: 10800, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user6.id, idUserSubscriptions: user6Sub1.id, idClub: clubCafeSelecto.id, boxMonthYear: '2025-04', estimatedDeliveryStartDate: new Date('2025-04-12'), estimatedDeliveryEndDate: new Date('2025-04-22'), actualDeliveryDate: new Date('2025-04-15'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000142', logisticsCompany: 'Correo Argentino', shippingCost: 10800, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user6.id, idUserSubscriptions: user6Sub1.id, idClub: clubCafeSelecto.id, boxMonthYear: '2025-05', estimatedDeliveryStartDate: new Date('2025-05-12'), estimatedDeliveryEndDate: new Date('2025-05-22'), actualDeliveryDate: new Date('2025-05-18'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000143', logisticsCompany: 'Correo Argentino', shippingCost: 10800, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user6.id, idUserSubscriptions: user6Sub1.id, idClub: clubCafeSelecto.id, boxMonthYear: '2025-06', estimatedDeliveryStartDate: new Date('2025-06-12'), estimatedDeliveryEndDate: new Date('2025-06-22'), actualDeliveryDate: new Date('2025-06-13'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000144', logisticsCompany: 'Correo Argentino', shippingCost: 10800, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user6.id, idUserSubscriptions: user6Sub1.id, idClub: clubCafeSelecto.id, boxMonthYear: '2025-07', estimatedDeliveryStartDate: new Date('2025-07-12'), estimatedDeliveryEndDate: new Date('2025-07-22'), actualDeliveryDate: new Date('2025-07-22'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000145', logisticsCompany: 'Correo Argentino', shippingCost: 10800, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user6.id, idUserSubscriptions: user6Sub1.id, idClub: clubCafeSelecto.id, boxMonthYear: '2025-08', estimatedDeliveryStartDate: new Date('2025-08-12'), estimatedDeliveryEndDate: new Date('2025-08-22'), actualDeliveryDate: new Date('2025-08-16'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000146', logisticsCompany: 'Correo Argentino', shippingCost: 10800, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user6.id, idUserSubscriptions: user6Sub1.id, idClub: clubCafeSelecto.id, boxMonthYear: '2025-09', estimatedDeliveryStartDate: new Date('2025-09-12'), estimatedDeliveryEndDate: new Date('2025-09-22'), actualDeliveryDate: new Date('2025-09-19'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000147', logisticsCompany: 'Correo Argentino', shippingCost: 10800, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user6.id, idUserSubscriptions: user6Sub1.id, idClub: clubCafeSelecto.id, boxMonthYear: '2025-10', estimatedDeliveryStartDate: new Date('2025-10-12'), estimatedDeliveryEndDate: new Date('2025-10-22'), actualDeliveryDate: new Date('2025-10-13'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000148', logisticsCompany: 'Correo Argentino', shippingCost: 10800, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user6.id, idUserSubscriptions: user6Sub1.id, idClub: clubCafeSelecto.id, boxMonthYear: '2025-11', estimatedDeliveryStartDate: new Date('2025-11-12'), estimatedDeliveryEndDate: new Date('2025-11-22'), actualDeliveryDate: new Date('2025-11-21'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000149', logisticsCompany: 'Correo Argentino', shippingCost: 10800, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user6.id, idUserSubscriptions: user6Sub1.id, idClub: clubCafeSelecto.id, boxMonthYear: '2025-12', estimatedDeliveryStartDate: new Date('2025-12-12'), estimatedDeliveryEndDate: new Date('2025-12-22'), actualDeliveryDate: new Date('2025-12-17'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000150', logisticsCompany: 'Correo Argentino', shippingCost: 10800, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user6.id, idUserSubscriptions: user6Sub1.id, idClub: clubCafeSelecto.id, boxMonthYear: '2026-01', estimatedDeliveryStartDate: new Date('2026-01-12'), estimatedDeliveryEndDate: new Date('2026-01-22'), actualDeliveryDate: new Date('2026-01-14'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000151', logisticsCompany: 'Correo Argentino', shippingCost: 10800, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user6.id, idUserSubscriptions: user6Sub1.id, idClub: clubCafeSelecto.id, boxMonthYear: '2026-02', estimatedDeliveryStartDate: new Date('2026-02-12'), estimatedDeliveryEndDate: new Date('2026-02-22'), actualDeliveryDate: new Date('2026-02-20'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000152', logisticsCompany: 'Correo Argentino', shippingCost: 10800, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user6.id, idUserSubscriptions: user6Sub1.id, idClub: clubCafeSelecto.id, boxMonthYear: '2026-03', estimatedDeliveryStartDate: new Date('2026-03-12'), estimatedDeliveryEndDate: new Date('2026-03-22'), actualDeliveryDate: new Date('2026-03-12'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000153', logisticsCompany: 'Correo Argentino', shippingCost: 10800, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user6.id, idUserSubscriptions: user6Sub1.id, idClub: clubCafeSelecto.id, boxMonthYear: '2026-04', estimatedDeliveryStartDate: new Date('2026-04-12'), estimatedDeliveryEndDate: new Date('2026-04-22'), actualDeliveryDate: new Date('2026-04-18'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000154', logisticsCompany: 'Correo Argentino', shippingCost: 10800, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user6.id, idUserSubscriptions: user6Sub1.id, idClub: clubCafeSelecto.id, boxMonthYear: '2026-05', estimatedDeliveryStartDate: new Date('2026-05-12'), estimatedDeliveryEndDate: new Date('2026-05-22'), actualDeliveryDate: new Date('2026-05-15'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000155', logisticsCompany: 'Correo Argentino', shippingCost: 10800, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user6.id, idUserSubscriptions: user6Sub1.id, idClub: clubCafeSelecto.id, boxMonthYear: '2026-06', estimatedDeliveryStartDate: new Date('2026-06-12'), estimatedDeliveryEndDate: new Date('2026-06-22'), actualDeliveryDate: null, shipmentStatus: ShipmentStatus.Pendiente, trackingNumber: 'CA-000156', logisticsCompany: 'Correo Argentino', shippingCost: 10800, shippingNotes: null } });
+    //#endregion
+
+    //#region 24.6.2. user6Sub2 / Loot Crate AR Geek Mensual - OCA - 17 envíos 
+    await prisma.shipments.create({ data: { idUser: user6.id, idUserSubscriptions: user6Sub2.id, idClub: clubLootCrateAR.id, boxMonthYear: '2025-02', estimatedDeliveryStartDate: new Date('2025-02-11'), estimatedDeliveryEndDate: new Date('2025-02-21'), actualDeliveryDate: new Date('2025-02-19'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'OCA-000053', logisticsCompany: 'OCA', shippingCost: 15600, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user6.id, idUserSubscriptions: user6Sub2.id, idClub: clubLootCrateAR.id, boxMonthYear: '2025-03', estimatedDeliveryStartDate: new Date('2025-03-11'), estimatedDeliveryEndDate: new Date('2025-03-21'), actualDeliveryDate: new Date('2025-03-14'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'OCA-000054', logisticsCompany: 'OCA', shippingCost: 15600, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user6.id, idUserSubscriptions: user6Sub2.id, idClub: clubLootCrateAR.id, boxMonthYear: '2025-04', estimatedDeliveryStartDate: new Date('2025-04-11'), estimatedDeliveryEndDate: new Date('2025-04-21'), actualDeliveryDate: new Date('2025-04-21'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'OCA-000055', logisticsCompany: 'OCA', shippingCost: 15600, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user6.id, idUserSubscriptions: user6Sub2.id, idClub: clubLootCrateAR.id, boxMonthYear: '2025-05', estimatedDeliveryStartDate: new Date('2025-05-11'), estimatedDeliveryEndDate: new Date('2025-05-21'), actualDeliveryDate: new Date('2025-05-15'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'OCA-000056', logisticsCompany: 'OCA', shippingCost: 15600, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user6.id, idUserSubscriptions: user6Sub2.id, idClub: clubLootCrateAR.id, boxMonthYear: '2025-06', estimatedDeliveryStartDate: new Date('2025-06-11'), estimatedDeliveryEndDate: new Date('2025-06-21'), actualDeliveryDate: new Date('2025-06-20'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'OCA-000057', logisticsCompany: 'OCA', shippingCost: 15600, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user6.id, idUserSubscriptions: user6Sub2.id, idClub: clubLootCrateAR.id, boxMonthYear: '2025-07', estimatedDeliveryStartDate: new Date('2025-07-11'), estimatedDeliveryEndDate: new Date('2025-07-21'), actualDeliveryDate: new Date('2025-07-13'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'OCA-000058', logisticsCompany: 'OCA', shippingCost: 15600, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user6.id, idUserSubscriptions: user6Sub2.id, idClub: clubLootCrateAR.id, boxMonthYear: '2025-08', estimatedDeliveryStartDate: new Date('2025-08-11'), estimatedDeliveryEndDate: new Date('2025-08-21'), actualDeliveryDate: new Date('2025-08-20'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'OCA-000059', logisticsCompany: 'OCA', shippingCost: 15600, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user6.id, idUserSubscriptions: user6Sub2.id, idClub: clubLootCrateAR.id, boxMonthYear: '2025-09', estimatedDeliveryStartDate: new Date('2025-09-11'), estimatedDeliveryEndDate: new Date('2025-09-21'), actualDeliveryDate: new Date('2025-09-11'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'OCA-000060', logisticsCompany: 'OCA', shippingCost: 15600, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user6.id, idUserSubscriptions: user6Sub2.id, idClub: clubLootCrateAR.id, boxMonthYear: '2025-10', estimatedDeliveryStartDate: new Date('2025-10-11'), estimatedDeliveryEndDate: new Date('2025-10-21'), actualDeliveryDate: new Date('2025-10-18'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'OCA-000061', logisticsCompany: 'OCA', shippingCost: 15600, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user6.id, idUserSubscriptions: user6Sub2.id, idClub: clubLootCrateAR.id, boxMonthYear: '2025-11', estimatedDeliveryStartDate: new Date('2025-11-11'), estimatedDeliveryEndDate: new Date('2025-11-21'), actualDeliveryDate: new Date('2025-11-12'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'OCA-000062', logisticsCompany: 'OCA', shippingCost: 15600, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user6.id, idUserSubscriptions: user6Sub2.id, idClub: clubLootCrateAR.id, boxMonthYear: '2025-12', estimatedDeliveryStartDate: new Date('2025-12-11'), estimatedDeliveryEndDate: new Date('2025-12-21'), actualDeliveryDate: new Date('2025-12-19'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'OCA-000063', logisticsCompany: 'OCA', shippingCost: 15600, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user6.id, idUserSubscriptions: user6Sub2.id, idClub: clubLootCrateAR.id, boxMonthYear: '2026-01', estimatedDeliveryStartDate: new Date('2026-01-11'), estimatedDeliveryEndDate: new Date('2026-01-21'), actualDeliveryDate: new Date('2026-01-16'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'OCA-000064', logisticsCompany: 'OCA', shippingCost: 15600, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user6.id, idUserSubscriptions: user6Sub2.id, idClub: clubLootCrateAR.id, boxMonthYear: '2026-02', estimatedDeliveryStartDate: new Date('2026-02-11'), estimatedDeliveryEndDate: new Date('2026-02-21'), actualDeliveryDate: new Date('2026-02-17'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'OCA-000065', logisticsCompany: 'OCA', shippingCost: 15600, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user6.id, idUserSubscriptions: user6Sub2.id, idClub: clubLootCrateAR.id, boxMonthYear: '2026-03', estimatedDeliveryStartDate: new Date('2026-03-11'), estimatedDeliveryEndDate: new Date('2026-03-21'), actualDeliveryDate: new Date('2026-03-20'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'OCA-000066', logisticsCompany: 'OCA', shippingCost: 15600, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user6.id, idUserSubscriptions: user6Sub2.id, idClub: clubLootCrateAR.id, boxMonthYear: '2026-04', estimatedDeliveryStartDate: new Date('2026-04-11'), estimatedDeliveryEndDate: new Date('2026-04-21'), actualDeliveryDate: new Date('2026-04-14'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'OCA-000067', logisticsCompany: 'OCA', shippingCost: 15600, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user6.id, idUserSubscriptions: user6Sub2.id, idClub: clubLootCrateAR.id, boxMonthYear: '2026-05', estimatedDeliveryStartDate: new Date('2026-05-11'), estimatedDeliveryEndDate: new Date('2026-05-21'), actualDeliveryDate: new Date('2026-05-19'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'OCA-000068', logisticsCompany: 'OCA', shippingCost: 15600, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user6.id, idUserSubscriptions: user6Sub2.id, idClub: clubLootCrateAR.id, boxMonthYear: '2026-06', estimatedDeliveryStartDate: new Date('2026-06-11'), estimatedDeliveryEndDate: new Date('2026-06-21'), actualDeliveryDate: null, shipmentStatus: ShipmentStatus.Pendiente, trackingNumber: 'OCA-000069', logisticsCompany: 'OCA', shippingCost: 15600, shippingNotes: null } });
+    //#endregion
+  //#endregion
+
+  //#region 24.7. Camila Torres - Posadas, Misiones (~1000km de CABA)
+    //#region 24.7.1. user7Sub1 / Bodega Privada Acceso Privado - OCA - 18 envíos
+    await prisma.shipments.create({ data: { idUser: user7.id, idUserSubscriptions: user7Sub1.id, idClub: clubBodegaPrivada.id, boxMonthYear: '2025-01', estimatedDeliveryStartDate: new Date('2025-01-03'), estimatedDeliveryEndDate: new Date('2025-01-13'), actualDeliveryDate: new Date('2025-01-09'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'OCA-000070', logisticsCompany: 'OCA', shippingCost: 13000, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user7.id, idUserSubscriptions: user7Sub1.id, idClub: clubBodegaPrivada.id, boxMonthYear: '2025-02', estimatedDeliveryStartDate: new Date('2025-02-03'), estimatedDeliveryEndDate: new Date('2025-02-13'), actualDeliveryDate: new Date('2025-02-07'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'OCA-000071', logisticsCompany: 'OCA', shippingCost: 13000, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user7.id, idUserSubscriptions: user7Sub1.id, idClub: clubBodegaPrivada.id, boxMonthYear: '2025-03', estimatedDeliveryStartDate: new Date('2025-03-03'), estimatedDeliveryEndDate: new Date('2025-03-13'), actualDeliveryDate: new Date('2025-03-11'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'OCA-000072', logisticsCompany: 'OCA', shippingCost: 13000, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user7.id, idUserSubscriptions: user7Sub1.id, idClub: clubBodegaPrivada.id, boxMonthYear: '2025-04', estimatedDeliveryStartDate: new Date('2025-04-03'), estimatedDeliveryEndDate: new Date('2025-04-13'), actualDeliveryDate: new Date('2025-04-05'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'OCA-000073', logisticsCompany: 'OCA', shippingCost: 13000, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user7.id, idUserSubscriptions: user7Sub1.id, idClub: clubBodegaPrivada.id, boxMonthYear: '2025-05', estimatedDeliveryStartDate: new Date('2025-05-03'), estimatedDeliveryEndDate: new Date('2025-05-13'), actualDeliveryDate: new Date('2025-05-12'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'OCA-000074', logisticsCompany: 'OCA', shippingCost: 13000, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user7.id, idUserSubscriptions: user7Sub1.id, idClub: clubBodegaPrivada.id, boxMonthYear: '2025-06', estimatedDeliveryStartDate: new Date('2025-06-03'), estimatedDeliveryEndDate: new Date('2025-06-13'), actualDeliveryDate: new Date('2025-06-06'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'OCA-000075', logisticsCompany: 'OCA', shippingCost: 13000, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user7.id, idUserSubscriptions: user7Sub1.id, idClub: clubBodegaPrivada.id, boxMonthYear: '2025-07', estimatedDeliveryStartDate: new Date('2025-07-03'), estimatedDeliveryEndDate: new Date('2025-07-13'), actualDeliveryDate: new Date('2025-07-10'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'OCA-000076', logisticsCompany: 'OCA', shippingCost: 13000, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user7.id, idUserSubscriptions: user7Sub1.id, idClub: clubBodegaPrivada.id, boxMonthYear: '2025-08', estimatedDeliveryStartDate: new Date('2025-08-03'), estimatedDeliveryEndDate: new Date('2025-08-13'), actualDeliveryDate: new Date('2025-08-04'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'OCA-000077', logisticsCompany: 'OCA', shippingCost: 13000, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user7.id, idUserSubscriptions: user7Sub1.id, idClub: clubBodegaPrivada.id, boxMonthYear: '2025-09', estimatedDeliveryStartDate: new Date('2025-09-03'), estimatedDeliveryEndDate: new Date('2025-09-13'), actualDeliveryDate: new Date('2025-09-13'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'OCA-000078', logisticsCompany: 'OCA', shippingCost: 13000, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user7.id, idUserSubscriptions: user7Sub1.id, idClub: clubBodegaPrivada.id, boxMonthYear: '2025-10', estimatedDeliveryStartDate: new Date('2025-10-03'), estimatedDeliveryEndDate: new Date('2025-10-13'), actualDeliveryDate: new Date('2025-10-08'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'OCA-000079', logisticsCompany: 'OCA', shippingCost: 13000, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user7.id, idUserSubscriptions: user7Sub1.id, idClub: clubBodegaPrivada.id, boxMonthYear: '2025-11', estimatedDeliveryStartDate: new Date('2025-11-03'), estimatedDeliveryEndDate: new Date('2025-11-13'), actualDeliveryDate: new Date('2025-11-11'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'OCA-000080', logisticsCompany: 'OCA', shippingCost: 13000, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user7.id, idUserSubscriptions: user7Sub1.id, idClub: clubBodegaPrivada.id, boxMonthYear: '2025-12', estimatedDeliveryStartDate: new Date('2025-12-03'), estimatedDeliveryEndDate: new Date('2025-12-13'), actualDeliveryDate: new Date('2025-12-07'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'OCA-000081', logisticsCompany: 'OCA', shippingCost: 13000, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user7.id, idUserSubscriptions: user7Sub1.id, idClub: clubBodegaPrivada.id, boxMonthYear: '2026-01', estimatedDeliveryStartDate: new Date('2026-01-03'), estimatedDeliveryEndDate: new Date('2026-01-13'), actualDeliveryDate: new Date('2026-01-12'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'OCA-000082', logisticsCompany: 'OCA', shippingCost: 13000, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user7.id, idUserSubscriptions: user7Sub1.id, idClub: clubBodegaPrivada.id, boxMonthYear: '2026-02', estimatedDeliveryStartDate: new Date('2026-02-03'), estimatedDeliveryEndDate: new Date('2026-02-13'), actualDeliveryDate: new Date('2026-02-06'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'OCA-000083', logisticsCompany: 'OCA', shippingCost: 13000, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user7.id, idUserSubscriptions: user7Sub1.id, idClub: clubBodegaPrivada.id, boxMonthYear: '2026-03', estimatedDeliveryStartDate: new Date('2026-03-03'), estimatedDeliveryEndDate: new Date('2026-03-13'), actualDeliveryDate: new Date('2026-03-10'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'OCA-000084', logisticsCompany: 'OCA', shippingCost: 13000, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user7.id, idUserSubscriptions: user7Sub1.id, idClub: clubBodegaPrivada.id, boxMonthYear: '2026-04', estimatedDeliveryStartDate: new Date('2026-04-03'), estimatedDeliveryEndDate: new Date('2026-04-13'), actualDeliveryDate: new Date('2026-04-04'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'OCA-000085', logisticsCompany: 'OCA', shippingCost: 13000, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user7.id, idUserSubscriptions: user7Sub1.id, idClub: clubBodegaPrivada.id, boxMonthYear: '2026-05', estimatedDeliveryStartDate: new Date('2026-05-03'), estimatedDeliveryEndDate: new Date('2026-05-13'), actualDeliveryDate: new Date('2026-05-09'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'OCA-000086', logisticsCompany: 'OCA', shippingCost: 13000, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user7.id, idUserSubscriptions: user7Sub1.id, idClub: clubBodegaPrivada.id, boxMonthYear: '2026-06', estimatedDeliveryStartDate: new Date('2026-06-03'), estimatedDeliveryEndDate: new Date('2026-06-13'), actualDeliveryDate: null, shipmentStatus: ShipmentStatus.En_Camino, trackingNumber: 'OCA-000087', logisticsCompany: 'OCA', shippingCost: 13000, shippingNotes: null } });
+    //#endregion
+  //#endregion
+
+  //#region 24.8. Federico Romero - La Plata, Buenos Aires (~60km de CABA)
+    //#region 24.8.1. user8Sub1 / Beer Box Six Pack - Correo Argentino - 18 envíos
+    await prisma.shipments.create({ data: { idUser: user8.id, idUserSubscriptions: user8Sub1.id, idClub: clubBeerBox.id, boxMonthYear: '2025-01', estimatedDeliveryStartDate: new Date('2025-01-04'), estimatedDeliveryEndDate: new Date('2025-01-14'), actualDeliveryDate: new Date('2025-01-08'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000157', logisticsCompany: 'Correo Argentino', shippingCost: 1200, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user8.id, idUserSubscriptions: user8Sub1.id, idClub: clubBeerBox.id, boxMonthYear: '2025-02', estimatedDeliveryStartDate: new Date('2025-02-04'), estimatedDeliveryEndDate: new Date('2025-02-14'), actualDeliveryDate: new Date('2025-02-11'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000158', logisticsCompany: 'Correo Argentino', shippingCost: 1200, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user8.id, idUserSubscriptions: user8Sub1.id, idClub: clubBeerBox.id, boxMonthYear: '2025-03', estimatedDeliveryStartDate: new Date('2025-03-04'), estimatedDeliveryEndDate: new Date('2025-03-14'), actualDeliveryDate: new Date('2025-03-06'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000159', logisticsCompany: 'Correo Argentino', shippingCost: 1200, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user8.id, idUserSubscriptions: user8Sub1.id, idClub: clubBeerBox.id, boxMonthYear: '2025-04', estimatedDeliveryStartDate: new Date('2025-04-04'), estimatedDeliveryEndDate: new Date('2025-04-14'), actualDeliveryDate: new Date('2025-04-13'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000160', logisticsCompany: 'Correo Argentino', shippingCost: 1200, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user8.id, idUserSubscriptions: user8Sub1.id, idClub: clubBeerBox.id, boxMonthYear: '2025-05', estimatedDeliveryStartDate: new Date('2025-05-04'), estimatedDeliveryEndDate: new Date('2025-05-14'), actualDeliveryDate: new Date('2025-05-07'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000161', logisticsCompany: 'Correo Argentino', shippingCost: 1200, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user8.id, idUserSubscriptions: user8Sub1.id, idClub: clubBeerBox.id, boxMonthYear: '2025-06', estimatedDeliveryStartDate: new Date('2025-06-04'), estimatedDeliveryEndDate: new Date('2025-06-14'), actualDeliveryDate: new Date('2025-06-09'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000162', logisticsCompany: 'Correo Argentino', shippingCost: 1200, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user8.id, idUserSubscriptions: user8Sub1.id, idClub: clubBeerBox.id, boxMonthYear: '2025-07', estimatedDeliveryStartDate: new Date('2025-07-04'), estimatedDeliveryEndDate: new Date('2025-07-14'), actualDeliveryDate: new Date('2025-07-14'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000163', logisticsCompany: 'Correo Argentino', shippingCost: 1200, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user8.id, idUserSubscriptions: user8Sub1.id, idClub: clubBeerBox.id, boxMonthYear: '2025-08', estimatedDeliveryStartDate: new Date('2025-08-04'), estimatedDeliveryEndDate: new Date('2025-08-14'), actualDeliveryDate: new Date('2025-08-05'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000164', logisticsCompany: 'Correo Argentino', shippingCost: 1200, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user8.id, idUserSubscriptions: user8Sub1.id, idClub: clubBeerBox.id, boxMonthYear: '2025-09', estimatedDeliveryStartDate: new Date('2025-09-04'), estimatedDeliveryEndDate: new Date('2025-09-14'), actualDeliveryDate: new Date('2025-09-12'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000165', logisticsCompany: 'Correo Argentino', shippingCost: 1200, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user8.id, idUserSubscriptions: user8Sub1.id, idClub: clubBeerBox.id, boxMonthYear: '2025-10', estimatedDeliveryStartDate: new Date('2025-10-04'), estimatedDeliveryEndDate: new Date('2025-10-14'), actualDeliveryDate: new Date('2025-10-10'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000166', logisticsCompany: 'Correo Argentino', shippingCost: 1200, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user8.id, idUserSubscriptions: user8Sub1.id, idClub: clubBeerBox.id, boxMonthYear: '2025-11', estimatedDeliveryStartDate: new Date('2025-11-04'), estimatedDeliveryEndDate: new Date('2025-11-14'), actualDeliveryDate: new Date('2025-11-06'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000167', logisticsCompany: 'Correo Argentino', shippingCost: 1200, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user8.id, idUserSubscriptions: user8Sub1.id, idClub: clubBeerBox.id, boxMonthYear: '2025-12', estimatedDeliveryStartDate: new Date('2025-12-04'), estimatedDeliveryEndDate: new Date('2025-12-14'), actualDeliveryDate: new Date('2025-12-11'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000168', logisticsCompany: 'Correo Argentino', shippingCost: 1200, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user8.id, idUserSubscriptions: user8Sub1.id, idClub: clubBeerBox.id, boxMonthYear: '2026-01', estimatedDeliveryStartDate: new Date('2026-01-04'), estimatedDeliveryEndDate: new Date('2026-01-14'), actualDeliveryDate: new Date('2026-01-13'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000169', logisticsCompany: 'Correo Argentino', shippingCost: 1200, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user8.id, idUserSubscriptions: user8Sub1.id, idClub: clubBeerBox.id, boxMonthYear: '2026-02', estimatedDeliveryStartDate: new Date('2026-02-04'), estimatedDeliveryEndDate: new Date('2026-02-14'), actualDeliveryDate: new Date('2026-02-08'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000170', logisticsCompany: 'Correo Argentino', shippingCost: 1200, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user8.id, idUserSubscriptions: user8Sub1.id, idClub: clubBeerBox.id, boxMonthYear: '2026-03', estimatedDeliveryStartDate: new Date('2026-03-04'), estimatedDeliveryEndDate: new Date('2026-03-14'), actualDeliveryDate: new Date('2026-03-07'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000171', logisticsCompany: 'Correo Argentino', shippingCost: 1200, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user8.id, idUserSubscriptions: user8Sub1.id, idClub: clubBeerBox.id, boxMonthYear: '2026-04', estimatedDeliveryStartDate: new Date('2026-04-04'), estimatedDeliveryEndDate: new Date('2026-04-14'), actualDeliveryDate: new Date('2026-04-11'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000172', logisticsCompany: 'Correo Argentino', shippingCost: 1200, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user8.id, idUserSubscriptions: user8Sub1.id, idClub: clubBeerBox.id, boxMonthYear: '2026-05', estimatedDeliveryStartDate: new Date('2026-05-04'), estimatedDeliveryEndDate: new Date('2026-05-14'), actualDeliveryDate: new Date('2026-05-05'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000173', logisticsCompany: 'Correo Argentino', shippingCost: 1200, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user8.id, idUserSubscriptions: user8Sub1.id, idClub: clubBeerBox.id, boxMonthYear: '2026-06', estimatedDeliveryStartDate: new Date('2026-06-04'), estimatedDeliveryEndDate: new Date('2026-06-14'), actualDeliveryDate: null, shipmentStatus: ShipmentStatus.En_Camino, trackingNumber: 'CA-000174', logisticsCompany: 'Correo Argentino', shippingCost: 1200, shippingNotes: null } });
+    //#endregion
+
+    //#region 24.8.2. user8Sub2 / Gaming Box Controller Pack - Correo Argentino - 17 envíos
+    await prisma.shipments.create({ data: { idUser: user8.id, idUserSubscriptions: user8Sub2.id, idClub: clubGamingBox.id, boxMonthYear: '2025-02', estimatedDeliveryStartDate: new Date('2025-02-16'), estimatedDeliveryEndDate: new Date('2025-02-26'), actualDeliveryDate: new Date('2025-02-21'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000175', logisticsCompany: 'Correo Argentino', shippingCost: 1200, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user8.id, idUserSubscriptions: user8Sub2.id, idClub: clubGamingBox.id, boxMonthYear: '2025-03', estimatedDeliveryStartDate: new Date('2025-03-16'), estimatedDeliveryEndDate: new Date('2025-03-26'), actualDeliveryDate: new Date('2025-03-18'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000176', logisticsCompany: 'Correo Argentino', shippingCost: 1200, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user8.id, idUserSubscriptions: user8Sub2.id, idClub: clubGamingBox.id, boxMonthYear: '2025-04', estimatedDeliveryStartDate: new Date('2025-04-16'), estimatedDeliveryEndDate: new Date('2025-04-26'), actualDeliveryDate: new Date('2025-04-25'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000177', logisticsCompany: 'Correo Argentino', shippingCost: 1200, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user8.id, idUserSubscriptions: user8Sub2.id, idClub: clubGamingBox.id, boxMonthYear: '2025-05', estimatedDeliveryStartDate: new Date('2025-05-16'), estimatedDeliveryEndDate: new Date('2025-05-26'), actualDeliveryDate: new Date('2025-05-17'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000178', logisticsCompany: 'Correo Argentino', shippingCost: 1200, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user8.id, idUserSubscriptions: user8Sub2.id, idClub: clubGamingBox.id, boxMonthYear: '2025-06', estimatedDeliveryStartDate: new Date('2025-06-16'), estimatedDeliveryEndDate: new Date('2025-06-26'), actualDeliveryDate: new Date('2025-06-22'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000179', logisticsCompany: 'Correo Argentino', shippingCost: 1200, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user8.id, idUserSubscriptions: user8Sub2.id, idClub: clubGamingBox.id, boxMonthYear: '2025-07', estimatedDeliveryStartDate: new Date('2025-07-16'), estimatedDeliveryEndDate: new Date('2025-07-26'), actualDeliveryDate: new Date('2025-07-16'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000180', logisticsCompany: 'Correo Argentino', shippingCost: 1200, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user8.id, idUserSubscriptions: user8Sub2.id, idClub: clubGamingBox.id, boxMonthYear: '2025-08', estimatedDeliveryStartDate: new Date('2025-08-16'), estimatedDeliveryEndDate: new Date('2025-08-26'), actualDeliveryDate: new Date('2025-08-24'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000181', logisticsCompany: 'Correo Argentino', shippingCost: 1200, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user8.id, idUserSubscriptions: user8Sub2.id, idClub: clubGamingBox.id, boxMonthYear: '2025-09', estimatedDeliveryStartDate: new Date('2025-09-16'), estimatedDeliveryEndDate: new Date('2025-09-26'), actualDeliveryDate: new Date('2025-09-19'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000182', logisticsCompany: 'Correo Argentino', shippingCost: 1200, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user8.id, idUserSubscriptions: user8Sub2.id, idClub: clubGamingBox.id, boxMonthYear: '2025-10', estimatedDeliveryStartDate: new Date('2025-10-16'), estimatedDeliveryEndDate: new Date('2025-10-26'), actualDeliveryDate: new Date('2025-10-26'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000183', logisticsCompany: 'Correo Argentino', shippingCost: 1200, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user8.id, idUserSubscriptions: user8Sub2.id, idClub: clubGamingBox.id, boxMonthYear: '2025-11', estimatedDeliveryStartDate: new Date('2025-11-16'), estimatedDeliveryEndDate: new Date('2025-11-26'), actualDeliveryDate: new Date('2025-11-18'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000184', logisticsCompany: 'Correo Argentino', shippingCost: 1200, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user8.id, idUserSubscriptions: user8Sub2.id, idClub: clubGamingBox.id, boxMonthYear: '2025-12', estimatedDeliveryStartDate: new Date('2025-12-16'), estimatedDeliveryEndDate: new Date('2025-12-26'), actualDeliveryDate: new Date('2025-12-20'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000185', logisticsCompany: 'Correo Argentino', shippingCost: 1200, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user8.id, idUserSubscriptions: user8Sub2.id, idClub: clubGamingBox.id, boxMonthYear: '2026-01', estimatedDeliveryStartDate: new Date('2026-01-16'), estimatedDeliveryEndDate: new Date('2026-01-26'), actualDeliveryDate: new Date('2026-01-23'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000186', logisticsCompany: 'Correo Argentino', shippingCost: 1200, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user8.id, idUserSubscriptions: user8Sub2.id, idClub: clubGamingBox.id, boxMonthYear: '2026-02', estimatedDeliveryStartDate: new Date('2026-02-16'), estimatedDeliveryEndDate: new Date('2026-02-26'), actualDeliveryDate: new Date('2026-02-17'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000187', logisticsCompany: 'Correo Argentino', shippingCost: 1200, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user8.id, idUserSubscriptions: user8Sub2.id, idClub: clubGamingBox.id, boxMonthYear: '2026-03', estimatedDeliveryStartDate: new Date('2026-03-16'), estimatedDeliveryEndDate: new Date('2026-03-26'), actualDeliveryDate: new Date('2026-03-25'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000188', logisticsCompany: 'Correo Argentino', shippingCost: 1200, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user8.id, idUserSubscriptions: user8Sub2.id, idClub: clubGamingBox.id, boxMonthYear: '2026-04', estimatedDeliveryStartDate: new Date('2026-04-16'), estimatedDeliveryEndDate: new Date('2026-04-26'), actualDeliveryDate: new Date('2026-04-16'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000189', logisticsCompany: 'Correo Argentino', shippingCost: 1200, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user8.id, idUserSubscriptions: user8Sub2.id, idClub: clubGamingBox.id, boxMonthYear: '2026-05', estimatedDeliveryStartDate: new Date('2026-05-16'), estimatedDeliveryEndDate: new Date('2026-05-26'), actualDeliveryDate: new Date('2026-05-22'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000190', logisticsCompany: 'Correo Argentino', shippingCost: 1200, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user8.id, idUserSubscriptions: user8Sub2.id, idClub: clubGamingBox.id, boxMonthYear: '2026-06', estimatedDeliveryStartDate: new Date('2026-06-16'), estimatedDeliveryEndDate: new Date('2026-06-26'), actualDeliveryDate: null, shipmentStatus: ShipmentStatus.Pendiente, trackingNumber: 'CA-000191', logisticsCompany: 'Correo Argentino', shippingCost: 1200, shippingNotes: null } });
+    //#endregion
+
+    //#region 24.8.3. user8Sub3 / Snack Box Viaje de Sabores - OCA - 16 envíos
+    await prisma.shipments.create({ data: { idUser: user8.id, idUserSubscriptions: user8Sub3.id, idClub: clubSnackBox.id, boxMonthYear: '2025-03', estimatedDeliveryStartDate: new Date('2025-03-22'), estimatedDeliveryEndDate: new Date('2025-04-02'), actualDeliveryDate: new Date('2025-03-28'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'OCA-000088', logisticsCompany: 'OCA', shippingCost: 1800, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user8.id, idUserSubscriptions: user8Sub3.id, idClub: clubSnackBox.id, boxMonthYear: '2025-04', estimatedDeliveryStartDate: new Date('2025-04-22'), estimatedDeliveryEndDate: new Date('2025-05-02'), actualDeliveryDate: new Date('2025-04-30'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'OCA-000089', logisticsCompany: 'OCA', shippingCost: 1800, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user8.id, idUserSubscriptions: user8Sub3.id, idClub: clubSnackBox.id, boxMonthYear: '2025-05', estimatedDeliveryStartDate: new Date('2025-05-22'), estimatedDeliveryEndDate: new Date('2025-06-02'), actualDeliveryDate: new Date('2025-05-25'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'OCA-000090', logisticsCompany: 'OCA', shippingCost: 1800, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user8.id, idUserSubscriptions: user8Sub3.id, idClub: clubSnackBox.id, boxMonthYear: '2025-06', estimatedDeliveryStartDate: new Date('2025-06-22'), estimatedDeliveryEndDate: new Date('2025-07-02'), actualDeliveryDate: new Date('2025-06-29'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'OCA-000091', logisticsCompany: 'OCA', shippingCost: 1800, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user8.id, idUserSubscriptions: user8Sub3.id, idClub: clubSnackBox.id, boxMonthYear: '2025-07', estimatedDeliveryStartDate: new Date('2025-07-22'), estimatedDeliveryEndDate: new Date('2025-08-02'), actualDeliveryDate: new Date('2025-07-24'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'OCA-000092', logisticsCompany: 'OCA', shippingCost: 1800, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user8.id, idUserSubscriptions: user8Sub3.id, idClub: clubSnackBox.id, boxMonthYear: '2025-08', estimatedDeliveryStartDate: new Date('2025-08-22'), estimatedDeliveryEndDate: new Date('2025-09-02'), actualDeliveryDate: new Date('2025-09-01'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'OCA-000093', logisticsCompany: 'OCA', shippingCost: 1800, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user8.id, idUserSubscriptions: user8Sub3.id, idClub: clubSnackBox.id, boxMonthYear: '2025-09', estimatedDeliveryStartDate: new Date('2025-09-22'), estimatedDeliveryEndDate: new Date('2025-10-02'), actualDeliveryDate: new Date('2025-09-26'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'OCA-000094', logisticsCompany: 'OCA', shippingCost: 1800, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user8.id, idUserSubscriptions: user8Sub3.id, idClub: clubSnackBox.id, boxMonthYear: '2025-10', estimatedDeliveryStartDate: new Date('2025-10-22'), estimatedDeliveryEndDate: new Date('2025-11-02'), actualDeliveryDate: new Date('2025-10-31'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'OCA-000095', logisticsCompany: 'OCA', shippingCost: 1800, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user8.id, idUserSubscriptions: user8Sub3.id, idClub: clubSnackBox.id, boxMonthYear: '2025-11', estimatedDeliveryStartDate: new Date('2025-11-22'), estimatedDeliveryEndDate: new Date('2025-12-02'), actualDeliveryDate: new Date('2025-11-28'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'OCA-000096', logisticsCompany: 'OCA', shippingCost: 1800, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user8.id, idUserSubscriptions: user8Sub3.id, idClub: clubSnackBox.id, boxMonthYear: '2025-12', estimatedDeliveryStartDate: new Date('2025-12-22'), estimatedDeliveryEndDate: new Date('2026-01-02'), actualDeliveryDate: new Date('2025-12-27'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'OCA-000097', logisticsCompany: 'OCA', shippingCost: 1800, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user8.id, idUserSubscriptions: user8Sub3.id, idClub: clubSnackBox.id, boxMonthYear: '2026-01', estimatedDeliveryStartDate: new Date('2026-01-22'), estimatedDeliveryEndDate: new Date('2026-02-02'), actualDeliveryDate: new Date('2026-01-29'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'OCA-000098', logisticsCompany: 'OCA', shippingCost: 1800, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user8.id, idUserSubscriptions: user8Sub3.id, idClub: clubSnackBox.id, boxMonthYear: '2026-02', estimatedDeliveryStartDate: new Date('2026-02-22'), estimatedDeliveryEndDate: new Date('2026-03-02'), actualDeliveryDate: new Date('2026-02-24'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'OCA-000099', logisticsCompany: 'OCA', shippingCost: 1800, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user8.id, idUserSubscriptions: user8Sub3.id, idClub: clubSnackBox.id, boxMonthYear: '2026-03', estimatedDeliveryStartDate: new Date('2026-03-22'), estimatedDeliveryEndDate: new Date('2026-04-02'), actualDeliveryDate: new Date('2026-03-30'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'OCA-000100', logisticsCompany: 'OCA', shippingCost: 1800, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user8.id, idUserSubscriptions: user8Sub3.id, idClub: clubSnackBox.id, boxMonthYear: '2026-04', estimatedDeliveryStartDate: new Date('2026-04-22'), estimatedDeliveryEndDate: new Date('2026-05-02'), actualDeliveryDate: new Date('2026-04-23'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'OCA-000101', logisticsCompany: 'OCA', shippingCost: 1800, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user8.id, idUserSubscriptions: user8Sub3.id, idClub: clubSnackBox.id, boxMonthYear: '2026-05', estimatedDeliveryStartDate: new Date('2026-05-22'), estimatedDeliveryEndDate: new Date('2026-06-02'), actualDeliveryDate: new Date('2026-05-29'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'OCA-000102', logisticsCompany: 'OCA', shippingCost: 1800, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user8.id, idUserSubscriptions: user8Sub3.id, idClub: clubSnackBox.id, boxMonthYear: '2026-06', estimatedDeliveryStartDate: new Date('2026-06-22'), estimatedDeliveryEndDate: new Date('2026-07-02'), actualDeliveryDate: null, shipmentStatus: ShipmentStatus.Pendiente, trackingNumber: 'OCA-000103', logisticsCompany: 'OCA', shippingCost: 1800, shippingNotes: null } });
+    //#endregion
+  //#endregion
+
+  //#region 24.9. Sofía Núñez - San Miguel de Tucumán (~1200km de CABA)
+    //#region 24.9.1. user9Sub1 / Anime Box Otaku Mensual - Correo Argentino - 18 envíos
+    await prisma.shipments.create({ data: { idUser: user9.id, idUserSubscriptions: user9Sub1.id, idClub: clubAnimeBox.id, boxMonthYear: '2025-01', estimatedDeliveryStartDate: new Date('2025-01-01'), estimatedDeliveryEndDate: new Date('2025-01-11'), actualDeliveryDate: new Date('2025-01-09'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000192', logisticsCompany: 'Correo Argentino', shippingCost: 10800, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user9.id, idUserSubscriptions: user9Sub1.id, idClub: clubAnimeBox.id, boxMonthYear: '2025-02', estimatedDeliveryStartDate: new Date('2025-02-01'), estimatedDeliveryEndDate: new Date('2025-02-11'), actualDeliveryDate: new Date('2025-02-04'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000193', logisticsCompany: 'Correo Argentino', shippingCost: 10800, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user9.id, idUserSubscriptions: user9Sub1.id, idClub: clubAnimeBox.id, boxMonthYear: '2025-03', estimatedDeliveryStartDate: new Date('2025-03-01'), estimatedDeliveryEndDate: new Date('2025-03-11'), actualDeliveryDate: new Date('2025-03-10'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000194', logisticsCompany: 'Correo Argentino', shippingCost: 10800, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user9.id, idUserSubscriptions: user9Sub1.id, idClub: clubAnimeBox.id, boxMonthYear: '2025-04', estimatedDeliveryStartDate: new Date('2025-04-01'), estimatedDeliveryEndDate: new Date('2025-04-11'), actualDeliveryDate: new Date('2025-04-03'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000195', logisticsCompany: 'Correo Argentino', shippingCost: 10800, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user9.id, idUserSubscriptions: user9Sub1.id, idClub: clubAnimeBox.id, boxMonthYear: '2025-05', estimatedDeliveryStartDate: new Date('2025-05-01'), estimatedDeliveryEndDate: new Date('2025-05-11'), actualDeliveryDate: new Date('2025-05-11'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000196', logisticsCompany: 'Correo Argentino', shippingCost: 10800, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user9.id, idUserSubscriptions: user9Sub1.id, idClub: clubAnimeBox.id, boxMonthYear: '2025-06', estimatedDeliveryStartDate: new Date('2025-06-01'), estimatedDeliveryEndDate: new Date('2025-06-11'), actualDeliveryDate: new Date('2025-06-07'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000197', logisticsCompany: 'Correo Argentino', shippingCost: 10800, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user9.id, idUserSubscriptions: user9Sub1.id, idClub: clubAnimeBox.id, boxMonthYear: '2025-07', estimatedDeliveryStartDate: new Date('2025-07-01'), estimatedDeliveryEndDate: new Date('2025-07-11'), actualDeliveryDate: new Date('2025-07-02'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000198', logisticsCompany: 'Correo Argentino', shippingCost: 10800, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user9.id, idUserSubscriptions: user9Sub1.id, idClub: clubAnimeBox.id, boxMonthYear: '2025-08', estimatedDeliveryStartDate: new Date('2025-08-01'), estimatedDeliveryEndDate: new Date('2025-08-11'), actualDeliveryDate: new Date('2025-08-08'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000199', logisticsCompany: 'Correo Argentino', shippingCost: 10800, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user9.id, idUserSubscriptions: user9Sub1.id, idClub: clubAnimeBox.id, boxMonthYear: '2025-09', estimatedDeliveryStartDate: new Date('2025-09-01'), estimatedDeliveryEndDate: new Date('2025-09-11'), actualDeliveryDate: new Date('2025-09-11'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000200', logisticsCompany: 'Correo Argentino', shippingCost: 10800, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user9.id, idUserSubscriptions: user9Sub1.id, idClub: clubAnimeBox.id, boxMonthYear: '2025-10', estimatedDeliveryStartDate: new Date('2025-10-01'), estimatedDeliveryEndDate: new Date('2025-10-11'), actualDeliveryDate: new Date('2025-10-05'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000201', logisticsCompany: 'Correo Argentino', shippingCost: 10800, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user9.id, idUserSubscriptions: user9Sub1.id, idClub: clubAnimeBox.id, boxMonthYear: '2025-11', estimatedDeliveryStartDate: new Date('2025-11-01'), estimatedDeliveryEndDate: new Date('2025-11-11'), actualDeliveryDate: new Date('2025-11-10'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000202', logisticsCompany: 'Correo Argentino', shippingCost: 10800, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user9.id, idUserSubscriptions: user9Sub1.id, idClub: clubAnimeBox.id, boxMonthYear: '2025-12', estimatedDeliveryStartDate: new Date('2025-12-01'), estimatedDeliveryEndDate: new Date('2025-12-11'), actualDeliveryDate: new Date('2025-12-06'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000203', logisticsCompany: 'Correo Argentino', shippingCost: 10800, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user9.id, idUserSubscriptions: user9Sub1.id, idClub: clubAnimeBox.id, boxMonthYear: '2026-01', estimatedDeliveryStartDate: new Date('2026-01-01'), estimatedDeliveryEndDate: new Date('2026-01-11'), actualDeliveryDate: new Date('2026-01-04'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000204', logisticsCompany: 'Correo Argentino', shippingCost: 10800, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user9.id, idUserSubscriptions: user9Sub1.id, idClub: clubAnimeBox.id, boxMonthYear: '2026-02', estimatedDeliveryStartDate: new Date('2026-02-01'), estimatedDeliveryEndDate: new Date('2026-02-11'), actualDeliveryDate: new Date('2026-02-10'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000205', logisticsCompany: 'Correo Argentino', shippingCost: 10800, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user9.id, idUserSubscriptions: user9Sub1.id, idClub: clubAnimeBox.id, boxMonthYear: '2026-03', estimatedDeliveryStartDate: new Date('2026-03-01'), estimatedDeliveryEndDate: new Date('2026-03-11'), actualDeliveryDate: new Date('2026-03-03'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000206', logisticsCompany: 'Correo Argentino', shippingCost: 10800, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user9.id, idUserSubscriptions: user9Sub1.id, idClub: clubAnimeBox.id, boxMonthYear: '2026-04', estimatedDeliveryStartDate: new Date('2026-04-01'), estimatedDeliveryEndDate: new Date('2026-04-11'), actualDeliveryDate: new Date('2026-04-09'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000207', logisticsCompany: 'Correo Argentino', shippingCost: 10800, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user9.id, idUserSubscriptions: user9Sub1.id, idClub: clubAnimeBox.id, boxMonthYear: '2026-05', estimatedDeliveryStartDate: new Date('2026-05-01'), estimatedDeliveryEndDate: new Date('2026-05-11'), actualDeliveryDate: new Date('2026-05-07'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000208', logisticsCompany: 'Correo Argentino', shippingCost: 10800, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user9.id, idUserSubscriptions: user9Sub1.id, idClub: clubAnimeBox.id, boxMonthYear: '2026-06', estimatedDeliveryStartDate: new Date('2026-06-01'), estimatedDeliveryEndDate: new Date('2026-06-11'), actualDeliveryDate: null, shipmentStatus: ShipmentStatus.En_Camino, trackingNumber: 'CA-000209', logisticsCompany: 'Correo Argentino', shippingCost: 10800, shippingNotes: null } });
+    //#endregion
+
+    //#region 24.9.2. user9Sub2 / Manjar Poesía - Correo Argentino - 17 envíos
+    await prisma.shipments.create({ data: { idUser: user9.id, idUserSubscriptions: user9Sub2.id, idClub: clubManjarLiterario.id, boxMonthYear: '2025-02', estimatedDeliveryStartDate: new Date('2025-02-08'), estimatedDeliveryEndDate: new Date('2025-02-18'), actualDeliveryDate: new Date('2025-02-14'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000210', logisticsCompany: 'Correo Argentino', shippingCost: 10800, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user9.id, idUserSubscriptions: user9Sub2.id, idClub: clubManjarLiterario.id, boxMonthYear: '2025-03', estimatedDeliveryStartDate: new Date('2025-03-08'), estimatedDeliveryEndDate: new Date('2025-03-18'), actualDeliveryDate: new Date('2025-03-17'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000211', logisticsCompany: 'Correo Argentino', shippingCost: 10800, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user9.id, idUserSubscriptions: user9Sub2.id, idClub: clubManjarLiterario.id, boxMonthYear: '2025-04', estimatedDeliveryStartDate: new Date('2025-04-08'), estimatedDeliveryEndDate: new Date('2025-04-18'), actualDeliveryDate: new Date('2025-04-09'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000212', logisticsCompany: 'Correo Argentino', shippingCost: 10800, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user9.id, idUserSubscriptions: user9Sub2.id, idClub: clubManjarLiterario.id, boxMonthYear: '2025-05', estimatedDeliveryStartDate: new Date('2025-05-08'), estimatedDeliveryEndDate: new Date('2025-05-18'), actualDeliveryDate: new Date('2025-05-16'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000213', logisticsCompany: 'Correo Argentino', shippingCost: 10800, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user9.id, idUserSubscriptions: user9Sub2.id, idClub: clubManjarLiterario.id, boxMonthYear: '2025-06', estimatedDeliveryStartDate: new Date('2025-06-08'), estimatedDeliveryEndDate: new Date('2025-06-18'), actualDeliveryDate: new Date('2025-06-10'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000214', logisticsCompany: 'Correo Argentino', shippingCost: 10800, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user9.id, idUserSubscriptions: user9Sub2.id, idClub: clubManjarLiterario.id, boxMonthYear: '2025-07', estimatedDeliveryStartDate: new Date('2025-07-08'), estimatedDeliveryEndDate: new Date('2025-07-18'), actualDeliveryDate: new Date('2025-07-18'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000215', logisticsCompany: 'Correo Argentino', shippingCost: 10800, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user9.id, idUserSubscriptions: user9Sub2.id, idClub: clubManjarLiterario.id, boxMonthYear: '2025-08', estimatedDeliveryStartDate: new Date('2025-08-08'), estimatedDeliveryEndDate: new Date('2025-08-18'), actualDeliveryDate: new Date('2025-08-12'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000216', logisticsCompany: 'Correo Argentino', shippingCost: 10800, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user9.id, idUserSubscriptions: user9Sub2.id, idClub: clubManjarLiterario.id, boxMonthYear: '2025-09', estimatedDeliveryStartDate: new Date('2025-09-08'), estimatedDeliveryEndDate: new Date('2025-09-18'), actualDeliveryDate: new Date('2025-09-08'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000217', logisticsCompany: 'Correo Argentino', shippingCost: 10800, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user9.id, idUserSubscriptions: user9Sub2.id, idClub: clubManjarLiterario.id, boxMonthYear: '2025-10', estimatedDeliveryStartDate: new Date('2025-10-08'), estimatedDeliveryEndDate: new Date('2025-10-18'), actualDeliveryDate: new Date('2025-10-15'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000218', logisticsCompany: 'Correo Argentino', shippingCost: 10800, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user9.id, idUserSubscriptions: user9Sub2.id, idClub: clubManjarLiterario.id, boxMonthYear: '2025-11', estimatedDeliveryStartDate: new Date('2025-11-08'), estimatedDeliveryEndDate: new Date('2025-11-18'), actualDeliveryDate: new Date('2025-11-13'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000219', logisticsCompany: 'Correo Argentino', shippingCost: 10800, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user9.id, idUserSubscriptions: user9Sub2.id, idClub: clubManjarLiterario.id, boxMonthYear: '2025-12', estimatedDeliveryStartDate: new Date('2025-12-08'), estimatedDeliveryEndDate: new Date('2025-12-18'), actualDeliveryDate: new Date('2025-12-11'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000220', logisticsCompany: 'Correo Argentino', shippingCost: 10800, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user9.id, idUserSubscriptions: user9Sub2.id, idClub: clubManjarLiterario.id, boxMonthYear: '2026-01', estimatedDeliveryStartDate: new Date('2026-01-08'), estimatedDeliveryEndDate: new Date('2026-01-18'), actualDeliveryDate: new Date('2026-01-15'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000221', logisticsCompany: 'Correo Argentino', shippingCost: 10800, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user9.id, idUserSubscriptions: user9Sub2.id, idClub: clubManjarLiterario.id, boxMonthYear: '2026-02', estimatedDeliveryStartDate: new Date('2026-02-08'), estimatedDeliveryEndDate: new Date('2026-02-18'), actualDeliveryDate: new Date('2026-02-13'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000222', logisticsCompany: 'Correo Argentino', shippingCost: 10800, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user9.id, idUserSubscriptions: user9Sub2.id, idClub: clubManjarLiterario.id, boxMonthYear: '2026-03', estimatedDeliveryStartDate: new Date('2026-03-08'), estimatedDeliveryEndDate: new Date('2026-03-18'), actualDeliveryDate: new Date('2026-03-16'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000223', logisticsCompany: 'Correo Argentino', shippingCost: 10800, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user9.id, idUserSubscriptions: user9Sub2.id, idClub: clubManjarLiterario.id, boxMonthYear: '2026-04', estimatedDeliveryStartDate: new Date('2026-04-08'), estimatedDeliveryEndDate: new Date('2026-04-18'), actualDeliveryDate: new Date('2026-04-08'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000224', logisticsCompany: 'Correo Argentino', shippingCost: 10800, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user9.id, idUserSubscriptions: user9Sub2.id, idClub: clubManjarLiterario.id, boxMonthYear: '2026-05', estimatedDeliveryStartDate: new Date('2026-05-08'), estimatedDeliveryEndDate: new Date('2026-05-18'), actualDeliveryDate: new Date('2026-05-14'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000225', logisticsCompany: 'Correo Argentino', shippingCost: 10800, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user9.id, idUserSubscriptions: user9Sub2.id, idClub: clubManjarLiterario.id, boxMonthYear: '2026-06', estimatedDeliveryStartDate: new Date('2026-06-08'), estimatedDeliveryEndDate: new Date('2026-06-18'), actualDeliveryDate: null, shipmentStatus: ShipmentStatus.Pendiente, trackingNumber: 'CA-000226', logisticsCompany: 'Correo Argentino', shippingCost: 10800, shippingNotes: null } });
+    //#endregion
+  //#endregion
+
+  //#region 24.10. Nicolás Gutiérrez - Salta (~1250km de CABA)
+    //#region 24.10.1. user10Sub1 / Outdoor Box Explorer Pro - Correo Argentino - 18 envíos
+    await prisma.shipments.create({ data: { idUser: user10.id, idUserSubscriptions: user10Sub1.id, idClub: clubOutdoorBox.id, boxMonthYear: '2025-01', estimatedDeliveryStartDate: new Date('2025-01-14'), estimatedDeliveryEndDate: new Date('2025-01-24'), actualDeliveryDate: new Date('2025-01-20'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000227', logisticsCompany: 'Correo Argentino', shippingCost: 11250, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user10.id, idUserSubscriptions: user10Sub1.id, idClub: clubOutdoorBox.id, boxMonthYear: '2025-02', estimatedDeliveryStartDate: new Date('2025-02-14'), estimatedDeliveryEndDate: new Date('2025-02-24'), actualDeliveryDate: new Date('2025-02-17'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000228', logisticsCompany: 'Correo Argentino', shippingCost: 11250, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user10.id, idUserSubscriptions: user10Sub1.id, idClub: clubOutdoorBox.id, boxMonthYear: '2025-03', estimatedDeliveryStartDate: new Date('2025-03-14'), estimatedDeliveryEndDate: new Date('2025-03-24'), actualDeliveryDate: new Date('2025-03-23'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000229', logisticsCompany: 'Correo Argentino', shippingCost: 11250, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user10.id, idUserSubscriptions: user10Sub1.id, idClub: clubOutdoorBox.id, boxMonthYear: '2025-04', estimatedDeliveryStartDate: new Date('2025-04-14'), estimatedDeliveryEndDate: new Date('2025-04-24'), actualDeliveryDate: new Date('2025-04-15'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000230', logisticsCompany: 'Correo Argentino', shippingCost: 11250, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user10.id, idUserSubscriptions: user10Sub1.id, idClub: clubOutdoorBox.id, boxMonthYear: '2025-05', estimatedDeliveryStartDate: new Date('2025-05-14'), estimatedDeliveryEndDate: new Date('2025-05-24'), actualDeliveryDate: new Date('2025-05-21'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000231', logisticsCompany: 'Correo Argentino', shippingCost: 11250, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user10.id, idUserSubscriptions: user10Sub1.id, idClub: clubOutdoorBox.id, boxMonthYear: '2025-06', estimatedDeliveryStartDate: new Date('2025-06-14'), estimatedDeliveryEndDate: new Date('2025-06-24'), actualDeliveryDate: new Date('2025-06-14'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000232', logisticsCompany: 'Correo Argentino', shippingCost: 11250, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user10.id, idUserSubscriptions: user10Sub1.id, idClub: clubOutdoorBox.id, boxMonthYear: '2025-07', estimatedDeliveryStartDate: new Date('2025-07-14'), estimatedDeliveryEndDate: new Date('2025-07-24'), actualDeliveryDate: new Date('2025-07-19'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000233', logisticsCompany: 'Correo Argentino', shippingCost: 11250, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user10.id, idUserSubscriptions: user10Sub1.id, idClub: clubOutdoorBox.id, boxMonthYear: '2025-08', estimatedDeliveryStartDate: new Date('2025-08-14'), estimatedDeliveryEndDate: new Date('2025-08-24'), actualDeliveryDate: new Date('2025-08-22'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000234', logisticsCompany: 'Correo Argentino', shippingCost: 11250, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user10.id, idUserSubscriptions: user10Sub1.id, idClub: clubOutdoorBox.id, boxMonthYear: '2025-09', estimatedDeliveryStartDate: new Date('2025-09-14'), estimatedDeliveryEndDate: new Date('2025-09-24'), actualDeliveryDate: new Date('2025-09-16'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000235', logisticsCompany: 'Correo Argentino', shippingCost: 11250, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user10.id, idUserSubscriptions: user10Sub1.id, idClub: clubOutdoorBox.id, boxMonthYear: '2025-10', estimatedDeliveryStartDate: new Date('2025-10-14'), estimatedDeliveryEndDate: new Date('2025-10-24'), actualDeliveryDate: new Date('2025-10-24'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000236', logisticsCompany: 'Correo Argentino', shippingCost: 11250, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user10.id, idUserSubscriptions: user10Sub1.id, idClub: clubOutdoorBox.id, boxMonthYear: '2025-11', estimatedDeliveryStartDate: new Date('2025-11-14'), estimatedDeliveryEndDate: new Date('2025-11-24'), actualDeliveryDate: new Date('2025-11-18'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000237', logisticsCompany: 'Correo Argentino', shippingCost: 11250, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user10.id, idUserSubscriptions: user10Sub1.id, idClub: clubOutdoorBox.id, boxMonthYear: '2025-12', estimatedDeliveryStartDate: new Date('2025-12-14'), estimatedDeliveryEndDate: new Date('2025-12-24'), actualDeliveryDate: new Date('2025-12-20'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000238', logisticsCompany: 'Correo Argentino', shippingCost: 11250, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user10.id, idUserSubscriptions: user10Sub1.id, idClub: clubOutdoorBox.id, boxMonthYear: '2026-01', estimatedDeliveryStartDate: new Date('2026-01-14'), estimatedDeliveryEndDate: new Date('2026-01-24'), actualDeliveryDate: new Date('2026-01-22'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000239', logisticsCompany: 'Correo Argentino', shippingCost: 11250, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user10.id, idUserSubscriptions: user10Sub1.id, idClub: clubOutdoorBox.id, boxMonthYear: '2026-02', estimatedDeliveryStartDate: new Date('2026-02-14'), estimatedDeliveryEndDate: new Date('2026-02-24'), actualDeliveryDate: new Date('2026-02-15'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000240', logisticsCompany: 'Correo Argentino', shippingCost: 11250, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user10.id, idUserSubscriptions: user10Sub1.id, idClub: clubOutdoorBox.id, boxMonthYear: '2026-03', estimatedDeliveryStartDate: new Date('2026-03-14'), estimatedDeliveryEndDate: new Date('2026-03-24'), actualDeliveryDate: new Date('2026-03-21'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000241', logisticsCompany: 'Correo Argentino', shippingCost: 11250, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user10.id, idUserSubscriptions: user10Sub1.id, idClub: clubOutdoorBox.id, boxMonthYear: '2026-04', estimatedDeliveryStartDate: new Date('2026-04-14'), estimatedDeliveryEndDate: new Date('2026-04-24'), actualDeliveryDate: new Date('2026-04-17'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000242', logisticsCompany: 'Correo Argentino', shippingCost: 11250, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user10.id, idUserSubscriptions: user10Sub1.id, idClub: clubOutdoorBox.id, boxMonthYear: '2026-05', estimatedDeliveryStartDate: new Date('2026-05-14'), estimatedDeliveryEndDate: new Date('2026-05-24'), actualDeliveryDate: new Date('2026-05-23'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000243', logisticsCompany: 'Correo Argentino', shippingCost: 11250, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user10.id, idUserSubscriptions: user10Sub1.id, idClub: clubOutdoorBox.id, boxMonthYear: '2026-06', estimatedDeliveryStartDate: new Date('2026-06-14'), estimatedDeliveryEndDate: new Date('2026-06-24'), actualDeliveryDate: null, shipmentStatus: ShipmentStatus.En_Camino, trackingNumber: 'CA-000244', logisticsCompany: 'Correo Argentino', shippingCost: 11250, shippingNotes: null } });
+    //#endregion
+  //#endregion
+
+  //#region 24.11. Florencia Méndez - Mar del Plata (~400km de CABA)
+    //#region 24.11.1. user11Sub1 / Bookerly Mensual - Correo Argentino - 18 envíos
+    await prisma.shipments.create({ data: { idUser: user11.id, idUserSubscriptions: user11Sub1.id, idClub: clubBookerly.id, boxMonthYear: '2025-01', estimatedDeliveryStartDate: new Date('2025-01-18'), estimatedDeliveryEndDate: new Date('2025-01-28'), actualDeliveryDate: new Date('2025-01-24'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000245', logisticsCompany: 'Correo Argentino', shippingCost: 3600, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user11.id, idUserSubscriptions: user11Sub1.id, idClub: clubBookerly.id, boxMonthYear: '2025-02', estimatedDeliveryStartDate: new Date('2025-02-18'), estimatedDeliveryEndDate: new Date('2025-02-28'), actualDeliveryDate: new Date('2025-02-20'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000246', logisticsCompany: 'Correo Argentino', shippingCost: 3600, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user11.id, idUserSubscriptions: user11Sub1.id, idClub: clubBookerly.id, boxMonthYear: '2025-03', estimatedDeliveryStartDate: new Date('2025-03-18'), estimatedDeliveryEndDate: new Date('2025-03-28'), actualDeliveryDate: new Date('2025-03-25'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000247', logisticsCompany: 'Correo Argentino', shippingCost: 3600, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user11.id, idUserSubscriptions: user11Sub1.id, idClub: clubBookerly.id, boxMonthYear: '2025-04', estimatedDeliveryStartDate: new Date('2025-04-18'), estimatedDeliveryEndDate: new Date('2025-04-28'), actualDeliveryDate: new Date('2025-04-19'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000248', logisticsCompany: 'Correo Argentino', shippingCost: 3600, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user11.id, idUserSubscriptions: user11Sub1.id, idClub: clubBookerly.id, boxMonthYear: '2025-05', estimatedDeliveryStartDate: new Date('2025-05-18'), estimatedDeliveryEndDate: new Date('2025-05-28'), actualDeliveryDate: new Date('2025-05-27'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000249', logisticsCompany: 'Correo Argentino', shippingCost: 3600, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user11.id, idUserSubscriptions: user11Sub1.id, idClub: clubBookerly.id, boxMonthYear: '2025-06', estimatedDeliveryStartDate: new Date('2025-06-18'), estimatedDeliveryEndDate: new Date('2025-06-28'), actualDeliveryDate: new Date('2025-06-22'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000250', logisticsCompany: 'Correo Argentino', shippingCost: 3600, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user11.id, idUserSubscriptions: user11Sub1.id, idClub: clubBookerly.id, boxMonthYear: '2025-07', estimatedDeliveryStartDate: new Date('2025-07-18'), estimatedDeliveryEndDate: new Date('2025-07-28'), actualDeliveryDate: new Date('2025-07-18'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000251', logisticsCompany: 'Correo Argentino', shippingCost: 3600, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user11.id, idUserSubscriptions: user11Sub1.id, idClub: clubBookerly.id, boxMonthYear: '2025-08', estimatedDeliveryStartDate: new Date('2025-08-18'), estimatedDeliveryEndDate: new Date('2025-08-28'), actualDeliveryDate: new Date('2025-08-26'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000252', logisticsCompany: 'Correo Argentino', shippingCost: 3600, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user11.id, idUserSubscriptions: user11Sub1.id, idClub: clubBookerly.id, boxMonthYear: '2025-09', estimatedDeliveryStartDate: new Date('2025-09-18'), estimatedDeliveryEndDate: new Date('2025-09-28'), actualDeliveryDate: new Date('2025-09-21'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000253', logisticsCompany: 'Correo Argentino', shippingCost: 3600, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user11.id, idUserSubscriptions: user11Sub1.id, idClub: clubBookerly.id, boxMonthYear: '2025-10', estimatedDeliveryStartDate: new Date('2025-10-18'), estimatedDeliveryEndDate: new Date('2025-10-28'), actualDeliveryDate: new Date('2025-10-18'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000254', logisticsCompany: 'Correo Argentino', shippingCost: 3600, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user11.id, idUserSubscriptions: user11Sub1.id, idClub: clubBookerly.id, boxMonthYear: '2025-11', estimatedDeliveryStartDate: new Date('2025-11-18'), estimatedDeliveryEndDate: new Date('2025-11-28'), actualDeliveryDate: new Date('2025-11-25'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000255', logisticsCompany: 'Correo Argentino', shippingCost: 3600, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user11.id, idUserSubscriptions: user11Sub1.id, idClub: clubBookerly.id, boxMonthYear: '2025-12', estimatedDeliveryStartDate: new Date('2025-12-18'), estimatedDeliveryEndDate: new Date('2025-12-28'), actualDeliveryDate: new Date('2025-12-19'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000256', logisticsCompany: 'Correo Argentino', shippingCost: 3600, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user11.id, idUserSubscriptions: user11Sub1.id, idClub: clubBookerly.id, boxMonthYear: '2026-01', estimatedDeliveryStartDate: new Date('2026-01-18'), estimatedDeliveryEndDate: new Date('2026-01-28'), actualDeliveryDate: new Date('2026-01-26'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000257', logisticsCompany: 'Correo Argentino', shippingCost: 3600, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user11.id, idUserSubscriptions: user11Sub1.id, idClub: clubBookerly.id, boxMonthYear: '2026-02', estimatedDeliveryStartDate: new Date('2026-02-18'), estimatedDeliveryEndDate: new Date('2026-02-28'), actualDeliveryDate: new Date('2026-02-23'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000258', logisticsCompany: 'Correo Argentino', shippingCost: 3600, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user11.id, idUserSubscriptions: user11Sub1.id, idClub: clubBookerly.id, boxMonthYear: '2026-03', estimatedDeliveryStartDate: new Date('2026-03-18'), estimatedDeliveryEndDate: new Date('2026-03-28'), actualDeliveryDate: new Date('2026-03-18'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000259', logisticsCompany: 'Correo Argentino', shippingCost: 3600, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user11.id, idUserSubscriptions: user11Sub1.id, idClub: clubBookerly.id, boxMonthYear: '2026-04', estimatedDeliveryStartDate: new Date('2026-04-18'), estimatedDeliveryEndDate: new Date('2026-04-28'), actualDeliveryDate: new Date('2026-04-24'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000260', logisticsCompany: 'Correo Argentino', shippingCost: 3600, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user11.id, idUserSubscriptions: user11Sub1.id, idClub: clubBookerly.id, boxMonthYear: '2026-05', estimatedDeliveryStartDate: new Date('2026-05-18'), estimatedDeliveryEndDate: new Date('2026-05-28'), actualDeliveryDate: new Date('2026-05-20'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000261', logisticsCompany: 'Correo Argentino', shippingCost: 3600, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user11.id, idUserSubscriptions: user11Sub1.id, idClub: clubBookerly.id, boxMonthYear: '2026-06', estimatedDeliveryStartDate: new Date('2026-06-18'), estimatedDeliveryEndDate: new Date('2026-06-28'), actualDeliveryDate: null, shipmentStatus: ShipmentStatus.Pendiente, trackingNumber: 'CA-000262', logisticsCompany: 'Correo Argentino', shippingCost: 3600, shippingNotes: null } });
+    //#endregion
+
+    //#region 24.11.2. user11Sub2 / Cristales Club Energía Mensual - Correo Argentino - 17 envíos
+    await prisma.shipments.create({ data: { idUser: user11.id, idUserSubscriptions: user11Sub2.id, idClub: clubCristalesClub.id, boxMonthYear: '2025-02', estimatedDeliveryStartDate: new Date('2025-02-02'), estimatedDeliveryEndDate: new Date('2025-02-12'), actualDeliveryDate: new Date('2025-02-08'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000263', logisticsCompany: 'Correo Argentino', shippingCost: 3600, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user11.id, idUserSubscriptions: user11Sub2.id, idClub: clubCristalesClub.id, boxMonthYear: '2025-03', estimatedDeliveryStartDate: new Date('2025-03-02'), estimatedDeliveryEndDate: new Date('2025-03-12'), actualDeliveryDate: new Date('2025-03-09'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000264', logisticsCompany: 'Correo Argentino', shippingCost: 3600, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user11.id, idUserSubscriptions: user11Sub2.id, idClub: clubCristalesClub.id, boxMonthYear: '2025-04', estimatedDeliveryStartDate: new Date('2025-04-02'), estimatedDeliveryEndDate: new Date('2025-04-12'), actualDeliveryDate: new Date('2025-04-02'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000265', logisticsCompany: 'Correo Argentino', shippingCost: 3600, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user11.id, idUserSubscriptions: user11Sub2.id, idClub: clubCristalesClub.id, boxMonthYear: '2025-05', estimatedDeliveryStartDate: new Date('2025-05-02'), estimatedDeliveryEndDate: new Date('2025-05-12'), actualDeliveryDate: new Date('2025-05-11'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000266', logisticsCompany: 'Correo Argentino', shippingCost: 3600, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user11.id, idUserSubscriptions: user11Sub2.id, idClub: clubCristalesClub.id, boxMonthYear: '2025-06', estimatedDeliveryStartDate: new Date('2025-06-02'), estimatedDeliveryEndDate: new Date('2025-06-12'), actualDeliveryDate: new Date('2025-06-05'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000267', logisticsCompany: 'Correo Argentino', shippingCost: 3600, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user11.id, idUserSubscriptions: user11Sub2.id, idClub: clubCristalesClub.id, boxMonthYear: '2025-07', estimatedDeliveryStartDate: new Date('2025-07-02'), estimatedDeliveryEndDate: new Date('2025-07-12'), actualDeliveryDate: new Date('2025-07-12'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000268', logisticsCompany: 'Correo Argentino', shippingCost: 3600, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user11.id, idUserSubscriptions: user11Sub2.id, idClub: clubCristalesClub.id, boxMonthYear: '2025-08', estimatedDeliveryStartDate: new Date('2025-08-02'), estimatedDeliveryEndDate: new Date('2025-08-12'), actualDeliveryDate: new Date('2025-08-04'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000269', logisticsCompany: 'Correo Argentino', shippingCost: 3600, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user11.id, idUserSubscriptions: user11Sub2.id, idClub: clubCristalesClub.id, boxMonthYear: '2025-09', estimatedDeliveryStartDate: new Date('2025-09-02'), estimatedDeliveryEndDate: new Date('2025-09-12'), actualDeliveryDate: new Date('2025-09-10'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000270', logisticsCompany: 'Correo Argentino', shippingCost: 3600, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user11.id, idUserSubscriptions: user11Sub2.id, idClub: clubCristalesClub.id, boxMonthYear: '2025-10', estimatedDeliveryStartDate: new Date('2025-10-02'), estimatedDeliveryEndDate: new Date('2025-10-12'), actualDeliveryDate: new Date('2025-10-07'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000271', logisticsCompany: 'Correo Argentino', shippingCost: 3600, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user11.id, idUserSubscriptions: user11Sub2.id, idClub: clubCristalesClub.id, boxMonthYear: '2025-11', estimatedDeliveryStartDate: new Date('2025-11-02'), estimatedDeliveryEndDate: new Date('2025-11-12'), actualDeliveryDate: new Date('2025-11-03'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000272', logisticsCompany: 'Correo Argentino', shippingCost: 3600, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user11.id, idUserSubscriptions: user11Sub2.id, idClub: clubCristalesClub.id, boxMonthYear: '2025-12', estimatedDeliveryStartDate: new Date('2025-12-02'), estimatedDeliveryEndDate: new Date('2025-12-12'), actualDeliveryDate: new Date('2025-12-12'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000273', logisticsCompany: 'Correo Argentino', shippingCost: 3600, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user11.id, idUserSubscriptions: user11Sub2.id, idClub: clubCristalesClub.id, boxMonthYear: '2026-01', estimatedDeliveryStartDate: new Date('2026-01-02'), estimatedDeliveryEndDate: new Date('2026-01-12'), actualDeliveryDate: new Date('2026-01-06'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000274', logisticsCompany: 'Correo Argentino', shippingCost: 3600, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user11.id, idUserSubscriptions: user11Sub2.id, idClub: clubCristalesClub.id, boxMonthYear: '2026-02', estimatedDeliveryStartDate: new Date('2026-02-02'), estimatedDeliveryEndDate: new Date('2026-02-12'), actualDeliveryDate: new Date('2026-02-11'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000275', logisticsCompany: 'Correo Argentino', shippingCost: 3600, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user11.id, idUserSubscriptions: user11Sub2.id, idClub: clubCristalesClub.id, boxMonthYear: '2026-03', estimatedDeliveryStartDate: new Date('2026-03-02'), estimatedDeliveryEndDate: new Date('2026-03-12'), actualDeliveryDate: new Date('2026-03-05'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000276', logisticsCompany: 'Correo Argentino', shippingCost: 3600, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user11.id, idUserSubscriptions: user11Sub2.id, idClub: clubCristalesClub.id, boxMonthYear: '2026-04', estimatedDeliveryStartDate: new Date('2026-04-02'), estimatedDeliveryEndDate: new Date('2026-04-12'), actualDeliveryDate: new Date('2026-04-09'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000277', logisticsCompany: 'Correo Argentino', shippingCost: 3600, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user11.id, idUserSubscriptions: user11Sub2.id, idClub: clubCristalesClub.id, boxMonthYear: '2026-05', estimatedDeliveryStartDate: new Date('2026-05-02'), estimatedDeliveryEndDate: new Date('2026-05-12'), actualDeliveryDate: new Date('2026-05-06'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000278', logisticsCompany: 'Correo Argentino', shippingCost: 3600, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user11.id, idUserSubscriptions: user11Sub2.id, idClub: clubCristalesClub.id, boxMonthYear: '2026-06', estimatedDeliveryStartDate: new Date('2026-06-02'), estimatedDeliveryEndDate: new Date('2026-06-12'), actualDeliveryDate: null, shipmentStatus: ShipmentStatus.En_Camino, trackingNumber: 'CA-000279', logisticsCompany: 'Correo Argentino', shippingCost: 3600, shippingNotes: null } });
+    //#endregion
+
+    //#region 24.11.3. user11Sub3 / Tarot Box Luna Mensual - OCA - 16 envíos
+    await prisma.shipments.create({ data: { idUser: user11.id, idUserSubscriptions: user11Sub3.id, idClub: clubTarotBox.id, boxMonthYear: '2025-03', estimatedDeliveryStartDate: new Date('2025-03-25'), estimatedDeliveryEndDate: new Date('2025-04-05'), actualDeliveryDate: new Date('2025-03-31'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'OCA-000104', logisticsCompany: 'OCA', shippingCost: 5200, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user11.id, idUserSubscriptions: user11Sub3.id, idClub: clubTarotBox.id, boxMonthYear: '2025-04', estimatedDeliveryStartDate: new Date('2025-04-25'), estimatedDeliveryEndDate: new Date('2025-05-05'), actualDeliveryDate: new Date('2025-04-28'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'OCA-000105', logisticsCompany: 'OCA', shippingCost: 5200, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user11.id, idUserSubscriptions: user11Sub3.id, idClub: clubTarotBox.id, boxMonthYear: '2025-05', estimatedDeliveryStartDate: new Date('2025-05-25'), estimatedDeliveryEndDate: new Date('2025-06-05'), actualDeliveryDate: new Date('2025-06-03'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'OCA-000106', logisticsCompany: 'OCA', shippingCost: 5200, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user11.id, idUserSubscriptions: user11Sub3.id, idClub: clubTarotBox.id, boxMonthYear: '2025-06', estimatedDeliveryStartDate: new Date('2025-06-25'), estimatedDeliveryEndDate: new Date('2025-07-05'), actualDeliveryDate: new Date('2025-06-27'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'OCA-000107', logisticsCompany: 'OCA', shippingCost: 5200, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user11.id, idUserSubscriptions: user11Sub3.id, idClub: clubTarotBox.id, boxMonthYear: '2025-07', estimatedDeliveryStartDate: new Date('2025-07-25'), estimatedDeliveryEndDate: new Date('2025-08-05'), actualDeliveryDate: new Date('2025-08-01'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'OCA-000108', logisticsCompany: 'OCA', shippingCost: 5200, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user11.id, idUserSubscriptions: user11Sub3.id, idClub: clubTarotBox.id, boxMonthYear: '2025-08', estimatedDeliveryStartDate: new Date('2025-08-25'), estimatedDeliveryEndDate: new Date('2025-09-05'), actualDeliveryDate: new Date('2025-08-29'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'OCA-000109', logisticsCompany: 'OCA', shippingCost: 5200, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user11.id, idUserSubscriptions: user11Sub3.id, idClub: clubTarotBox.id, boxMonthYear: '2025-09', estimatedDeliveryStartDate: new Date('2025-09-25'), estimatedDeliveryEndDate: new Date('2025-10-05'), actualDeliveryDate: new Date('2025-10-04'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'OCA-000110', logisticsCompany: 'OCA', shippingCost: 5200, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user11.id, idUserSubscriptions: user11Sub3.id, idClub: clubTarotBox.id, boxMonthYear: '2025-10', estimatedDeliveryStartDate: new Date('2025-10-25'), estimatedDeliveryEndDate: new Date('2025-11-05'), actualDeliveryDate: new Date('2025-10-26'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'OCA-000111', logisticsCompany: 'OCA', shippingCost: 5200, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user11.id, idUserSubscriptions: user11Sub3.id, idClub: clubTarotBox.id, boxMonthYear: '2025-11', estimatedDeliveryStartDate: new Date('2025-11-25'), estimatedDeliveryEndDate: new Date('2025-12-05'), actualDeliveryDate: new Date('2025-11-30'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'OCA-000112', logisticsCompany: 'OCA', shippingCost: 5200, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user11.id, idUserSubscriptions: user11Sub3.id, idClub: clubTarotBox.id, boxMonthYear: '2025-12', estimatedDeliveryStartDate: new Date('2025-12-25'), estimatedDeliveryEndDate: new Date('2026-01-05'), actualDeliveryDate: new Date('2025-12-28'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'OCA-000113', logisticsCompany: 'OCA', shippingCost: 5200, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user11.id, idUserSubscriptions: user11Sub3.id, idClub: clubTarotBox.id, boxMonthYear: '2026-01', estimatedDeliveryStartDate: new Date('2026-01-25'), estimatedDeliveryEndDate: new Date('2026-02-05'), actualDeliveryDate: new Date('2026-02-03'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'OCA-000114', logisticsCompany: 'OCA', shippingCost: 5200, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user11.id, idUserSubscriptions: user11Sub3.id, idClub: clubTarotBox.id, boxMonthYear: '2026-02', estimatedDeliveryStartDate: new Date('2026-02-25'), estimatedDeliveryEndDate: new Date('2026-03-05'), actualDeliveryDate: new Date('2026-02-27'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'OCA-000115', logisticsCompany: 'OCA', shippingCost: 5200, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user11.id, idUserSubscriptions: user11Sub3.id, idClub: clubTarotBox.id, boxMonthYear: '2026-03', estimatedDeliveryStartDate: new Date('2026-03-25'), estimatedDeliveryEndDate: new Date('2026-04-05'), actualDeliveryDate: new Date('2026-04-01'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'OCA-000116', logisticsCompany: 'OCA', shippingCost: 5200, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user11.id, idUserSubscriptions: user11Sub3.id, idClub: clubTarotBox.id, boxMonthYear: '2026-04', estimatedDeliveryStartDate: new Date('2026-04-25'), estimatedDeliveryEndDate: new Date('2026-05-05'), actualDeliveryDate: new Date('2026-04-30'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'OCA-000117', logisticsCompany: 'OCA', shippingCost: 5200, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user11.id, idUserSubscriptions: user11Sub3.id, idClub: clubTarotBox.id, boxMonthYear: '2026-05', estimatedDeliveryStartDate: new Date('2026-05-25'), estimatedDeliveryEndDate: new Date('2026-06-05'), actualDeliveryDate: new Date('2026-05-28'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'OCA-000118', logisticsCompany: 'OCA', shippingCost: 5200, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user11.id, idUserSubscriptions: user11Sub3.id, idClub: clubTarotBox.id, boxMonthYear: '2026-06', estimatedDeliveryStartDate: new Date('2026-06-25'), estimatedDeliveryEndDate: new Date('2026-07-05'), actualDeliveryDate: null, shipmentStatus: ShipmentStatus.Pendiente, trackingNumber: 'OCA-000119', logisticsCompany: 'OCA', shippingCost: 5200, shippingNotes: null } });
+    //#endregion
+  //#endregion
+
+  //#region 24.12. Rodrigo Acosta - San Juan (~1100km de CABA)
+    //#region 24.12.1. user12Sub1 / Yerba Club Caja Matero Completa - Correo Argentino - 18 envíos
+    await prisma.shipments.create({ data: { idUser: user12.id, idUserSubscriptions: user12Sub1.id, idClub: clubYerbaClub.id, boxMonthYear: '2025-01', estimatedDeliveryStartDate: new Date('2025-01-06'), estimatedDeliveryEndDate: new Date('2025-01-16'), actualDeliveryDate: new Date('2025-01-13'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000280', logisticsCompany: 'Correo Argentino', shippingCost: 9900, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user12.id, idUserSubscriptions: user12Sub1.id, idClub: clubYerbaClub.id, boxMonthYear: '2025-02', estimatedDeliveryStartDate: new Date('2025-02-06'), estimatedDeliveryEndDate: new Date('2025-02-16'), actualDeliveryDate: new Date('2025-02-07'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000281', logisticsCompany: 'Correo Argentino', shippingCost: 9900, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user12.id, idUserSubscriptions: user12Sub1.id, idClub: clubYerbaClub.id, boxMonthYear: '2025-03', estimatedDeliveryStartDate: new Date('2025-03-06'), estimatedDeliveryEndDate: new Date('2025-03-16'), actualDeliveryDate: new Date('2025-03-15'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000282', logisticsCompany: 'Correo Argentino', shippingCost: 9900, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user12.id, idUserSubscriptions: user12Sub1.id, idClub: clubYerbaClub.id, boxMonthYear: '2025-04', estimatedDeliveryStartDate: new Date('2025-04-06'), estimatedDeliveryEndDate: new Date('2025-04-16'), actualDeliveryDate: new Date('2025-04-08'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000283', logisticsCompany: 'Correo Argentino', shippingCost: 9900, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user12.id, idUserSubscriptions: user12Sub1.id, idClub: clubYerbaClub.id, boxMonthYear: '2025-05', estimatedDeliveryStartDate: new Date('2025-05-06'), estimatedDeliveryEndDate: new Date('2025-05-16'), actualDeliveryDate: new Date('2025-05-14'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000284', logisticsCompany: 'Correo Argentino', shippingCost: 9900, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user12.id, idUserSubscriptions: user12Sub1.id, idClub: clubYerbaClub.id, boxMonthYear: '2025-06', estimatedDeliveryStartDate: new Date('2025-06-06'), estimatedDeliveryEndDate: new Date('2025-06-16'), actualDeliveryDate: new Date('2025-06-09'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000285', logisticsCompany: 'Correo Argentino', shippingCost: 9900, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user12.id, idUserSubscriptions: user12Sub1.id, idClub: clubYerbaClub.id, boxMonthYear: '2025-07', estimatedDeliveryStartDate: new Date('2025-07-06'), estimatedDeliveryEndDate: new Date('2025-07-16'), actualDeliveryDate: new Date('2025-07-16'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000286', logisticsCompany: 'Correo Argentino', shippingCost: 9900, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user12.id, idUserSubscriptions: user12Sub1.id, idClub: clubYerbaClub.id, boxMonthYear: '2025-08', estimatedDeliveryStartDate: new Date('2025-08-06'), estimatedDeliveryEndDate: new Date('2025-08-16'), actualDeliveryDate: new Date('2025-08-10'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000287', logisticsCompany: 'Correo Argentino', shippingCost: 9900, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user12.id, idUserSubscriptions: user12Sub1.id, idClub: clubYerbaClub.id, boxMonthYear: '2025-09', estimatedDeliveryStartDate: new Date('2025-09-06'), estimatedDeliveryEndDate: new Date('2025-09-16'), actualDeliveryDate: new Date('2025-09-06'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000288', logisticsCompany: 'Correo Argentino', shippingCost: 9900, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user12.id, idUserSubscriptions: user12Sub1.id, idClub: clubYerbaClub.id, boxMonthYear: '2025-10', estimatedDeliveryStartDate: new Date('2025-10-06'), estimatedDeliveryEndDate: new Date('2025-10-16'), actualDeliveryDate: new Date('2025-10-12'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000289', logisticsCompany: 'Correo Argentino', shippingCost: 9900, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user12.id, idUserSubscriptions: user12Sub1.id, idClub: clubYerbaClub.id, boxMonthYear: '2025-11', estimatedDeliveryStartDate: new Date('2025-11-06'), estimatedDeliveryEndDate: new Date('2025-11-16'), actualDeliveryDate: new Date('2025-11-07'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000290', logisticsCompany: 'Correo Argentino', shippingCost: 9900, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user12.id, idUserSubscriptions: user12Sub1.id, idClub: clubYerbaClub.id, boxMonthYear: '2025-12', estimatedDeliveryStartDate: new Date('2025-12-06'), estimatedDeliveryEndDate: new Date('2025-12-16'), actualDeliveryDate: new Date('2025-12-16'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000291', logisticsCompany: 'Correo Argentino', shippingCost: 9900, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user12.id, idUserSubscriptions: user12Sub1.id, idClub: clubYerbaClub.id, boxMonthYear: '2026-01', estimatedDeliveryStartDate: new Date('2026-01-06'), estimatedDeliveryEndDate: new Date('2026-01-16'), actualDeliveryDate: new Date('2026-01-09'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000292', logisticsCompany: 'Correo Argentino', shippingCost: 9900, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user12.id, idUserSubscriptions: user12Sub1.id, idClub: clubYerbaClub.id, boxMonthYear: '2026-02', estimatedDeliveryStartDate: new Date('2026-02-06'), estimatedDeliveryEndDate: new Date('2026-02-16'), actualDeliveryDate: new Date('2026-02-14'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000293', logisticsCompany: 'Correo Argentino', shippingCost: 9900, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user12.id, idUserSubscriptions: user12Sub1.id, idClub: clubYerbaClub.id, boxMonthYear: '2026-03', estimatedDeliveryStartDate: new Date('2026-03-06'), estimatedDeliveryEndDate: new Date('2026-03-16'), actualDeliveryDate: new Date('2026-03-11'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000294', logisticsCompany: 'Correo Argentino', shippingCost: 9900, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user12.id, idUserSubscriptions: user12Sub1.id, idClub: clubYerbaClub.id, boxMonthYear: '2026-04', estimatedDeliveryStartDate: new Date('2026-04-06'), estimatedDeliveryEndDate: new Date('2026-04-16'), actualDeliveryDate: new Date('2026-04-06'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000295', logisticsCompany: 'Correo Argentino', shippingCost: 9900, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user12.id, idUserSubscriptions: user12Sub1.id, idClub: clubYerbaClub.id, boxMonthYear: '2026-05', estimatedDeliveryStartDate: new Date('2026-05-06'), estimatedDeliveryEndDate: new Date('2026-05-16'), actualDeliveryDate: new Date('2026-05-13'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000296', logisticsCompany: 'Correo Argentino', shippingCost: 9900, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user12.id, idUserSubscriptions: user12Sub1.id, idClub: clubYerbaClub.id, boxMonthYear: '2026-06', estimatedDeliveryStartDate: new Date('2026-06-06'), estimatedDeliveryEndDate: new Date('2026-06-16'), actualDeliveryDate: null, shipmentStatus: ShipmentStatus.En_Camino, trackingNumber: 'CA-000297', logisticsCompany: 'Correo Argentino', shippingCost: 9900, shippingNotes: null } });
+    //#endregion
+
+    //#region 24.12.2. user12Sub2 / Bonvivir Selección Puro Malbec - OCA - 17 envíos
+    await prisma.shipments.create({ data: { idUser: user12.id, idUserSubscriptions: user12Sub2.id, idClub: clubBonvivir.id, boxMonthYear: '2025-02', estimatedDeliveryStartDate: new Date('2025-02-05'), estimatedDeliveryEndDate: new Date('2025-02-15'), actualDeliveryDate: new Date('2025-02-11'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'OCA-000120', logisticsCompany: 'OCA', shippingCost: 14300, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user12.id, idUserSubscriptions: user12Sub2.id, idClub: clubBonvivir.id, boxMonthYear: '2025-03', estimatedDeliveryStartDate: new Date('2025-03-05'), estimatedDeliveryEndDate: new Date('2025-03-15'), actualDeliveryDate: new Date('2025-03-08'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'OCA-000121', logisticsCompany: 'OCA', shippingCost: 14300, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user12.id, idUserSubscriptions: user12Sub2.id, idClub: clubBonvivir.id, boxMonthYear: '2025-04', estimatedDeliveryStartDate: new Date('2025-04-05'), estimatedDeliveryEndDate: new Date('2025-04-15'), actualDeliveryDate: new Date('2025-04-14'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'OCA-000122', logisticsCompany: 'OCA', shippingCost: 14300, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user12.id, idUserSubscriptions: user12Sub2.id, idClub: clubBonvivir.id, boxMonthYear: '2025-05', estimatedDeliveryStartDate: new Date('2025-05-05'), estimatedDeliveryEndDate: new Date('2025-05-15'), actualDeliveryDate: new Date('2025-05-05'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'OCA-000123', logisticsCompany: 'OCA', shippingCost: 14300, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user12.id, idUserSubscriptions: user12Sub2.id, idClub: clubBonvivir.id, boxMonthYear: '2025-06', estimatedDeliveryStartDate: new Date('2025-06-05'), estimatedDeliveryEndDate: new Date('2025-06-15'), actualDeliveryDate: new Date('2025-06-12'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'OCA-000124', logisticsCompany: 'OCA', shippingCost: 14300, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user12.id, idUserSubscriptions: user12Sub2.id, idClub: clubBonvivir.id, boxMonthYear: '2025-07', estimatedDeliveryStartDate: new Date('2025-07-05'), estimatedDeliveryEndDate: new Date('2025-07-15'), actualDeliveryDate: new Date('2025-07-07'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'OCA-000125', logisticsCompany: 'OCA', shippingCost: 14300, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user12.id, idUserSubscriptions: user12Sub2.id, idClub: clubBonvivir.id, boxMonthYear: '2025-08', estimatedDeliveryStartDate: new Date('2025-08-05'), estimatedDeliveryEndDate: new Date('2025-08-15'), actualDeliveryDate: new Date('2025-08-15'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'OCA-000126', logisticsCompany: 'OCA', shippingCost: 14300, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user12.id, idUserSubscriptions: user12Sub2.id, idClub: clubBonvivir.id, boxMonthYear: '2025-09', estimatedDeliveryStartDate: new Date('2025-09-05'), estimatedDeliveryEndDate: new Date('2025-09-15'), actualDeliveryDate: new Date('2025-09-09'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'OCA-000127', logisticsCompany: 'OCA', shippingCost: 14300, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user12.id, idUserSubscriptions: user12Sub2.id, idClub: clubBonvivir.id, boxMonthYear: '2025-10', estimatedDeliveryStartDate: new Date('2025-10-05'), estimatedDeliveryEndDate: new Date('2025-10-15'), actualDeliveryDate: new Date('2025-10-13'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'OCA-000128', logisticsCompany: 'OCA', shippingCost: 14300, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user12.id, idUserSubscriptions: user12Sub2.id, idClub: clubBonvivir.id, boxMonthYear: '2025-11', estimatedDeliveryStartDate: new Date('2025-11-05'), estimatedDeliveryEndDate: new Date('2025-11-15'), actualDeliveryDate: new Date('2025-11-06'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'OCA-000129', logisticsCompany: 'OCA', shippingCost: 14300, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user12.id, idUserSubscriptions: user12Sub2.id, idClub: clubBonvivir.id, boxMonthYear: '2025-12', estimatedDeliveryStartDate: new Date('2025-12-05'), estimatedDeliveryEndDate: new Date('2025-12-15'), actualDeliveryDate: new Date('2025-12-10'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'OCA-000130', logisticsCompany: 'OCA', shippingCost: 14300, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user12.id, idUserSubscriptions: user12Sub2.id, idClub: clubBonvivir.id, boxMonthYear: '2026-01', estimatedDeliveryStartDate: new Date('2026-01-05'), estimatedDeliveryEndDate: new Date('2026-01-15'), actualDeliveryDate: new Date('2026-01-14'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'OCA-000131', logisticsCompany: 'OCA', shippingCost: 14300, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user12.id, idUserSubscriptions: user12Sub2.id, idClub: clubBonvivir.id, boxMonthYear: '2026-02', estimatedDeliveryStartDate: new Date('2026-02-05'), estimatedDeliveryEndDate: new Date('2026-02-15'), actualDeliveryDate: new Date('2026-02-05'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'OCA-000132', logisticsCompany: 'OCA', shippingCost: 14300, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user12.id, idUserSubscriptions: user12Sub2.id, idClub: clubBonvivir.id, boxMonthYear: '2026-03', estimatedDeliveryStartDate: new Date('2026-03-05'), estimatedDeliveryEndDate: new Date('2026-03-15'), actualDeliveryDate: new Date('2026-03-13'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'OCA-000133', logisticsCompany: 'OCA', shippingCost: 14300, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user12.id, idUserSubscriptions: user12Sub2.id, idClub: clubBonvivir.id, boxMonthYear: '2026-04', estimatedDeliveryStartDate: new Date('2026-04-05'), estimatedDeliveryEndDate: new Date('2026-04-15'), actualDeliveryDate: new Date('2026-04-11'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'OCA-000134', logisticsCompany: 'OCA', shippingCost: 14300, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user12.id, idUserSubscriptions: user12Sub2.id, idClub: clubBonvivir.id, boxMonthYear: '2026-05', estimatedDeliveryStartDate: new Date('2026-05-05'), estimatedDeliveryEndDate: new Date('2026-05-15'), actualDeliveryDate: new Date('2026-05-08'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'OCA-000135', logisticsCompany: 'OCA', shippingCost: 14300, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user12.id, idUserSubscriptions: user12Sub2.id, idClub: clubBonvivir.id, boxMonthYear: '2026-06', estimatedDeliveryStartDate: new Date('2026-06-05'), estimatedDeliveryEndDate: new Date('2026-06-15'), actualDeliveryDate: null, shipmentStatus: ShipmentStatus.Pendiente, trackingNumber: 'OCA-000136', logisticsCompany: 'OCA', shippingCost: 14300, shippingNotes: null } });
+    //#endregion
+  //#endregion
+
+  //#region 24.13. Julieta Vega - San Luis (~800km de CABA)
+    //#region 24.13.1. user13Sub1 / Gin Tonic Club Perfect Serve - OCA - 18 envíos
+    await prisma.shipments.create({ data: { idUser: user13.id, idUserSubscriptions: user13Sub1.id, idClub: clubGinTonicClub.id, boxMonthYear: '2025-01', estimatedDeliveryStartDate: new Date('2025-01-03'), estimatedDeliveryEndDate: new Date('2025-01-13'), actualDeliveryDate: new Date('2025-01-09'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'OCA-000137', logisticsCompany: 'OCA', shippingCost: 10400, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user13.id, idUserSubscriptions: user13Sub1.id, idClub: clubGinTonicClub.id, boxMonthYear: '2025-02', estimatedDeliveryStartDate: new Date('2025-02-03'), estimatedDeliveryEndDate: new Date('2025-02-13'), actualDeliveryDate: new Date('2025-02-07'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'OCA-000138', logisticsCompany: 'OCA', shippingCost: 10400, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user13.id, idUserSubscriptions: user13Sub1.id, idClub: clubGinTonicClub.id, boxMonthYear: '2025-03', estimatedDeliveryStartDate: new Date('2025-03-03'), estimatedDeliveryEndDate: new Date('2025-03-13'), actualDeliveryDate: new Date('2025-03-12'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'OCA-000139', logisticsCompany: 'OCA', shippingCost: 10400, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user13.id, idUserSubscriptions: user13Sub1.id, idClub: clubGinTonicClub.id, boxMonthYear: '2025-04', estimatedDeliveryStartDate: new Date('2025-04-03'), estimatedDeliveryEndDate: new Date('2025-04-13'), actualDeliveryDate: new Date('2025-04-05'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'OCA-000140', logisticsCompany: 'OCA', shippingCost: 10400, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user13.id, idUserSubscriptions: user13Sub1.id, idClub: clubGinTonicClub.id, boxMonthYear: '2025-05', estimatedDeliveryStartDate: new Date('2025-05-03'), estimatedDeliveryEndDate: new Date('2025-05-13'), actualDeliveryDate: new Date('2025-05-10'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'OCA-000141', logisticsCompany: 'OCA', shippingCost: 10400, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user13.id, idUserSubscriptions: user13Sub1.id, idClub: clubGinTonicClub.id, boxMonthYear: '2025-06', estimatedDeliveryStartDate: new Date('2025-06-03'), estimatedDeliveryEndDate: new Date('2025-06-13'), actualDeliveryDate: new Date('2025-06-06'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'OCA-000142', logisticsCompany: 'OCA', shippingCost: 10400, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user13.id, idUserSubscriptions: user13Sub1.id, idClub: clubGinTonicClub.id, boxMonthYear: '2025-07', estimatedDeliveryStartDate: new Date('2025-07-03'), estimatedDeliveryEndDate: new Date('2025-07-13'), actualDeliveryDate: new Date('2025-07-11'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'OCA-000143', logisticsCompany: 'OCA', shippingCost: 10400, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user13.id, idUserSubscriptions: user13Sub1.id, idClub: clubGinTonicClub.id, boxMonthYear: '2025-08', estimatedDeliveryStartDate: new Date('2025-08-03'), estimatedDeliveryEndDate: new Date('2025-08-13'), actualDeliveryDate: new Date('2025-08-04'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'OCA-000144', logisticsCompany: 'OCA', shippingCost: 10400, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user13.id, idUserSubscriptions: user13Sub1.id, idClub: clubGinTonicClub.id, boxMonthYear: '2025-09', estimatedDeliveryStartDate: new Date('2025-09-03'), estimatedDeliveryEndDate: new Date('2025-09-13'), actualDeliveryDate: new Date('2025-09-13'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'OCA-000145', logisticsCompany: 'OCA', shippingCost: 10400, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user13.id, idUserSubscriptions: user13Sub1.id, idClub: clubGinTonicClub.id, boxMonthYear: '2025-10', estimatedDeliveryStartDate: new Date('2025-10-03'), estimatedDeliveryEndDate: new Date('2025-10-13'), actualDeliveryDate: new Date('2025-10-08'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'OCA-000146', logisticsCompany: 'OCA', shippingCost: 10400, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user13.id, idUserSubscriptions: user13Sub1.id, idClub: clubGinTonicClub.id, boxMonthYear: '2025-11', estimatedDeliveryStartDate: new Date('2025-11-03'), estimatedDeliveryEndDate: new Date('2025-11-13'), actualDeliveryDate: new Date('2025-11-10'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'OCA-000147', logisticsCompany: 'OCA', shippingCost: 10400, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user13.id, idUserSubscriptions: user13Sub1.id, idClub: clubGinTonicClub.id, boxMonthYear: '2025-12', estimatedDeliveryStartDate: new Date('2025-12-03'), estimatedDeliveryEndDate: new Date('2025-12-13'), actualDeliveryDate: new Date('2025-12-07'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'OCA-000148', logisticsCompany: 'OCA', shippingCost: 10400, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user13.id, idUserSubscriptions: user13Sub1.id, idClub: clubGinTonicClub.id, boxMonthYear: '2026-01', estimatedDeliveryStartDate: new Date('2026-01-03'), estimatedDeliveryEndDate: new Date('2026-01-13'), actualDeliveryDate: new Date('2026-01-12'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'OCA-000149', logisticsCompany: 'OCA', shippingCost: 10400, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user13.id, idUserSubscriptions: user13Sub1.id, idClub: clubGinTonicClub.id, boxMonthYear: '2026-02', estimatedDeliveryStartDate: new Date('2026-02-03'), estimatedDeliveryEndDate: new Date('2026-02-13'), actualDeliveryDate: new Date('2026-02-05'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'OCA-000150', logisticsCompany: 'OCA', shippingCost: 10400, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user13.id, idUserSubscriptions: user13Sub1.id, idClub: clubGinTonicClub.id, boxMonthYear: '2026-03', estimatedDeliveryStartDate: new Date('2026-03-03'), estimatedDeliveryEndDate: new Date('2026-03-13'), actualDeliveryDate: new Date('2026-03-09'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'OCA-000151', logisticsCompany: 'OCA', shippingCost: 10400, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user13.id, idUserSubscriptions: user13Sub1.id, idClub: clubGinTonicClub.id, boxMonthYear: '2026-04', estimatedDeliveryStartDate: new Date('2026-04-03'), estimatedDeliveryEndDate: new Date('2026-04-13'), actualDeliveryDate: new Date('2026-04-03'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'OCA-000152', logisticsCompany: 'OCA', shippingCost: 10400, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user13.id, idUserSubscriptions: user13Sub1.id, idClub: clubGinTonicClub.id, boxMonthYear: '2026-05', estimatedDeliveryStartDate: new Date('2026-05-03'), estimatedDeliveryEndDate: new Date('2026-05-13'), actualDeliveryDate: new Date('2026-05-11'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'OCA-000153', logisticsCompany: 'OCA', shippingCost: 10400, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user13.id, idUserSubscriptions: user13Sub1.id, idClub: clubGinTonicClub.id, boxMonthYear: '2026-06', estimatedDeliveryStartDate: new Date('2026-06-03'), estimatedDeliveryEndDate: new Date('2026-06-13'), actualDeliveryDate: null, shipmentStatus: ShipmentStatus.En_Camino, trackingNumber: 'OCA-000154', logisticsCompany: 'OCA', shippingCost: 10400, shippingNotes: null } });
+    //#endregion
+
+    //#region 24.13.2. user13Sub2 / Chocolate Box Cacao del Mes - Correo Argentino - 17 envíos
+    await prisma.shipments.create({ data: { idUser: user13.id, idUserSubscriptions: user13Sub2.id, idClub: clubChocolateBox.id, boxMonthYear: '2025-02', estimatedDeliveryStartDate: new Date('2025-02-19'), estimatedDeliveryEndDate: new Date('2025-03-01'), actualDeliveryDate: new Date('2025-02-24'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000298', logisticsCompany: 'Correo Argentino', shippingCost: 7200, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user13.id, idUserSubscriptions: user13Sub2.id, idClub: clubChocolateBox.id, boxMonthYear: '2025-03', estimatedDeliveryStartDate: new Date('2025-03-19'), estimatedDeliveryEndDate: new Date('2025-03-29'), actualDeliveryDate: new Date('2025-03-25'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000299', logisticsCompany: 'Correo Argentino', shippingCost: 7200, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user13.id, idUserSubscriptions: user13Sub2.id, idClub: clubChocolateBox.id, boxMonthYear: '2025-04', estimatedDeliveryStartDate: new Date('2025-04-19'), estimatedDeliveryEndDate: new Date('2025-04-29'), actualDeliveryDate: new Date('2025-04-21'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000300', logisticsCompany: 'Correo Argentino', shippingCost: 7200, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user13.id, idUserSubscriptions: user13Sub2.id, idClub: clubChocolateBox.id, boxMonthYear: '2025-05', estimatedDeliveryStartDate: new Date('2025-05-19'), estimatedDeliveryEndDate: new Date('2025-05-29'), actualDeliveryDate: new Date('2025-05-28'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000301', logisticsCompany: 'Correo Argentino', shippingCost: 7200, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user13.id, idUserSubscriptions: user13Sub2.id, idClub: clubChocolateBox.id, boxMonthYear: '2025-06', estimatedDeliveryStartDate: new Date('2025-06-19'), estimatedDeliveryEndDate: new Date('2025-06-29'), actualDeliveryDate: new Date('2025-06-22'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000302', logisticsCompany: 'Correo Argentino', shippingCost: 7200, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user13.id, idUserSubscriptions: user13Sub2.id, idClub: clubChocolateBox.id, boxMonthYear: '2025-07', estimatedDeliveryStartDate: new Date('2025-07-19'), estimatedDeliveryEndDate: new Date('2025-07-29'), actualDeliveryDate: new Date('2025-07-19'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000303', logisticsCompany: 'Correo Argentino', shippingCost: 7200, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user13.id, idUserSubscriptions: user13Sub2.id, idClub: clubChocolateBox.id, boxMonthYear: '2025-08', estimatedDeliveryStartDate: new Date('2025-08-19'), estimatedDeliveryEndDate: new Date('2025-08-29'), actualDeliveryDate: new Date('2025-08-27'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000304', logisticsCompany: 'Correo Argentino', shippingCost: 7200, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user13.id, idUserSubscriptions: user13Sub2.id, idClub: clubChocolateBox.id, boxMonthYear: '2025-09', estimatedDeliveryStartDate: new Date('2025-09-19'), estimatedDeliveryEndDate: new Date('2025-09-29'), actualDeliveryDate: new Date('2025-09-23'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000305', logisticsCompany: 'Correo Argentino', shippingCost: 7200, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user13.id, idUserSubscriptions: user13Sub2.id, idClub: clubChocolateBox.id, boxMonthYear: '2025-10', estimatedDeliveryStartDate: new Date('2025-10-19'), estimatedDeliveryEndDate: new Date('2025-10-29'), actualDeliveryDate: new Date('2025-10-20'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000306', logisticsCompany: 'Correo Argentino', shippingCost: 7200, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user13.id, idUserSubscriptions: user13Sub2.id, idClub: clubChocolateBox.id, boxMonthYear: '2025-11', estimatedDeliveryStartDate: new Date('2025-11-19'), estimatedDeliveryEndDate: new Date('2025-11-29'), actualDeliveryDate: new Date('2025-11-26'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000307', logisticsCompany: 'Correo Argentino', shippingCost: 7200, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user13.id, idUserSubscriptions: user13Sub2.id, idClub: clubChocolateBox.id, boxMonthYear: '2025-12', estimatedDeliveryStartDate: new Date('2025-12-19'), estimatedDeliveryEndDate: new Date('2025-12-29'), actualDeliveryDate: new Date('2025-12-21'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000308', logisticsCompany: 'Correo Argentino', shippingCost: 7200, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user13.id, idUserSubscriptions: user13Sub2.id, idClub: clubChocolateBox.id, boxMonthYear: '2026-01', estimatedDeliveryStartDate: new Date('2026-01-19'), estimatedDeliveryEndDate: new Date('2026-01-29'), actualDeliveryDate: new Date('2026-01-25'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000309', logisticsCompany: 'Correo Argentino', shippingCost: 7200, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user13.id, idUserSubscriptions: user13Sub2.id, idClub: clubChocolateBox.id, boxMonthYear: '2026-02', estimatedDeliveryStartDate: new Date('2026-02-19'), estimatedDeliveryEndDate: new Date('2026-03-01'), actualDeliveryDate: new Date('2026-02-22'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000310', logisticsCompany: 'Correo Argentino', shippingCost: 7200, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user13.id, idUserSubscriptions: user13Sub2.id, idClub: clubChocolateBox.id, boxMonthYear: '2026-03', estimatedDeliveryStartDate: new Date('2026-03-19'), estimatedDeliveryEndDate: new Date('2026-03-29'), actualDeliveryDate: new Date('2026-03-28'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000311', logisticsCompany: 'Correo Argentino', shippingCost: 7200, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user13.id, idUserSubscriptions: user13Sub2.id, idClub: clubChocolateBox.id, boxMonthYear: '2026-04', estimatedDeliveryStartDate: new Date('2026-04-19'), estimatedDeliveryEndDate: new Date('2026-04-29'), actualDeliveryDate: new Date('2026-04-20'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000312', logisticsCompany: 'Correo Argentino', shippingCost: 7200, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user13.id, idUserSubscriptions: user13Sub2.id, idClub: clubChocolateBox.id, boxMonthYear: '2026-05', estimatedDeliveryStartDate: new Date('2026-05-19'), estimatedDeliveryEndDate: new Date('2026-05-29'), actualDeliveryDate: new Date('2026-05-26'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000313', logisticsCompany: 'Correo Argentino', shippingCost: 7200, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user13.id, idUserSubscriptions: user13Sub2.id, idClub: clubChocolateBox.id, boxMonthYear: '2026-06', estimatedDeliveryStartDate: new Date('2026-06-19'), estimatedDeliveryEndDate: new Date('2026-06-29'), actualDeliveryDate: null, shipmentStatus: ShipmentStatus.Pendiente, trackingNumber: 'CA-000314', logisticsCompany: 'Correo Argentino', shippingCost: 7200, shippingNotes: null } });
+    //#endregion
+  //#endregion
+
+  //#region 24.14. Ignacio Blanco - Resistencia (~1000km de CABA)
+    //#region 24.14.1. user14Sub1 / Skincare Natural Rutina Mensual - Correo Argentino - 18 envíos
+    await prisma.shipments.create({ data: { idUser: user14.id, idUserSubscriptions: user14Sub1.id, idClub: clubSkincareNatural.id, boxMonthYear: '2025-01', estimatedDeliveryStartDate: new Date('2025-01-11'), estimatedDeliveryEndDate: new Date('2025-01-21'), actualDeliveryDate: new Date('2025-01-17'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000315', logisticsCompany: 'Correo Argentino', shippingCost: 9000, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user14.id, idUserSubscriptions: user14Sub1.id, idClub: clubSkincareNatural.id, boxMonthYear: '2025-02', estimatedDeliveryStartDate: new Date('2025-02-11'), estimatedDeliveryEndDate: new Date('2025-02-21'), actualDeliveryDate: new Date('2025-02-13'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000316', logisticsCompany: 'Correo Argentino', shippingCost: 9000, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user14.id, idUserSubscriptions: user14Sub1.id, idClub: clubSkincareNatural.id, boxMonthYear: '2025-03', estimatedDeliveryStartDate: new Date('2025-03-11'), estimatedDeliveryEndDate: new Date('2025-03-21'), actualDeliveryDate: new Date('2025-03-20'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000317', logisticsCompany: 'Correo Argentino', shippingCost: 9000, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user14.id, idUserSubscriptions: user14Sub1.id, idClub: clubSkincareNatural.id, boxMonthYear: '2025-04', estimatedDeliveryStartDate: new Date('2025-04-11'), estimatedDeliveryEndDate: new Date('2025-04-21'), actualDeliveryDate: new Date('2025-04-12'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000318', logisticsCompany: 'Correo Argentino', shippingCost: 9000, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user14.id, idUserSubscriptions: user14Sub1.id, idClub: clubSkincareNatural.id, boxMonthYear: '2025-05', estimatedDeliveryStartDate: new Date('2025-05-11'), estimatedDeliveryEndDate: new Date('2025-05-21'), actualDeliveryDate: new Date('2025-05-19'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000319', logisticsCompany: 'Correo Argentino', shippingCost: 9000, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user14.id, idUserSubscriptions: user14Sub1.id, idClub: clubSkincareNatural.id, boxMonthYear: '2025-06', estimatedDeliveryStartDate: new Date('2025-06-11'), estimatedDeliveryEndDate: new Date('2025-06-21'), actualDeliveryDate: new Date('2025-06-14'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000320', logisticsCompany: 'Correo Argentino', shippingCost: 9000, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user14.id, idUserSubscriptions: user14Sub1.id, idClub: clubSkincareNatural.id, boxMonthYear: '2025-07', estimatedDeliveryStartDate: new Date('2025-07-11'), estimatedDeliveryEndDate: new Date('2025-07-21'), actualDeliveryDate: new Date('2025-07-21'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000321', logisticsCompany: 'Correo Argentino', shippingCost: 9000, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user14.id, idUserSubscriptions: user14Sub1.id, idClub: clubSkincareNatural.id, boxMonthYear: '2025-08', estimatedDeliveryStartDate: new Date('2025-08-11'), estimatedDeliveryEndDate: new Date('2025-08-21'), actualDeliveryDate: new Date('2025-08-15'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000322', logisticsCompany: 'Correo Argentino', shippingCost: 9000, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user14.id, idUserSubscriptions: user14Sub1.id, idClub: clubSkincareNatural.id, boxMonthYear: '2025-09', estimatedDeliveryStartDate: new Date('2025-09-11'), estimatedDeliveryEndDate: new Date('2025-09-21'), actualDeliveryDate: new Date('2025-09-11'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000323', logisticsCompany: 'Correo Argentino', shippingCost: 9000, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user14.id, idUserSubscriptions: user14Sub1.id, idClub: clubSkincareNatural.id, boxMonthYear: '2025-10', estimatedDeliveryStartDate: new Date('2025-10-11'), estimatedDeliveryEndDate: new Date('2025-10-21'), actualDeliveryDate: new Date('2025-10-18'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000324', logisticsCompany: 'Correo Argentino', shippingCost: 9000, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user14.id, idUserSubscriptions: user14Sub1.id, idClub: clubSkincareNatural.id, boxMonthYear: '2025-11', estimatedDeliveryStartDate: new Date('2025-11-11'), estimatedDeliveryEndDate: new Date('2025-11-21'), actualDeliveryDate: new Date('2025-11-12'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000325', logisticsCompany: 'Correo Argentino', shippingCost: 9000, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user14.id, idUserSubscriptions: user14Sub1.id, idClub: clubSkincareNatural.id, boxMonthYear: '2025-12', estimatedDeliveryStartDate: new Date('2025-12-11'), estimatedDeliveryEndDate: new Date('2025-12-21'), actualDeliveryDate: new Date('2025-12-19'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000326', logisticsCompany: 'Correo Argentino', shippingCost: 9000, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user14.id, idUserSubscriptions: user14Sub1.id, idClub: clubSkincareNatural.id, boxMonthYear: '2026-01', estimatedDeliveryStartDate: new Date('2026-01-11'), estimatedDeliveryEndDate: new Date('2026-01-21'), actualDeliveryDate: new Date('2026-01-16'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000327', logisticsCompany: 'Correo Argentino', shippingCost: 9000, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user14.id, idUserSubscriptions: user14Sub1.id, idClub: clubSkincareNatural.id, boxMonthYear: '2026-02', estimatedDeliveryStartDate: new Date('2026-02-11'), estimatedDeliveryEndDate: new Date('2026-02-21'), actualDeliveryDate: new Date('2026-02-20'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000328', logisticsCompany: 'Correo Argentino', shippingCost: 9000, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user14.id, idUserSubscriptions: user14Sub1.id, idClub: clubSkincareNatural.id, boxMonthYear: '2026-03', estimatedDeliveryStartDate: new Date('2026-03-11'), estimatedDeliveryEndDate: new Date('2026-03-21'), actualDeliveryDate: new Date('2026-03-13'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000329', logisticsCompany: 'Correo Argentino', shippingCost: 9000, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user14.id, idUserSubscriptions: user14Sub1.id, idClub: clubSkincareNatural.id, boxMonthYear: '2026-04', estimatedDeliveryStartDate: new Date('2026-04-11'), estimatedDeliveryEndDate: new Date('2026-04-21'), actualDeliveryDate: new Date('2026-04-17'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000330', logisticsCompany: 'Correo Argentino', shippingCost: 9000, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user14.id, idUserSubscriptions: user14Sub1.id, idClub: clubSkincareNatural.id, boxMonthYear: '2026-05', estimatedDeliveryStartDate: new Date('2026-05-11'), estimatedDeliveryEndDate: new Date('2026-05-21'), actualDeliveryDate: new Date('2026-05-14'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000331', logisticsCompany: 'Correo Argentino', shippingCost: 9000, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user14.id, idUserSubscriptions: user14Sub1.id, idClub: clubSkincareNatural.id, boxMonthYear: '2026-06', estimatedDeliveryStartDate: new Date('2026-06-11'), estimatedDeliveryEndDate: new Date('2026-06-21'), actualDeliveryDate: null, shipmentStatus: ShipmentStatus.En_Camino, trackingNumber: 'CA-000332', logisticsCompany: 'Correo Argentino', shippingCost: 9000, shippingNotes: null } });
+    //#endregion
+  //#endregion
+
+  //#region 24.15. Antonella Ríos - Corrientes (~1000km de CABA)
+    //#region 24.15.1. user15Sub1 / Wellness Box Caja Bienestar - Correo Argentino - 18 envíos
+    await prisma.shipments.create({ data: { idUser: user15.id, idUserSubscriptions: user15Sub1.id, idClub: clubWellnessBox.id, boxMonthYear: '2025-01', estimatedDeliveryStartDate: new Date('2025-01-07'), estimatedDeliveryEndDate: new Date('2025-01-17'), actualDeliveryDate: new Date('2025-01-14'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000333', logisticsCompany: 'Correo Argentino', shippingCost: 9000, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user15.id, idUserSubscriptions: user15Sub1.id, idClub: clubWellnessBox.id, boxMonthYear: '2025-02', estimatedDeliveryStartDate: new Date('2025-02-07'), estimatedDeliveryEndDate: new Date('2025-02-17'), actualDeliveryDate: new Date('2025-02-10'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000334', logisticsCompany: 'Correo Argentino', shippingCost: 9000, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user15.id, idUserSubscriptions: user15Sub1.id, idClub: clubWellnessBox.id, boxMonthYear: '2025-03', estimatedDeliveryStartDate: new Date('2025-03-07'), estimatedDeliveryEndDate: new Date('2025-03-17'), actualDeliveryDate: new Date('2025-03-17'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000335', logisticsCompany: 'Correo Argentino', shippingCost: 9000, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user15.id, idUserSubscriptions: user15Sub1.id, idClub: clubWellnessBox.id, boxMonthYear: '2025-04', estimatedDeliveryStartDate: new Date('2025-04-07'), estimatedDeliveryEndDate: new Date('2025-04-17'), actualDeliveryDate: new Date('2025-04-08'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000336', logisticsCompany: 'Correo Argentino', shippingCost: 9000, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user15.id, idUserSubscriptions: user15Sub1.id, idClub: clubWellnessBox.id, boxMonthYear: '2025-05', estimatedDeliveryStartDate: new Date('2025-05-07'), estimatedDeliveryEndDate: new Date('2025-05-17'), actualDeliveryDate: new Date('2025-05-15'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000337', logisticsCompany: 'Correo Argentino', shippingCost: 9000, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user15.id, idUserSubscriptions: user15Sub1.id, idClub: clubWellnessBox.id, boxMonthYear: '2025-06', estimatedDeliveryStartDate: new Date('2025-06-07'), estimatedDeliveryEndDate: new Date('2025-06-17'), actualDeliveryDate: new Date('2025-06-09'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000338', logisticsCompany: 'Correo Argentino', shippingCost: 9000, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user15.id, idUserSubscriptions: user15Sub1.id, idClub: clubWellnessBox.id, boxMonthYear: '2025-07', estimatedDeliveryStartDate: new Date('2025-07-07'), estimatedDeliveryEndDate: new Date('2025-07-17'), actualDeliveryDate: new Date('2025-07-16'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000339', logisticsCompany: 'Correo Argentino', shippingCost: 9000, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user15.id, idUserSubscriptions: user15Sub1.id, idClub: clubWellnessBox.id, boxMonthYear: '2025-08', estimatedDeliveryStartDate: new Date('2025-08-07'), estimatedDeliveryEndDate: new Date('2025-08-17'), actualDeliveryDate: new Date('2025-08-07'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000340', logisticsCompany: 'Correo Argentino', shippingCost: 9000, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user15.id, idUserSubscriptions: user15Sub1.id, idClub: clubWellnessBox.id, boxMonthYear: '2025-09', estimatedDeliveryStartDate: new Date('2025-09-07'), estimatedDeliveryEndDate: new Date('2025-09-17'), actualDeliveryDate: new Date('2025-09-13'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000341', logisticsCompany: 'Correo Argentino', shippingCost: 9000, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user15.id, idUserSubscriptions: user15Sub1.id, idClub: clubWellnessBox.id, boxMonthYear: '2025-10', estimatedDeliveryStartDate: new Date('2025-10-07'), estimatedDeliveryEndDate: new Date('2025-10-17'), actualDeliveryDate: new Date('2025-10-10'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000342', logisticsCompany: 'Correo Argentino', shippingCost: 9000, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user15.id, idUserSubscriptions: user15Sub1.id, idClub: clubWellnessBox.id, boxMonthYear: '2025-11', estimatedDeliveryStartDate: new Date('2025-11-07'), estimatedDeliveryEndDate: new Date('2025-11-17'), actualDeliveryDate: new Date('2025-11-07'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000343', logisticsCompany: 'Correo Argentino', shippingCost: 9000, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user15.id, idUserSubscriptions: user15Sub1.id, idClub: clubWellnessBox.id, boxMonthYear: '2025-12', estimatedDeliveryStartDate: new Date('2025-12-07'), estimatedDeliveryEndDate: new Date('2025-12-17'), actualDeliveryDate: new Date('2025-12-16'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000344', logisticsCompany: 'Correo Argentino', shippingCost: 9000, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user15.id, idUserSubscriptions: user15Sub1.id, idClub: clubWellnessBox.id, boxMonthYear: '2026-01', estimatedDeliveryStartDate: new Date('2026-01-07'), estimatedDeliveryEndDate: new Date('2026-01-17'), actualDeliveryDate: new Date('2026-01-11'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000345', logisticsCompany: 'Correo Argentino', shippingCost: 9000, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user15.id, idUserSubscriptions: user15Sub1.id, idClub: clubWellnessBox.id, boxMonthYear: '2026-02', estimatedDeliveryStartDate: new Date('2026-02-07'), estimatedDeliveryEndDate: new Date('2026-02-17'), actualDeliveryDate: new Date('2026-02-15'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000346', logisticsCompany: 'Correo Argentino', shippingCost: 9000, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user15.id, idUserSubscriptions: user15Sub1.id, idClub: clubWellnessBox.id, boxMonthYear: '2026-03', estimatedDeliveryStartDate: new Date('2026-03-07'), estimatedDeliveryEndDate: new Date('2026-03-17'), actualDeliveryDate: new Date('2026-03-08'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000347', logisticsCompany: 'Correo Argentino', shippingCost: 9000, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user15.id, idUserSubscriptions: user15Sub1.id, idClub: clubWellnessBox.id, boxMonthYear: '2026-04', estimatedDeliveryStartDate: new Date('2026-04-07'), estimatedDeliveryEndDate: new Date('2026-04-17'), actualDeliveryDate: new Date('2026-04-14'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000348', logisticsCompany: 'Correo Argentino', shippingCost: 9000, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user15.id, idUserSubscriptions: user15Sub1.id, idClub: clubWellnessBox.id, boxMonthYear: '2026-05', estimatedDeliveryStartDate: new Date('2026-05-07'), estimatedDeliveryEndDate: new Date('2026-05-17'), actualDeliveryDate: new Date('2026-05-09'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000349', logisticsCompany: 'Correo Argentino', shippingCost: 9000, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user15.id, idUserSubscriptions: user15Sub1.id, idClub: clubWellnessBox.id, boxMonthYear: '2026-06', estimatedDeliveryStartDate: new Date('2026-06-07'), estimatedDeliveryEndDate: new Date('2026-06-17'), actualDeliveryDate: null, shipmentStatus: ShipmentStatus.Pendiente, trackingNumber: 'CA-000350', logisticsCompany: 'Correo Argentino', shippingCost: 9000, shippingNotes: null } });
+    //#endregion
+
+    //#region 24.15.2. user15Sub2 / Suculentas Club Suculenta del Mes - Correo Argentino - 17 envíos
+    await prisma.shipments.create({ data: { idUser: user15.id, idUserSubscriptions: user15Sub2.id, idClub: clubSuculentasClub.id, boxMonthYear: '2025-02', estimatedDeliveryStartDate: new Date('2025-02-21'), estimatedDeliveryEndDate: new Date('2025-03-03'), actualDeliveryDate: new Date('2025-02-27'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000351', logisticsCompany: 'Correo Argentino', shippingCost: 9000, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user15.id, idUserSubscriptions: user15Sub2.id, idClub: clubSuculentasClub.id, boxMonthYear: '2025-03', estimatedDeliveryStartDate: new Date('2025-03-21'), estimatedDeliveryEndDate: new Date('2025-03-31'), actualDeliveryDate: new Date('2025-03-24'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000352', logisticsCompany: 'Correo Argentino', shippingCost: 9000, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user15.id, idUserSubscriptions: user15Sub2.id, idClub: clubSuculentasClub.id, boxMonthYear: '2025-04', estimatedDeliveryStartDate: new Date('2025-04-21'), estimatedDeliveryEndDate: new Date('2025-05-01'), actualDeliveryDate: new Date('2025-04-29'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000353', logisticsCompany: 'Correo Argentino', shippingCost: 9000, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user15.id, idUserSubscriptions: user15Sub2.id, idClub: clubSuculentasClub.id, boxMonthYear: '2025-05', estimatedDeliveryStartDate: new Date('2025-05-21'), estimatedDeliveryEndDate: new Date('2025-05-31'), actualDeliveryDate: new Date('2025-05-22'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000354', logisticsCompany: 'Correo Argentino', shippingCost: 9000, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user15.id, idUserSubscriptions: user15Sub2.id, idClub: clubSuculentasClub.id, boxMonthYear: '2025-06', estimatedDeliveryStartDate: new Date('2025-06-21'), estimatedDeliveryEndDate: new Date('2025-07-01'), actualDeliveryDate: new Date('2025-06-28'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000355', logisticsCompany: 'Correo Argentino', shippingCost: 9000, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user15.id, idUserSubscriptions: user15Sub2.id, idClub: clubSuculentasClub.id, boxMonthYear: '2025-07', estimatedDeliveryStartDate: new Date('2025-07-21'), estimatedDeliveryEndDate: new Date('2025-07-31'), actualDeliveryDate: new Date('2025-07-25'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000356', logisticsCompany: 'Correo Argentino', shippingCost: 9000, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user15.id, idUserSubscriptions: user15Sub2.id, idClub: clubSuculentasClub.id, boxMonthYear: '2025-08', estimatedDeliveryStartDate: new Date('2025-08-21'), estimatedDeliveryEndDate: new Date('2025-08-31'), actualDeliveryDate: new Date('2025-08-21'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000357', logisticsCompany: 'Correo Argentino', shippingCost: 9000, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user15.id, idUserSubscriptions: user15Sub2.id, idClub: clubSuculentasClub.id, boxMonthYear: '2025-09', estimatedDeliveryStartDate: new Date('2025-09-21'), estimatedDeliveryEndDate: new Date('2025-10-01'), actualDeliveryDate: new Date('2025-09-30'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000358', logisticsCompany: 'Correo Argentino', shippingCost: 9000, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user15.id, idUserSubscriptions: user15Sub2.id, idClub: clubSuculentasClub.id, boxMonthYear: '2025-10', estimatedDeliveryStartDate: new Date('2025-10-21'), estimatedDeliveryEndDate: new Date('2025-10-31'), actualDeliveryDate: new Date('2025-10-23'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000359', logisticsCompany: 'Correo Argentino', shippingCost: 9000, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user15.id, idUserSubscriptions: user15Sub2.id, idClub: clubSuculentasClub.id, boxMonthYear: '2025-11', estimatedDeliveryStartDate: new Date('2025-11-21'), estimatedDeliveryEndDate: new Date('2025-12-01'), actualDeliveryDate: new Date('2025-11-29'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000360', logisticsCompany: 'Correo Argentino', shippingCost: 9000, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user15.id, idUserSubscriptions: user15Sub2.id, idClub: clubSuculentasClub.id, boxMonthYear: '2025-12', estimatedDeliveryStartDate: new Date('2025-12-21'), estimatedDeliveryEndDate: new Date('2025-12-31'), actualDeliveryDate: new Date('2025-12-26'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000361', logisticsCompany: 'Correo Argentino', shippingCost: 9000, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user15.id, idUserSubscriptions: user15Sub2.id, idClub: clubSuculentasClub.id, boxMonthYear: '2026-01', estimatedDeliveryStartDate: new Date('2026-01-21'), estimatedDeliveryEndDate: new Date('2026-01-31'), actualDeliveryDate: new Date('2026-01-28'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000362', logisticsCompany: 'Correo Argentino', shippingCost: 9000, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user15.id, idUserSubscriptions: user15Sub2.id, idClub: clubSuculentasClub.id, boxMonthYear: '2026-02', estimatedDeliveryStartDate: new Date('2026-02-21'), estimatedDeliveryEndDate: new Date('2026-03-03'), actualDeliveryDate: new Date('2026-02-25'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000363', logisticsCompany: 'Correo Argentino', shippingCost: 9000, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user15.id, idUserSubscriptions: user15Sub2.id, idClub: clubSuculentasClub.id, boxMonthYear: '2026-03', estimatedDeliveryStartDate: new Date('2026-03-21'), estimatedDeliveryEndDate: new Date('2026-03-31'), actualDeliveryDate: new Date('2026-03-21'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000364', logisticsCompany: 'Correo Argentino', shippingCost: 9000, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user15.id, idUserSubscriptions: user15Sub2.id, idClub: clubSuculentasClub.id, boxMonthYear: '2026-04', estimatedDeliveryStartDate: new Date('2026-04-21'), estimatedDeliveryEndDate: new Date('2026-05-01'), actualDeliveryDate: new Date('2026-04-27'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000365', logisticsCompany: 'Correo Argentino', shippingCost: 9000, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user15.id, idUserSubscriptions: user15Sub2.id, idClub: clubSuculentasClub.id, boxMonthYear: '2026-05', estimatedDeliveryStartDate: new Date('2026-05-21'), estimatedDeliveryEndDate: new Date('2026-05-31'), actualDeliveryDate: new Date('2026-05-24'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000366', logisticsCompany: 'Correo Argentino', shippingCost: 9000, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user15.id, idUserSubscriptions: user15Sub2.id, idClub: clubSuculentasClub.id, boxMonthYear: '2026-06', estimatedDeliveryStartDate: new Date('2026-06-21'), estimatedDeliveryEndDate: new Date('2026-07-01'), actualDeliveryDate: null, shipmentStatus: ShipmentStatus.En_Camino, trackingNumber: 'CA-000367', logisticsCompany: 'Correo Argentino', shippingCost: 9000, shippingNotes: null } });
+    //#endregion
+
+    //#region 24.15.3. user15Sub3 / Papelería Box Stationery - OCA - 16 envíos
+    await prisma.shipments.create({ data: { idUser: user15.id, idUserSubscriptions: user15Sub3.id, idClub: clubPapeleriaBox.id, boxMonthYear: '2025-03', estimatedDeliveryStartDate: new Date('2025-03-13'), estimatedDeliveryEndDate: new Date('2025-03-23'), actualDeliveryDate: new Date('2025-03-19'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'OCA-000155', logisticsCompany: 'OCA', shippingCost: 13000, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user15.id, idUserSubscriptions: user15Sub3.id, idClub: clubPapeleriaBox.id, boxMonthYear: '2025-04', estimatedDeliveryStartDate: new Date('2025-04-13'), estimatedDeliveryEndDate: new Date('2025-04-23'), actualDeliveryDate: new Date('2025-04-16'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'OCA-000156', logisticsCompany: 'OCA', shippingCost: 13000, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user15.id, idUserSubscriptions: user15Sub3.id, idClub: clubPapeleriaBox.id, boxMonthYear: '2025-05', estimatedDeliveryStartDate: new Date('2025-05-13'), estimatedDeliveryEndDate: new Date('2025-05-23'), actualDeliveryDate: new Date('2025-05-22'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'OCA-000157', logisticsCompany: 'OCA', shippingCost: 13000, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user15.id, idUserSubscriptions: user15Sub3.id, idClub: clubPapeleriaBox.id, boxMonthYear: '2025-06', estimatedDeliveryStartDate: new Date('2025-06-13'), estimatedDeliveryEndDate: new Date('2025-06-23'), actualDeliveryDate: new Date('2025-06-14'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'OCA-000158', logisticsCompany: 'OCA', shippingCost: 13000, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user15.id, idUserSubscriptions: user15Sub3.id, idClub: clubPapeleriaBox.id, boxMonthYear: '2025-07', estimatedDeliveryStartDate: new Date('2025-07-13'), estimatedDeliveryEndDate: new Date('2025-07-23'), actualDeliveryDate: new Date('2025-07-20'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'OCA-000159', logisticsCompany: 'OCA', shippingCost: 13000, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user15.id, idUserSubscriptions: user15Sub3.id, idClub: clubPapeleriaBox.id, boxMonthYear: '2025-08', estimatedDeliveryStartDate: new Date('2025-08-13'), estimatedDeliveryEndDate: new Date('2025-08-23'), actualDeliveryDate: new Date('2025-08-13'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'OCA-000160', logisticsCompany: 'OCA', shippingCost: 13000, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user15.id, idUserSubscriptions: user15Sub3.id, idClub: clubPapeleriaBox.id, boxMonthYear: '2025-09', estimatedDeliveryStartDate: new Date('2025-09-13'), estimatedDeliveryEndDate: new Date('2025-09-23'), actualDeliveryDate: new Date('2025-09-21'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'OCA-000161', logisticsCompany: 'OCA', shippingCost: 13000, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user15.id, idUserSubscriptions: user15Sub3.id, idClub: clubPapeleriaBox.id, boxMonthYear: '2025-10', estimatedDeliveryStartDate: new Date('2025-10-13'), estimatedDeliveryEndDate: new Date('2025-10-23'), actualDeliveryDate: new Date('2025-10-15'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'OCA-000162', logisticsCompany: 'OCA', shippingCost: 13000, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user15.id, idUserSubscriptions: user15Sub3.id, idClub: clubPapeleriaBox.id, boxMonthYear: '2025-11', estimatedDeliveryStartDate: new Date('2025-11-13'), estimatedDeliveryEndDate: new Date('2025-11-23'), actualDeliveryDate: new Date('2025-11-22'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'OCA-000163', logisticsCompany: 'OCA', shippingCost: 13000, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user15.id, idUserSubscriptions: user15Sub3.id, idClub: clubPapeleriaBox.id, boxMonthYear: '2025-12', estimatedDeliveryStartDate: new Date('2025-12-13'), estimatedDeliveryEndDate: new Date('2025-12-23'), actualDeliveryDate: new Date('2025-12-18'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'OCA-000164', logisticsCompany: 'OCA', shippingCost: 13000, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user15.id, idUserSubscriptions: user15Sub3.id, idClub: clubPapeleriaBox.id, boxMonthYear: '2026-01', estimatedDeliveryStartDate: new Date('2026-01-13'), estimatedDeliveryEndDate: new Date('2026-01-23'), actualDeliveryDate: new Date('2026-01-20'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'OCA-000165', logisticsCompany: 'OCA', shippingCost: 13000, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user15.id, idUserSubscriptions: user15Sub3.id, idClub: clubPapeleriaBox.id, boxMonthYear: '2026-02', estimatedDeliveryStartDate: new Date('2026-02-13'), estimatedDeliveryEndDate: new Date('2026-02-23'), actualDeliveryDate: new Date('2026-02-16'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'OCA-000166', logisticsCompany: 'OCA', shippingCost: 13000, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user15.id, idUserSubscriptions: user15Sub3.id, idClub: clubPapeleriaBox.id, boxMonthYear: '2026-03', estimatedDeliveryStartDate: new Date('2026-03-13'), estimatedDeliveryEndDate: new Date('2026-03-23'), actualDeliveryDate: new Date('2026-03-23'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'OCA-000167', logisticsCompany: 'OCA', shippingCost: 13000, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user15.id, idUserSubscriptions: user15Sub3.id, idClub: clubPapeleriaBox.id, boxMonthYear: '2026-04', estimatedDeliveryStartDate: new Date('2026-04-13'), estimatedDeliveryEndDate: new Date('2026-04-23'), actualDeliveryDate: new Date('2026-04-18'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'OCA-000168', logisticsCompany: 'OCA', shippingCost: 13000, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user15.id, idUserSubscriptions: user15Sub3.id, idClub: clubPapeleriaBox.id, boxMonthYear: '2026-05', estimatedDeliveryStartDate: new Date('2026-05-13'), estimatedDeliveryEndDate: new Date('2026-05-23'), actualDeliveryDate: new Date('2026-05-21'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'OCA-000169', logisticsCompany: 'OCA', shippingCost: 13000, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user15.id, idUserSubscriptions: user15Sub3.id, idClub: clubPapeleriaBox.id, boxMonthYear: '2026-06', estimatedDeliveryStartDate: new Date('2026-06-13'), estimatedDeliveryEndDate: new Date('2026-06-23'), actualDeliveryDate: null, shipmentStatus: ShipmentStatus.Pendiente, trackingNumber: 'OCA-000170', logisticsCompany: 'OCA', shippingCost: 13000, shippingNotes: null } });
+    //#endregion
+  //#endregion
+
+  //#region 24.16. Emiliano Peralta - Bahía Blanca (~650km de CABA)
+    //#region 24.16.1. user16Sub1 / Especias Club Caja del Chef - Correo Argentino - 18 envíos
+    await prisma.shipments.create({ data: { idUser: user16.id, idUserSubscriptions: user16Sub1.id, idClub: clubEspeciasClub.id, boxMonthYear: '2025-01', estimatedDeliveryStartDate: new Date('2025-01-05'), estimatedDeliveryEndDate: new Date('2025-01-15'), actualDeliveryDate: new Date('2025-01-10'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000368', logisticsCompany: 'Correo Argentino', shippingCost: 5850, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user16.id, idUserSubscriptions: user16Sub1.id, idClub: clubEspeciasClub.id, boxMonthYear: '2025-02', estimatedDeliveryStartDate: new Date('2025-02-05'), estimatedDeliveryEndDate: new Date('2025-02-15'), actualDeliveryDate: new Date('2025-02-06'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000369', logisticsCompany: 'Correo Argentino', shippingCost: 5850, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user16.id, idUserSubscriptions: user16Sub1.id, idClub: clubEspeciasClub.id, boxMonthYear: '2025-03', estimatedDeliveryStartDate: new Date('2025-03-05'), estimatedDeliveryEndDate: new Date('2025-03-15'), actualDeliveryDate: new Date('2025-03-14'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000370', logisticsCompany: 'Correo Argentino', shippingCost: 5850, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user16.id, idUserSubscriptions: user16Sub1.id, idClub: clubEspeciasClub.id, boxMonthYear: '2025-04', estimatedDeliveryStartDate: new Date('2025-04-05'), estimatedDeliveryEndDate: new Date('2025-04-15'), actualDeliveryDate: new Date('2025-04-07'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000371', logisticsCompany: 'Correo Argentino', shippingCost: 5850, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user16.id, idUserSubscriptions: user16Sub1.id, idClub: clubEspeciasClub.id, boxMonthYear: '2025-05', estimatedDeliveryStartDate: new Date('2025-05-05'), estimatedDeliveryEndDate: new Date('2025-05-15'), actualDeliveryDate: new Date('2025-05-13'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000372', logisticsCompany: 'Correo Argentino', shippingCost: 5850, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user16.id, idUserSubscriptions: user16Sub1.id, idClub: clubEspeciasClub.id, boxMonthYear: '2025-06', estimatedDeliveryStartDate: new Date('2025-06-05'), estimatedDeliveryEndDate: new Date('2025-06-15'), actualDeliveryDate: new Date('2025-06-08'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000373', logisticsCompany: 'Correo Argentino', shippingCost: 5850, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user16.id, idUserSubscriptions: user16Sub1.id, idClub: clubEspeciasClub.id, boxMonthYear: '2025-07', estimatedDeliveryStartDate: new Date('2025-07-05'), estimatedDeliveryEndDate: new Date('2025-07-15'), actualDeliveryDate: new Date('2025-07-15'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000374', logisticsCompany: 'Correo Argentino', shippingCost: 5850, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user16.id, idUserSubscriptions: user16Sub1.id, idClub: clubEspeciasClub.id, boxMonthYear: '2025-08', estimatedDeliveryStartDate: new Date('2025-08-05'), estimatedDeliveryEndDate: new Date('2025-08-15'), actualDeliveryDate: new Date('2025-08-05'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000375', logisticsCompany: 'Correo Argentino', shippingCost: 5850, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user16.id, idUserSubscriptions: user16Sub1.id, idClub: clubEspeciasClub.id, boxMonthYear: '2025-09', estimatedDeliveryStartDate: new Date('2025-09-05'), estimatedDeliveryEndDate: new Date('2025-09-15'), actualDeliveryDate: new Date('2025-09-11'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000376', logisticsCompany: 'Correo Argentino', shippingCost: 5850, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user16.id, idUserSubscriptions: user16Sub1.id, idClub: clubEspeciasClub.id, boxMonthYear: '2025-10', estimatedDeliveryStartDate: new Date('2025-10-05'), estimatedDeliveryEndDate: new Date('2025-10-15'), actualDeliveryDate: new Date('2025-10-09'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000377', logisticsCompany: 'Correo Argentino', shippingCost: 5850, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user16.id, idUserSubscriptions: user16Sub1.id, idClub: clubEspeciasClub.id, boxMonthYear: '2025-11', estimatedDeliveryStartDate: new Date('2025-11-05'), estimatedDeliveryEndDate: new Date('2025-11-15'), actualDeliveryDate: new Date('2025-11-14'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000378', logisticsCompany: 'Correo Argentino', shippingCost: 5850, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user16.id, idUserSubscriptions: user16Sub1.id, idClub: clubEspeciasClub.id, boxMonthYear: '2025-12', estimatedDeliveryStartDate: new Date('2025-12-05'), estimatedDeliveryEndDate: new Date('2025-12-15'), actualDeliveryDate: new Date('2025-12-06'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000379', logisticsCompany: 'Correo Argentino', shippingCost: 5850, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user16.id, idUserSubscriptions: user16Sub1.id, idClub: clubEspeciasClub.id, boxMonthYear: '2026-01', estimatedDeliveryStartDate: new Date('2026-01-05'), estimatedDeliveryEndDate: new Date('2026-01-15'), actualDeliveryDate: new Date('2026-01-13'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000380', logisticsCompany: 'Correo Argentino', shippingCost: 5850, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user16.id, idUserSubscriptions: user16Sub1.id, idClub: clubEspeciasClub.id, boxMonthYear: '2026-02', estimatedDeliveryStartDate: new Date('2026-02-05'), estimatedDeliveryEndDate: new Date('2026-02-15'), actualDeliveryDate: new Date('2026-02-09'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000381', logisticsCompany: 'Correo Argentino', shippingCost: 5850, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user16.id, idUserSubscriptions: user16Sub1.id, idClub: clubEspeciasClub.id, boxMonthYear: '2026-03', estimatedDeliveryStartDate: new Date('2026-03-05'), estimatedDeliveryEndDate: new Date('2026-03-15'), actualDeliveryDate: new Date('2026-03-05'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000382', logisticsCompany: 'Correo Argentino', shippingCost: 5850, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user16.id, idUserSubscriptions: user16Sub1.id, idClub: clubEspeciasClub.id, boxMonthYear: '2026-04', estimatedDeliveryStartDate: new Date('2026-04-05'), estimatedDeliveryEndDate: new Date('2026-04-15'), actualDeliveryDate: new Date('2026-04-12'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000383', logisticsCompany: 'Correo Argentino', shippingCost: 5850, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user16.id, idUserSubscriptions: user16Sub1.id, idClub: clubEspeciasClub.id, boxMonthYear: '2026-05', estimatedDeliveryStartDate: new Date('2026-05-05'), estimatedDeliveryEndDate: new Date('2026-05-15'), actualDeliveryDate: new Date('2026-05-07'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000384', logisticsCompany: 'Correo Argentino', shippingCost: 5850, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user16.id, idUserSubscriptions: user16Sub1.id, idClub: clubEspeciasClub.id, boxMonthYear: '2026-06', estimatedDeliveryStartDate: new Date('2026-06-05'), estimatedDeliveryEndDate: new Date('2026-06-15'), actualDeliveryDate: null, shipmentStatus: ShipmentStatus.En_Camino, trackingNumber: 'CA-000385', logisticsCompany: 'Correo Argentino', shippingCost: 5850, shippingNotes: null } });
+    //#endregion
+
+    //#region 24.16.2. user16Sub2 / Club Woopy Mensual - Correo Argentino - 17 envíos
+    await prisma.shipments.create({ data: { idUser: user16.id, idUserSubscriptions: user16Sub2.id, idClub: clubClubWoopy.id, boxMonthYear: '2025-02', estimatedDeliveryStartDate: new Date('2025-02-16'), estimatedDeliveryEndDate: new Date('2025-02-26'), actualDeliveryDate: new Date('2025-02-19'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000386', logisticsCompany: 'Correo Argentino', shippingCost: 5850, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user16.id, idUserSubscriptions: user16Sub2.id, idClub: clubClubWoopy.id, boxMonthYear: '2025-03', estimatedDeliveryStartDate: new Date('2025-03-16'), estimatedDeliveryEndDate: new Date('2025-03-26'), actualDeliveryDate: new Date('2025-03-25'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000387', logisticsCompany: 'Correo Argentino', shippingCost: 5850, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user16.id, idUserSubscriptions: user16Sub2.id, idClub: clubClubWoopy.id, boxMonthYear: '2025-04', estimatedDeliveryStartDate: new Date('2025-04-16'), estimatedDeliveryEndDate: new Date('2025-04-26'), actualDeliveryDate: new Date('2025-04-17'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000388', logisticsCompany: 'Correo Argentino', shippingCost: 5850, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user16.id, idUserSubscriptions: user16Sub2.id, idClub: clubClubWoopy.id, boxMonthYear: '2025-05', estimatedDeliveryStartDate: new Date('2025-05-16'), estimatedDeliveryEndDate: new Date('2025-05-26'), actualDeliveryDate: new Date('2025-05-24'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000389', logisticsCompany: 'Correo Argentino', shippingCost: 5850, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user16.id, idUserSubscriptions: user16Sub2.id, idClub: clubClubWoopy.id, boxMonthYear: '2025-06', estimatedDeliveryStartDate: new Date('2025-06-16'), estimatedDeliveryEndDate: new Date('2025-06-26'), actualDeliveryDate: new Date('2025-06-18'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000390', logisticsCompany: 'Correo Argentino', shippingCost: 5850, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user16.id, idUserSubscriptions: user16Sub2.id, idClub: clubClubWoopy.id, boxMonthYear: '2025-07', estimatedDeliveryStartDate: new Date('2025-07-16'), estimatedDeliveryEndDate: new Date('2025-07-26'), actualDeliveryDate: new Date('2025-07-16'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000391', logisticsCompany: 'Correo Argentino', shippingCost: 5850, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user16.id, idUserSubscriptions: user16Sub2.id, idClub: clubClubWoopy.id, boxMonthYear: '2025-08', estimatedDeliveryStartDate: new Date('2025-08-16'), estimatedDeliveryEndDate: new Date('2025-08-26'), actualDeliveryDate: new Date('2025-08-22'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000392', logisticsCompany: 'Correo Argentino', shippingCost: 5850, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user16.id, idUserSubscriptions: user16Sub2.id, idClub: clubClubWoopy.id, boxMonthYear: '2025-09', estimatedDeliveryStartDate: new Date('2025-09-16'), estimatedDeliveryEndDate: new Date('2025-09-26'), actualDeliveryDate: new Date('2025-09-16'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000393', logisticsCompany: 'Correo Argentino', shippingCost: 5850, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user16.id, idUserSubscriptions: user16Sub2.id, idClub: clubClubWoopy.id, boxMonthYear: '2025-10', estimatedDeliveryStartDate: new Date('2025-10-16'), estimatedDeliveryEndDate: new Date('2025-10-26'), actualDeliveryDate: new Date('2025-10-25'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000394', logisticsCompany: 'Correo Argentino', shippingCost: 5850, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user16.id, idUserSubscriptions: user16Sub2.id, idClub: clubClubWoopy.id, boxMonthYear: '2025-11', estimatedDeliveryStartDate: new Date('2025-11-16'), estimatedDeliveryEndDate: new Date('2025-11-26'), actualDeliveryDate: new Date('2025-11-17'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000395', logisticsCompany: 'Correo Argentino', shippingCost: 5850, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user16.id, idUserSubscriptions: user16Sub2.id, idClub: clubClubWoopy.id, boxMonthYear: '2025-12', estimatedDeliveryStartDate: new Date('2025-12-16'), estimatedDeliveryEndDate: new Date('2025-12-26'), actualDeliveryDate: new Date('2025-12-23'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000396', logisticsCompany: 'Correo Argentino', shippingCost: 5850, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user16.id, idUserSubscriptions: user16Sub2.id, idClub: clubClubWoopy.id, boxMonthYear: '2026-01', estimatedDeliveryStartDate: new Date('2026-01-16'), estimatedDeliveryEndDate: new Date('2026-01-26'), actualDeliveryDate: new Date('2026-01-24'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000397', logisticsCompany: 'Correo Argentino', shippingCost: 5850, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user16.id, idUserSubscriptions: user16Sub2.id, idClub: clubClubWoopy.id, boxMonthYear: '2026-02', estimatedDeliveryStartDate: new Date('2026-02-16'), estimatedDeliveryEndDate: new Date('2026-02-26'), actualDeliveryDate: new Date('2026-02-18'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000398', logisticsCompany: 'Correo Argentino', shippingCost: 5850, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user16.id, idUserSubscriptions: user16Sub2.id, idClub: clubClubWoopy.id, boxMonthYear: '2026-03', estimatedDeliveryStartDate: new Date('2026-03-16'), estimatedDeliveryEndDate: new Date('2026-03-26'), actualDeliveryDate: new Date('2026-03-26'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000399', logisticsCompany: 'Correo Argentino', shippingCost: 5850, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user16.id, idUserSubscriptions: user16Sub2.id, idClub: clubClubWoopy.id, boxMonthYear: '2026-04', estimatedDeliveryStartDate: new Date('2026-04-16'), estimatedDeliveryEndDate: new Date('2026-04-26'), actualDeliveryDate: new Date('2026-04-20'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000400', logisticsCompany: 'Correo Argentino', shippingCost: 5850, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user16.id, idUserSubscriptions: user16Sub2.id, idClub: clubClubWoopy.id, boxMonthYear: '2026-05', estimatedDeliveryStartDate: new Date('2026-05-16'), estimatedDeliveryEndDate: new Date('2026-05-26'), actualDeliveryDate: new Date('2026-05-16'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000401', logisticsCompany: 'Correo Argentino', shippingCost: 5850, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user16.id, idUserSubscriptions: user16Sub2.id, idClub: clubClubWoopy.id, boxMonthYear: '2026-06', estimatedDeliveryStartDate: new Date('2026-06-16'), estimatedDeliveryEndDate: new Date('2026-06-26'), actualDeliveryDate: null, shipmentStatus: ShipmentStatus.Pendiente, trackingNumber: 'CA-000402', logisticsCompany: 'Correo Argentino', shippingCost: 5850, shippingNotes: null } });
+    //#endregion
+  //#endregion
+
+  //#region 24.17. Luciana Suárez - Paraná, Entre Ríos (~440km de CABA)
+    //#region 24.17.1. user17Sub1 / Mr. Coffee Plan Barista - Correo Argentino - 18 envíos
+    await prisma.shipments.create({ data: { idUser: user17.id, idUserSubscriptions: user17Sub1.id, idClub: clubMrCoffeeClub.id, boxMonthYear: '2025-01', estimatedDeliveryStartDate: new Date('2025-01-01'), estimatedDeliveryEndDate: new Date('2025-01-11'), actualDeliveryDate: new Date('2025-01-06'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000403', logisticsCompany: 'Correo Argentino', shippingCost: 3960, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user17.id, idUserSubscriptions: user17Sub1.id, idClub: clubMrCoffeeClub.id, boxMonthYear: '2025-02', estimatedDeliveryStartDate: new Date('2025-02-01'), estimatedDeliveryEndDate: new Date('2025-02-11'), actualDeliveryDate: new Date('2025-02-09'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000404', logisticsCompany: 'Correo Argentino', shippingCost: 3960, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user17.id, idUserSubscriptions: user17Sub1.id, idClub: clubMrCoffeeClub.id, boxMonthYear: '2025-03', estimatedDeliveryStartDate: new Date('2025-03-01'), estimatedDeliveryEndDate: new Date('2025-03-11'), actualDeliveryDate: new Date('2025-03-04'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000405', logisticsCompany: 'Correo Argentino', shippingCost: 3960, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user17.id, idUserSubscriptions: user17Sub1.id, idClub: clubMrCoffeeClub.id, boxMonthYear: '2025-04', estimatedDeliveryStartDate: new Date('2025-04-01'), estimatedDeliveryEndDate: new Date('2025-04-11'), actualDeliveryDate: new Date('2025-04-11'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000406', logisticsCompany: 'Correo Argentino', shippingCost: 3960, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user17.id, idUserSubscriptions: user17Sub1.id, idClub: clubMrCoffeeClub.id, boxMonthYear: '2025-05', estimatedDeliveryStartDate: new Date('2025-05-01'), estimatedDeliveryEndDate: new Date('2025-05-11'), actualDeliveryDate: new Date('2025-05-08'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000407', logisticsCompany: 'Correo Argentino', shippingCost: 3960, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user17.id, idUserSubscriptions: user17Sub1.id, idClub: clubMrCoffeeClub.id, boxMonthYear: '2025-06', estimatedDeliveryStartDate: new Date('2025-06-01'), estimatedDeliveryEndDate: new Date('2025-06-11'), actualDeliveryDate: new Date('2025-06-02'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000408', logisticsCompany: 'Correo Argentino', shippingCost: 3960, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user17.id, idUserSubscriptions: user17Sub1.id, idClub: clubMrCoffeeClub.id, boxMonthYear: '2025-07', estimatedDeliveryStartDate: new Date('2025-07-01'), estimatedDeliveryEndDate: new Date('2025-07-11'), actualDeliveryDate: new Date('2025-07-10'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000409', logisticsCompany: 'Correo Argentino', shippingCost: 3960, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user17.id, idUserSubscriptions: user17Sub1.id, idClub: clubMrCoffeeClub.id, boxMonthYear: '2025-08', estimatedDeliveryStartDate: new Date('2025-08-01'), estimatedDeliveryEndDate: new Date('2025-08-11'), actualDeliveryDate: new Date('2025-08-05'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000410', logisticsCompany: 'Correo Argentino', shippingCost: 3960, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user17.id, idUserSubscriptions: user17Sub1.id, idClub: clubMrCoffeeClub.id, boxMonthYear: '2025-09', estimatedDeliveryStartDate: new Date('2025-09-01'), estimatedDeliveryEndDate: new Date('2025-09-11'), actualDeliveryDate: new Date('2025-09-09'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000411', logisticsCompany: 'Correo Argentino', shippingCost: 3960, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user17.id, idUserSubscriptions: user17Sub1.id, idClub: clubMrCoffeeClub.id, boxMonthYear: '2025-10', estimatedDeliveryStartDate: new Date('2025-10-01'), estimatedDeliveryEndDate: new Date('2025-10-11'), actualDeliveryDate: new Date('2025-10-11'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000412', logisticsCompany: 'Correo Argentino', shippingCost: 3960, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user17.id, idUserSubscriptions: user17Sub1.id, idClub: clubMrCoffeeClub.id, boxMonthYear: '2025-11', estimatedDeliveryStartDate: new Date('2025-11-01'), estimatedDeliveryEndDate: new Date('2025-11-11'), actualDeliveryDate: new Date('2025-11-03'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000413', logisticsCompany: 'Correo Argentino', shippingCost: 3960, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user17.id, idUserSubscriptions: user17Sub1.id, idClub: clubMrCoffeeClub.id, boxMonthYear: '2025-12', estimatedDeliveryStartDate: new Date('2025-12-01'), estimatedDeliveryEndDate: new Date('2025-12-11'), actualDeliveryDate: new Date('2025-12-08'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000414', logisticsCompany: 'Correo Argentino', shippingCost: 3960, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user17.id, idUserSubscriptions: user17Sub1.id, idClub: clubMrCoffeeClub.id, boxMonthYear: '2026-01', estimatedDeliveryStartDate: new Date('2026-01-01'), estimatedDeliveryEndDate: new Date('2026-01-11'), actualDeliveryDate: new Date('2026-01-06'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000415', logisticsCompany: 'Correo Argentino', shippingCost: 3960, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user17.id, idUserSubscriptions: user17Sub1.id, idClub: clubMrCoffeeClub.id, boxMonthYear: '2026-02', estimatedDeliveryStartDate: new Date('2026-02-01'), estimatedDeliveryEndDate: new Date('2026-02-11'), actualDeliveryDate: new Date('2026-02-10'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000416', logisticsCompany: 'Correo Argentino', shippingCost: 3960, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user17.id, idUserSubscriptions: user17Sub1.id, idClub: clubMrCoffeeClub.id, boxMonthYear: '2026-03', estimatedDeliveryStartDate: new Date('2026-03-01'), estimatedDeliveryEndDate: new Date('2026-03-11'), actualDeliveryDate: new Date('2026-03-03'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000417', logisticsCompany: 'Correo Argentino', shippingCost: 3960, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user17.id, idUserSubscriptions: user17Sub1.id, idClub: clubMrCoffeeClub.id, boxMonthYear: '2026-04', estimatedDeliveryStartDate: new Date('2026-04-01'), estimatedDeliveryEndDate: new Date('2026-04-11'), actualDeliveryDate: new Date('2026-04-09'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000418', logisticsCompany: 'Correo Argentino', shippingCost: 3960, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user17.id, idUserSubscriptions: user17Sub1.id, idClub: clubMrCoffeeClub.id, boxMonthYear: '2026-05', estimatedDeliveryStartDate: new Date('2026-05-01'), estimatedDeliveryEndDate: new Date('2026-05-11'), actualDeliveryDate: new Date('2026-05-07'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000419', logisticsCompany: 'Correo Argentino', shippingCost: 3960, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user17.id, idUserSubscriptions: user17Sub1.id, idClub: clubMrCoffeeClub.id, boxMonthYear: '2026-06', estimatedDeliveryStartDate: new Date('2026-06-01'), estimatedDeliveryEndDate: new Date('2026-06-11'), actualDeliveryDate: null, shipmentStatus: ShipmentStatus.En_Camino, trackingNumber: 'CA-000420', logisticsCompany: 'Correo Argentino', shippingCost: 3960, shippingNotes: null } });
+    //#endregion
+  //#endregion
+  
+  //#region 24.18. Braian Ojeda - Santiago del Estero (~1050km de CABA)
+    //#region 24.18.1. user18Sub1 / My Pet Box Caja Perro - OCA - 18 envíos
+    await prisma.shipments.create({ data: { idUser: user18.id, idUserSubscriptions: user18Sub1.id, idClub: clubMyPetBox.id, boxMonthYear: '2025-01', estimatedDeliveryStartDate: new Date('2025-01-09'), estimatedDeliveryEndDate: new Date('2025-01-19'), actualDeliveryDate: new Date('2025-01-15'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'OCA-000171', logisticsCompany: 'OCA', shippingCost: 13650, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user18.id, idUserSubscriptions: user18Sub1.id, idClub: clubMyPetBox.id, boxMonthYear: '2025-02', estimatedDeliveryStartDate: new Date('2025-02-09'), estimatedDeliveryEndDate: new Date('2025-02-19'), actualDeliveryDate: new Date('2025-02-12'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'OCA-000172', logisticsCompany: 'OCA', shippingCost: 13650, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user18.id, idUserSubscriptions: user18Sub1.id, idClub: clubMyPetBox.id, boxMonthYear: '2025-03', estimatedDeliveryStartDate: new Date('2025-03-09'), estimatedDeliveryEndDate: new Date('2025-03-19'), actualDeliveryDate: new Date('2025-03-18'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'OCA-000173', logisticsCompany: 'OCA', shippingCost: 13650, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user18.id, idUserSubscriptions: user18Sub1.id, idClub: clubMyPetBox.id, boxMonthYear: '2025-04', estimatedDeliveryStartDate: new Date('2025-04-09'), estimatedDeliveryEndDate: new Date('2025-04-19'), actualDeliveryDate: new Date('2025-04-10'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'OCA-000174', logisticsCompany: 'OCA', shippingCost: 13650, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user18.id, idUserSubscriptions: user18Sub1.id, idClub: clubMyPetBox.id, boxMonthYear: '2025-05', estimatedDeliveryStartDate: new Date('2025-05-09'), estimatedDeliveryEndDate: new Date('2025-05-19'), actualDeliveryDate: new Date('2025-05-17'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'OCA-000175', logisticsCompany: 'OCA', shippingCost: 13650, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user18.id, idUserSubscriptions: user18Sub1.id, idClub: clubMyPetBox.id, boxMonthYear: '2025-06', estimatedDeliveryStartDate: new Date('2025-06-09'), estimatedDeliveryEndDate: new Date('2025-06-19'), actualDeliveryDate: new Date('2025-06-13'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'OCA-000176', logisticsCompany: 'OCA', shippingCost: 13650, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user18.id, idUserSubscriptions: user18Sub1.id, idClub: clubMyPetBox.id, boxMonthYear: '2025-07', estimatedDeliveryStartDate: new Date('2025-07-09'), estimatedDeliveryEndDate: new Date('2025-07-19'), actualDeliveryDate: new Date('2025-07-11'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'OCA-000177', logisticsCompany: 'OCA', shippingCost: 13650, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user18.id, idUserSubscriptions: user18Sub1.id, idClub: clubMyPetBox.id, boxMonthYear: '2025-08', estimatedDeliveryStartDate: new Date('2025-08-09'), estimatedDeliveryEndDate: new Date('2025-08-19'), actualDeliveryDate: new Date('2025-08-19'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'OCA-000178', logisticsCompany: 'OCA', shippingCost: 13650, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user18.id, idUserSubscriptions: user18Sub1.id, idClub: clubMyPetBox.id, boxMonthYear: '2025-09', estimatedDeliveryStartDate: new Date('2025-09-09'), estimatedDeliveryEndDate: new Date('2025-09-19'), actualDeliveryDate: new Date('2025-09-09'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'OCA-000179', logisticsCompany: 'OCA', shippingCost: 13650, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user18.id, idUserSubscriptions: user18Sub1.id, idClub: clubMyPetBox.id, boxMonthYear: '2025-10', estimatedDeliveryStartDate: new Date('2025-10-09'), estimatedDeliveryEndDate: new Date('2025-10-19'), actualDeliveryDate: new Date('2025-10-16'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'OCA-000180', logisticsCompany: 'OCA', shippingCost: 13650, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user18.id, idUserSubscriptions: user18Sub1.id, idClub: clubMyPetBox.id, boxMonthYear: '2025-11', estimatedDeliveryStartDate: new Date('2025-11-09'), estimatedDeliveryEndDate: new Date('2025-11-19'), actualDeliveryDate: new Date('2025-11-14'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'OCA-000181', logisticsCompany: 'OCA', shippingCost: 13650, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user18.id, idUserSubscriptions: user18Sub1.id, idClub: clubMyPetBox.id, boxMonthYear: '2025-12', estimatedDeliveryStartDate: new Date('2025-12-09'), estimatedDeliveryEndDate: new Date('2025-12-19'), actualDeliveryDate: new Date('2025-12-12'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'OCA-000182', logisticsCompany: 'OCA', shippingCost: 13650, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user18.id, idUserSubscriptions: user18Sub1.id, idClub: clubMyPetBox.id, boxMonthYear: '2026-01', estimatedDeliveryStartDate: new Date('2026-01-09'), estimatedDeliveryEndDate: new Date('2026-01-19'), actualDeliveryDate: new Date('2026-01-18'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'OCA-000183', logisticsCompany: 'OCA', shippingCost: 13650, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user18.id, idUserSubscriptions: user18Sub1.id, idClub: clubMyPetBox.id, boxMonthYear: '2026-02', estimatedDeliveryStartDate: new Date('2026-02-09'), estimatedDeliveryEndDate: new Date('2026-02-19'), actualDeliveryDate: new Date('2026-02-11'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'OCA-000184', logisticsCompany: 'OCA', shippingCost: 13650, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user18.id, idUserSubscriptions: user18Sub1.id, idClub: clubMyPetBox.id, boxMonthYear: '2026-03', estimatedDeliveryStartDate: new Date('2026-03-09'), estimatedDeliveryEndDate: new Date('2026-03-19'), actualDeliveryDate: new Date('2026-03-17'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'OCA-000185', logisticsCompany: 'OCA', shippingCost: 13650, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user18.id, idUserSubscriptions: user18Sub1.id, idClub: clubMyPetBox.id, boxMonthYear: '2026-04', estimatedDeliveryStartDate: new Date('2026-04-09'), estimatedDeliveryEndDate: new Date('2026-04-19'), actualDeliveryDate: new Date('2026-04-09'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'OCA-000186', logisticsCompany: 'OCA', shippingCost: 13650, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user18.id, idUserSubscriptions: user18Sub1.id, idClub: clubMyPetBox.id, boxMonthYear: '2026-05', estimatedDeliveryStartDate: new Date('2026-05-09'), estimatedDeliveryEndDate: new Date('2026-05-19'), actualDeliveryDate: new Date('2026-05-15'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'OCA-000187', logisticsCompany: 'OCA', shippingCost: 13650, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user18.id, idUserSubscriptions: user18Sub1.id, idClub: clubMyPetBox.id, boxMonthYear: '2026-06', estimatedDeliveryStartDate: new Date('2026-06-09'), estimatedDeliveryEndDate: new Date('2026-06-19'), actualDeliveryDate: null, shipmentStatus: ShipmentStatus.En_Camino, trackingNumber: 'OCA-000188', logisticsCompany: 'OCA', shippingCost: 13650, shippingNotes: null } });
+    //#endregion
+
+    //#region 24.18.2. user18Sub2 / Medias Club Collector Pack - Correo Argentino - 17 envíos
+    await prisma.shipments.create({ data: { idUser: user18.id, idUserSubscriptions: user18Sub2.id, idClub: clubMediasClub.id, boxMonthYear: '2025-02', estimatedDeliveryStartDate: new Date('2025-02-14'), estimatedDeliveryEndDate: new Date('2025-02-24'), actualDeliveryDate: new Date('2025-02-20'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000421', logisticsCompany: 'Correo Argentino', shippingCost: 9450, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user18.id, idUserSubscriptions: user18Sub2.id, idClub: clubMediasClub.id, boxMonthYear: '2025-03', estimatedDeliveryStartDate: new Date('2025-03-14'), estimatedDeliveryEndDate: new Date('2025-03-24'), actualDeliveryDate: new Date('2025-03-16'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000422', logisticsCompany: 'Correo Argentino', shippingCost: 9450, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user18.id, idUserSubscriptions: user18Sub2.id, idClub: clubMediasClub.id, boxMonthYear: '2025-04', estimatedDeliveryStartDate: new Date('2025-04-14'), estimatedDeliveryEndDate: new Date('2025-04-24'), actualDeliveryDate: new Date('2025-04-23'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000423', logisticsCompany: 'Correo Argentino', shippingCost: 9450, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user18.id, idUserSubscriptions: user18Sub2.id, idClub: clubMediasClub.id, boxMonthYear: '2025-05', estimatedDeliveryStartDate: new Date('2025-05-14'), estimatedDeliveryEndDate: new Date('2025-05-24'), actualDeliveryDate: new Date('2025-05-15'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000424', logisticsCompany: 'Correo Argentino', shippingCost: 9450, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user18.id, idUserSubscriptions: user18Sub2.id, idClub: clubMediasClub.id, boxMonthYear: '2025-06', estimatedDeliveryStartDate: new Date('2025-06-14'), estimatedDeliveryEndDate: new Date('2025-06-24'), actualDeliveryDate: new Date('2025-06-19'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000425', logisticsCompany: 'Correo Argentino', shippingCost: 9450, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user18.id, idUserSubscriptions: user18Sub2.id, idClub: clubMediasClub.id, boxMonthYear: '2025-07', estimatedDeliveryStartDate: new Date('2025-07-14'), estimatedDeliveryEndDate: new Date('2025-07-24'), actualDeliveryDate: new Date('2025-07-22'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000426', logisticsCompany: 'Correo Argentino', shippingCost: 9450, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user18.id, idUserSubscriptions: user18Sub2.id, idClub: clubMediasClub.id, boxMonthYear: '2025-08', estimatedDeliveryStartDate: new Date('2025-08-14'), estimatedDeliveryEndDate: new Date('2025-08-24'), actualDeliveryDate: new Date('2025-08-14'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000427', logisticsCompany: 'Correo Argentino', shippingCost: 9450, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user18.id, idUserSubscriptions: user18Sub2.id, idClub: clubMediasClub.id, boxMonthYear: '2025-09', estimatedDeliveryStartDate: new Date('2025-09-14'), estimatedDeliveryEndDate: new Date('2025-09-24'), actualDeliveryDate: new Date('2025-09-21'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000428', logisticsCompany: 'Correo Argentino', shippingCost: 9450, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user18.id, idUserSubscriptions: user18Sub2.id, idClub: clubMediasClub.id, boxMonthYear: '2025-10', estimatedDeliveryStartDate: new Date('2025-10-14'), estimatedDeliveryEndDate: new Date('2025-10-24'), actualDeliveryDate: new Date('2025-10-24'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000429', logisticsCompany: 'Correo Argentino', shippingCost: 9450, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user18.id, idUserSubscriptions: user18Sub2.id, idClub: clubMediasClub.id, boxMonthYear: '2025-11', estimatedDeliveryStartDate: new Date('2025-11-14'), estimatedDeliveryEndDate: new Date('2025-11-24'), actualDeliveryDate: new Date('2025-11-17'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000430', logisticsCompany: 'Correo Argentino', shippingCost: 9450, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user18.id, idUserSubscriptions: user18Sub2.id, idClub: clubMediasClub.id, boxMonthYear: '2025-12', estimatedDeliveryStartDate: new Date('2025-12-14'), estimatedDeliveryEndDate: new Date('2025-12-24'), actualDeliveryDate: new Date('2025-12-15'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000431', logisticsCompany: 'Correo Argentino', shippingCost: 9450, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user18.id, idUserSubscriptions: user18Sub2.id, idClub: clubMediasClub.id, boxMonthYear: '2026-01', estimatedDeliveryStartDate: new Date('2026-01-14'), estimatedDeliveryEndDate: new Date('2026-01-24'), actualDeliveryDate: new Date('2026-01-22'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000432', logisticsCompany: 'Correo Argentino', shippingCost: 9450, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user18.id, idUserSubscriptions: user18Sub2.id, idClub: clubMediasClub.id, boxMonthYear: '2026-02', estimatedDeliveryStartDate: new Date('2026-02-14'), estimatedDeliveryEndDate: new Date('2026-02-24'), actualDeliveryDate: new Date('2026-02-18'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000433', logisticsCompany: 'Correo Argentino', shippingCost: 9450, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user18.id, idUserSubscriptions: user18Sub2.id, idClub: clubMediasClub.id, boxMonthYear: '2026-03', estimatedDeliveryStartDate: new Date('2026-03-14'), estimatedDeliveryEndDate: new Date('2026-03-24'), actualDeliveryDate: new Date('2026-03-14'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000434', logisticsCompany: 'Correo Argentino', shippingCost: 9450, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user18.id, idUserSubscriptions: user18Sub2.id, idClub: clubMediasClub.id, boxMonthYear: '2026-04', estimatedDeliveryStartDate: new Date('2026-04-14'), estimatedDeliveryEndDate: new Date('2026-04-24'), actualDeliveryDate: new Date('2026-04-20'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000435', logisticsCompany: 'Correo Argentino', shippingCost: 9450, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user18.id, idUserSubscriptions: user18Sub2.id, idClub: clubMediasClub.id, boxMonthYear: '2026-05', estimatedDeliveryStartDate: new Date('2026-05-14'), estimatedDeliveryEndDate: new Date('2026-05-24'), actualDeliveryDate: new Date('2026-05-23'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000436', logisticsCompany: 'Correo Argentino', shippingCost: 9450, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user18.id, idUserSubscriptions: user18Sub2.id, idClub: clubMediasClub.id, boxMonthYear: '2026-06', estimatedDeliveryStartDate: new Date('2026-06-14'), estimatedDeliveryEndDate: new Date('2026-06-24'), actualDeliveryDate: null, shipmentStatus: ShipmentStatus.Pendiente, trackingNumber: 'CA-000437', logisticsCompany: 'Correo Argentino', shippingCost: 9450, shippingNotes: null } });
+    //#endregion
+  //#endregion
+
+  //#region 24.19. Mariana Ibáñez - Cipolletti, Río Negro (~1450km de CABA)
+    //#region 24.19.1. user19Sub1 / Bodega Privada Colección Reserva - OCA - 18 envíos
+    await prisma.shipments.create({ data: { idUser: user19.id, idUserSubscriptions: user19Sub1.id, idClub: clubBodegaPrivada.id, boxMonthYear: '2025-01', estimatedDeliveryStartDate: new Date('2025-01-03'), estimatedDeliveryEndDate: new Date('2025-01-13'), actualDeliveryDate: new Date('2025-01-09'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'OCA-000189', logisticsCompany: 'OCA', shippingCost: 18850, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user19.id, idUserSubscriptions: user19Sub1.id, idClub: clubBodegaPrivada.id, boxMonthYear: '2025-02', estimatedDeliveryStartDate: new Date('2025-02-03'), estimatedDeliveryEndDate: new Date('2025-02-13'), actualDeliveryDate: new Date('2025-02-07'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'OCA-000190', logisticsCompany: 'OCA', shippingCost: 18850, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user19.id, idUserSubscriptions: user19Sub1.id, idClub: clubBodegaPrivada.id, boxMonthYear: '2025-03', estimatedDeliveryStartDate: new Date('2025-03-03'), estimatedDeliveryEndDate: new Date('2025-03-13'), actualDeliveryDate: new Date('2025-03-12'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'OCA-000191', logisticsCompany: 'OCA', shippingCost: 18850, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user19.id, idUserSubscriptions: user19Sub1.id, idClub: clubBodegaPrivada.id, boxMonthYear: '2025-04', estimatedDeliveryStartDate: new Date('2025-04-03'), estimatedDeliveryEndDate: new Date('2025-04-13'), actualDeliveryDate: new Date('2025-04-05'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'OCA-000192', logisticsCompany: 'OCA', shippingCost: 18850, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user19.id, idUserSubscriptions: user19Sub1.id, idClub: clubBodegaPrivada.id, boxMonthYear: '2025-05', estimatedDeliveryStartDate: new Date('2025-05-03'), estimatedDeliveryEndDate: new Date('2025-05-13'), actualDeliveryDate: new Date('2025-05-11'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'OCA-000193', logisticsCompany: 'OCA', shippingCost: 18850, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user19.id, idUserSubscriptions: user19Sub1.id, idClub: clubBodegaPrivada.id, boxMonthYear: '2025-06', estimatedDeliveryStartDate: new Date('2025-06-03'), estimatedDeliveryEndDate: new Date('2025-06-13'), actualDeliveryDate: new Date('2025-06-08'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'OCA-000194', logisticsCompany: 'OCA', shippingCost: 18850, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user19.id, idUserSubscriptions: user19Sub1.id, idClub: clubBodegaPrivada.id, boxMonthYear: '2025-07', estimatedDeliveryStartDate: new Date('2025-07-03'), estimatedDeliveryEndDate: new Date('2025-07-13'), actualDeliveryDate: new Date('2025-07-13'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'OCA-000195', logisticsCompany: 'OCA', shippingCost: 18850, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user19.id, idUserSubscriptions: user19Sub1.id, idClub: clubBodegaPrivada.id, boxMonthYear: '2025-08', estimatedDeliveryStartDate: new Date('2025-08-03'), estimatedDeliveryEndDate: new Date('2025-08-13'), actualDeliveryDate: new Date('2025-08-04'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'OCA-000196', logisticsCompany: 'OCA', shippingCost: 18850, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user19.id, idUserSubscriptions: user19Sub1.id, idClub: clubBodegaPrivada.id, boxMonthYear: '2025-09', estimatedDeliveryStartDate: new Date('2025-09-03'), estimatedDeliveryEndDate: new Date('2025-09-13'), actualDeliveryDate: new Date('2025-09-10'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'OCA-000197', logisticsCompany: 'OCA', shippingCost: 18850, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user19.id, idUserSubscriptions: user19Sub1.id, idClub: clubBodegaPrivada.id, boxMonthYear: '2025-10', estimatedDeliveryStartDate: new Date('2025-10-03'), estimatedDeliveryEndDate: new Date('2025-10-13'), actualDeliveryDate: new Date('2025-10-09'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'OCA-000198', logisticsCompany: 'OCA', shippingCost: 18850, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user19.id, idUserSubscriptions: user19Sub1.id, idClub: clubBodegaPrivada.id, boxMonthYear: '2025-11', estimatedDeliveryStartDate: new Date('2025-11-03'), estimatedDeliveryEndDate: new Date('2025-11-13'), actualDeliveryDate: new Date('2025-11-12'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'OCA-000199', logisticsCompany: 'OCA', shippingCost: 18850, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user19.id, idUserSubscriptions: user19Sub1.id, idClub: clubBodegaPrivada.id, boxMonthYear: '2025-12', estimatedDeliveryStartDate: new Date('2025-12-03'), estimatedDeliveryEndDate: new Date('2025-12-13'), actualDeliveryDate: new Date('2025-12-06'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'OCA-000200', logisticsCompany: 'OCA', shippingCost: 18850, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user19.id, idUserSubscriptions: user19Sub1.id, idClub: clubBodegaPrivada.id, boxMonthYear: '2026-01', estimatedDeliveryStartDate: new Date('2026-01-03'), estimatedDeliveryEndDate: new Date('2026-01-13'), actualDeliveryDate: new Date('2026-01-11'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'OCA-000201', logisticsCompany: 'OCA', shippingCost: 18850, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user19.id, idUserSubscriptions: user19Sub1.id, idClub: clubBodegaPrivada.id, boxMonthYear: '2026-02', estimatedDeliveryStartDate: new Date('2026-02-03'), estimatedDeliveryEndDate: new Date('2026-02-13'), actualDeliveryDate: new Date('2026-02-09'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'OCA-000202', logisticsCompany: 'OCA', shippingCost: 18850, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user19.id, idUserSubscriptions: user19Sub1.id, idClub: clubBodegaPrivada.id, boxMonthYear: '2026-03', estimatedDeliveryStartDate: new Date('2026-03-03'), estimatedDeliveryEndDate: new Date('2026-03-13'), actualDeliveryDate: new Date('2026-03-13'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'OCA-000203', logisticsCompany: 'OCA', shippingCost: 18850, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user19.id, idUserSubscriptions: user19Sub1.id, idClub: clubBodegaPrivada.id, boxMonthYear: '2026-04', estimatedDeliveryStartDate: new Date('2026-04-03'), estimatedDeliveryEndDate: new Date('2026-04-13'), actualDeliveryDate: new Date('2026-04-04'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'OCA-000204', logisticsCompany: 'OCA', shippingCost: 18850, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user19.id, idUserSubscriptions: user19Sub1.id, idClub: clubBodegaPrivada.id, boxMonthYear: '2026-05', estimatedDeliveryStartDate: new Date('2026-05-03'), estimatedDeliveryEndDate: new Date('2026-05-13'), actualDeliveryDate: new Date('2026-05-10'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'OCA-000205', logisticsCompany: 'OCA', shippingCost: 18850, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user19.id, idUserSubscriptions: user19Sub1.id, idClub: clubBodegaPrivada.id, boxMonthYear: '2026-06', estimatedDeliveryStartDate: new Date('2026-06-03'), estimatedDeliveryEndDate: new Date('2026-06-13'), actualDeliveryDate: new Date('2026-06-12'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'OCA-000206', logisticsCompany: 'OCA', shippingCost: 18850, shippingNotes: null } });
+    //#endregion
+    
+    //#region 24.19.2. user19Sub2 / Yoga Box Namaste Box - Correo Argentino - 17 envíos
+    await prisma.shipments.create({ data: { idUser: user19.id, idUserSubscriptions: user19Sub2.id, idClub: clubYogaBox.id, boxMonthYear: '2025-02', estimatedDeliveryStartDate: new Date('2025-02-17'), estimatedDeliveryEndDate: new Date('2025-02-27'), actualDeliveryDate: new Date('2025-02-23'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000438', logisticsCompany: 'Correo Argentino', shippingCost: 13050, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user19.id, idUserSubscriptions: user19Sub2.id, idClub: clubYogaBox.id, boxMonthYear: '2025-03', estimatedDeliveryStartDate: new Date('2025-03-17'), estimatedDeliveryEndDate: new Date('2025-03-27'), actualDeliveryDate: new Date('2025-03-19'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000439', logisticsCompany: 'Correo Argentino', shippingCost: 13050, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user19.id, idUserSubscriptions: user19Sub2.id, idClub: clubYogaBox.id, boxMonthYear: '2025-04', estimatedDeliveryStartDate: new Date('2025-04-17'), estimatedDeliveryEndDate: new Date('2025-04-27'), actualDeliveryDate: new Date('2025-04-26'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000440', logisticsCompany: 'Correo Argentino', shippingCost: 13050, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user19.id, idUserSubscriptions: user19Sub2.id, idClub: clubYogaBox.id, boxMonthYear: '2025-05', estimatedDeliveryStartDate: new Date('2025-05-17'), estimatedDeliveryEndDate: new Date('2025-05-27'), actualDeliveryDate: new Date('2025-05-18'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000441', logisticsCompany: 'Correo Argentino', shippingCost: 13050, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user19.id, idUserSubscriptions: user19Sub2.id, idClub: clubYogaBox.id, boxMonthYear: '2025-06', estimatedDeliveryStartDate: new Date('2025-06-17'), estimatedDeliveryEndDate: new Date('2025-06-27'), actualDeliveryDate: new Date('2025-06-22'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000442', logisticsCompany: 'Correo Argentino', shippingCost: 13050, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user19.id, idUserSubscriptions: user19Sub2.id, idClub: clubYogaBox.id, boxMonthYear: '2025-07', estimatedDeliveryStartDate: new Date('2025-07-17'), estimatedDeliveryEndDate: new Date('2025-07-27'), actualDeliveryDate: new Date('2025-07-25'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000443', logisticsCompany: 'Correo Argentino', shippingCost: 13050, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user19.id, idUserSubscriptions: user19Sub2.id, idClub: clubYogaBox.id, boxMonthYear: '2025-08', estimatedDeliveryStartDate: new Date('2025-08-17'), estimatedDeliveryEndDate: new Date('2025-08-27'), actualDeliveryDate: new Date('2025-08-17'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000444', logisticsCompany: 'Correo Argentino', shippingCost: 13050, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user19.id, idUserSubscriptions: user19Sub2.id, idClub: clubYogaBox.id, boxMonthYear: '2025-09', estimatedDeliveryStartDate: new Date('2025-09-17'), estimatedDeliveryEndDate: new Date('2025-09-27'), actualDeliveryDate: new Date('2025-09-24'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000445', logisticsCompany: 'Correo Argentino', shippingCost: 13050, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user19.id, idUserSubscriptions: user19Sub2.id, idClub: clubYogaBox.id, boxMonthYear: '2025-10', estimatedDeliveryStartDate: new Date('2025-10-17'), estimatedDeliveryEndDate: new Date('2025-10-27'), actualDeliveryDate: new Date('2025-10-27'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000446', logisticsCompany: 'Correo Argentino', shippingCost: 13050, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user19.id, idUserSubscriptions: user19Sub2.id, idClub: clubYogaBox.id, boxMonthYear: '2025-11', estimatedDeliveryStartDate: new Date('2025-11-17'), estimatedDeliveryEndDate: new Date('2025-11-27'), actualDeliveryDate: new Date('2025-11-20'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000447', logisticsCompany: 'Correo Argentino', shippingCost: 13050, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user19.id, idUserSubscriptions: user19Sub2.id, idClub: clubYogaBox.id, boxMonthYear: '2025-12', estimatedDeliveryStartDate: new Date('2025-12-17'), estimatedDeliveryEndDate: new Date('2025-12-27'), actualDeliveryDate: new Date('2025-12-18'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000448', logisticsCompany: 'Correo Argentino', shippingCost: 13050, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user19.id, idUserSubscriptions: user19Sub2.id, idClub: clubYogaBox.id, boxMonthYear: '2026-01', estimatedDeliveryStartDate: new Date('2026-01-17'), estimatedDeliveryEndDate: new Date('2026-01-27'), actualDeliveryDate: new Date('2026-01-25'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000449', logisticsCompany: 'Correo Argentino', shippingCost: 13050, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user19.id, idUserSubscriptions: user19Sub2.id, idClub: clubYogaBox.id, boxMonthYear: '2026-02', estimatedDeliveryStartDate: new Date('2026-02-17'), estimatedDeliveryEndDate: new Date('2026-02-27'), actualDeliveryDate: new Date('2026-02-21'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000450', logisticsCompany: 'Correo Argentino', shippingCost: 13050, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user19.id, idUserSubscriptions: user19Sub2.id, idClub: clubYogaBox.id, boxMonthYear: '2026-03', estimatedDeliveryStartDate: new Date('2026-03-17'), estimatedDeliveryEndDate: new Date('2026-03-27'), actualDeliveryDate: new Date('2026-03-17'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000451', logisticsCompany: 'Correo Argentino', shippingCost: 13050, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user19.id, idUserSubscriptions: user19Sub2.id, idClub: clubYogaBox.id, boxMonthYear: '2026-04', estimatedDeliveryStartDate: new Date('2026-04-17'), estimatedDeliveryEndDate: new Date('2026-04-27'), actualDeliveryDate: new Date('2026-04-23'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000452', logisticsCompany: 'Correo Argentino', shippingCost: 13050, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user19.id, idUserSubscriptions: user19Sub2.id, idClub: clubYogaBox.id, boxMonthYear: '2026-05', estimatedDeliveryStartDate: new Date('2026-05-17'), estimatedDeliveryEndDate: new Date('2026-05-27'), actualDeliveryDate: new Date('2026-05-26'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000453', logisticsCompany: 'Correo Argentino', shippingCost: 13050, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user19.id, idUserSubscriptions: user19Sub2.id, idClub: clubYogaBox.id, boxMonthYear: '2026-06', estimatedDeliveryStartDate: new Date('2026-06-17'), estimatedDeliveryEndDate: new Date('2026-06-27'), actualDeliveryDate: null, shipmentStatus: ShipmentStatus.Pendiente, trackingNumber: 'CA-000454', logisticsCompany: 'Correo Argentino', shippingCost: 13050, shippingNotes: null } });
+    //#endregion
+    
+    //#region 24.19.3. user19Sub3 / Charcuterie Box Tablera Mensual - Andreani - 16 envíos
+    await prisma.shipments.create({ data: { idUser: user19.id, idUserSubscriptions: user19Sub3.id, idClub: clubCharcuterieBox.id, boxMonthYear: '2025-03', estimatedDeliveryStartDate: new Date('2025-03-02'), estimatedDeliveryEndDate: new Date('2025-03-12'), actualDeliveryDate: new Date('2025-03-08'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'AND-000001', logisticsCompany: 'Andreani', shippingCost: 23200, shippingNotes: 'Producto refrigerado, entregar antes de las 18hs' } });
+    await prisma.shipments.create({ data: { idUser: user19.id, idUserSubscriptions: user19Sub3.id, idClub: clubCharcuterieBox.id, boxMonthYear: '2025-04', estimatedDeliveryStartDate: new Date('2025-04-02'), estimatedDeliveryEndDate: new Date('2025-04-12'), actualDeliveryDate: new Date('2025-04-04'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'AND-000002', logisticsCompany: 'Andreani', shippingCost: 23200, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user19.id, idUserSubscriptions: user19Sub3.id, idClub: clubCharcuterieBox.id, boxMonthYear: '2025-05', estimatedDeliveryStartDate: new Date('2025-05-02'), estimatedDeliveryEndDate: new Date('2025-05-12'), actualDeliveryDate: new Date('2025-05-11'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'AND-000003', logisticsCompany: 'Andreani', shippingCost: 23200, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user19.id, idUserSubscriptions: user19Sub3.id, idClub: clubCharcuterieBox.id, boxMonthYear: '2025-06', estimatedDeliveryStartDate: new Date('2025-06-02'), estimatedDeliveryEndDate: new Date('2025-06-12'), actualDeliveryDate: new Date('2025-06-09'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'AND-000004', logisticsCompany: 'Andreani', shippingCost: 23200, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user19.id, idUserSubscriptions: user19Sub3.id, idClub: clubCharcuterieBox.id, boxMonthYear: '2025-07', estimatedDeliveryStartDate: new Date('2025-07-02'), estimatedDeliveryEndDate: new Date('2025-07-12'), actualDeliveryDate: new Date('2025-07-02'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'AND-000005', logisticsCompany: 'Andreani', shippingCost: 23200, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user19.id, idUserSubscriptions: user19Sub3.id, idClub: clubCharcuterieBox.id, boxMonthYear: '2025-08', estimatedDeliveryStartDate: new Date('2025-08-02'), estimatedDeliveryEndDate: new Date('2025-08-12'), actualDeliveryDate: new Date('2025-08-12'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'AND-000006', logisticsCompany: 'Andreani', shippingCost: 23200, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user19.id, idUserSubscriptions: user19Sub3.id, idClub: clubCharcuterieBox.id, boxMonthYear: '2025-09', estimatedDeliveryStartDate: new Date('2025-09-02'), estimatedDeliveryEndDate: new Date('2025-09-12'), actualDeliveryDate: new Date('2025-09-06'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'AND-000007', logisticsCompany: 'Andreani', shippingCost: 23200, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user19.id, idUserSubscriptions: user19Sub3.id, idClub: clubCharcuterieBox.id, boxMonthYear: '2025-10', estimatedDeliveryStartDate: new Date('2025-10-02'), estimatedDeliveryEndDate: new Date('2025-10-12'), actualDeliveryDate: new Date('2025-10-10'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'AND-000008', logisticsCompany: 'Andreani', shippingCost: 23200, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user19.id, idUserSubscriptions: user19Sub3.id, idClub: clubCharcuterieBox.id, boxMonthYear: '2025-11', estimatedDeliveryStartDate: new Date('2025-11-02'), estimatedDeliveryEndDate: new Date('2025-11-12'), actualDeliveryDate: new Date('2025-11-03'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'AND-000009', logisticsCompany: 'Andreani', shippingCost: 23200, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user19.id, idUserSubscriptions: user19Sub3.id, idClub: clubCharcuterieBox.id, boxMonthYear: '2025-12', estimatedDeliveryStartDate: new Date('2025-12-02'), estimatedDeliveryEndDate: new Date('2025-12-12'), actualDeliveryDate: new Date('2025-12-12'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'AND-000010', logisticsCompany: 'Andreani', shippingCost: 23200, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user19.id, idUserSubscriptions: user19Sub3.id, idClub: clubCharcuterieBox.id, boxMonthYear: '2026-01', estimatedDeliveryStartDate: new Date('2026-01-02'), estimatedDeliveryEndDate: new Date('2026-01-12'), actualDeliveryDate: new Date('2026-01-07'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'AND-000011', logisticsCompany: 'Andreani', shippingCost: 23200, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user19.id, idUserSubscriptions: user19Sub3.id, idClub: clubCharcuterieBox.id, boxMonthYear: '2026-02', estimatedDeliveryStartDate: new Date('2026-02-02'), estimatedDeliveryEndDate: new Date('2026-02-12'), actualDeliveryDate: new Date('2026-02-09'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'AND-000012', logisticsCompany: 'Andreani', shippingCost: 23200, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user19.id, idUserSubscriptions: user19Sub3.id, idClub: clubCharcuterieBox.id, boxMonthYear: '2026-03', estimatedDeliveryStartDate: new Date('2026-03-02'), estimatedDeliveryEndDate: new Date('2026-03-12'), actualDeliveryDate: new Date('2026-03-04'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'AND-000013', logisticsCompany: 'Andreani', shippingCost: 23200, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user19.id, idUserSubscriptions: user19Sub3.id, idClub: clubCharcuterieBox.id, boxMonthYear: '2026-04', estimatedDeliveryStartDate: new Date('2026-04-02'), estimatedDeliveryEndDate: new Date('2026-04-12'), actualDeliveryDate: new Date('2026-04-11'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'AND-000014', logisticsCompany: 'Andreani', shippingCost: 23200, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user19.id, idUserSubscriptions: user19Sub3.id, idClub: clubCharcuterieBox.id, boxMonthYear: '2026-05', estimatedDeliveryStartDate: new Date('2026-05-02'), estimatedDeliveryEndDate: new Date('2026-05-12'), actualDeliveryDate: new Date('2026-05-08'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'AND-000015', logisticsCompany: 'Andreani', shippingCost: 23200, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user19.id, idUserSubscriptions: user19Sub3.id, idClub: clubCharcuterieBox.id, boxMonthYear: '2026-06', estimatedDeliveryStartDate: new Date('2026-06-02'), estimatedDeliveryEndDate: new Date('2026-06-12'), actualDeliveryDate: new Date('2026-06-10'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'AND-000016', logisticsCompany: 'Andreani', shippingCost: 23200, shippingNotes: null } });
+    //#endregion
+  //#endregion
+
+  //#region 24.20. Sebastián Quiroga - La Rioja (~1150km de CABA)
+    //#region 24.20.1. user20Sub1 / Fósiles Club Paleontólogo Box - Correo Argentino - 18 envíos
+    await prisma.shipments.create({ data: { idUser: user20.id, idUserSubscriptions: user20Sub1.id, idClub: clubFosilesClub.id, boxMonthYear: '2025-01', estimatedDeliveryStartDate: new Date('2025-01-20'), estimatedDeliveryEndDate: new Date('2025-01-30'), actualDeliveryDate: new Date('2025-01-26'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000455', logisticsCompany: 'Correo Argentino', shippingCost: 10350, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user20.id, idUserSubscriptions: user20Sub1.id, idClub: clubFosilesClub.id, boxMonthYear: '2025-02', estimatedDeliveryStartDate: new Date('2025-02-20'), estimatedDeliveryEndDate: new Date('2025-02-28'), actualDeliveryDate: new Date('2025-02-25'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000456', logisticsCompany: 'Correo Argentino', shippingCost: 10350, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user20.id, idUserSubscriptions: user20Sub1.id, idClub: clubFosilesClub.id, boxMonthYear: '2025-03', estimatedDeliveryStartDate: new Date('2025-03-20'), estimatedDeliveryEndDate: new Date('2025-03-30'), actualDeliveryDate: new Date('2025-03-29'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000457', logisticsCompany: 'Correo Argentino', shippingCost: 10350, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user20.id, idUserSubscriptions: user20Sub1.id, idClub: clubFosilesClub.id, boxMonthYear: '2025-04', estimatedDeliveryStartDate: new Date('2025-04-20'), estimatedDeliveryEndDate: new Date('2025-04-30'), actualDeliveryDate: new Date('2025-04-22'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000458', logisticsCompany: 'Correo Argentino', shippingCost: 10350, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user20.id, idUserSubscriptions: user20Sub1.id, idClub: clubFosilesClub.id, boxMonthYear: '2025-05', estimatedDeliveryStartDate: new Date('2025-05-20'), estimatedDeliveryEndDate: new Date('2025-05-30'), actualDeliveryDate: new Date('2025-05-30'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000459', logisticsCompany: 'Correo Argentino', shippingCost: 10350, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user20.id, idUserSubscriptions: user20Sub1.id, idClub: clubFosilesClub.id, boxMonthYear: '2025-06', estimatedDeliveryStartDate: new Date('2025-06-20'), estimatedDeliveryEndDate: new Date('2025-06-30'), actualDeliveryDate: new Date('2025-06-24'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000460', logisticsCompany: 'Correo Argentino', shippingCost: 10350, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user20.id, idUserSubscriptions: user20Sub1.id, idClub: clubFosilesClub.id, boxMonthYear: '2025-07', estimatedDeliveryStartDate: new Date('2025-07-20'), estimatedDeliveryEndDate: new Date('2025-07-30'), actualDeliveryDate: new Date('2025-07-21'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000461', logisticsCompany: 'Correo Argentino', shippingCost: 10350, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user20.id, idUserSubscriptions: user20Sub1.id, idClub: clubFosilesClub.id, boxMonthYear: '2025-08', estimatedDeliveryStartDate: new Date('2025-08-20'), estimatedDeliveryEndDate: new Date('2025-08-30'), actualDeliveryDate: new Date('2025-08-28'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000462', logisticsCompany: 'Correo Argentino', shippingCost: 10350, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user20.id, idUserSubscriptions: user20Sub1.id, idClub: clubFosilesClub.id, boxMonthYear: '2025-09', estimatedDeliveryStartDate: new Date('2025-09-20'), estimatedDeliveryEndDate: new Date('2025-09-30'), actualDeliveryDate: new Date('2025-09-23'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000463', logisticsCompany: 'Correo Argentino', shippingCost: 10350, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user20.id, idUserSubscriptions: user20Sub1.id, idClub: clubFosilesClub.id, boxMonthYear: '2025-10', estimatedDeliveryStartDate: new Date('2025-10-20'), estimatedDeliveryEndDate: new Date('2025-10-30'), actualDeliveryDate: new Date('2025-10-30'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000464', logisticsCompany: 'Correo Argentino', shippingCost: 10350, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user20.id, idUserSubscriptions: user20Sub1.id, idClub: clubFosilesClub.id, boxMonthYear: '2025-11', estimatedDeliveryStartDate: new Date('2025-11-20'), estimatedDeliveryEndDate: new Date('2025-11-30'), actualDeliveryDate: new Date('2025-11-25'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000465', logisticsCompany: 'Correo Argentino', shippingCost: 10350, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user20.id, idUserSubscriptions: user20Sub1.id, idClub: clubFosilesClub.id, boxMonthYear: '2025-12', estimatedDeliveryStartDate: new Date('2025-12-20'), estimatedDeliveryEndDate: new Date('2025-12-30'), actualDeliveryDate: new Date('2025-12-21'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000466', logisticsCompany: 'Correo Argentino', shippingCost: 10350, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user20.id, idUserSubscriptions: user20Sub1.id, idClub: clubFosilesClub.id, boxMonthYear: '2026-01', estimatedDeliveryStartDate: new Date('2026-01-20'), estimatedDeliveryEndDate: new Date('2026-01-30'), actualDeliveryDate: new Date('2026-01-29'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000467', logisticsCompany: 'Correo Argentino', shippingCost: 10350, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user20.id, idUserSubscriptions: user20Sub1.id, idClub: clubFosilesClub.id, boxMonthYear: '2026-02', estimatedDeliveryStartDate: new Date('2026-02-20'), estimatedDeliveryEndDate: new Date('2026-02-28'), actualDeliveryDate: new Date('2026-02-22'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000468', logisticsCompany: 'Correo Argentino', shippingCost: 10350, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user20.id, idUserSubscriptions: user20Sub1.id, idClub: clubFosilesClub.id, boxMonthYear: '2026-03', estimatedDeliveryStartDate: new Date('2026-03-20'), estimatedDeliveryEndDate: new Date('2026-03-30'), actualDeliveryDate: new Date('2026-03-27'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000469', logisticsCompany: 'Correo Argentino', shippingCost: 10350, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user20.id, idUserSubscriptions: user20Sub1.id, idClub: clubFosilesClub.id, boxMonthYear: '2026-04', estimatedDeliveryStartDate: new Date('2026-04-20'), estimatedDeliveryEndDate: new Date('2026-04-30'), actualDeliveryDate: new Date('2026-04-21'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000470', logisticsCompany: 'Correo Argentino', shippingCost: 10350, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user20.id, idUserSubscriptions: user20Sub1.id, idClub: clubFosilesClub.id, boxMonthYear: '2026-05', estimatedDeliveryStartDate: new Date('2026-05-20'), estimatedDeliveryEndDate: new Date('2026-05-30'), actualDeliveryDate: new Date('2026-05-29'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000471', logisticsCompany: 'Correo Argentino', shippingCost: 10350, shippingNotes: null } });
+    await prisma.shipments.create({ data: { idUser: user20.id, idUserSubscriptions: user20Sub1.id, idClub: clubFosilesClub.id, boxMonthYear: '2026-06', estimatedDeliveryStartDate: new Date('2026-06-20'), estimatedDeliveryEndDate: new Date('2026-06-30'), actualDeliveryDate: null, shipmentStatus: ShipmentStatus.Pendiente, trackingNumber: 'CA-000472', logisticsCompany: 'Correo Argentino', shippingCost: 10350, shippingNotes: null } });
+    //#endregion
+   
+    //#region 24.20.2. user20Sub2 / Bonvivir Oliva - Correo Argentino - 6 envíos
+    await prisma.shipments.create({ data: { idUser: user20.id, idUserSubscriptions: user20Sub2.id, idClub: clubBonvivir.id, boxMonthYear: '2025-01', estimatedDeliveryStartDate: new Date('2025-01-05'), estimatedDeliveryEndDate: new Date('2025-01-15'), actualDeliveryDate: new Date('2025-01-11'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000473', logisticsCompany: 'Correo Argentino', shippingCost: 10350, shippingNotes: 'Caja de aceites - frágil' } });
+    await prisma.shipments.create({ data: { idUser: user20.id, idUserSubscriptions: user20Sub2.id, idClub: clubBonvivir.id, boxMonthYear: '2025-04', estimatedDeliveryStartDate: new Date('2025-04-05'), estimatedDeliveryEndDate: new Date('2025-04-15'), actualDeliveryDate: new Date('2025-04-09'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000474', logisticsCompany: 'Correo Argentino', shippingCost: 10350, shippingNotes: 'Caja de aceites - frágil' } });
+    await prisma.shipments.create({ data: { idUser: user20.id, idUserSubscriptions: user20Sub2.id, idClub: clubBonvivir.id, boxMonthYear: '2025-07', estimatedDeliveryStartDate: new Date('2025-07-05'), estimatedDeliveryEndDate: new Date('2025-07-15'), actualDeliveryDate: new Date('2025-07-14'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000475', logisticsCompany: 'Correo Argentino', shippingCost: 10350, shippingNotes: 'Caja de aceites - frágil' } });
+    await prisma.shipments.create({ data: { idUser: user20.id, idUserSubscriptions: user20Sub2.id, idClub: clubBonvivir.id, boxMonthYear: '2025-10', estimatedDeliveryStartDate: new Date('2025-10-05'), estimatedDeliveryEndDate: new Date('2025-10-15'), actualDeliveryDate: new Date('2025-10-08'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000476', logisticsCompany: 'Correo Argentino', shippingCost: 10350, shippingNotes: 'Caja de aceites - frágil' } });
+    await prisma.shipments.create({ data: { idUser: user20.id, idUserSubscriptions: user20Sub2.id, idClub: clubBonvivir.id, boxMonthYear: '2026-01', estimatedDeliveryStartDate: new Date('2026-01-05'), estimatedDeliveryEndDate: new Date('2026-01-15'), actualDeliveryDate: new Date('2026-01-13'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000477', logisticsCompany: 'Correo Argentino', shippingCost: 10350, shippingNotes: 'Caja de aceites - frágil' } });
+    await prisma.shipments.create({ data: { idUser: user20.id, idUserSubscriptions: user20Sub2.id, idClub: clubBonvivir.id, boxMonthYear: '2026-04', estimatedDeliveryStartDate: new Date('2026-04-05'), estimatedDeliveryEndDate: new Date('2026-04-15'), actualDeliveryDate: new Date('2026-04-10'), shipmentStatus: ShipmentStatus.Entregado, trackingNumber: 'CA-000478', logisticsCompany: 'Correo Argentino', shippingCost: 10350, shippingNotes: 'Caja de aceites - frágil' } });
+    //#endregion
+  //#endregion
+//#endregion
+
+//#region 25. REVIEWS
+
+  //#region 25.1. Lucía Ramírez 
+    //#region 25.1.1. Manjar Literario - manjarNarrativa
+    await prisma.reviews.create({
+      data: {
+        idUser: user.id,
+        idClub: clubManjarLiterario.id,
+        rating: 4,
+        title: 'Una experiencia literaria muy cuidada',
+        comment: 'La selección del libro de narrativa fue excelente, y los extras como la postal y el señalador le dan un toque muy especial a la caja. Le faltó un poco más de variedad en la especia culinaria, pero en general quedé muy conforme.',
+        active: true,
+      },
+    });
+    //#endregion
+
+    //#region 25.1.2. Café Selecto - cafeSelectoOrigenDelMes
+    await prisma.reviews.create({
+      data: {
+        idUser: user.id,
+        idClub: clubCafeSelecto.id,
+        rating: 3,
+        title: 'Buen café, pero esperable',
+        comment: 'El café colombiano que me llegó este mes estaba bien, aunque no fue nada que no pudiera conseguir en una dietética del barrio. La tarjeta del origen es un detalle lindo, pero esperaba algo más sorprendente para el precio.',
+        active: true,
+      },
+    });
+    //#endregion
+  //#endregion
+
+  //#region 25.2. Tomás Herrera
+  //#region 25.2.1. Bonvivir - bonvivirSeleccionExclusiva
   await prisma.reviews.create({
     data: {
-      idUser: user.id,
-      idClub: clubManjarLiterario.id,
+      idUser: user2.id,
+      idClub: clubBonvivir.id,
       rating: 5,
-      title: '¡Experiencia increíble!',
-      comment: 'La caja llegó perfecta, el libro era una maravilla.',
+      title: '¡El mejor club de vinos que probé!',
+      comment: 'Las tres botellas que llegaron este mes fueron una revelación. La selección de tintos a ciegas es un formato genial, nunca hubiera elegido esas bodegas por mi cuenta y quedé fascinado con los tres vinos. Las fichas de cata son súper completas. Totalmente recomendable.',
+      active: true,
+    },
+  });
+  //#endregion
+
+  //#region 25.2.2. Encantada Libros - encantadaLiterariaMensual
+  await prisma.reviews.create({
+    data: {
+      idUser: user2.id,
+      idClub: clubEncantadaLibros.id,
+      rating: 4,
+      title: 'Muy buena caja literaria juvenil',
+      comment: 'Los dos libros de romance que llegaron este mes estaban muy bien elegidos, con una narrativa ágil y entretenida. Los stickers y el señalador son un plus que se agradece. Quizás el packaging podría mejorar un poco, pero el contenido literario es sólido.',
+      active: true,
+    },
+  });
+  //#endregion
+  
+  //#region 25.2.3. Black Box - blackBoxCajaMisteriosa
+  await prisma.reviews.create({
+    data: {
+      idUser: user2.id,
+      idClub: clubBlackBox.id,
+      rating: 3,
+      title: 'La sorpresa es divertida, pero irregular',
+      comment: 'El concepto de la caja misteriosa de cervezas artesanales me copa, y este mes llegaron dos cervezas muy buenas entre las seis. El problema es que las otras cuatro eran bastante mediocres. Con esa inconsistencia es difícil sostener la suscripción.',
+      active: true,
+    },
+  });
+  //#endregion
+  //#endregion
+
+  //#region 25.3. Micaela López  
+  //#region 25.3.1. Cervecero Club - cerveceroClubPlanArtesanal
+  await prisma.reviews.create({
+    data: {
+      idUser: user3.id,
+      idClub: clubCerveceroClub.id,
+      rating: 4,
+      title: 'Cervecerías boutique que no conocía para nada',
+      comment: 'Me llegaron seis botellas de cervecerías artesanales independientes y la mayoría eran nombres que nunca había visto en Rosario. La IPA cordobesa y la stout de Mendoza fueron las estrellas. La ficha de cada productora es un gran detalle. Muy recomendable si querés salir del circuito mainstream.',
+      active: true,
+    },
+  });
+  //#endregion
+  
+  //#region 25.3.2. Tea Blends Club - teaBlendsInfusionDelMes
+  await prisma.reviews.create({
+    data: {
+      idUser: user3.id,
+      idClub: clubTeaBlends.id,
+      rating: 2,
+      title: 'Los blends no me convencieron',
+      comment: 'Uno de los dos tés que llegaron este mes tenía un sabor raro, como a hierbas viejas. El otro estaba bien pero tampoco era nada especial. Para el precio que tiene la suscripción esperaba blends más sorprendentes y de mejor calidad de hoja. Por ahora no lo renovaría.',
+      active: true,
+    },
+  });
+  //#endregion
+   //#endregion
+
+  //#region 25.4. Martín Fernández  
+  //#region 25.4.1. Winexperts - winexpertsPlanSommelier
+  await prisma.reviews.create({
+    data: {
+      idUser: user4.id,
+      idClub: clubWinexperts.id,
+      rating: 5,
+      title: 'El Plan Sommelier no tiene competencia',
+      comment: 'Tres vinos de bodegas boutique de producción limitada, notas de cata extendidas y un live mensual con sommeliers certificados: no hay nada igual en el mercado. Este mes el Malbec de una pequeña bodega sanjuanina me dejó sin palabras. Cada caja justifica ampliamente el precio.',
+      active: true,
+    },
+  });
+  //#endregion
+  //#endregion
+
+  //#region 25.5. Valentina Castro  
+  //#region 25.5.1. Glossybox - glossyboxMensual
+  await prisma.reviews.create({
+    data: {
+      idUser: user5.id,
+      idClub: clubGlossyBox.id,
+      rating: 4,
+      title: 'Productos de marcas que no llegarían acá de otra manera',
+      comment: 'Me llegaron cinco productos de belleza internacionales y tres eran de marcas que directamente no se consiguen en Argentina. El packaging de Glossybox es súper lindo, ideal para regalar. Le saco un punto porque uno de los productos era un poco básico para el nivel de la caja.',
+      active: true,
+    },
+  });
+  //#endregion
+  
+  //#region 25.5.2. Alma Box - almaBoxCajaNatural
+  await prisma.reviews.create({
+    data: {
+      idUser: user5.id,
+      idClub: clubAlmaBox.id,
+      rating: 3,
+      title: 'Buena propuesta, pero algunos productos no me convencieron',
+      comment: 'La caja de cosmética natural llegó muy bien presentada y la guía de rutina de cuidado es útil. Pero el sérum de este mes me causó una pequeña reacción en la piel, no fue nada grave pero me generó desconfianza. El resto de los productos estaban bien.',
+      active: true,
+    },
+  });
+  //#endregion
+  
+  //#region 25.5.3. Sweet Box - sweetBoxDulceSorpresa
+  await prisma.reviews.create({
+    data: {
+      idUser: user5.id,
+      idClub: clubSweetBox.id,
+      rating: 4,
+      title: 'Una caja muy divertida y variada',
+      comment: 'Llegaron como ocho golosinas y dulces artesanales con una temática de verano muy simpática. Los caramelos de fruta artesanales fueron los favoritos de toda la familia. La tarjeta de descripción de cada producto es un detalle que le da mucha personalidad a la caja.',
+      active: true,
+    },
+  });
+  //#endregion
+  //#endregion
+
+  //#region 25.6. Agustín Morales
+  //#region 25.6.1. Café Selecto - cafeSelectoCajaGourmet
+  await prisma.reviews.create({
+    data: {
+      idUser: user6.id,
+      idClub: clubCafeSelecto.id,
+      rating: 3,
+      title: 'Buena caja pero el accesorio fue decepcionante',
+      comment: 'Los dos cafés de la Caja Gourmet eran de buena calidad, el etíope especialmente tenía notas frutales muy interesantes. Pero el accesorio de café que prometían para nuevas suscripciones llegó tarde y era un simple filtro de papel, nada especial. Espero que mejoren en ese aspecto.',
+      active: true,
+    },
+  });
+  //#endregion
+  
+  //#region 25.6.2. Loot Crate AR - lootCrateARGeekMensual
+  await prisma.reviews.create({
+    data: {
+      idUser: user6.id,
+      idClub: clubLootCrateAR.id,
+      rating: 4,
+      title: 'La temática de este mes fue increíble',
+      comment: 'Este mes la caja vino temática de videojuegos retro y estaba muy bien curada. La figura coleccionable era de muy buena calidad y los pins son geniales. El packaging coleccionable es un detalle que los diferencia. Le bajaría un punto porque la remera no era talle exacto.',
+      active: true,
+    },
+  });
+  //#endregion
+ //#endregion
+
+  //#region 25.7. Camila Torres  
+  //#region 25.7.1. Bodega Privada - bodegaPrivadaAccesoPrivado
+  await prisma.reviews.create({
+    data: {
+      idUser: user7.id,
+      idClub: clubBodegaPrivada.id,
+      rating: 1,
+      title: 'Muy decepcionante para el precio que tiene',
+      comment: 'Pagué casi cincuenta mil pesos por dos botellas de bodegas boutique y una llegó con el corcho desplazado, claramente mal almacenada. El vino estaba oxidado. La tarjeta del productor está muy bien redactada, pero de nada sirve si el producto llega en mal estado. Pedí reposición y tardaron tres semanas.',
+      active: true,
+    },
+  });
+  //#endregion
+  //#endregion
+
+  //#region 25.8. Federico Romero  
+  //#region 25.8.1. Beer Box - beerBoxSixPack
+  await prisma.reviews.create({
+    data: {
+      idUser: user8.id,
+      idClub: clubBeerBox.id,
+      rating: 5,
+      title: 'La mejor selección de craft beer que recibí',
+      comment: 'Las seis cervezas de este mes fueron de un nivel impresionante: una IPA de Bariloche, una stout de Buenos Aires, una lager de Mendoza y tres más de estilos que raramente encuentro en La Plata. Las fichas técnicas con IBU y ABV son perfectas para los que realmente disfrutamos el mundo del craft.',
+      active: true,
+    },
+  });
+  //#endregion
+  
+  //#region 25.8.2. Gaming Box - gamingBoxControllerPack
+  await prisma.reviews.create({
+    data: {
+      idUser: user8.id,
+      idClub: clubGamingBox.id,
+      rating: 3,
+      title: 'Correcto pero sin grandes sorpresas',
+      comment: 'Los accesorios gamer de este mes cumplieron, el mousepad era de buena calidad y los stickers estaban bien diseñados. Pero el ítem sorpresa fue un llavero bastante genérico que no tiene nada de especial. Para el precio esperaba algo más impactante al menos en ese ítem.',
+      active: true,
+    },
+  });
+  //#endregion
+  
+  //#region 25.8.3. Snack Box - snackBoxViajeDeSabores
+  await prisma.reviews.create({
+    data: {
+      idUser: user8.id,
+      idClub: clubSnackBox.id,
+      rating: 4,
+      title: 'Un viaje de sabores muy bien armado',
+      comment: 'Once snacks de seis países distintos, con la tarjeta identificando cada uno: exactamente lo que prometían. Los snacks coreanos de algas y los chips mexicanos enchilados fueron los favoritos. Muy buena relación precio-cantidad. Le saco un punto porque dos productos ya los había recibido el mes anterior.',
+      active: true,
+    },
+  });
+  //#endregion
+  //#endregion
+
+  //#region 25.9. Sofía Núñez  
+  //#region 25.9.1. Anime Box - animeBoxOtakuMensual
+  await prisma.reviews.create({
+    data: {
+      idUser: user9.id,
+      idClub: clubAnimeBox.id,
+      rating: 4,
+      title: 'La caja otaku más completa del mercado',
+      comment: 'Este mes la temática fue Demon Slayer y los productos estaban muy bien elegidos: la figura chibi de Tanjiro era de muy buena calidad y el washi tape temático es hermoso. El snack japonés fue un gran bonus. Le falta consistencia en el tamaño de las figuras respecto a cajas anteriores.',
+      active: true,
+    },
+  });
+  //#endregion
+  
+  //#region 25.9.2. Manjar Literario - manjarPoesia
+  await prisma.reviews.create({
+    data: {
+      idUser: user9.id,
+      idClub: clubManjarLiterario.id,
+      rating: 2,
+      title: 'El libro de poesía no fue lo que esperaba',
+      comment: 'La presentación de la caja es preciosa y los extras como la Polaroid y la postal son muy lindos. Pero el libro de poesía de este mes era de un autor muy hermético que no conecté para nada. Entiendo que es subjetivo, pero para el precio del envío esperaba una selección con más criterio de llegada al lector.',
+      active: true,
+    },
+  });
+  //#endregion
+  //#endregion  
+ 
+  //#region 25.10. Nicolás Gutiérrez
+  //#region 25.10.1. Outdoor Box - outdoorBoxExplorerPro
+  await prisma.reviews.create({
+    data: {
+      idUser: user10.id,
+      idClub: clubOutdoorBox.id,
+      rating: 3,
+      title: 'Buena idea pero la calidad del equipamiento falla',
+      comment: 'La guía de ruta patagónica que incluía este mes estaba muy bien armada y es algo que voy a usar. Pero uno de los accesorios de supervivencia que venía en la caja era claramente de baja calidad, el material se sentía frágil para uso outdoor real. Para trekkers serios el estándar tiene que ser más alto.',
       active: true,
     },
   });
 
-  // 26. FAVORITES
-  await prisma.favorites.create({
+  // 25. REVIEWS (users 11-20)
+  //#endregion
+  //#endregion
+
+  //#region 25.11. Florencia Méndez  
+  //#region 25.11.1. Bookerly - bookerlyMensual
+  await prisma.reviews.create({
     data: {
-      idUser: user.id,
-      idClub: clubManjarLiterario.id,
+      idUser: user11.id,
+      idClub: clubBookerly.id,
+      rating: 4,
+      title: 'Una selección literaria muy cuidada',
+      comment: 'El libro de ficción contemporánea que llegó este mes era de una editorial independiente que no conocía para nada y me encantó. El té que incluye la caja es un detalle muy lindo para acompañar la lectura. El señalador origami estaba impecable. Le saco un punto porque la guía de lectura podría tener más profundidad sobre el autor.',
+      active: true,
+    },
+  });
+  //#endregion
+
+  //#region 25.11.2. Cristales Club - cristalesClubEnergiaMensual
+  await prisma.reviews.create({
+    data: {
+      idUser: user11.id,
+      idClub: clubCristalesClub.id,
+      rating: 3,
+      title: 'Los cristales están bien pero la información es básica',
+      comment: 'Los dos cristales que llegaron este mes son bonitos, la presentación en cajita es linda. Pero la tarjeta de identificación y propiedades es muy superficial, cualquier cosa que dice ahí la encuentro con diez segundos de búsqueda en internet. Para alguien que quiere aprender en serio sobre cristales, esperaba más contenido educativo.',
+      active: true,
+    },
+  });
+  //#endregion
+  
+  //#region 25.11.3. Tarot Box - tarotBoxLunaMensual
+  await prisma.reviews.create({
+    data: {
+      idUser: user11.id,
+      idClub: clubTarotBox.id,
+      rating: 5,
+      title: '¡La caja más especial que recibí!',
+      comment: 'Este mes llegó un libro de consulta de tarot que no conseguía en ninguna librería de Mar del Plata, un cristal de amatista hermoso y un incienso con un aroma increíble. La guía del ritual lunar estaba muy bien redactada y realmente la puse en práctica. Todo coherente, todo cuidado con intención. No cambiaría nada.',
+      active: true,
+    },
+  });
+  //#endregion
+  //#endregion
+  
+  //#region 25.12. Rodrigo Acosta
+  //#region 25.12.1. Yerba Club - yerbaClubCajaMateroCompleta
+  await prisma.reviews.create({
+    data: {
+      idUser: user12.id,
+      idClub: clubYerbaClub.id,
+      rating: 4,
+      title: 'Yerbas artesanales que no se consiguen en San Juan',
+      comment: 'Las dos yerbas de este mes eran de Misiones y de Corrientes, con perfiles sensoriales completamente distintos. El accesorio sorpresa fue una bombilla de alpaca muy bien hecha. La guía de cebado tiene tips que hasta yo, que tomo mate hace 30 años, no sabía. Le faltaría un poco más de información sobre el productor.',
+      active: true,
+    },
+  });
+  //#endregion
+  
+  //#region 25.12.2 Bonvivir - bonvivirSeleccionPuroMalbec
+  await prisma.reviews.create({
+    data: {
+      idUser: user12.id,
+      idClub: clubBonvivir.id,
+      rating: 4,
+      title: 'Dos Malbec completamente distintos, muy interesante',
+      comment: 'Recibir dos Malbec de estilos y orígenes diferentes en la misma caja es una idea brillante para entender la diversidad de la cepa. Uno era de Mendoza más clásico y el otro de San Juan con un perfil completamente diferente. Las fichas coleccionables son muy completas. El envío llegó en perfectas condiciones.',
+      active: true,
+    },
+  });
+  //#endregion
+  //#endregion
+
+  //#region 25.13. Julieta Vega  
+  //#region 25.13.1. Gin Tonic Club - ginTonicClubPerfectServeMensual
+  await prisma.reviews.create({
+    data: {
+      idUser: user13.id,
+      idClub: clubGinTonicClub.id,
+      rating: 5,
+      title: 'El perfect serve más rico que preparé en casa',
+      comment: 'El gin artesanal de esta destilería mendocina era extraordinario, con botánicos locales que le daban un carácter único. Las dos tónicas premium estaban perfectamente elegidas para maridar y los botanicals sugeridos (romero seco y cáscara de pomelo) cerraban todo a la perfección. La guía del perfect serve es muy clara. Totalmente recomendable.',
+      active: true,
+    },
+  });
+  //#endregion
+  
+  //#region 25.13.2. Chocolate Box - chocolateBoxCacaoDelMes
+  await prisma.reviews.create({
+    data: {
+      idUser: user13.id,
+      idClub: clubChocolateBox.id,
+      rating: 3,
+      title: 'Buen chocolate pero nada extraordinario',
+      comment: 'Las tres tabletas bean to bar eran de buena calidad, especialmente la de cacao peruano al 72%. La tarjeta de cata describe bien el perfil sensorial. Pero para el precio que tiene la suscripción esperaba porcentajes más altos o productores más difíciles de conseguir. Se puede encontrar algo similar en cualquier dietética gourmet.',
+      active: true,
+    },
+  });
+  //#endregion
+  //#endregion
+
+  //#region 25.14. Ignacio Blanco
+  //#region 25.14.1. Skincare Natural - skincareNaturalRutinaMensual
+  await prisma.reviews.create({
+    data: {
+      idUser: user14.id,
+      idClub: clubSkincareNatural.id,
+      rating: 1,
+      title: 'Muy decepcionante, productos que no funcionaron',
+      comment: 'Me suscribí porque busco una rutina de skincare limpia, sin químicos agresivos. Pero el limpiador de este mes me dejó la piel tirante durante días y el tratamiento tenía un olor muy invasivo que no se iba. Revisé los ingredientes y había algunos que directamente no reconocí como naturales. Para el precio que tiene la caja el nivel de calidad no se justifica.',
+      active: true,
+    },
+  });
+  //#endregion
+  //#endregion
+  
+  //#region 25.15. Antonella Ríos
+  //#region 25.15.1. Wellness Box - wellnessBoxCajaBienestar
+  await prisma.reviews.create({
+    data: {
+      idUser: user15.id,
+      idClub: clubWellnessBox.id,
+      rating: 4,
+      title: 'Una caja muy completa para el bienestar diario',
+      comment: 'Este mes llegaron cinco productos muy variados: un suplemento de magnesio, una infusión funcional de ashwagandha, un aceite esencial de lavanda, un accesorio de meditación y la guía de hábitos del mes. Todo coherente y de buena calidad. La guía de hábitos es el diferencial real de esta caja. Le saco un punto porque el aceite esencial venía con el gotero flojo.',
+      active: true,
+    },
+  });
+  //#endregion
+  
+  //#region 25.15.2. Suculentas Club - suculentasClubSuculentaDelMes
+  await prisma.reviews.create({
+    data: {
+      idUser: user15.id,
+      idClub: clubSuculentasClub.id,
+      rating: 3,
+      title: 'Las suculentas llegaron bien, pero una era muy común',
+      comment: 'Una de las dos suculentas era una Haworthia que realmente no se consigue fácil y me encantó. Pero la otra era una Echeveria básica que se vende en cualquier vivero de Corrientes. Las macetas cerámicas artesanales son lindísimas y la ficha informativa está muy bien redactada. Espero que el mes que viene ambas plantas sean igual de especiales.',
+      active: true,
+    },
+  });
+  //#endregion
+  
+  //#region 25.15.3. Papelería Box - papeleriaBoxStationery
+  await prisma.reviews.create({
+    data: {
+      idUser: user15.id,
+      idClub: clubPapeleriaBox.id,
+      rating: 4,
+      title: 'La temática de este mes fue adorable',
+      comment: 'Llegaron cinco artículos con una estética botanical muy bien coordinada: un cuaderno tapa dura con ilustraciones de plantas, washi tape floral, stickers, un bolígrafo de tinta de gel y marcadores de colores tierra. Todo muy cuidado visualmente. Le bajaría un punto porque el cuaderno tenía las hojas un poco finas para usar con marcadores.',
+      active: true,
+    },
+  });
+  //#endregion
+  //#endregion
+
+  //#region 25.16. Emiliano Peralta
+  //#region 25.16.1. Especias Club - especiasClubCajaDelChef
+  await prisma.reviews.create({
+    data: {
+      idUser: user16.id,
+      idClub: clubEspeciasClub.id,
+      rating: 5,
+      title: 'La Caja del Chef es un lujo absoluto',
+      comment: 'Este mes llegaron cinco especias gourmet increíbles: za\'atar libanés, sumac, pimienta de Sichuan, flor de sal ahumada y curry de Madras. La salsa harissa artesanal que incluía era de otro nivel. Y la receta exclusiva del equipo para hacer un tagine marroquí estaba perfectamente explicada. El packaging reutilizable es un detalle que se agradece mucho.',
+      active: true,
     },
   });
 
-  // 27. USER_CLUB_PREFERENCES
-  await prisma.user_Club_Preferences.create({
+  // Club Woopy - woopyMensual
+  await prisma.reviews.create({
     data: {
-      idUser: user.id,
-      idSubscriptionTypes: manjarNarrativa.id,
-      idClub: clubManjarLiterario.id,
-      preferenceType: 'genero_literario',
-      preferenceValue: 'Fantasía',
+      idUser: user16.id,
+      idClub: clubClubWoopy.id,
+      rating: 3,
+      title: 'Papelería correcta pero sin mucha originalidad',
+      comment: 'La caja de este mes incluía artículos útiles pero bastante genéricos: un cuaderno básico, algunos marcadores y washi tape común. No sentí que hubiera una curaduría especial detrás de la selección, cualquier cosa podría haberla comprado en cualquier librería de Bahía Blanca. Para ser el primer programa de suscripción librería del país esperaba algo más diferenciador.',
+      active: true,
     },
   });
+  //#endregion
+  //#endregion
+
+  //#region 25.17. Luciana Suárez
+  //#region 25.17.1. Mr. Coffee Club - mrCoffeeBarista
+  await prisma.reviews.create({
+    data: {
+      idUser: user17.id,
+      idClub: clubMrCoffeeClub.id,
+      rating: 4,
+      title: 'Dos orígenes completamente distintos, ideal para aprender',
+      comment: 'Las dos variedades de este mes eran un Etíope Yirgacheffe lavado y un Brasilero natural, con perfiles completamente opuestos. La guía de preparación para los tres métodos es muy clara y útil. El contenido digital sobre el mundo del café de especialidad es excelente. Le saco un punto porque uno de los cafés venía molido y preferiría siempre en grano para mejor frescura.',
+      active: true,
+    },
+  });
+  //#endregion
+  //#endregion
+  
+  //#region 25.18. Braian Ojeda
+  //#region 25.18.1. My Pet Box - myPetBoxCajaPerro
+  await prisma.reviews.create({
+    data: {
+      idUser: user18.id,
+      idClub: clubMyPetBox.id,
+      rating: 2,
+      title: 'Los snacks llegaron mal y el juguete duró poco',
+      comment: 'Uno de los snacks naturales para perro llegó con el packaging roto y claramente había estado en contacto con humedad. El juguete era de goma blanda y mi perro lo destruyó en menos de dos horas, no era apto para razas medianas con mordida fuerte. El accesorio sorpresa era un collar muy básico. Esperaba más cuidado en la selección y el empaque.',
+      active: true,
+    },
+  });
+  //#endregion
+  
+  //#region 25.18.2. Medias Club - mediasClubCollector
+  await prisma.reviews.create({
+    data: {
+      idUser: user18.id,
+      idClub: clubMediasClub.id,
+      rating: 4,
+      title: 'Cuatro pares con diseños que realmente sorprenden',
+      comment: 'Los cuatro pares de este mes tenían diseños de ilustradores independientes argentinos y todos eran originales y creativos. El algodón peinado se siente muy bien en el pie. La tarjeta con la historia del diseño y el ilustrador detrás de cada par es un detalle que le da mucho valor a la caja. Le saco un punto porque uno de los talles venía un poco corto.',
+      active: true,
+    },
+  });
+  //#endregion
+  //#endregion
+  
+  //#region 25.19. Mariana Ibáñez
+  //#region 25.19.1. Bodega Privada - bodegaPrivadaColeccionReserva
+  await prisma.reviews.create({
+    data: {
+      idUser: user19.id,
+      idClub: clubBodegaPrivada.id,
+      rating: 5,
+      title: 'Vinos de reserva que no se consiguen en ningún lado',
+      comment: 'Las tres botellas de esta Colección Reserva eran de bodegas pequeñas que jamás había visto en una vinoteca de Cipolletti. Un Gran Reserva de La Rioja, un Blend de Neuquén y un Cabernet Franc de Mendoza, todos excepcionales. Las fichas técnicas extendidas son muy completas y la receta de maridaje era perfecta. La cata virtual del mes fue el broche de oro.',
+      active: true,
+    },
+  });
+  //#endregion
+  
+  //#region 25.19.2. Yoga Box - yogaBoxNamasteBox
+  await prisma.reviews.create({
+    data: {
+      idUser: user19.id,
+      idClub: clubYogaBox.id,
+      rating: 3,
+      title: 'Buena propuesta pero los accesorios son básicos',
+      comment: 'El aceite corporal de este mes era muy agradable y el incienso de sándalo quedó perfecto para la práctica. Pero el accesorio de yoga era una correa muy básica que no transmite la calidad que uno esperaría de una caja curada. La práctica guiada online exclusiva es el verdadero valor de esta suscripción, ahí sí está el diferencial.',
+      active: true,
+    },
+  });
+  //#endregion
+  
+  //#region 25.19.3. Charcuterie Box - charcuterieBoxTableraMensual
+  await prisma.reviews.create({
+    data: {
+      idUser: user19.id,
+      idClub: clubCharcuterieBox.id,
+      rating: 4,
+      title: 'Una tabla de charcutería de nivel gourmet',
+      comment: 'Llegaron cuatro embutidos artesanales de productores de distintas provincias: un salame del campo de Santa Fe, un lomo ahumado de Córdoba, una brescaola de Buenos Aires y un chorizo curado de Mendoza. La ficha de cada productor es un detalle que lo hace todo más especial. El envío refrigerado llegó en perfectas condiciones. Muy recomendable para armar una buena tabla.',
+      active: true,
+    },
+  });
+  //#endregion
+  //#endregion
+  
+  //#region 25.20. Sebastián Quiroga
+  //#region 25.20.1. Fósiles Club - fosilesClubPaleontologoMensual
+  await prisma.reviews.create({
+    data: {
+      idUser: user20.id,
+      idClub: clubFosilesClub.id,
+      rating: 5,
+      title: 'La caja más fascinante que existe en el mercado',
+      comment: 'Este mes llegó un amonite de 12cm con certificado de autenticidad, dos minerales de formación geológica espectaculares y una réplica de un diente de megalodón. La guía sobre el período Jurásico estaba redactada con un nivel científico impecable pero accesible. Para alguien que lleva años coleccionando fósiles, esta caja supera cualquier expectativa. Es única en Argentina.',
+      active: true,
+    },
+  });
+  //#endregion
+  
+  //#region 25.20.2. Bonvivir - bonvivirOliva
+  await prisma.reviews.create({
+    data: {
+      idUser: user20.id,
+      idClub: clubBonvivir.id,
+      rating: 1,
+      title: 'Muy decepcionante para ser Bonvivir',
+      comment: 'Esperaba que la suscripción de aceites de oliva de Bonvivir tuviera el mismo nivel que tienen con los vinos, pero fue una desilusión total. Los tres aceites eran de marcas comerciales que consigo en cualquier supermercado de La Rioja, sin ningún diferencial gourmet. Para el precio trimestral que se cobra esto no tiene ninguna justificación. No lo renovaría.',
+      active: true,
+    },
+  });
+  //#endregion
+  //#endregion
+
+  //#endregion
+
+  // 26. FAVORITES
+  
+  // 27. USER_CLUB_PREFERENCES
+
 
 //#region 28. ADMIN_OR_ENTREPRENEUR_ROLE
 

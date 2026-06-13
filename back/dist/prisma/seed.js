@@ -1213,7 +1213,7 @@ async function main() {
         grantPerm(rolAdminSeguridad.id, permVerNotificacionesEnviadas.id),
     ]);
     const passUser1 = await bcrypt.hash('User1234!', 10);
-    const user = await prisma.user.create({
+    const user = const user = await prisma.user.create({
         data: {
             firstName: 'Lucía',
             lastName: 'Ramírez',
@@ -1234,7 +1234,7 @@ async function main() {
         },
     });
     const passUser2 = await bcrypt.hash('User1234!', 10);
-    await prisma.user.create({
+    const user = await prisma.user.create({
         data: {
             firstName: 'Tomás',
             lastName: 'Herrera',
@@ -1255,7 +1255,7 @@ async function main() {
         },
     });
     const passUser3 = await bcrypt.hash('User1234!', 10);
-    await prisma.user.create({
+    const user = await prisma.user.create({
         data: {
             firstName: 'Micaela',
             lastName: 'López',
@@ -1276,7 +1276,7 @@ async function main() {
         },
     });
     const passUser4 = await bcrypt.hash('User1234!', 10);
-    await prisma.user.create({
+    const user = await prisma.user.create({
         data: {
             firstName: 'Martín',
             lastName: 'Fernández',
@@ -1297,7 +1297,7 @@ async function main() {
         },
     });
     const passUser5 = await bcrypt.hash('User1234!', 10);
-    await prisma.user.create({
+    const user = await prisma.user.create({
         data: {
             firstName: 'Valentina',
             lastName: 'Castro',
@@ -1318,7 +1318,7 @@ async function main() {
         },
     });
     const passUser6 = await bcrypt.hash('User1234!', 10);
-    await prisma.user.create({
+    const user = await prisma.user.create({
         data: {
             firstName: 'Agustín',
             lastName: 'Morales',
@@ -1339,7 +1339,7 @@ async function main() {
         },
     });
     const passUser7 = await bcrypt.hash('User1234!', 10);
-    await prisma.user.create({
+    const user = await prisma.user.create({
         data: {
             firstName: 'Camila',
             lastName: 'Torres',
@@ -1360,7 +1360,7 @@ async function main() {
         },
     });
     const passUser8 = await bcrypt.hash('User1234!', 10);
-    await prisma.user.create({
+    const user = await prisma.user.create({
         data: {
             firstName: 'Federico',
             lastName: 'Romero',
@@ -1381,7 +1381,7 @@ async function main() {
         },
     });
     const passUser9 = await bcrypt.hash('User1234!', 10);
-    await prisma.user.create({
+    const user = await prisma.user.create({
         data: {
             firstName: 'Sofía',
             lastName: 'Núñez',
@@ -1402,7 +1402,7 @@ async function main() {
         },
     });
     const passUser10 = await bcrypt.hash('User1234!', 10);
-    await prisma.user.create({
+    const user = await prisma.user.create({
         data: {
             firstName: 'Nicolás',
             lastName: 'Gutiérrez',
@@ -1423,7 +1423,7 @@ async function main() {
         },
     });
     const passUser11 = await bcrypt.hash('User1234!', 10);
-    await prisma.user.create({
+    const user = await prisma.user.create({
         data: {
             firstName: 'Florencia',
             lastName: 'Méndez',
@@ -1444,7 +1444,7 @@ async function main() {
         },
     });
     const passUser12 = await bcrypt.hash('User1234!', 10);
-    await prisma.user.create({
+    const user = await prisma.user.create({
         data: {
             firstName: 'Rodrigo',
             lastName: 'Acosta',
@@ -1465,7 +1465,7 @@ async function main() {
         },
     });
     const passUser13 = await bcrypt.hash('User1234!', 10);
-    await prisma.user.create({
+    const user = await prisma.user.create({
         data: {
             firstName: 'Julieta',
             lastName: 'Vega',
@@ -1486,7 +1486,7 @@ async function main() {
         },
     });
     const passUser14 = await bcrypt.hash('User1234!', 10);
-    await prisma.user.create({
+    const user = await prisma.user.create({
         data: {
             firstName: 'Ignacio',
             lastName: 'Blanco',
@@ -1507,7 +1507,7 @@ async function main() {
         },
     });
     const passUser15 = await bcrypt.hash('User1234!', 10);
-    await prisma.user.create({
+    const user = await prisma.user.create({
         data: {
             firstName: 'Antonella',
             lastName: 'Ríos',
@@ -1528,7 +1528,7 @@ async function main() {
         },
     });
     const passUser16 = await bcrypt.hash('User1234!', 10);
-    await prisma.user.create({
+    const user = await prisma.user.create({
         data: {
             firstName: 'Emiliano',
             lastName: 'Peralta',
@@ -1549,7 +1549,7 @@ async function main() {
         },
     });
     const passUser17 = await bcrypt.hash('User1234!', 10);
-    await prisma.user.create({
+    const user = await prisma.user.create({
         data: {
             firstName: 'Luciana',
             lastName: 'Suárez',
@@ -1570,7 +1570,7 @@ async function main() {
         },
     });
     const passUser18 = await bcrypt.hash('User1234!', 10);
-    await prisma.user.create({
+    const user = await prisma.user.create({
         data: {
             firstName: 'Braian',
             lastName: 'Ojeda',
@@ -1591,7 +1591,7 @@ async function main() {
         },
     });
     const passUser19 = await bcrypt.hash('User1234!', 10);
-    await prisma.user.create({
+    const user = await prisma.user.create({
         data: {
             firstName: 'Mariana',
             lastName: 'Ibáñez',
@@ -1612,7 +1612,7 @@ async function main() {
         },
     });
     const passUser20 = await bcrypt.hash('User1234!', 10);
-    await prisma.user.create({
+    const user = await prisma.user.create({
         data: {
             firstName: 'Sebastián',
             lastName: 'Quiroga',
@@ -4124,7 +4124,7 @@ async function main() {
             idAdmins: admin.id,
             previousStatus: client_1.ClubStatus.PENDIENTE_APROBACION,
             newStatus: client_1.ClubStatus.APROBADO,
-            changeDate: new Date('2025-01-15'),
+            changeDate: true,
             changeReason: 'Documentación validada correctamente',
         },
     });
@@ -4134,7 +4134,7 @@ async function main() {
             idAdmins: admin.id,
             previousStatus: client_1.ClubStatus.PENDIENTE_APROBACION,
             newStatus: client_1.ClubStatus.APROBADO,
-            changeDate: new Date('2025-01-15'),
+            changeDate: true,
             changeReason: 'Documentación validada correctamente',
         },
     });
@@ -4144,7 +4144,7 @@ async function main() {
             idAdmins: admin.id,
             previousStatus: client_1.ClubStatus.PENDIENTE_APROBACION,
             newStatus: client_1.ClubStatus.APROBADO,
-            changeDate: new Date('2025-01-15'),
+            changeDate: true,
             changeReason: 'Documentación validada correctamente',
         },
     });
@@ -4154,7 +4154,7 @@ async function main() {
             idAdmins: admin.id,
             previousStatus: client_1.ClubStatus.PENDIENTE_APROBACION,
             newStatus: client_1.ClubStatus.APROBADO,
-            changeDate: new Date('2025-01-15'),
+            changeDate: true,
             changeReason: 'Documentación validada correctamente',
         },
     });
@@ -4164,7 +4164,7 @@ async function main() {
             idAdmins: admin.id,
             previousStatus: client_1.ClubStatus.PENDIENTE_APROBACION,
             newStatus: client_1.ClubStatus.APROBADO,
-            changeDate: new Date('2025-01-15'),
+            changeDate: true,
             changeReason: 'Documentación validada correctamente',
         },
     });
@@ -4174,7 +4174,7 @@ async function main() {
             idAdmins: admin.id,
             previousStatus: client_1.ClubStatus.PENDIENTE_APROBACION,
             newStatus: client_1.ClubStatus.APROBADO,
-            changeDate: new Date('2025-01-15'),
+            changeDate: true,
             changeReason: 'Documentación validada correctamente',
         },
     });
@@ -4184,7 +4184,7 @@ async function main() {
             idAdmins: admin.id,
             previousStatus: client_1.ClubStatus.PENDIENTE_APROBACION,
             newStatus: client_1.ClubStatus.APROBADO,
-            changeDate: new Date('2025-01-15'),
+            changeDate: true,
             changeReason: 'Documentación validada correctamente',
         },
     });
@@ -4194,7 +4194,7 @@ async function main() {
             idAdmins: admin.id,
             previousStatus: client_1.ClubStatus.PENDIENTE_APROBACION,
             newStatus: client_1.ClubStatus.APROBADO,
-            changeDate: new Date('2025-01-15'),
+            changeDate: true,
             changeReason: 'Documentación validada correctamente',
         },
     });
@@ -4204,7 +4204,7 @@ async function main() {
             idAdmins: admin.id,
             previousStatus: client_1.ClubStatus.PENDIENTE_APROBACION,
             newStatus: client_1.ClubStatus.APROBADO,
-            changeDate: new Date('2025-01-15'),
+            changeDate: true,
             changeReason: 'Documentación validada correctamente',
         },
     });
@@ -4214,7 +4214,7 @@ async function main() {
             idAdmins: admin.id,
             previousStatus: client_1.ClubStatus.PENDIENTE_APROBACION,
             newStatus: client_1.ClubStatus.APROBADO,
-            changeDate: new Date('2025-01-15'),
+            changeDate: true,
             changeReason: 'Documentación validada correctamente',
         },
     });
@@ -4224,7 +4224,7 @@ async function main() {
             idAdmins: admin.id,
             previousStatus: client_1.ClubStatus.PENDIENTE_APROBACION,
             newStatus: client_1.ClubStatus.APROBADO,
-            changeDate: new Date('2025-01-15'),
+            changeDate: true,
             changeReason: 'Documentación validada correctamente',
         },
     });
@@ -4234,7 +4234,7 @@ async function main() {
             idAdmins: admin.id,
             previousStatus: client_1.ClubStatus.PENDIENTE_APROBACION,
             newStatus: client_1.ClubStatus.APROBADO,
-            changeDate: new Date('2025-01-15'),
+            changeDate: true,
             changeReason: 'Documentación validada correctamente',
         },
     });
@@ -4244,7 +4244,7 @@ async function main() {
             idAdmins: admin.id,
             previousStatus: client_1.ClubStatus.PENDIENTE_APROBACION,
             newStatus: client_1.ClubStatus.APROBADO,
-            changeDate: new Date('2025-01-15'),
+            changeDate: true,
             changeReason: 'Documentación validada correctamente',
         },
     });
@@ -4254,7 +4254,7 @@ async function main() {
             idAdmins: admin.id,
             previousStatus: client_1.ClubStatus.PENDIENTE_APROBACION,
             newStatus: client_1.ClubStatus.APROBADO,
-            changeDate: new Date('2025-01-15'),
+            changeDate: true,
             changeReason: 'Documentación validada correctamente',
         },
     });
@@ -4264,7 +4264,7 @@ async function main() {
             idAdmins: admin.id,
             previousStatus: client_1.ClubStatus.PENDIENTE_APROBACION,
             newStatus: client_1.ClubStatus.APROBADO,
-            changeDate: new Date('2025-01-15'),
+            changeDate: true,
             changeReason: 'Documentación validada correctamente',
         },
     });
@@ -4274,7 +4274,7 @@ async function main() {
             idAdmins: admin.id,
             previousStatus: client_1.ClubStatus.PENDIENTE_APROBACION,
             newStatus: client_1.ClubStatus.APROBADO,
-            changeDate: new Date('2025-01-15'),
+            changeDate: true,
             changeReason: 'Documentación validada correctamente',
         },
     });
@@ -4284,7 +4284,7 @@ async function main() {
             idAdmins: admin.id,
             previousStatus: client_1.ClubStatus.PENDIENTE_APROBACION,
             newStatus: client_1.ClubStatus.APROBADO,
-            changeDate: new Date('2025-01-15'),
+            changeDate: true,
             changeReason: 'Documentación validada correctamente',
         },
     });
@@ -4294,7 +4294,7 @@ async function main() {
             idAdmins: admin.id,
             previousStatus: client_1.ClubStatus.PENDIENTE_APROBACION,
             newStatus: client_1.ClubStatus.APROBADO,
-            changeDate: new Date('2025-01-15'),
+            changeDate: true,
             changeReason: 'Documentación validada correctamente',
         },
     });
@@ -4304,7 +4304,7 @@ async function main() {
             idAdmins: admin.id,
             previousStatus: client_1.ClubStatus.PENDIENTE_APROBACION,
             newStatus: client_1.ClubStatus.APROBADO,
-            changeDate: new Date('2025-01-15'),
+            changeDate: true,
             changeReason: 'Documentación validada correctamente',
         },
     });
@@ -4314,7 +4314,7 @@ async function main() {
             idAdmins: admin.id,
             previousStatus: client_1.ClubStatus.PENDIENTE_APROBACION,
             newStatus: client_1.ClubStatus.APROBADO,
-            changeDate: new Date('2025-01-15'),
+            changeDate: true,
             changeReason: 'Documentación validada correctamente',
         },
     });
@@ -4324,7 +4324,7 @@ async function main() {
             idAdmins: admin.id,
             previousStatus: client_1.ClubStatus.PENDIENTE_APROBACION,
             newStatus: client_1.ClubStatus.APROBADO,
-            changeDate: new Date('2025-01-15'),
+            changeDate: true,
             changeReason: 'Documentación validada correctamente',
         },
     });
@@ -4334,7 +4334,7 @@ async function main() {
             idAdmins: admin.id,
             previousStatus: client_1.ClubStatus.PENDIENTE_APROBACION,
             newStatus: client_1.ClubStatus.APROBADO,
-            changeDate: new Date('2025-01-15'),
+            changeDate: true,
             changeReason: 'Documentación validada correctamente',
         },
     });
@@ -4344,7 +4344,7 @@ async function main() {
             idAdmins: admin.id,
             previousStatus: client_1.ClubStatus.PENDIENTE_APROBACION,
             newStatus: client_1.ClubStatus.APROBADO,
-            changeDate: new Date('2025-01-15'),
+            changeDate: true,
             changeReason: 'Documentación validada correctamente',
         },
     });
@@ -4354,7 +4354,7 @@ async function main() {
             idAdmins: admin.id,
             previousStatus: client_1.ClubStatus.PENDIENTE_APROBACION,
             newStatus: client_1.ClubStatus.APROBADO,
-            changeDate: new Date('2025-01-15'),
+            changeDate: true,
             changeReason: 'Documentación validada correctamente',
         },
     });
@@ -4364,7 +4364,7 @@ async function main() {
             idAdmins: admin.id,
             previousStatus: client_1.ClubStatus.PENDIENTE_APROBACION,
             newStatus: client_1.ClubStatus.APROBADO,
-            changeDate: new Date('2025-01-15'),
+            changeDate: true,
             changeReason: 'Documentación validada correctamente',
         },
     });
@@ -4374,7 +4374,7 @@ async function main() {
             idAdmins: admin.id,
             previousStatus: client_1.ClubStatus.PENDIENTE_APROBACION,
             newStatus: client_1.ClubStatus.APROBADO,
-            changeDate: new Date('2025-01-15'),
+            changeDate: true,
             changeReason: 'Documentación validada correctamente',
         },
     });
@@ -4384,7 +4384,7 @@ async function main() {
             idAdmins: admin.id,
             previousStatus: client_1.ClubStatus.PENDIENTE_APROBACION,
             newStatus: client_1.ClubStatus.APROBADO,
-            changeDate: new Date('2025-01-15'),
+            changeDate: true,
             changeReason: 'Documentación validada correctamente',
         },
     });
@@ -4394,7 +4394,7 @@ async function main() {
             idAdmins: admin.id,
             previousStatus: client_1.ClubStatus.PENDIENTE_APROBACION,
             newStatus: client_1.ClubStatus.APROBADO,
-            changeDate: new Date('2025-01-15'),
+            changeDate: true,
             changeReason: 'Documentación validada correctamente',
         },
     });
@@ -4404,7 +4404,7 @@ async function main() {
             idAdmins: admin.id,
             previousStatus: client_1.ClubStatus.PENDIENTE_APROBACION,
             newStatus: client_1.ClubStatus.APROBADO,
-            changeDate: new Date('2025-01-15'),
+            changeDate: true,
             changeReason: 'Documentación validada correctamente',
         },
     });
@@ -4414,7 +4414,7 @@ async function main() {
             idAdmins: admin.id,
             previousStatus: client_1.ClubStatus.PENDIENTE_APROBACION,
             newStatus: client_1.ClubStatus.APROBADO,
-            changeDate: new Date('2025-01-15'),
+            changeDate: true,
             changeReason: 'Documentación validada correctamente',
         },
     });
@@ -4424,7 +4424,7 @@ async function main() {
             idAdmins: admin.id,
             previousStatus: client_1.ClubStatus.PENDIENTE_APROBACION,
             newStatus: client_1.ClubStatus.APROBADO,
-            changeDate: new Date('2025-01-15'),
+            changeDate: true,
             changeReason: 'Documentación validada correctamente',
         },
     });
@@ -4434,7 +4434,7 @@ async function main() {
             idAdmins: admin.id,
             previousStatus: client_1.ClubStatus.PENDIENTE_APROBACION,
             newStatus: client_1.ClubStatus.APROBADO,
-            changeDate: new Date('2025-01-15'),
+            changeDate: true,
             changeReason: 'Documentación validada correctamente',
         },
     });
@@ -4444,7 +4444,7 @@ async function main() {
             idAdmins: admin.id,
             previousStatus: client_1.ClubStatus.PENDIENTE_APROBACION,
             newStatus: client_1.ClubStatus.APROBADO,
-            changeDate: new Date('2025-01-15'),
+            changeDate: true,
             changeReason: 'Documentación validada correctamente',
         },
     });
@@ -4454,7 +4454,7 @@ async function main() {
             idAdmins: admin.id,
             previousStatus: client_1.ClubStatus.PENDIENTE_APROBACION,
             newStatus: client_1.ClubStatus.APROBADO,
-            changeDate: new Date('2025-01-15'),
+            changeDate: true,
             changeReason: 'Documentación validada correctamente',
         },
     });
@@ -4464,7 +4464,7 @@ async function main() {
             idAdmins: admin.id,
             previousStatus: client_1.ClubStatus.PENDIENTE_APROBACION,
             newStatus: client_1.ClubStatus.APROBADO,
-            changeDate: new Date('2025-01-15'),
+            changeDate: true,
             changeReason: 'Documentación validada correctamente',
         },
     });
@@ -4474,7 +4474,7 @@ async function main() {
             idAdmins: admin.id,
             previousStatus: client_1.ClubStatus.PENDIENTE_APROBACION,
             newStatus: client_1.ClubStatus.APROBADO,
-            changeDate: new Date('2025-01-15'),
+            changeDate: true,
             changeReason: 'Documentación validada correctamente',
         },
     });
@@ -4484,7 +4484,7 @@ async function main() {
             idAdmins: admin.id,
             previousStatus: client_1.ClubStatus.PENDIENTE_APROBACION,
             newStatus: client_1.ClubStatus.APROBADO,
-            changeDate: new Date('2025-01-15'),
+            changeDate: true,
             changeReason: 'Documentación validada correctamente',
         },
     });
@@ -4494,7 +4494,7 @@ async function main() {
             idAdmins: admin.id,
             previousStatus: client_1.ClubStatus.PENDIENTE_APROBACION,
             newStatus: client_1.ClubStatus.APROBADO,
-            changeDate: new Date('2025-01-15'),
+            changeDate: true,
             changeReason: 'Documentación validada correctamente',
         },
     });
@@ -4504,7 +4504,7 @@ async function main() {
             idAdmins: admin.id,
             previousStatus: client_1.ClubStatus.PENDIENTE_APROBACION,
             newStatus: client_1.ClubStatus.APROBADO,
-            changeDate: new Date('2025-01-15'),
+            changeDate: true,
             changeReason: 'Documentación validada correctamente',
         },
     });
@@ -4514,7 +4514,7 @@ async function main() {
             idAdmins: admin.id,
             previousStatus: client_1.ClubStatus.PENDIENTE_APROBACION,
             newStatus: client_1.ClubStatus.APROBADO,
-            changeDate: new Date('2025-01-15'),
+            changeDate: true,
             changeReason: 'Documentación validada correctamente',
         },
     });
@@ -4524,7 +4524,7 @@ async function main() {
             idAdmins: admin.id,
             previousStatus: client_1.ClubStatus.PENDIENTE_APROBACION,
             newStatus: client_1.ClubStatus.APROBADO,
-            changeDate: new Date('2025-01-15'),
+            changeDate: true,
             changeReason: 'Documentación validada correctamente',
         },
     });
@@ -4534,7 +4534,7 @@ async function main() {
             idAdmins: admin.id,
             previousStatus: client_1.ClubStatus.PENDIENTE_APROBACION,
             newStatus: client_1.ClubStatus.APROBADO,
-            changeDate: new Date('2025-01-15'),
+            changeDate: true,
             changeReason: 'Documentación validada correctamente',
         },
     });
@@ -4544,7 +4544,7 @@ async function main() {
             idAdmins: admin.id,
             previousStatus: client_1.ClubStatus.PENDIENTE_APROBACION,
             newStatus: client_1.ClubStatus.APROBADO,
-            changeDate: new Date('2025-01-15'),
+            changeDate: true,
             changeReason: 'Documentación validada correctamente',
         },
     });
@@ -4554,7 +4554,7 @@ async function main() {
             idAdmins: admin.id,
             previousStatus: client_1.ClubStatus.PENDIENTE_APROBACION,
             newStatus: client_1.ClubStatus.APROBADO,
-            changeDate: new Date('2025-01-15'),
+            changeDate: true,
             changeReason: 'Documentación validada correctamente',
         },
     });
@@ -4564,7 +4564,7 @@ async function main() {
             idAdmins: admin.id,
             previousStatus: client_1.ClubStatus.PENDIENTE_APROBACION,
             newStatus: client_1.ClubStatus.APROBADO,
-            changeDate: new Date('2025-01-15'),
+            changeDate: true,
             changeReason: 'Documentación validada correctamente',
         },
     });
@@ -4574,7 +4574,7 @@ async function main() {
             idAdmins: admin.id,
             previousStatus: client_1.ClubStatus.PENDIENTE_APROBACION,
             newStatus: client_1.ClubStatus.APROBADO,
-            changeDate: new Date('2025-01-15'),
+            changeDate: true,
             changeReason: 'Documentación validada correctamente',
         },
     });
@@ -4584,7 +4584,7 @@ async function main() {
             idAdmins: admin.id,
             previousStatus: client_1.ClubStatus.PENDIENTE_APROBACION,
             newStatus: client_1.ClubStatus.APROBADO,
-            changeDate: new Date('2025-01-15'),
+            changeDate: true,
             changeReason: 'Documentación validada correctamente',
         },
     });
@@ -14685,7 +14685,7 @@ async function main() {
     const userSub = await prisma.user_Subscriptions.create({
         data: {
             idUser: user.id,
-            idPaymentMethods: payMethodMercadoPago.id,
+            idPaymentMethods: MercadoPago.id,
             idSubscriptionTypes: manjarNarrativa.id,
             startDate: new Date('2025-01-01'),
             expectedEndDate: new Date('2025-12-31'),
@@ -14700,7 +14700,7 @@ async function main() {
             idUserSubscription: userSub.id,
             idUser: user.id,
             idClub: clubManjarLiterario.id,
-            idPaymentMethods: payMethodMercadoPago.id,
+            idPaymentMethods: payMethod.id,
             idGatewayTransaction: 'MP-TXN-00001',
             totalAmountPaid: 26500,
             clubAmount: 24925,
@@ -14713,7 +14713,7 @@ async function main() {
             idUser: user.id,
             idUserSubscriptions: userSub.id,
             idClub: clubManjarLiterario.id,
-            idPaymentMethods: payMethodMercadoPago.id,
+            idPaymentMethods: payMethod.id,
             idGatewayTransaction: 'MP-TXN-00001',
             totalAmountPaid: 26500,
             clubAmount: 24925,
