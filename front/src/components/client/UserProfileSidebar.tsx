@@ -1,11 +1,11 @@
 import React from 'react';
 
-interface UserProfileSidebar {
+interface UserProfileSidebarProps {
   activeSection: string;
   setActiveSection: (section: string) => void;
 }
 
-const UserProfileSidebar: React.FC<UserProfileSidebar> = ({ activeSection, setActiveSection }) => {
+const UserProfileSidebar: React.FC<UserProfileSidebarProps> = ({ activeSection, setActiveSection }) => {
   const menuItems = [
     { id: 'profile', label: 'Mi Perfil', icon: 'M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z' },
     { id: 'location', label: 'Ubicación', icon: 'M12 11c1.104 0 2-.896 2-2s-.896-2-2-2-2 .896-2 2 .896 2 2 2z M12 2C8.134 2 5 5.134 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.866-3.134-7-7-7z' },
