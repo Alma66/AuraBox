@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import { FinancialMovement } from '../../types/financial';
 
 interface FinancialSidebarProps {
   activeFilter: string;

@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import EditProfileField from './EditProfileField';
-import EditPhoneField from './EditPhoneField';
 
 interface UserActivity {
   id: string;

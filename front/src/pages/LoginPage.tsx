@@ -123,9 +123,9 @@ const LoginPage: React.FC<LoginPageProps> = ({ onLogin }) => {
               </label>
             </div>
             <div className="text-sm">
-              <a href="#" className="font-medium text-blue-600 hover:text-blue-500">
+              <button className="font-medium text-blue-600 hover:text-blue-500">
                 ¿Olvidaste tu contraseña?
-              </a>
+              </button>
             </div>
           </div>
 

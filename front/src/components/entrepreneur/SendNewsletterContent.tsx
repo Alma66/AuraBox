@@ -16,11 +16,11 @@ const SendNewsletterContent: React.FC<SendNewsletterContentProps> = ({ activeSec
     { id: 'env1', asunto: 'Promoción de Junio', contenido: '¡Descuento del 20% este mes!', fecha: '2024-06-01', audiencia: 'todos', aperturas: 85, clics: 42 },
     { id: 'env2', asunto: 'Novedades de Julio', contenido: 'Descubre nuestras nuevas ediciones especiales.', fecha: '2024-07-01', audiencia: 'activos', aperturas: 92, clics: 28 }
   ]);
-  const [plantillas, setPlantillas] = useState([
+  const [plantillas] = useState([
     { id: 'plant1', nombre: 'Bienvenida', asunto: '¡Bienvenido a [Club]!', contenido: 'Gracias por unirte. Tu primera caja llega pronto...' },
     { id: 'plant2', nombre: 'Promoción Mensual', asunto: 'Oferta especial este mes', contenido: '¡Descuento del 20% en tu próxima suscripción! Usa código: AURA20' }
   ]);
-  const [metricas, setMetricas] = useState({ totalEnviados: 15, tasaApertura: 78, tasaClics: 25 });
+  const [metricas] = useState({ totalEnviados: 15, tasaApertura: 78, tasaClics: 25 });
 
   const handleEnviar = () => {
     if (newsletter.asunto && newsletter.contenido) {

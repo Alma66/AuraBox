@@ -78,16 +78,16 @@ const AboutUsPage: React.FC = () => {
             Un grupo de apasionados por el emprendimiento y la tecnología, trabajando para hacer de AuraBox la mejor plataforma posible.
           </p>
           <div className="flex justify-center space-x-6">
-            <a href="#" className="text-white hover:text-yellow-300 transition-colors duration-200 bg-blue-600 p-3 rounded-full">
+            <button className="text-white hover:text-yellow-300 transition-colors duration-200 bg-blue-600 p-3 rounded-full">
               <svg className="text-2xl" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.367 2.684 3 3 0 00-5.367-2.684z" />
               </svg>
-            </a>
-            <a href="#" className="text-white hover:text-yellow-300 transition-colors duration-200 bg-indigo-600 p-3 rounded-full">
+            </button>
+            <button className="text-white hover:text-yellow-300 transition-colors duration-200 bg-indigo-600 p-3 rounded-full">
               <svg className="text-2xl" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
               </svg>
-            </a>
+            </button>
           </div>
         </div>
       </section>
