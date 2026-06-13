@@ -11,7 +11,7 @@ import EditPhoneField from '../common/EditPhoneField';
 import SettingsSection from '../common/SettingsSection';
 import { User } from '../../types/user';
 import rawSubscriptionsData from '../../data/subscriptions.json';
-import api, { getResponseData } from '../../api/config';
+import api from '../../api/config';
 
 const subscriptionsData: Subscription[] = rawSubscriptionsData as Subscription[];
 

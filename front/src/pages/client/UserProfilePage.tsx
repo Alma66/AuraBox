@@ -1,11 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import ProfileSidebar from '../../components/client/UserProfileSidebar';
 import UserProfileContent from '../../components/client/UserProfileContent';
 import api, { getResponseData } from '../../api/config';
 import { User } from '../../types/user';
 
-// Mapea los campos de BD al formato que usan los componentes
 function mapApiUserToUser(data: any): User {
   return {
     id: String(data.id),
@@ -19,7 +18,6 @@ function mapApiUserToUser(data: any): User {
     documentType: data.documentType || '',
     documentNumber: data.documentNumber ? String(data.documentNumber) : '',
     phoneNumber: data.phoneNumber ? String(data.phoneNumber) : '',
-    // Dirección — mapeo de campos BD → campos del componente
     streetAddress: data.streetAddress || '',
     addressNumber: data.addressNumber,
     floorNumber: data.floorNumber || '',
@@ -27,7 +25,6 @@ function mapApiUserToUser(data: any): User {
     city: data.city || '',
     province: data.province || '',
     postalCode: data.postalCode || '',
-    // Legacy aliases para LocationSection
     street: data.streetAddress || '',
     streetNumber: data.addressNumber ? String(data.addressNumber) : '',
     floor: data.floorNumber || '',
@@ -42,7 +39,7 @@ const UserProfilePage: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
-  const fetchUser = async () => {
+  const fetchUser = useCallback(async () => {
     try {
       const response = await api.get('/users/me');
       const userData = getResponseData(response);
@@ -54,11 +51,11 @@ const UserProfilePage: React.FC = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [navigate]);
 
   useEffect(() => {
     fetchUser();
-  }, [navigate]);
+  }, [fetchUser]);
 
   if (loading) return <div className="text-center py-20">Cargando perfil...</div>;
   if (!user) return <div className="text-center py-20">Redirigiendo...</div>;

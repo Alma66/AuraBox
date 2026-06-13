@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import EntrepreneurProfileSidebar from '../../components/entrepreneur/EntrepreneurProfileSidebar';
 import EntrepreneurProfileContent from '../../components/entrepreneur/EntrepreneurProfileContent';
@@ -41,7 +41,7 @@ const EntrepreneurProfilePage: React.FC = () => {
   const navigate = useNavigate();
   const { userRole } = useAuth();
 
-  const fetchEntrepreneur = async () => {
+  const fetchEntrepreneur = useCallback(async () => {
     try {
       const response = await api.get('/entrepreneurs/me');
       const data = getResponseData(response);
@@ -53,7 +53,7 @@ const EntrepreneurProfilePage: React.FC = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [navigate]);
 
   useEffect(() => {
     if (userRole && userRole !== 'entrepreneur') {
@@ -61,7 +61,7 @@ const EntrepreneurProfilePage: React.FC = () => {
       return;
     }
     fetchEntrepreneur();
-  }, [userRole, navigate]);
+  }, [userRole, navigate, fetchEntrepreneur]);
 
   if (loading) return <div className="text-center py-20">Cargando perfil...</div>;
   if (!loggedInUser) return <div className="text-center py-20">Redirigiendo...</div>;
