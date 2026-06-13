@@ -1,8 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../../../App';
-import { User } from '../../../../types/user';
-import { Club } from '../../../../types/club';
 import api, { getResponseData } from '../../../../api/config';
 
 interface Message {
@@ -75,15 +73,7 @@ const CustomerSupportPage: React.FC = () => {
     setFilteredMessages(tempMessages);
   }, [messages, filterStatus, searchTerm]);
 
-  const getCustomerName = async (userId: string) => {
-    try {
-      const response = await api.get(`/users/${userId}`);
-      const userData = getResponseData(response);
-      return `${userData.firstName} ${userData.lastName}`;
-    } catch {
-      return 'Cliente Desconocido';
-    }
-  };
+ 
 
   const handleMessageClick = async (message: Message) => {
     setSelectedMessage(message);

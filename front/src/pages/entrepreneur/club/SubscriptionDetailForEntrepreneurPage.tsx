@@ -16,7 +16,6 @@ const SubscriptionDetailForEntrepreneurPage: React.FC = () => {
   const [customer, setCustomer] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [selectedYear, setSelectedYear] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchData = async () => {

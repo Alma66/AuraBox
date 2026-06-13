@@ -5,7 +5,6 @@ import { Club, SubscriptionPlan } from '../../../types/club';
 
 const SubscriptionPlanDetailPage: React.FC = () => {
   const { clubId, planId } = useParams<{ clubId: string; planId: string }>();
-  const navigate = useNavigate();
   const [club, setClub] = useState<Club | null>(null);
   const [plan, setPlan] = useState<SubscriptionPlan | null>(null);
   const [loading, setLoading] = useState(true);

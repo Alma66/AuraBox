@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import Slider from 'react-slick';
 import api, { getResponseData } from '../../../api/config';
-import { UserRole, User } from '../../../types/user';
+import { UserRole } from '../../../types/user';
 import { Club, LegalSection } from '../../../types/club';
 import { SubscriptionPlan as SubscriptionPlanCardType } from '../../../components/club/SubscriptionPlanCard';
 import SubscriptionPlanCard from '../../../components/club/SubscriptionPlanCard';
@@ -95,7 +95,7 @@ const ClubDetailPage: React.FC<{ userRole: UserRole | null }> = ({ userRole }) =
     }
   };
 
-  const handleLegalInfoChange = (field: keyof Club['legalInfo'], value: LegalSection[]) => {
+  const handleLegalInfoChange = (field: keyof NonNullable<Club['legalInfo']>, value: LegalSection[]) => {
     if (editableClub) {
       setEditableClub({
         ...editableClub,
