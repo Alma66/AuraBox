@@ -8,5 +8,6 @@ import { CloudinaryModule } from '../cloudinary/cloudinary.module';
   imports: [PrismaModule, CloudinaryModule],
   controllers: [ClubsController],
   providers: [ClubsService],
+  exports: [ClubsService],
 })
 export class ClubsModule {}

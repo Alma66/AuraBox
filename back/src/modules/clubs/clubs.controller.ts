@@ -13,6 +13,7 @@ import {
   ParseIntPipe,
   UseInterceptors,
   UploadedFile,
+  Optional,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { memoryStorage } from 'multer';
@@ -65,8 +66,9 @@ export class ClubsController {
 
   @Public()
   @Get(':id')
-  async findOne(@Param('id', ParseIntPipe) id: number) {
-    return this.clubsService.findOne(id);
+  async findOne(@Param('id', ParseIntPipe) id: number, @Request() req) {
+    const requesterId: number | undefined = req.user?.id;
+    return this.clubsService.findOne(id, requesterId);
   }
 
   @UseGuards(JwtAuthGuard, RolesGuard)

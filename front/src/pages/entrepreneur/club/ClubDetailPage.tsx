@@ -10,7 +10,6 @@ import ClubSocialMedia from '../../../components/club/ClubSocialMedia';
 import ClubLegalInfo from '../../../components/club/ClubLegalInfo';
 import ClubPaymentShippingInfo from '../../../components/club/ClubPaymentShippingInfo';
 import ClubFeaturedReviews from '../../../components/club/ClubFeaturedReviews';
-import { useAuth } from '../../../App';
 
 const bannerSliderSettings = {
   dots: true,
@@ -25,36 +24,45 @@ const bannerSliderSettings = {
   cssEase: 'linear',
 };
 
+// Extiende Club para incluir isOwner que viene del back
+interface ClubWithOwner extends Club {
+  isOwner?: boolean;
+}
+
 const ClubDetailPage: React.FC<{ userRole: UserRole | null }> = ({ userRole }) => {
   const { clubId } = useParams<{ clubId: string }>();
   const navigate = useNavigate();
-  const { user } = useAuth();
 
-  const [club, setClub] = useState<Club | null>(null);
+  const [club, setClub] = useState<ClubWithOwner | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [isEditing, setIsEditing] = useState(false);
-  const [editableClub, setEditableClub] = useState<Club | null>(null);
+  const [editableClub, setEditableClub] = useState<ClubWithOwner | null>(null);
+  const [saving, setSaving] = useState(false);
+  const [saveSuccess, setSaveSuccess] = useState('');
+  const [saveError, setSaveError] = useState('');
+
+  const fetchClub = async () => {
+    try {
+      setLoading(true);
+      const response = await api.get(`/clubs/${clubId}`);
+      const clubData = getResponseData(response);
+      setClub(clubData);
+      setEditableClub(clubData);
+    } catch (err) {
+      console.error('Error fetching club:', err);
+      setError('Error al cargar el club.');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    const fetchClub = async () => {
-      try {
-        setLoading(true);
-        const response = await api.get(`/clubs/${clubId}`);
-        const clubData = getResponseData(response);
-        setClub(clubData);
-        setEditableClub(clubData);
-      } catch (err) {
-        console.error("Error fetching club:", err);
-        setError('Error al cargar el club.');
-      } finally {
-        setLoading(false);
-      }
-    };
     if (clubId) fetchClub();
   }, [clubId]);
 
-  const isOwner = userRole === 'entrepreneur' && user?.managedClubId === clubId;
+  // isOwner viene directo del back — no depende del JWT del front
+  const isOwner = !!club?.isOwner;
 
   if (loading) {
     return (
@@ -86,6 +94,8 @@ const ClubDetailPage: React.FC<{ userRole: UserRole | null }> = ({ userRole }) =
     if (isOwner) {
       setIsEditing(!isEditing);
       setEditableClub(club);
+      setSaveSuccess('');
+      setSaveError('');
     }
   };
 
@@ -99,26 +109,35 @@ const ClubDetailPage: React.FC<{ userRole: UserRole | null }> = ({ userRole }) =
     if (editableClub) {
       setEditableClub({
         ...editableClub,
-        legalInfo: {
-          ...editableClub.legalInfo,
-          [field]: value,
-        },
+        legalInfo: { ...editableClub.legalInfo, [field]: value },
       });
     }
   };
 
-  const handleSave = () => {
-    if (editableClub) {
+  const handleSave = async () => {
+    if (!editableClub) return;
+    setSaving(true);
+    setSaveError('');
+    try {
+      await api.put(`/clubs/${clubId}`, {
+        name: editableClub.name,
+        slogan: editableClub.slogan,
+        shortDescription: editableClub.shortDescription,
+      });
       setClub(editableClub);
+      setIsEditing(false);
+      setSaveSuccess('¡Cambios guardados correctamente!');
+      setTimeout(() => setSaveSuccess(''), 3000);
+    } catch {
+      setSaveError('Error al guardar los cambios. Intentá de nuevo.');
+    } finally {
+      setSaving(false);
     }
-    setIsEditing(false);
   };
 
   const sectionsToText = (sections?: LegalSection[]) =>
     sections
-      ? sections
-          .map(s => (typeof s.content === 'string' ? s.content : s.content.join('\n')))
-          .join('\n\n')
+      ? sections.map(s => (typeof s.content === 'string' ? s.content : s.content.join('\n'))).join('\n\n')
       : '';
 
   const textToSections = (text: string, prefix: string): LegalSection[] =>
@@ -130,6 +149,7 @@ const ClubDetailPage: React.FC<{ userRole: UserRole | null }> = ({ userRole }) =
 
   return (
     <div className="bg-gray-50 min-h-screen">
+      {/* Banner */}
       <div className="relative h-64 md:h-96 overflow-hidden shadow-lg animate-fadeIn">
         {club.bannerImages && club.bannerImages.length > 0 ? (
           <Slider {...bannerSliderSettings}>
@@ -144,82 +164,117 @@ const ClubDetailPage: React.FC<{ userRole: UserRole | null }> = ({ userRole }) =
             ))}
           </Slider>
         ) : (
-          <img
-            src={club.mainImage || '/assets/default-banner.jpg'}
-            alt={`${club.name} Banner`}
-            className="w-full h-64 md:h-96 object-cover object-center"
-          />
+          <div className="w-full h-64 md:h-96 bg-gradient-to-br from-blue-600 to-purple-700" />
         )}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
+        <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
         <div className="absolute bottom-0 left-0 p-6 text-white flex items-end w-full">
           {club.logoImage && (
             <img
               src={club.logoImage}
               alt={`${club.name} Logo`}
-              className="w-24 h-24 md:w-32 md:h-32 rounded-full border-4 border-white shadow-lg mr-4 object-cover animate-bounce-once"
+              className="w-24 h-24 md:w-32 md:h-32 rounded-full border-4 border-white shadow-lg mr-4 object-cover"
             />
           )}
-          <div>
-            <h1 className="text-4xl md:text-6xl font-extrabold drop-shadow-lg animate-slideInUp">
-              {isEditing && isOwner ? (
+          <div className="flex-1 min-w-0">
+            {isEditing ? (
+              <input
+                type="text"
+                value={editableClub?.name || ''}
+                onChange={e => handleInputChange('name', e.target.value)}
+                className="text-4xl md:text-5xl font-extrabold w-full bg-transparent border-b-2 border-white text-white outline-none"
+              />
+            ) : (
+              <h1 className="text-4xl md:text-5xl font-extrabold drop-shadow-lg">{club.name}</h1>
+            )}
+            {(club.slogan || isEditing) && (
+              isEditing ? (
                 <input
                   type="text"
-                  value={editableClub?.name || ''}
-                  onChange={e => handleInputChange('name', e.target.value)}
-                  className="text-4xl md:text-6xl font-extrabold w-full bg-transparent border-b border-white text-white"
+                  value={editableClub?.slogan || ''}
+                  onChange={e => handleInputChange('slogan', e.target.value)}
+                  className="w-full bg-transparent border-b border-white text-white text-lg mt-2 outline-none"
+                  placeholder="Slogan del club..."
                 />
               ) : (
-                club.name
-              )}
-            </h1>
-            {club.slogan && (
-              <p className="text-lg md:text-xl mt-2 drop-shadow-md animate-fadeIn delay-200">
-                {isEditing && isOwner ? (
-                  <input
-                    type="text"
-                    value={editableClub?.slogan || ''}
-                    onChange={e => handleInputChange('slogan', e.target.value)}
-                    className="w-full bg-transparent border-b border-white text-white"
-                  />
-                ) : (
-                  club.slogan
-                )}
-              </p>
+                <p className="text-lg md:text-xl mt-2 drop-shadow-md">{club.slogan}</p>
+              )
             )}
           </div>
+
+          {/* Botones de edición — solo para el dueño */}
           {isOwner && (
-            <button
-              onClick={handleEditToggle}
-              className="ml-auto bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
-            >
-              {isEditing ? 'Cancelar' : 'Editar'}
-            </button>
+            <div className="ml-4 flex gap-2 flex-shrink-0">
+              {isEditing ? (
+                <>
+                  <button
+                    onClick={handleSave}
+                    disabled={saving}
+                    className="bg-green-500 text-white px-4 py-2 rounded-lg font-semibold hover:bg-green-600 disabled:opacity-50 transition-colors"
+                  >
+                    {saving ? 'Guardando...' : 'Guardar'}
+                  </button>
+                  <button
+                    onClick={handleEditToggle}
+                    className="bg-gray-500 text-white px-4 py-2 rounded-lg font-semibold hover:bg-gray-600 transition-colors"
+                  >
+                    Cancelar
+                  </button>
+                </>
+              ) : (
+                <button
+                  onClick={handleEditToggle}
+                  className="bg-blue-600 text-white px-4 py-2 rounded-lg font-semibold hover:bg-blue-700 transition-colors flex items-center gap-2"
+                >
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"
+                      d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                  </svg>
+                  Editar Club
+                </button>
+              )}
+            </div>
           )}
         </div>
       </div>
 
       <div className="container mx-auto px-4 py-8">
+        {/* Feedback */}
+        {saveSuccess && (
+          <div className="mb-4 p-3 bg-green-50 border border-green-200 text-green-700 rounded-lg">
+            {saveSuccess}
+          </div>
+        )}
+        {saveError && (
+          <div className="mb-4 p-3 bg-red-50 border border-red-200 text-red-700 rounded-lg">
+            {saveError}
+          </div>
+        )}
+
         <button
           onClick={() => navigate(-1)}
-          className="mb-6 flex items-center text-blue-600 hover:text-blue-800 transition-colors duration-200 transform hover:translate-x-1"
+          className="mb-6 flex items-center text-blue-600 hover:text-blue-800 transition-colors duration-200"
         >
           <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
           </svg>
           Volver
         </button>
 
+        {/* Info principal */}
         <div className="bg-white rounded-xl shadow-lg p-8 mb-8 animate-fadeInUp">
           <div className="flex justify-between items-center mb-6">
-            <span className="inline-block bg-purple-100 text-purple-800 text-sm font-semibold px-3 py-1 rounded-full animate-pulse-subtle">
+            <span className="inline-block bg-purple-100 text-purple-800 text-sm font-semibold px-3 py-1 rounded-full">
               {club.category}
             </span>
-            <button className="bg-gray-200 text-gray-700 px-4 py-2 rounded-full flex items-center space-x-2 hover:bg-red-100 hover:text-red-600 transition-all duration-200 transform hover:scale-105 active:scale-95">
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                <path fillRule="evenodd" d="M3.172 5.172a4.5 4.5 0 015.656 0L10 6.343l1.172-1.171a4.5 4.5 0 115.656 5.656L10 17.657l-6.828-6.829a4.5 4.5 0 010-5.656z" clipRule="evenodd" />
-              </svg>
-              <span>Favorito</span>
-            </button>
+            {/* Favorito — solo para usuarios logueados no dueños */}
+            {!isOwner && (
+              <button className="bg-gray-200 text-gray-700 px-4 py-2 rounded-full flex items-center space-x-2 hover:bg-red-100 hover:text-red-600 transition-all duration-200">
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                  <path fillRule="evenodd" d="M3.172 5.172a4.5 4.5 0 015.656 0L10 6.343l1.172-1.171a4.5 4.5 0 115.656 5.656L10 17.657l-6.828-6.829a4.5 4.5 0 010-5.656z" clipRule="evenodd" />
+                </svg>
+                <span>Favorito</span>
+              </button>
+            )}
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
@@ -229,7 +284,8 @@ const ClubDetailPage: React.FC<{ userRole: UserRole | null }> = ({ userRole }) =
                 <textarea
                   value={editableClub?.shortDescription || ''}
                   onChange={e => handleInputChange('shortDescription', e.target.value)}
-                  className="border rounded w-full p-2 h-32"
+                  className="border rounded w-full p-2 h-32 focus:ring-2 focus:ring-blue-300 outline-none"
+                  placeholder="Descripción del club..."
                 />
               ) : (
                 <p className="text-gray-700 leading-relaxed">{club.shortDescription}</p>
@@ -238,14 +294,14 @@ const ClubDetailPage: React.FC<{ userRole: UserRole | null }> = ({ userRole }) =
             {club.fullHistory && (
               <div className="relative group cursor-pointer">
                 <img
-                  src={club.historyBanner}
+                  src={club.mainImage || '/assets/default-banner.jpg'}
                   alt="Nuestra Historia"
                   className="w-full h-48 object-cover rounded-lg shadow-md group-hover:scale-105 transition-transform duration-300"
                 />
                 <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                   <Link
                     to={`/club/${club.id}/history`}
-                    className="text-white text-lg font-semibold px-6 py-3 bg-blue-600 rounded-full hover:bg-blue-700 transition-colors duration-200 transform hover:scale-110 active:scale-95"
+                    className="text-white text-lg font-semibold px-6 py-3 bg-blue-600 rounded-full hover:bg-blue-700 transition-colors duration-200"
                   >
                     Conocer Nuestra Historia
                   </Link>
@@ -257,6 +313,7 @@ const ClubDetailPage: React.FC<{ userRole: UserRole | null }> = ({ userRole }) =
           {club.socialMedia && <ClubSocialMedia socialMedia={club.socialMedia} />}
         </div>
 
+        {/* Planes de suscripción */}
         {club.subscriptionPlans && club.subscriptionPlans.length > 0 && (
           <div className="mb-12 animate-fadeInUp delay-200">
             <h2 className="text-3xl font-bold text-gray-800 mb-6 text-center">Nuestros Planes de Suscripción</h2>
@@ -287,51 +344,44 @@ const ClubDetailPage: React.FC<{ userRole: UserRole | null }> = ({ userRole }) =
           </div>
         )}
 
+        {/* Pago y envío */}
         {(club.paymentMethods || club.shippingInfo) && (
           <div className="mb-12 animate-fadeInUp delay-300">
             <ClubPaymentShippingInfo paymentMethods={club.paymentMethods} shippingInfo={club.shippingInfo} />
           </div>
         )}
 
+        {/* Reviews destacadas */}
         {club.featuredReviews && club.featuredReviews.length > 0 && (
           <div className="mb-12 animate-fadeInUp delay-400">
             <ClubFeaturedReviews reviews={club.featuredReviews} clubName={club.name} clubId={String(club.id)} />
           </div>
         )}
 
+        {/* Editor de info legal — solo para dueño en modo edición */}
         {isEditing && isOwner && (
           <div className="bg-white rounded-xl shadow-lg p-8 mb-8 animate-fadeInUp">
             <h2 className="text-2xl font-bold text-gray-800 mb-4">Editar Términos y Condiciones</h2>
             <textarea
               value={sectionsToText(editableClub?.legalInfo?.termsAndConditionsSections)}
               onChange={e => handleLegalInfoChange('termsAndConditionsSections', textToSections(e.target.value, 'tc-edited'))}
-              className="border rounded w-full p-2 h-64 mb-4"
-              placeholder="Contenido de Términos y Condiciones (texto plano)"
+              className="border rounded w-full p-2 h-48 mb-6 focus:ring-2 focus:ring-blue-300 outline-none"
+              placeholder="Contenido de Términos y Condiciones..."
             />
-            <h2 className="text-2xl font-bold text-gray-800 mb-4">Editar Políticas de Seguridad y Devolución</h2>
+            <h2 className="text-2xl font-bold text-gray-800 mb-4">Editar Políticas de Privacidad y Seguridad</h2>
             <textarea
               value={sectionsToText(editableClub?.legalInfo?.privacyAndSecurityPolicySections)}
               onChange={e => handleLegalInfoChange('privacyAndSecurityPolicySections', textToSections(e.target.value, 'ps-edited'))}
-              className="border rounded w-full p-2 h-64"
-              placeholder="Contenido de Políticas de Seguridad y Devolución (texto plano)"
+              className="border rounded w-full p-2 h-48 focus:ring-2 focus:ring-blue-300 outline-none"
+              placeholder="Contenido de Políticas de Privacidad y Seguridad..."
             />
           </div>
         )}
 
+        {/* Info legal pública */}
         {(club.legalInfo?.termsAndConditionsSections?.length || club.legalInfo?.privacyAndSecurityPolicySections?.length) && (
           <div className="animate-fadeInUp delay-500">
             <ClubLegalInfo legalInfo={club.legalInfo} clubId={String(club.id)} />
-          </div>
-        )}
-
-        {isEditing && isOwner && (
-          <div className="flex space-x-4 mt-6">
-            <button onClick={handleSave} className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700">
-              Guardar Cambios
-            </button>
-            <button onClick={handleEditToggle} className="bg-gray-400 text-black px-4 py-2 rounded hover:bg-gray-500">
-              Cancelar
-            </button>
           </div>
         )}
       </div>

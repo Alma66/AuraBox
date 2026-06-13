@@ -79,15 +79,126 @@ export class ClubsService {
     return clubsWithRatings;
   }
 
-  async findOne(id: number) {
+  async findOne(id: number, requesterId?: number) {
     const club = await this.prisma.club.findUnique({ where: { id } });
     if (!club) throw new NotFoundException('Club no encontrado');
+
     const reviews = await this.prisma.reviews.findMany({
       where: { idClub: id, active: true },
-      select: { id: true, rating: true, title: true, comment: true },
+      select: {
+        id: true,
+        rating: true,
+        title: true,
+        comment: true,
+        reviewDate: true,
+        idUser: true,
+      },
+      orderBy: { reviewDate: 'desc' },
+      take: 10,
     });
+
     const { averageRating, totalReviews } = computeRating(reviews);
-    return sanitizeClub({ ...club, averageRating, totalReviews, reviews });
+
+    const enrichedReviews = await Promise.all(
+      reviews.map(async (r) => {
+        const user = await this.prisma.user.findUnique({
+          where: { id: r.idUser },
+          select: { firstName: true, lastName: true },
+        });
+        return {
+          ...r,
+          reviewDate: r.reviewDate instanceof Date ? r.reviewDate.toISOString() : r.reviewDate,
+          userName: user ? `${user.firstName} ${user.lastName}` : 'Usuario',
+        };
+      }),
+    );
+
+    const socialNetworks = await this.prisma.club_Social_Networks.findMany({
+      where: { idClub: id },
+    });
+
+    const images = await this.prisma.image_Club.findMany({
+      where: { idClub: id },
+      orderBy: { uploadDate: 'desc' },
+    });
+
+    const subscriptionPlans = await this.prisma.subscription_Types.findMany({
+      where: { idClub: id, active: true },
+    });
+
+    const clubPaymentMethods = await this.prisma.club_Payment_Method.findMany({
+      where: { idClub: id },
+    });
+    const paymentMethodIds = clubPaymentMethods.map((cpm) => cpm.idPaymentMethod);
+    const paymentMethods = paymentMethodIds.length
+      ? await this.prisma.payment_Methods.findMany({
+          where: { id: { in: paymentMethodIds }, active: true },
+        })
+      : [];
+
+    const clubCategories = await this.prisma.club_Categories.findMany({
+      where: { idClub: id },
+    });
+    const categoryIds = clubCategories.map((cc) => cc.idCategories);
+    const categories = categoryIds.length
+      ? await this.prisma.categories.findMany({
+          where: { id: { in: categoryIds } },
+        })
+      : [];
+
+    let isOwner = false;
+    if (requesterId) {
+      const association = await this.prisma.entrepreneur_Club.findFirst({
+        where: { idEntrepreneurs: requesterId, idClub: id },
+      });
+      isOwner = !!association;
+    }
+
+    const socialMedia = socialNetworks.reduce((acc: Record<string, string>, sn) => {
+      acc[sn.networkType.toLowerCase()] = sn.profileUrl;
+      return acc;
+    }, {});
+
+    const bannerImages = images.filter((img) => img.contentType === 'Imagen').map((img) => img.imageUrl);
+
+    const mappedPlans = subscriptionPlans.map((plan) => ({
+      planId: String(plan.id),
+      name: plan.name,
+      price: Number(plan.basePrice),
+      currency: 'ARS',
+      description: plan.description || '',
+      deliveryFrequency: plan.frequency,
+      includes: [],
+      shippingAreas: '',
+      specifications: [],
+      cashDiscount: plan.cashDiscount ? Number(plan.cashDiscount) : undefined,
+      transferDiscount: plan.transferDiscount ? Number(plan.transferDiscount) : undefined,
+    }));
+
+    return sanitizeClub({
+      id: club.id,
+      name: club.name,
+      slogan: club.slogan,
+      shortDescription: club.shortDescription,
+      logoUrl: club.logoUrl,
+      logoImage: club.logoUrl,          
+      history: club.history,
+      fullHistory: club.history,        
+      contactEmail: club.contactEmail,
+      whatsappContact: club.whatsappContact,
+      clubStatus: club.clubStatus,
+      creationDate: club.creationDate,
+      averageRating,
+      totalReviews,
+      category: categories.map((c) => c.name).join(', ') || 'Sin categoría',
+      bannerImages,
+      mainImage: bannerImages[0] || null,
+      socialMedia: Object.keys(socialMedia).length ? socialMedia : null,
+      subscriptionPlans: mappedPlans,
+      paymentMethods: paymentMethods.map((pm) => pm.method),
+      featuredReviews: enrichedReviews,
+      isOwner,
+    });
   }
 
   async findFeatured() {
@@ -137,5 +248,13 @@ export class ClubsService {
     if (!club) throw new NotFoundException('Club no encontrado');
     await this.prisma.club.delete({ where: { id } });
     return { message: 'Club eliminado correctamente' };
+  }
+
+  async findClubByEntrepreneur(entrepreneurId: number) {
+    const association = await this.prisma.entrepreneur_Club.findFirst({
+      where: { idEntrepreneurs: entrepreneurId },
+    });
+    if (!association) return null;
+    return this.findOne(association.idClub, entrepreneurId);
   }
 }

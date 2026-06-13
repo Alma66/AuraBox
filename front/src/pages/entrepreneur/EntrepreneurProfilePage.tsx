@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import EntrepreneurProfileSidebar from '../../components/entrepreneur/EntrepreneurProfileSidebar';
 import EntrepreneurProfileContent from '../../components/entrepreneur/EntrepreneurProfileContent';
 import api, { getResponseData } from '../../api/config';
@@ -31,12 +31,14 @@ function mapApiEntrepreneurToUser(data: any): User {
     postalCode: '',
     taxId: data.cuitCuil ? String(data.cuitCuil) : '',
     legalName: `${data.firstName} ${data.lastName}`,
+    managedClubId: data.managedClubId ? String(data.managedClubId) : undefined,
   };
 }
 
 const EntrepreneurProfilePage: React.FC = () => {
   const [activeSection, setActiveSection] = useState<string>('profile');
   const [loggedInUser, setLoggedInUser] = useState<User | null>(null);
+  const [managedClub, setManagedClub] = useState<{ id: number; name: string; logoUrl: string } | null>(null);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
   const { userRole } = useAuth();
@@ -46,6 +48,9 @@ const EntrepreneurProfilePage: React.FC = () => {
       const response = await api.get('/entrepreneurs/me');
       const data = getResponseData(response);
       setLoggedInUser(mapApiEntrepreneurToUser(data));
+      if (data.managedClub) {
+        setManagedClub(data.managedClub);
+      }
     } catch (error) {
       console.error('Error fetching entrepreneur:', error);
       localStorage.removeItem('access_token');
@@ -68,7 +73,36 @@ const EntrepreneurProfilePage: React.FC = () => {
 
   return (
     <div className="container mx-auto px-4 py-8 min-h-screen">
-      <h1 className="text-4xl font-bold text-gray-800 mb-8 text-center">Mi Perfil de Emprendedor</h1>
+      <h1 className="text-4xl font-bold text-gray-800 mb-2 text-center">Mi Perfil de Emprendedor</h1>
+
+      {/* Acceso rápido al club */}
+      {managedClub && (
+        <div className="mb-8 flex justify-center">
+          <Link
+            to={`/club/${managedClub.id}`}
+            className="flex items-center gap-3 bg-blue-50 border border-blue-200 rounded-xl px-6 py-3
+                       hover:bg-blue-100 transition-colors duration-200 group"
+          >
+            {managedClub.logoUrl && (
+              <img
+                src={managedClub.logoUrl}
+                alt={managedClub.name}
+                className="w-10 h-10 rounded-full object-cover border-2 border-blue-300"
+              />
+            )}
+            <div className="text-left">
+              <p className="text-xs text-blue-500 font-medium">Mi Club</p>
+              <p className="text-blue-700 font-bold group-hover:text-blue-900 transition-colors">
+                {managedClub.name}
+              </p>
+            </div>
+            <svg className="w-5 h-5 text-blue-400 ml-2 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" />
+            </svg>
+          </Link>
+        </div>
+      )}
+
       <div className="flex flex-col lg:flex-row gap-8">
         <div className="lg:w-1/4">
           <EntrepreneurProfileSidebar activeSection={activeSection} setActiveSection={setActiveSection} />
