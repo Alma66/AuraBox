@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import Slider from 'react-slick';
 import api, { getResponseData } from '../../../api/config';
@@ -24,7 +24,6 @@ const bannerSliderSettings = {
   cssEase: 'linear',
 };
 
-// Extiende Club para incluir isOwner que viene del back
 interface ClubWithOwner extends Club {
   isOwner?: boolean;
 }
@@ -42,7 +41,7 @@ const ClubDetailPage: React.FC<{ userRole: UserRole | null }> = ({ userRole }) =
   const [saveSuccess, setSaveSuccess] = useState('');
   const [saveError, setSaveError] = useState('');
 
-  const fetchClub = async () => {
+  const fetchClub = useCallback(async () => {
     try {
       setLoading(true);
       const response = await api.get(`/clubs/${clubId}`);
@@ -55,13 +54,12 @@ const ClubDetailPage: React.FC<{ userRole: UserRole | null }> = ({ userRole }) =
     } finally {
       setLoading(false);
     }
-  };
+  }, [clubId]);
 
   useEffect(() => {
     if (clubId) fetchClub();
-  }, [clubId]);
+  }, [clubId, fetchClub]);
 
-  // isOwner viene directo del back — no depende del JWT del front
   const isOwner = !!club?.isOwner;
 
   if (loading) {
@@ -149,7 +147,6 @@ const ClubDetailPage: React.FC<{ userRole: UserRole | null }> = ({ userRole }) =
 
   return (
     <div className="bg-gray-50 min-h-screen">
-      {/* Banner */}
       <div className="relative h-64 md:h-96 overflow-hidden shadow-lg animate-fadeIn">
         {club.bannerImages && club.bannerImages.length > 0 ? (
           <Slider {...bannerSliderSettings}>
@@ -201,7 +198,6 @@ const ClubDetailPage: React.FC<{ userRole: UserRole | null }> = ({ userRole }) =
             )}
           </div>
 
-          {/* Botones de edición — solo para el dueño */}
           {isOwner && (
             <div className="ml-4 flex gap-2 flex-shrink-0">
               {isEditing ? (
@@ -238,7 +234,6 @@ const ClubDetailPage: React.FC<{ userRole: UserRole | null }> = ({ userRole }) =
       </div>
 
       <div className="container mx-auto px-4 py-8">
-        {/* Feedback */}
         {saveSuccess && (
           <div className="mb-4 p-3 bg-green-50 border border-green-200 text-green-700 rounded-lg">
             {saveSuccess}
@@ -260,13 +255,11 @@ const ClubDetailPage: React.FC<{ userRole: UserRole | null }> = ({ userRole }) =
           Volver
         </button>
 
-        {/* Info principal */}
         <div className="bg-white rounded-xl shadow-lg p-8 mb-8 animate-fadeInUp">
           <div className="flex justify-between items-center mb-6">
             <span className="inline-block bg-purple-100 text-purple-800 text-sm font-semibold px-3 py-1 rounded-full">
               {club.category}
             </span>
-            {/* Favorito — solo para usuarios logueados no dueños */}
             {!isOwner && (
               <button className="bg-gray-200 text-gray-700 px-4 py-2 rounded-full flex items-center space-x-2 hover:bg-red-100 hover:text-red-600 transition-all duration-200">
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
@@ -313,7 +306,6 @@ const ClubDetailPage: React.FC<{ userRole: UserRole | null }> = ({ userRole }) =
           {club.socialMedia && <ClubSocialMedia socialMedia={club.socialMedia} />}
         </div>
 
-        {/* Planes de suscripción */}
         {club.subscriptionPlans && club.subscriptionPlans.length > 0 && (
           <div className="mb-12 animate-fadeInUp delay-200">
             <h2 className="text-3xl font-bold text-gray-800 mb-6 text-center">Nuestros Planes de Suscripción</h2>
@@ -344,21 +336,18 @@ const ClubDetailPage: React.FC<{ userRole: UserRole | null }> = ({ userRole }) =
           </div>
         )}
 
-        {/* Pago y envío */}
         {(club.paymentMethods || club.shippingInfo) && (
           <div className="mb-12 animate-fadeInUp delay-300">
             <ClubPaymentShippingInfo paymentMethods={club.paymentMethods} shippingInfo={club.shippingInfo} />
           </div>
         )}
 
-        {/* Reviews destacadas */}
         {club.featuredReviews && club.featuredReviews.length > 0 && (
           <div className="mb-12 animate-fadeInUp delay-400">
             <ClubFeaturedReviews reviews={club.featuredReviews} clubName={club.name} clubId={String(club.id)} />
           </div>
         )}
 
-        {/* Editor de info legal — solo para dueño en modo edición */}
         {isEditing && isOwner && (
           <div className="bg-white rounded-xl shadow-lg p-8 mb-8 animate-fadeInUp">
             <h2 className="text-2xl font-bold text-gray-800 mb-4">Editar Términos y Condiciones</h2>
@@ -378,7 +367,6 @@ const ClubDetailPage: React.FC<{ userRole: UserRole | null }> = ({ userRole }) =
           </div>
         )}
 
-        {/* Info legal pública */}
         {(club.legalInfo?.termsAndConditionsSections?.length || club.legalInfo?.privacyAndSecurityPolicySections?.length) && (
           <div className="animate-fadeInUp delay-500">
             <ClubLegalInfo legalInfo={club.legalInfo} clubId={String(club.id)} />
