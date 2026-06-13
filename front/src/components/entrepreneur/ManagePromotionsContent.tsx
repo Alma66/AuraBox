@@ -9,7 +9,7 @@ interface ManagePromotionsContentProps {
 }
 
 const ManagePromotionsContent: React.FC<ManagePromotionsContentProps> = ({ activeSection, club, onUpdateClub }) => {
-  const [plans, setPlans] = useState<SubscriptionPlan[]>(club.subscriptionPlans);
+  const [plans, setPlans] = useState<SubscriptionPlan[]>(club.subscriptionPlans ?? []);
   const [historial, setHistorial] = useState([
     { id: 'hist-1', fecha: '2024-06-01', plan: 'Mensual Clásica', descuento: '10%', tipo: 'Transferencia', activo: false },
     { id: 'hist-2', fecha: '2024-05-15', plan: 'Semestral Premium', descuento: '15%', tipo: 'Efectivo', activo: false }

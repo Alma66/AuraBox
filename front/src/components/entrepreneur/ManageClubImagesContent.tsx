@@ -8,11 +8,11 @@ interface ManageClubImagesContentProps {
 }
 
 const ManageClubImagesContent: React.FC<ManageClubImagesContentProps> = ({ activeSection, club, onUpdateClub }) => {
-  const [logoPreview, setLogoPreview] = useState<string>(club.logoImage);
-  const [bannerPreviews, setBannerPreviews] = useState<string[]>(club.bannerImages);
+  const [logoPreview, setLogoPreview] = useState<string>(club.logoImage ?? '');
+  const [bannerPreviews, setBannerPreviews] = useState<string[]>(club.bannerImages ?? []);
   const [historyMoments, setHistoryMoments] = useState<HistoryMoment[]>(club.historyMoments || []);
   const [teamMembers, setTeamMembers] = useState<TeamMember[]>(club.teamMembers || []);
-  const [subscriptionPlans, setSubscriptionPlans] = useState<SubscriptionPlan[]>(club.subscriptionPlans);
+  const [subscriptionPlans, setSubscriptionPlans] = useState<SubscriptionPlan[]>(club.subscriptionPlans ?? []);
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>, callback: (url: string) => void) => {
     const file = e.target.files?.[0];
