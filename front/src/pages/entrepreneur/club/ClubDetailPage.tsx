@@ -3,7 +3,7 @@ import { useParams, useNavigate, Link } from 'react-router-dom';
 import Slider from 'react-slick';
 import api, { getResponseData } from '../../../api/config';
 import { useAuth } from '../../../App';
-import { Club, LegalSection } from '../../../types/club';
+import { Club } from '../../../types/club';
 import { SubscriptionPlan as SubscriptionPlanCardType } from '../../../components/club/SubscriptionPlanCard';
 import SubscriptionPlanCard from '../../../components/club/SubscriptionPlanCard';
 import ClubSocialMedia, { SocialMediaLinks } from '../../../components/club/ClubSocialMedia';
@@ -52,7 +52,7 @@ const NETWORK_TYPES = [
 const ClubDetailPage: React.FC = () => {
   const { clubId } = useParams<{ clubId: string }>();
   const navigate = useNavigate();
-  const { user, userRole } = useAuth();
+  const { userRole } = useAuth();
 
   const [club, setClub] = useState<ClubData | null>(null);
   const [loading, setLoading] = useState(true);
