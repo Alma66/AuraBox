@@ -1,19 +1,7 @@
 import {
-  Body,
-  Controller,
-  Get,
-  Post,
-  Put,
-  Delete,
-  Param,
-  ParseIntPipe,
-  UseGuards,
-  Request,
-  UsePipes,
-  ValidationPipe,
-  ForbiddenException,
-  Patch,
-  Query,
+  Body, Controller, Get, Post, Put, Delete, Patch,
+  Param, ParseIntPipe, UseGuards, Request, UsePipes,
+  ValidationPipe, ForbiddenException, Query,
 } from '@nestjs/common';
 import { EntrepreneurClubService } from './entrepreneur-club.service';
 import { CreateEntrepreneurClubDto } from './dto/create-entrepreneur-club.dto';
@@ -30,21 +18,21 @@ export class EntrepreneurClubController {
   @Post()
   @UsePipes(new ValidationPipe({ whitelist: true, transform: true }))
   async create(@Body() dto: CreateEntrepreneurClubDto, @Request() req) {
-    if (req.user.role !== 'ADMIN' && req.user.id !== dto.idEntrepreneurs) {
+    if (req.user.role !== 'admin' && req.user.id !== dto.idEntrepreneurs) {
       throw new ForbiddenException('No autorizado para crear esta asociación');
     }
     return this.service.create(dto);
   }
 
   @UseGuards(RolesGuard)
-  @Roles('ADMIN')
+  @Roles('admin')
   @Get()
   async findAll() {
     return this.service.findAll();
   }
 
   @UseGuards(RolesGuard)
-  @Roles('OWNER', 'ADMIN')
+  @Roles('entrepreneur', 'admin')
   @Get('by-club/:idClub')
   async findByClub(@Param('idClub', ParseIntPipe) idClub: number) {
     return this.service.findByClub(idClub);
@@ -52,7 +40,7 @@ export class EntrepreneurClubController {
 
   @Get('by-entrepreneur/:idEntrepreneur')
   async findByEntrepreneur(@Param('idEntrepreneur', ParseIntPipe) idEntrepreneur: number, @Request() req) {
-    if (req.user.id !== idEntrepreneur && req.user.role !== 'ADMIN') {
+    if (req.user.id !== idEntrepreneur && req.user.role !== 'admin') {
       throw new ForbiddenException('No autorizado para ver estas asociaciones');
     }
     return this.service.findByEntrepreneur(idEntrepreneur);
@@ -67,14 +55,14 @@ export class EntrepreneurClubController {
   @UsePipes(new ValidationPipe({ whitelist: true, transform: true }))
   async update(@Param('id', ParseIntPipe) id: number, @Body() dto: UpdateEntrepreneurClubDto, @Request() req) {
     const existing = await this.service.findOne(id);
-    if (req.user.role !== 'ADMIN' && req.user.id !== existing.idEntrepreneurs) {
+    if (req.user.role !== 'admin' && req.user.id !== existing.idEntrepreneurs) {
       throw new ForbiddenException('No autorizado para actualizar esta asociación');
     }
     return this.service.update(id, dto);
   }
 
   @UseGuards(RolesGuard)
-  @Roles('ADMIN')
+  @Roles('admin')
   @Delete(':id')
   async remove(@Param('id', ParseIntPipe) id: number) {
     return this.service.remove(id);

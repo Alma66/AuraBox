@@ -1,17 +1,6 @@
 import {
-  Body,
-  Controller,
-  Get,
-  Post,
-  Put,
-  Delete,
-  Param,
-  ParseIntPipe,
-  UseGuards,
-  Request,
-  UsePipes,
-  ValidationPipe,
-  ForbiddenException,
+  Body, Controller, Get, Post, Put, Delete,
+  Param, ParseIntPipe, UseGuards, UsePipes, ValidationPipe,
 } from '@nestjs/common';
 import { ClubSocialNetworksService } from './club-social-networks.service';
 import { CreateClubSocialNetworkDto } from './dto/create-club-social-network.dto';
@@ -21,20 +10,20 @@ import { RolesGuard } from '../auth/roles.guard';
 import { Roles } from '../auth/roles.decorator';
 
 @Controller('club-social-networks')
-@UseGuards(JwtAuthGuard) 
+@UseGuards(JwtAuthGuard)
 export class ClubSocialNetworksController {
   constructor(private readonly svc: ClubSocialNetworksService) {}
 
   @UseGuards(RolesGuard)
-  @Roles('OWNER', 'ADMIN')
+  @Roles('entrepreneur', 'admin')
   @Post()
   @UsePipes(new ValidationPipe({ whitelist: true, transform: true }))
-  async create(@Body() dto: CreateClubSocialNetworkDto, @Request() req) {
+  async create(@Body() dto: CreateClubSocialNetworkDto) {
     return this.svc.create(dto);
   }
 
   @UseGuards(RolesGuard)
-  @Roles('ADMIN')
+  @Roles('admin')
   @Get()
   async findAll() {
     return this.svc.findAll();
@@ -51,7 +40,7 @@ export class ClubSocialNetworksController {
   }
 
   @UseGuards(RolesGuard)
-  @Roles('OWNER', 'ADMIN')
+  @Roles('entrepreneur', 'admin')
   @Put(':id')
   @UsePipes(new ValidationPipe({ whitelist: true, transform: true }))
   async update(@Param('id', ParseIntPipe) id: number, @Body() dto: UpdateClubSocialNetworkDto) {
@@ -59,7 +48,7 @@ export class ClubSocialNetworksController {
   }
 
   @UseGuards(RolesGuard)
-  @Roles('OWNER', 'ADMIN')
+  @Roles('entrepreneur', 'admin')
   @Delete(':id')
   async remove(@Param('id', ParseIntPipe) id: number) {
     return this.svc.remove(id);

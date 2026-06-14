@@ -1,17 +1,7 @@
 import {
-  Body,
-  Controller,
-  Get,
-  Post,
-  Put,
-  Delete,
-  Param,
-  ParseIntPipe,
-  UseGuards,
-  Request,
-  UsePipes,
-  ValidationPipe,
-  ForbiddenException,
+  Body, Controller, Get, Post, Put, Delete,
+  Param, ParseIntPipe, UseGuards, Request, UsePipes,
+  ValidationPipe, ForbiddenException,
 } from '@nestjs/common';
 import { FavoritesService } from './favorites.service';
 import { CreateFavoriteDto } from './dto/create-favorite.dto';
@@ -28,14 +18,14 @@ export class FavoritesController {
   @Post()
   @UsePipes(new ValidationPipe({ whitelist: true, transform: true }))
   async create(@Body() dto: CreateFavoriteDto, @Request() req) {
-    if (req.user.id !== dto.idUser && req.user.role !== 'ADMIN') {
+    if (req.user.id !== dto.idUser && req.user.role !== 'admin') {
       throw new ForbiddenException('No autorizado para crear este favorito');
     }
     return this.favoritesService.create(dto);
   }
 
   @UseGuards(RolesGuard)
-  @Roles('ADMIN')
+  @Roles('admin')
   @Get()
   async findAll() {
     return this.favoritesService.findAll();
@@ -43,14 +33,14 @@ export class FavoritesController {
 
   @Get('by-user/:idUser')
   async findByUser(@Param('idUser', ParseIntPipe) idUser: number, @Request() req) {
-    if (req.user.id !== idUser && req.user.role !== 'ADMIN') {
+    if (req.user.id !== idUser && req.user.role !== 'admin') {
       throw new ForbiddenException('No autorizado para ver estos favoritos');
     }
     return this.favoritesService.findByUser(idUser);
   }
 
   @UseGuards(RolesGuard)
-  @Roles('OWNER', 'ADMIN')
+  @Roles('entrepreneur', 'admin')
   @Get('by-club/:idClub')
   async findByClub(@Param('idClub', ParseIntPipe) idClub: number) {
     return this.favoritesService.findByClub(idClub);
@@ -59,14 +49,14 @@ export class FavoritesController {
   @Get(':id')
   async findOne(@Param('id', ParseIntPipe) id: number, @Request() req) {
     const favorite = await this.favoritesService.findOne(id);
-    if (req.user.role !== 'ADMIN' && req.user.id !== favorite.idUser) {
+    if (req.user.role !== 'admin' && req.user.id !== favorite.idUser) {
       throw new ForbiddenException('No autorizado para ver este favorito');
     }
     return favorite;
   }
 
   @UseGuards(RolesGuard)
-  @Roles('ADMIN')
+  @Roles('admin')
   @Put(':id')
   @UsePipes(new ValidationPipe({ whitelist: true, transform: true }))
   async update(@Param('id', ParseIntPipe) id: number, @Body() dto: UpdateFavoriteDto) {
@@ -74,7 +64,7 @@ export class FavoritesController {
   }
 
   @UseGuards(RolesGuard)
-  @Roles('ADMIN')
+  @Roles('admin')
   @Delete(':id')
   async remove(@Param('id', ParseIntPipe) id: number) {
     return this.favoritesService.remove(id);

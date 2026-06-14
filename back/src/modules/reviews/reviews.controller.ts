@@ -1,17 +1,7 @@
 import {
-  Body,
-  Controller,
-  Get,
-  Post,
-  Put,
-  Delete,
-  Param,
-  ParseIntPipe,
-  UseGuards,
-  Request,
-  UsePipes,
-  ValidationPipe,
-  ForbiddenException,
+  Body, Controller, Get, Post, Put, Delete,
+  Param, ParseIntPipe, UseGuards, Request,
+  UsePipes, ValidationPipe, ForbiddenException,
 } from '@nestjs/common';
 import { ReviewsService } from './reviews.service';
 import { CreateReviewDto } from './dto/create-review.dto';
@@ -28,14 +18,14 @@ export class ReviewsController {
   @Post()
   @UsePipes(new ValidationPipe({ whitelist: true, transform: true }))
   async create(@Body() dto: CreateReviewDto, @Request() req) {
-    if (req.user.id !== dto.idUser && req.user.role !== 'ADMIN') {
+    if (req.user.id !== dto.idUser && req.user.role !== 'admin') {
       throw new ForbiddenException('No autorizado para crear esta reseña');
     }
     return this.reviewsService.create(dto);
   }
 
   @UseGuards(RolesGuard)
-  @Roles('ADMIN')
+  @Roles('admin')
   @Get()
   async findAll() {
     return this.reviewsService.findAll();
@@ -43,14 +33,14 @@ export class ReviewsController {
 
   @Get('by-user/:idUser')
   async findByUser(@Param('idUser', ParseIntPipe) idUser: number, @Request() req) {
-    if (req.user.id !== idUser && req.user.role !== 'ADMIN') {
+    if (req.user.id !== idUser && req.user.role !== 'admin') {
       throw new ForbiddenException('No autorizado para ver estas reseñas');
     }
     return this.reviewsService.findByUser(idUser);
   }
 
   @UseGuards(RolesGuard)
-  @Roles('OWNER', 'ADMIN')
+  @Roles('entrepreneur', 'admin')
   @Get('by-club/:idClub')
   async findByClub(@Param('idClub', ParseIntPipe) idClub: number) {
     return this.reviewsService.findByClub(idClub);
@@ -62,7 +52,7 @@ export class ReviewsController {
   }
 
   @UseGuards(RolesGuard)
-  @Roles('ADMIN')
+  @Roles('admin')
   @Put(':id')
   @UsePipes(new ValidationPipe({ whitelist: true, transform: true }))
   async update(@Param('id', ParseIntPipe) id: number, @Body() dto: UpdateReviewDto) {
@@ -70,7 +60,7 @@ export class ReviewsController {
   }
 
   @UseGuards(RolesGuard)
-  @Roles('ADMIN')
+  @Roles('admin')
   @Delete(':id')
   async remove(@Param('id', ParseIntPipe) id: number) {
     return this.reviewsService.remove(id);

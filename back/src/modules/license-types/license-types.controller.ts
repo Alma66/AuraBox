@@ -1,16 +1,6 @@
 import {
-  Body,
-  Controller,
-  Get,
-  Post,
-  Put,
-  Delete,
-  Param,
-  ParseIntPipe,
-  UseGuards,
-  Request,
-  UsePipes,
-  ValidationPipe,
+  Body, Controller, Get, Post, Put, Delete,
+  Param, ParseIntPipe, UseGuards, UsePipes, ValidationPipe,
 } from '@nestjs/common';
 import { LicenseTypesService } from './license-types.service';
 import { CreateLicenseTypeDto } from './dto/create-license-type.dto';
@@ -25,7 +15,7 @@ export class LicenseTypesController {
   constructor(private readonly svc: LicenseTypesService) {}
 
   @UseGuards(RolesGuard)
-  @Roles('ADMIN')
+  @Roles('admin')
   @Post()
   @UsePipes(new ValidationPipe({ whitelist: true, transform: true }))
   async create(@Body() dto: CreateLicenseTypeDto) {
@@ -33,7 +23,7 @@ export class LicenseTypesController {
   }
 
   @UseGuards(RolesGuard)
-  @Roles('ADMIN')
+  @Roles('admin')
   @Get()
   async findAll() {
     return this.svc.findAll();
@@ -50,7 +40,7 @@ export class LicenseTypesController {
   }
 
   @UseGuards(RolesGuard)
-  @Roles('ADMIN')
+  @Roles('admin')
   @Put(':id')
   @UsePipes(new ValidationPipe({ whitelist: true, transform: true }))
   async update(@Param('id', ParseIntPipe) id: number, @Body() dto: UpdateLicenseTypeDto) {
@@ -58,7 +48,7 @@ export class LicenseTypesController {
   }
 
   @UseGuards(RolesGuard)
-  @Roles('ADMIN')
+  @Roles('admin')
   @Delete(':id')
   async remove(@Param('id', ParseIntPipe) id: number) {
     return this.svc.remove(id);

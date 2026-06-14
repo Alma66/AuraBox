@@ -1,18 +1,6 @@
 import {
-  Body,
-  Controller,
-  Get,
-  Post,
-  Put,
-  Delete,
-  Param,
-  ParseIntPipe,
-  UseGuards,
-  Request,
-  UsePipes,
-  ValidationPipe,
-  ForbiddenException,
-  Patch,
+  Body, Controller, Get, Post, Delete,
+  Param, ParseIntPipe, UseGuards, UsePipes, ValidationPipe, Patch,
 } from '@nestjs/common';
 import { ClubCategoriesService } from './club-categories.service';
 import { CreateClubCategoryDto } from './dto/create-club-category.dto';
@@ -22,12 +10,12 @@ import { RolesGuard } from '../auth/roles.guard';
 import { Roles } from '../auth/roles.decorator';
 
 @Controller('club-categories')
-@UseGuards(JwtAuthGuard) 
+@UseGuards(JwtAuthGuard)
 export class ClubCategoriesController {
   constructor(private readonly service: ClubCategoriesService) {}
 
   @UseGuards(RolesGuard)
-  @Roles('OWNER', 'ADMIN')
+  @Roles('entrepreneur', 'admin')
   @Post()
   @UsePipes(new ValidationPipe({ whitelist: true, transform: true }))
   async create(@Body() dto: CreateClubCategoryDto) {
@@ -35,7 +23,7 @@ export class ClubCategoriesController {
   }
 
   @UseGuards(RolesGuard)
-  @Roles('ADMIN')
+  @Roles('admin')
   @Get()
   async findAll() {
     return this.service.findAll();
@@ -52,14 +40,14 @@ export class ClubCategoriesController {
   }
 
   @UseGuards(RolesGuard)
-  @Roles('ADMIN')
+  @Roles('admin')
   @Get(':id')
   async findOne(@Param('id', ParseIntPipe) id: number) {
     return this.service.findOne(id);
   }
 
   @UseGuards(RolesGuard)
-  @Roles('ADMIN')
+  @Roles('admin')
   @Patch(':id')
   @UsePipes(new ValidationPipe({ whitelist: true, transform: true }))
   async update(@Param('id', ParseIntPipe) id: number, @Body() dto: UpdateClubCategoryDto) {
@@ -67,7 +55,7 @@ export class ClubCategoriesController {
   }
 
   @UseGuards(RolesGuard)
-  @Roles('ADMIN')
+  @Roles('admin')
   @Delete(':id')
   async remove(@Param('id', ParseIntPipe) id: number) {
     return this.service.remove(id);

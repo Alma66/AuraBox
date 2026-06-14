@@ -1,18 +1,7 @@
 import {
-  Body,
-  Controller,
-  Get,
-  Post,
-  Put,
-  Delete,
-  Param,
-  ParseIntPipe,
-  Query,
-  UseGuards,
-  Request,
-  UsePipes,
-  ValidationPipe,
-  ForbiddenException,
+  Body, Controller, Get, Post, Put, Delete,
+  Param, ParseIntPipe, Query, UseGuards, Request,
+  UsePipes, ValidationPipe, ForbiddenException,
 } from '@nestjs/common';
 import { PaymentsService } from './payments.service';
 import { CreatePaymentDto } from './dto/create-payment.dto';
@@ -29,14 +18,14 @@ export class PaymentsController {
   @Post()
   @UsePipes(new ValidationPipe({ whitelist: true, transform: true }))
   async create(@Body() dto: CreatePaymentDto, @Request() req) {
-    if (req.user.id !== dto.idUser && req.user.role !== 'ADMIN') {
+    if (req.user.id !== dto.idUser && req.user.role !== 'admin') {
       throw new ForbiddenException('No autorizado para registrar este pago');
     }
     return this.paymentsService.create(dto);
   }
 
   @UseGuards(RolesGuard)
-  @Roles('ADMIN')
+  @Roles('admin')
   @Get()
   async findAll() {
     return this.paymentsService.findAll();
@@ -44,14 +33,14 @@ export class PaymentsController {
 
   @Get('by-user/:idUser')
   async findByUser(@Param('idUser', ParseIntPipe) idUser: number, @Request() req) {
-    if (req.user.id !== idUser && req.user.role !== 'ADMIN') {
+    if (req.user.id !== idUser && req.user.role !== 'admin') {
       throw new ForbiddenException('No autorizado para ver estos pagos');
     }
     return this.paymentsService.findByUser(idUser);
   }
 
   @UseGuards(RolesGuard)
-  @Roles('OWNER', 'ADMIN')
+  @Roles('entrepreneur', 'admin')
   @Get('by-club/:idClub')
   async findByClub(@Param('idClub', ParseIntPipe) idClub: number) {
     return this.paymentsService.findByClub(idClub);
@@ -63,7 +52,7 @@ export class PaymentsController {
   }
 
   @UseGuards(RolesGuard)
-  @Roles('ADMIN')
+  @Roles('admin')
   @Put(':id')
   @UsePipes(new ValidationPipe({ whitelist: true, transform: true }))
   async update(@Param('id', ParseIntPipe) id: number, @Body() dto: UpdatePaymentDto) {
@@ -71,7 +60,7 @@ export class PaymentsController {
   }
 
   @UseGuards(RolesGuard)
-  @Roles('ADMIN')
+  @Roles('admin')
   @Delete(':id')
   async remove(@Param('id', ParseIntPipe) id: number) {
     return this.paymentsService.remove(id);

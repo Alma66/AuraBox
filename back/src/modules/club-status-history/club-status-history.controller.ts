@@ -1,16 +1,6 @@
 import {
-  Body,
-  Controller,
-  Get,
-  Post,
-  Put,
-  Delete,
-  Param,
-  ParseIntPipe,
-  UseGuards,
-  Request,
-  UsePipes,
-  ValidationPipe,
+  Body, Controller, Get, Post, Put, Delete,
+  Param, ParseIntPipe, UseGuards, UsePipes, ValidationPipe,
 } from '@nestjs/common';
 import { ClubStatusHistoryService } from './club-status-history.service';
 import { CreateClubStatusHistoryDto } from './dto/create-club-status-history.dto';
@@ -20,12 +10,12 @@ import { RolesGuard } from '../auth/roles.guard';
 import { Roles } from '../auth/roles.decorator';
 
 @Controller('club-status-history')
-@UseGuards(JwtAuthGuard)  
+@UseGuards(JwtAuthGuard)
 export class ClubStatusHistoryController {
   constructor(private readonly svc: ClubStatusHistoryService) {}
 
   @UseGuards(RolesGuard)
-  @Roles('ADMIN')
+  @Roles('admin')
   @Post()
   @UsePipes(new ValidationPipe({ whitelist: true, transform: true }))
   async create(@Body() dto: CreateClubStatusHistoryDto) {
@@ -33,7 +23,7 @@ export class ClubStatusHistoryController {
   }
 
   @UseGuards(RolesGuard)
-  @Roles('ADMIN')
+  @Roles('admin')
   @Get()
   async findAll() {
     return this.svc.findAll();
@@ -55,7 +45,7 @@ export class ClubStatusHistoryController {
   }
 
   @UseGuards(RolesGuard)
-  @Roles('ADMIN')
+  @Roles('admin')
   @Put(':id')
   @UsePipes(new ValidationPipe({ whitelist: true, transform: true }))
   async update(@Param('id', ParseIntPipe) id: number, @Body() dto: UpdateClubStatusHistoryDto) {
@@ -63,7 +53,7 @@ export class ClubStatusHistoryController {
   }
 
   @UseGuards(RolesGuard)
-  @Roles('ADMIN')
+  @Roles('admin')
   @Delete(':id')
   async remove(@Param('id', ParseIntPipe) id: number) {
     return this.svc.remove(id);

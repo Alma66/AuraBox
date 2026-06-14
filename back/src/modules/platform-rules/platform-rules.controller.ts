@@ -1,17 +1,6 @@
 import {
-  Body,
-  Controller,
-  Get,
-  Post,
-  Put,
-  Delete,
-  Param,
-  ParseIntPipe,
-  UseGuards,
-  Request,
-  UsePipes,
-  ValidationPipe,
-  ForbiddenException,
+  Body, Controller, Get, Post, Put, Delete,
+  Param, ParseIntPipe, UseGuards, Request, UsePipes, ValidationPipe,
 } from '@nestjs/common';
 import { PlatformRulesService } from './platform-rules.service';
 import { CreatePlatformRuleDto } from './dto/create-platform-rule.dto';
@@ -26,15 +15,15 @@ export class PlatformRulesController {
   constructor(private readonly svc: PlatformRulesService) {}
 
   @UseGuards(RolesGuard)
-  @Roles('ADMIN')
+  @Roles('admin')
   @Post()
   @UsePipes(new ValidationPipe({ whitelist: true, transform: true }))
-  async create(@Body() dto: CreatePlatformRuleDto, @Request() req) {
+  async create(@Body() dto: CreatePlatformRuleDto) {
     return this.svc.create(dto);
   }
 
   @UseGuards(RolesGuard)
-  @Roles('ADMIN')
+  @Roles('admin')
   @Get()
   async findAll() {
     return this.svc.findAll();
@@ -51,7 +40,7 @@ export class PlatformRulesController {
   }
 
   @UseGuards(RolesGuard)
-  @Roles('ADMIN')
+  @Roles('admin')
   @Put(':id')
   @UsePipes(new ValidationPipe({ whitelist: true, transform: true }))
   async update(@Param('id', ParseIntPipe) id: number, @Body() dto: UpdatePlatformRuleDto) {
@@ -59,7 +48,7 @@ export class PlatformRulesController {
   }
 
   @UseGuards(RolesGuard)
-  @Roles('ADMIN')
+  @Roles('admin')
   @Delete(':id')
   async remove(@Param('id', ParseIntPipe) id: number) {
     return this.svc.remove(id);

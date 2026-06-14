@@ -1,17 +1,7 @@
 import {
-  Body,
-  Controller,
-  Get,
-  Post,
-  Put,
-  Delete,
-  Param,
-  ParseIntPipe,
-  UseGuards,
-  Request,
-  UsePipes,
-  ValidationPipe,
-  ForbiddenException,
+  Body, Controller, Get, Post, Put, Delete,
+  Param, ParseIntPipe, UseGuards, Request,
+  UsePipes, ValidationPipe, ForbiddenException,
 } from '@nestjs/common';
 import { ShipmentsService } from './shipments.service';
 import { CreateShipmentDto } from './dto/create-shipment.dto';
@@ -28,14 +18,14 @@ export class ShipmentsController {
   @Post()
   @UsePipes(new ValidationPipe({ whitelist: true, transform: true }))
   async create(@Body() dto: CreateShipmentDto, @Request() req) {
-    if (req.user.id !== dto.idUser && req.user.role !== 'ADMIN') {
+    if (req.user.id !== dto.idUser && req.user.role !== 'admin') {
       throw new ForbiddenException('No autorizado para crear este envío');
     }
     return this.shipmentsService.create(dto);
   }
 
   @UseGuards(RolesGuard)
-  @Roles('ADMIN')
+  @Roles('admin')
   @Get()
   async findAll() {
     return this.shipmentsService.findAll();
@@ -43,14 +33,14 @@ export class ShipmentsController {
 
   @Get('by-user/:idUser')
   async findByUser(@Param('idUser', ParseIntPipe) idUser: number, @Request() req) {
-    if (req.user.id !== idUser && req.user.role !== 'ADMIN') {
+    if (req.user.id !== idUser && req.user.role !== 'admin') {
       throw new ForbiddenException('No autorizado para ver estos envíos');
     }
     return this.shipmentsService.findByUser(idUser);
   }
 
   @UseGuards(RolesGuard)
-  @Roles('OWNER', 'ADMIN')
+  @Roles('entrepreneur', 'admin')
   @Get('by-club/:idClub')
   async findByClub(@Param('idClub', ParseIntPipe) idClub: number) {
     return this.shipmentsService.findByClub(idClub);
@@ -59,14 +49,14 @@ export class ShipmentsController {
   @Get(':id')
   async findOne(@Param('id', ParseIntPipe) id: number, @Request() req) {
     const shipment = await this.shipmentsService.findOne(id);
-    if (req.user.role !== 'ADMIN' && req.user.id !== shipment.idUser) {
+    if (req.user.role !== 'admin' && req.user.id !== shipment.idUser) {
       throw new ForbiddenException('No autorizado para ver este envío');
     }
     return shipment;
   }
 
   @UseGuards(RolesGuard)
-  @Roles('ADMIN')
+  @Roles('admin')
   @Put(':id')
   @UsePipes(new ValidationPipe({ whitelist: true, transform: true }))
   async update(@Param('id', ParseIntPipe) id: number, @Body() dto: UpdateShipmentDto) {
@@ -74,7 +64,7 @@ export class ShipmentsController {
   }
 
   @UseGuards(RolesGuard)
-  @Roles('ADMIN')
+  @Roles('admin')
   @Delete(':id')
   async remove(@Param('id', ParseIntPipe) id: number) {
     return this.shipmentsService.remove(id);

@@ -1,19 +1,7 @@
 import {
-  Body,
-  Controller,
-  Get,
-  Post,
-  Put,
-  Delete,
-  Param,
-  ParseIntPipe,
-  UseGuards,
-  Request,
-  UsePipes,
-  ValidationPipe,
-  Query,
-  UseInterceptors,
-  UploadedFile,
+  Body, Controller, Get, Post, Put, Delete,
+  Param, ParseIntPipe, UseGuards, Request, UsePipes,
+  ValidationPipe, Query, UseInterceptors, UploadedFile,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { memoryStorage } from 'multer';
@@ -30,7 +18,7 @@ export class BoxContentHistoryController {
   constructor(private readonly svc: BoxContentHistoryService) {}
 
   @UseGuards(RolesGuard)
-  @Roles('OWNER', 'ADMIN')
+  @Roles('entrepreneur', 'admin')
   @Post()
   @UseInterceptors(FileInterceptor('image', {
     storage: memoryStorage(),
@@ -53,12 +41,10 @@ export class BoxContentHistoryController {
   }
 
   @UseGuards(RolesGuard)
-  @Roles('ADMIN')
+  @Roles('admin')
   @Get()
   async findAll(@Query('page') page?: string, @Query('perPage') perPage?: string) {
-    const p = page ? parseInt(page, 10) : 1;
-    const pp = perPage ? parseInt(perPage, 10) : 50;
-    return this.svc.findAll(p, pp);
+    return this.svc.findAll(page ? parseInt(page, 10) : 1, perPage ? parseInt(perPage, 10) : 50);
   }
 
   @Get('by-subscription-type/:idSubscriptionTypes')
@@ -77,19 +63,15 @@ export class BoxContentHistoryController {
   }
 
   @UseGuards(RolesGuard)
-  @Roles('OWNER','ADMIN')
+  @Roles('entrepreneur', 'admin')
   @Put(':id')
   @UsePipes(new ValidationPipe({ whitelist: true, transform: true }))
-  async update(
-    @Param('id', ParseIntPipe) id: number,
-    @Body() dto: UpdateBoxContentHistoryDto,
-    @Request() req,
-  ) {
+  async update(@Param('id', ParseIntPipe) id: number, @Body() dto: UpdateBoxContentHistoryDto) {
     return this.svc.update(id, dto);
   }
 
   @UseGuards(RolesGuard)
-  @Roles('OWNER', 'ADMIN')
+  @Roles('entrepreneur', 'admin')
   @Delete(':id')
   async remove(@Param('id', ParseIntPipe) id: number) {
     return this.svc.remove(id);

@@ -1,18 +1,7 @@
 import {
-  Body,
-  Controller,
-  Get,
-  Post,
-  Put,
-  Delete,
-  Param,
-  ParseIntPipe,
-  UseGuards,
-  Request,
-  UsePipes,
-  ValidationPipe,
-  UseInterceptors,
-  UploadedFile,
+  Body, Controller, Get, Post, Put, Delete,
+  Param, ParseIntPipe, UseGuards, Request, UsePipes,
+  ValidationPipe, UseInterceptors, UploadedFile,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { memoryStorage } from 'multer';
@@ -29,7 +18,7 @@ export class ImageClubController {
   constructor(private readonly imageClubService: ImageClubService) {}
 
   @UseGuards(RolesGuard)
-  @Roles('OWNER', 'ADMIN')
+  @Roles('entrepreneur', 'admin')
   @Post()
   @UseInterceptors(FileInterceptor('image', {
     storage: memoryStorage(),
@@ -43,16 +32,12 @@ export class ImageClubController {
     },
   }))
   @UsePipes(new ValidationPipe({ whitelist: true, transform: true }))
-  async create(
-    @Body() dto: CreateImageClubDto,
-    @Request() req,
-    @UploadedFile() image?: Express.Multer.File,
-  ) {
+  async create(@Body() dto: CreateImageClubDto, @Request() req, @UploadedFile() image?: Express.Multer.File) {
     return this.imageClubService.create(dto, image);
   }
 
   @UseGuards(RolesGuard)
-  @Roles('ADMIN')
+  @Roles('admin')
   @Get()
   async findAll() {
     return this.imageClubService.findAll();
@@ -69,19 +54,15 @@ export class ImageClubController {
   }
 
   @UseGuards(RolesGuard)
-  @Roles('OWNER', 'ADMIN')
+  @Roles('entrepreneur', 'admin')
   @Put(':id')
   @UsePipes(new ValidationPipe({ whitelist: true, transform: true }))
-  async update(
-    @Param('id', ParseIntPipe) id: number,
-    @Body() dto: UpdateImageClubDto,
-    @Request() req,
-  ) {
+  async update(@Param('id', ParseIntPipe) id: number, @Body() dto: UpdateImageClubDto) {
     return this.imageClubService.update(id, dto);
   }
 
   @UseGuards(RolesGuard)
-  @Roles('OWNER', 'ADMIN')
+  @Roles('entrepreneur', 'admin')
   @Delete(':id')
   async remove(@Param('id', ParseIntPipe) id: number) {
     return this.imageClubService.remove(id);

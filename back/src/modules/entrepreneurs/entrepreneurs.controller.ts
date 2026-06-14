@@ -1,18 +1,7 @@
 import {
-  Body,
-  Controller,
-  Get,
-  Post,
-  Put,
-  Delete,
-  Param,
-  ParseIntPipe,
-  UseGuards,
-  Request,
-  UsePipes,
-  ValidationPipe,
-  ForbiddenException,
-  Patch,
+  Body, Controller, Get, Post, Put, Delete, Patch,
+  Param, ParseIntPipe, UseGuards, Request, UsePipes,
+  ValidationPipe, ForbiddenException,
 } from '@nestjs/common';
 import { EntrepreneursService } from './entrepreneurs.service';
 import { CreateEntrepreneurDto } from './dto/create-entrepreneurs.dto';
@@ -42,9 +31,7 @@ export class EntrepreneursController {
     const club = await this.clubsService.findClubByEntrepreneur(req.user.id);
     return {
       ...entrepreneur,
-      managedClub: club
-        ? { id: club.id, name: club.name, logoUrl: club.logoUrl }
-        : null,
+      managedClub: club ? { id: club.id, name: club.name, logoUrl: club.logoUrl } : null,
       managedClubId: club ? club.id : null,
     };
   }
@@ -60,18 +47,15 @@ export class EntrepreneursController {
     return this.entrepreneursService.update(req.user.id, dto);
   }
 
-  // El emprendedor ve su propio club directamente
   @Get('me/club')
   async getMyClub(@Request() req: any) {
     const club = await this.clubsService.findClubByEntrepreneur(req.user.id);
-    if (!club) {
-      return { message: 'No tenés un club asociado aún' };
-    }
+    if (!club) return { message: 'No tenés un club asociado aún' };
     return club;
   }
 
   @UseGuards(RolesGuard)
-  @Roles('ADMIN')
+  @Roles('admin')
   @Get()
   async findAll() {
     return this.entrepreneursService.findAll();
@@ -86,11 +70,7 @@ export class EntrepreneursController {
   }
 
   @Patch(':id')
-  async update(
-    @Param('id', ParseIntPipe) id: number,
-    @Body() dto: UpdateEntrepreneurDto,
-    @Request() req: any,
-  ) {
+  async update(@Param('id', ParseIntPipe) id: number, @Body() dto: UpdateEntrepreneurDto, @Request() req: any) {
     if (req.user.id !== id && req.user.role !== 'admin') {
       throw new ForbiddenException('No autorizado para actualizar este emprendedor');
     }
@@ -98,14 +78,14 @@ export class EntrepreneursController {
   }
 
   @UseGuards(RolesGuard)
-  @Roles('ADMIN')
+  @Roles('admin')
   @Put(':id/deactivate')
   async deactivate(@Param('id', ParseIntPipe) id: number) {
     return this.entrepreneursService.deactivate(id);
   }
 
   @UseGuards(RolesGuard)
-  @Roles('ADMIN')
+  @Roles('admin')
   @Delete(':id')
   async remove(@Param('id', ParseIntPipe) id: number) {
     return this.entrepreneursService.remove(id);

@@ -1,17 +1,6 @@
 import {
-  Body,
-  Controller,
-  Get,
-  Post,
-  Put,
-  Delete,
-  Param,
-  ParseIntPipe,
-  UseGuards,
-  Request,
-  UsePipes,
-  ValidationPipe,
-  ForbiddenException,
+  Body, Controller, Get, Post, Put, Delete,
+  Param, ParseIntPipe, UseGuards, UsePipes, ValidationPipe,
 } from '@nestjs/common';
 import { AdminOrEntrepreneurRoleService } from './admin-or-entrepreneur-role.service';
 import { CreateAdminOrEntrepreneurRoleDto } from './dto/create-admin-or-entrepreneur-role.dto';
@@ -21,12 +10,12 @@ import { RolesGuard } from '../auth/roles.guard';
 import { Roles } from '../auth/roles.decorator';
 
 @Controller('admin-or-entrepreneur-role')
-@UseGuards(JwtAuthGuard)  
+@UseGuards(JwtAuthGuard)
 export class AdminOrEntrepreneurRoleController {
   constructor(private readonly svc: AdminOrEntrepreneurRoleService) {}
 
   @UseGuards(RolesGuard)
-  @Roles('ADMIN')
+  @Roles('admin')
   @Post()
   @UsePipes(new ValidationPipe({ whitelist: true, transform: true }))
   async create(@Body() dto: CreateAdminOrEntrepreneurRoleDto) {
@@ -34,7 +23,7 @@ export class AdminOrEntrepreneurRoleController {
   }
 
   @UseGuards(RolesGuard)
-  @Roles('ADMIN')
+  @Roles('admin')
   @Get()
   async findAll() {
     return this.svc.findAll();
@@ -56,7 +45,7 @@ export class AdminOrEntrepreneurRoleController {
   }
 
   @UseGuards(RolesGuard)
-  @Roles('ADMIN')
+  @Roles('admin')
   @Put(':id')
   @UsePipes(new ValidationPipe({ whitelist: true, transform: true }))
   async update(@Param('id', ParseIntPipe) id: number, @Body() dto: UpdateAdminOrEntrepreneurRoleDto) {
@@ -64,7 +53,7 @@ export class AdminOrEntrepreneurRoleController {
   }
 
   @UseGuards(RolesGuard)
-  @Roles('ADMIN')
+  @Roles('admin')
   @Delete(':id')
   async remove(@Param('id', ParseIntPipe) id: number) {
     return this.svc.remove(id);

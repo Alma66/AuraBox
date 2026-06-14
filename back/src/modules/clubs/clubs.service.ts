@@ -207,12 +207,12 @@ export class ClubsService {
   async update(id: number, userId: number, userRole: string, dto: UpdateClubDto) {
     const club = await this.prisma.club.findUnique({ where: { id } });
     if (!club) throw new NotFoundException('Club no encontrado');
-    if (userRole === 'OWNER') {
+    if (userRole === 'entrepreneur') {
       const association = await this.prisma.entrepreneur_Club.findFirst({
         where: { idEntrepreneurs: userId, idClub: id },
       });
       if (!association) throw new ForbiddenException('No eres el owner de este club');
-    } else if (userRole !== 'ADMIN') {
+    } else if (userRole !== 'admin') {
       throw new ForbiddenException('No autorizado para editar clubes');
     }
     const updated = await this.prisma.club.update({ where: { id }, data: dto });
@@ -225,12 +225,12 @@ export class ClubsService {
     const club = await this.prisma.club.findUnique({ where: { id } });
     if (!club) throw new NotFoundException('Club no encontrado');
 
-    if (userRole === 'OWNER') {
+    if (userRole === 'entrepreneur') {
       const association = await this.prisma.entrepreneur_Club.findFirst({
         where: { idEntrepreneurs: userId, idClub: id },
       });
       if (!association) throw new ForbiddenException('No eres el owner de este club');
-    } else if (userRole !== 'ADMIN') {
+    } else if (userRole !== 'admin') {
       throw new ForbiddenException('No autorizado para editar clubes');
     }
 
@@ -247,7 +247,7 @@ export class ClubsService {
   }
 
   async remove(id: number, userRole: string) {
-    if (userRole !== 'ADMIN') throw new ForbiddenException('Solo los administradores pueden eliminar clubes');
+    if (userRole !== 'admin') throw new ForbiddenException('Solo los administradores pueden eliminar clubes');
     const club = await this.prisma.club.findUnique({ where: { id } });
     if (!club) throw new NotFoundException('Club no encontrado');
     await this.prisma.club.delete({ where: { id } });

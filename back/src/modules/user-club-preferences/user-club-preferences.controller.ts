@@ -1,17 +1,7 @@
 import {
-  Body,
-  Controller,
-  Get,
-  Post,
-  Put,
-  Delete,
-  Param,
-  ParseIntPipe,
-  UseGuards,
-  Request,
-  UsePipes,
-  ValidationPipe,
-  ForbiddenException,
+  Body, Controller, Get, Post, Put, Delete,
+  Param, ParseIntPipe, UseGuards, Request,
+  UsePipes, ValidationPipe, ForbiddenException,
 } from '@nestjs/common';
 import { UserClubPreferencesService } from './user-club-preferences.service';
 import { CreateUserClubPreferenceDto } from './dto/create-user-club-preference.dto';
@@ -28,14 +18,14 @@ export class UserClubPreferencesController {
   @Post()
   @UsePipes(new ValidationPipe({ whitelist: true, transform: true }))
   async create(@Body() dto: CreateUserClubPreferenceDto, @Request() req) {
-    if (req.user.id !== dto.idUser && req.user.role !== 'ADMIN') {
+    if (req.user.id !== dto.idUser && req.user.role !== 'admin') {
       throw new ForbiddenException('No autorizado para crear esta preferencia');
     }
     return this.svc.create(dto);
   }
 
   @UseGuards(RolesGuard)
-  @Roles('ADMIN')
+  @Roles('admin')
   @Get()
   async findAll() {
     return this.svc.findAll();
@@ -43,7 +33,7 @@ export class UserClubPreferencesController {
 
   @Get('by-user/:idUser')
   async findByUser(@Param('idUser', ParseIntPipe) idUser: number, @Request() req) {
-    if (req.user.id !== idUser && req.user.role !== 'ADMIN') {
+    if (req.user.id !== idUser && req.user.role !== 'admin') {
       throw new ForbiddenException('No autorizado para ver estas preferencias');
     }
     return this.svc.findByUser(idUser);

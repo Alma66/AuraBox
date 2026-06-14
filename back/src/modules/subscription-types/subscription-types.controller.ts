@@ -1,17 +1,6 @@
 import {
-  Body,
-  Controller,
-  Delete,
-  Get,
-  Param,
-  ParseIntPipe,
-  Post,
-  Put,
-  UseGuards,
-  Request,
-  UsePipes,
-  ValidationPipe,
-  Query,
+  Body, Controller, Delete, Get, Param, ParseIntPipe,
+  Post, Put, UseGuards, Request, UsePipes, ValidationPipe, Query,
 } from '@nestjs/common';
 import { SubscriptionTypesService } from './subscription-types.service';
 import { CreateSubscriptionTypeDto } from './dto/create-subscription-types.dto';
@@ -27,9 +16,7 @@ export class SubscriptionTypesController {
 
   @Get()
   async findAll(@Query('clubId') clubId?: string) {
-    if (clubId) {
-      return this.svc.findByClub(Number(clubId));
-    }
+    if (clubId) return this.svc.findByClub(Number(clubId));
     return this.svc.findAll();
   }
 
@@ -39,7 +26,7 @@ export class SubscriptionTypesController {
   }
 
   @UseGuards(RolesGuard)
-  @Roles('OWNER', 'ADMIN')
+  @Roles('entrepreneur', 'admin')
   @Post()
   @UsePipes(new ValidationPipe({ whitelist: true, transform: true }))
   async create(@Body() dto: CreateSubscriptionTypeDto, @Request() req) {
@@ -47,7 +34,7 @@ export class SubscriptionTypesController {
   }
 
   @UseGuards(RolesGuard)
-  @Roles('OWNER', 'ADMIN')
+  @Roles('entrepreneur', 'admin')
   @Put(':id')
   @UsePipes(new ValidationPipe({ whitelist: true, transform: true }))
   async update(@Param('id', ParseIntPipe) id: number, @Body() dto: UpdateSubscriptionTypeDto, @Request() req) {
@@ -55,7 +42,7 @@ export class SubscriptionTypesController {
   }
 
   @UseGuards(RolesGuard)
-  @Roles('ADMIN')
+  @Roles('admin')
   @Delete(':id')
   async remove(@Param('id', ParseIntPipe) id: number) {
     return this.svc.remove(id);

@@ -1,18 +1,7 @@
 import {
-  Body,
-  Controller,
-  Delete,
-  Get,
-  Param,
-  ParseIntPipe,
-  Post,
-  Put,
-  UseGuards,
-  Request,
-  UsePipes,
-  ValidationPipe,
-  Query,
-  ForbiddenException 
+  Body, Controller, Delete, Get, Param, ParseIntPipe,
+  Post, Put, UseGuards, Request, UsePipes, ValidationPipe,
+  Query, ForbiddenException,
 } from '@nestjs/common';
 import { UserSubscriptionsService } from './user-subscriptions.service';
 import { CreateUserSubscriptionDto } from './dto/create-user-subscription.dto';
@@ -44,7 +33,7 @@ export class UserSubscriptionsController {
   }
 
   @UseGuards(RolesGuard)
-  @Roles('ADMIN','OWNER')
+  @Roles('admin', 'entrepreneur')
   @Put(':id')
   @UsePipes(new ValidationPipe({ whitelist: true, transform: true }))
   async update(@Param('id', ParseIntPipe) id: number, @Body() dto: UpdateUserSubscriptionDto, @Request() req) {
@@ -54,14 +43,14 @@ export class UserSubscriptionsController {
   @Post(':id/cancel')
   async cancel(@Param('id', ParseIntPipe) id: number, @Body() body: { reason?: string }, @Request() req) {
     const sub = await this.svc.findById(id);
-    if (req.user?.id !== sub.idUser && req.user?.role !== 'ADMIN') {
+    if (req.user?.id !== sub.idUser && req.user?.role !== 'admin') {
       throw new ForbiddenException('No autorizado para cancelar esta suscripción');
     }
     return this.svc.cancel(id, body?.reason);
   }
 
   @UseGuards(RolesGuard)
-  @Roles('ADMIN')
+  @Roles('admin')
   @Delete(':id')
   async remove(@Param('id', ParseIntPipe) id: number) {
     return this.svc.remove(id);

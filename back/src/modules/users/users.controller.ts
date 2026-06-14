@@ -1,18 +1,7 @@
 import {
-  Body,
-  Controller,
-  Delete,
-  Get,
-  Param,
-  ParseIntPipe,
-  Post,
-  Put,
-  Patch,
-  UseGuards,
-  UsePipes,
-  ValidationPipe,
-  Request,
-  ForbiddenException,
+  Body, Controller, Delete, Get, Param, ParseIntPipe,
+  Post, Put, Patch, UseGuards, UsePipes, ValidationPipe,
+  Request, ForbiddenException,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
@@ -32,13 +21,11 @@ export class UsersController {
     return this.usersService.create(dto);
   }
 
-  // Endpoint que usa UserProfilePage
   @Get('me')
   async getMe(@Request() req: any) {
     return this.usersService.findById(req.user.id);
   }
 
-  // Verifica contraseña para mostrar datos sensibles
   @Post('me/verify-password')
   async verifyPassword(@Request() req: any, @Body() body: { password: string }) {
     return this.usersService.verifyPassword(req.user.id, body.password);
@@ -52,14 +39,14 @@ export class UsersController {
 
   @Get()
   @UseGuards(RolesGuard)
-  @Roles('ADMIN')
+  @Roles('admin')
   async findAll() {
     return this.usersService.findAll();
   }
 
   @Get(':id')
   @UseGuards(RolesGuard)
-  @Roles('ADMIN', 'CUSTOMER')
+  @Roles('admin', 'customer')
   async findOne(@Param('id', ParseIntPipe) id: number, @Request() req: any) {
     if (req.user.role !== 'admin' && req.user.id !== id) {
       throw new ForbiddenException('No autorizado');
@@ -69,7 +56,7 @@ export class UsersController {
 
   @Put(':id')
   @UseGuards(RolesGuard)
-  @Roles('ADMIN', 'CUSTOMER')
+  @Roles('admin', 'customer')
   @UsePipes(new ValidationPipe({ whitelist: true, transform: true }))
   async update(@Param('id', ParseIntPipe) id: number, @Body() dto: UpdateUserDto, @Request() req: any) {
     if (req.user.role !== 'admin' && req.user.id !== id) {
@@ -80,7 +67,7 @@ export class UsersController {
 
   @Delete(':id')
   @UseGuards(RolesGuard)
-  @Roles('ADMIN')
+  @Roles('admin')
   async remove(@Param('id', ParseIntPipe) id: number) {
     return this.usersService.remove(id);
   }
