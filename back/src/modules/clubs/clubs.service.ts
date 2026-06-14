@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException, ForbiddenException } from '@nestjs/common';
+import { Injectable, NotFoundException, ForbiddenException, BadRequestException } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
 import { CreateClubDto } from './dto/create-club.dto';
 import { UpdateClubDto } from './dto/update-club.dto';
@@ -29,14 +29,12 @@ export class ClubsService {
   ) {}
 
   async create(ownerId: number, dto: CreateClubDto, logoFile?: Express.Multer.File) {
-    const entrepreneur = await this.prisma.entrepreneurs.findUnique({
-      where: { id: ownerId },
-    });
+    const entrepreneur = await this.prisma.entrepreneurs.findUnique({ where: { id: ownerId } });
     if (!entrepreneur) throw new ForbiddenException('Solo entrepreneurs pueden crear clubs');
 
     let logoUrl = dto.logoUrl ?? '';
     if (logoFile) {
-      logoUrl = await this.cloudinary.uploadImage(logoFile, 'aurabox/clubs');
+      logoUrl = await this.cloudinary.uploadImage(logoFile, 'aurabox/clubs/logos');
     }
 
     const club = await this.prisma.club.create({
@@ -53,19 +51,14 @@ export class ClubsService {
     });
 
     await this.prisma.entrepreneur_Club.create({
-      data: {
-        idEntrepreneurs: ownerId,
-        idClub: club.id,
-      },
+      data: { idEntrepreneurs: ownerId, idClub: club.id },
     });
 
     return sanitizeClub(club);
   }
 
   async findAll() {
-    const clubs = await this.prisma.club.findMany({
-      orderBy: { creationDate: 'desc' },
-    });
+    const clubs = await this.prisma.club.findMany({ orderBy: { creationDate: 'desc' } });
     const clubsWithRatings = await Promise.all(
       clubs.map(async (club) => {
         const reviews = await this.prisma.reviews.findMany({
@@ -85,14 +78,7 @@ export class ClubsService {
 
     const reviews = await this.prisma.reviews.findMany({
       where: { idClub: id, active: true },
-      select: {
-        id: true,
-        rating: true,
-        title: true,
-        comment: true,
-        reviewDate: true,
-        idUser: true,
-      },
+      select: { id: true, rating: true, title: true, comment: true, reviewDate: true, idUser: true },
       orderBy: { reviewDate: 'desc' },
       take: 10,
     });
@@ -113,9 +99,7 @@ export class ClubsService {
       }),
     );
 
-    const socialNetworks = await this.prisma.club_Social_Networks.findMany({
-      where: { idClub: id },
-    });
+    const socialNetworks = await this.prisma.club_Social_Networks.findMany({ where: { idClub: id } });
 
     const images = await this.prisma.image_Club.findMany({
       where: { idClub: id },
@@ -126,24 +110,16 @@ export class ClubsService {
       where: { idClub: id, active: true },
     });
 
-    const clubPaymentMethods = await this.prisma.club_Payment_Method.findMany({
-      where: { idClub: id },
-    });
+    const clubPaymentMethods = await this.prisma.club_Payment_Method.findMany({ where: { idClub: id } });
     const paymentMethodIds = clubPaymentMethods.map((cpm) => cpm.idPaymentMethod);
     const paymentMethods = paymentMethodIds.length
-      ? await this.prisma.payment_Methods.findMany({
-          where: { id: { in: paymentMethodIds }, active: true },
-        })
+      ? await this.prisma.payment_Methods.findMany({ where: { id: { in: paymentMethodIds }, active: true } })
       : [];
 
-    const clubCategories = await this.prisma.club_Categories.findMany({
-      where: { idClub: id },
-    });
+    const clubCategories = await this.prisma.club_Categories.findMany({ where: { idClub: id } });
     const categoryIds = clubCategories.map((cc) => cc.idCategories);
     const categories = categoryIds.length
-      ? await this.prisma.categories.findMany({
-          where: { id: { in: categoryIds } },
-        })
+      ? await this.prisma.categories.findMany({ where: { id: { in: categoryIds } } })
       : [];
 
     let isOwner = false;
@@ -160,6 +136,12 @@ export class ClubsService {
     }, {});
 
     const bannerImages = images.filter((img) => img.contentType === 'Imagen').map((img) => img.imageUrl);
+
+    const socialNetworksRaw = socialNetworks.map((sn) => ({
+      id: sn.id,
+      networkType: sn.networkType,
+      profileUrl: sn.profileUrl,
+    }));
 
     const mappedPlans = subscriptionPlans.map((plan) => ({
       planId: String(plan.id),
@@ -181,9 +163,9 @@ export class ClubsService {
       slogan: club.slogan,
       shortDescription: club.shortDescription,
       logoUrl: club.logoUrl,
-      logoImage: club.logoUrl,          
+      logoImage: club.logoUrl,
       history: club.history,
-      fullHistory: club.history,        
+      fullHistory: club.history,
       contactEmail: club.contactEmail,
       whatsappContact: club.whatsappContact,
       clubStatus: club.clubStatus,
@@ -192,8 +174,10 @@ export class ClubsService {
       totalReviews,
       category: categories.map((c) => c.name).join(', ') || 'Sin categoría',
       bannerImages,
+      bannerImagesRaw: images.filter((img) => img.contentType === 'Imagen').map((img) => ({ id: img.id, imageUrl: img.imageUrl })),
       mainImage: bannerImages[0] || null,
       socialMedia: Object.keys(socialMedia).length ? socialMedia : null,
+      socialNetworksRaw,
       subscriptionPlans: mappedPlans,
       paymentMethods: paymentMethods.map((pm) => pm.method),
       featuredReviews: enrichedReviews,
@@ -202,9 +186,7 @@ export class ClubsService {
   }
 
   async findFeatured() {
-    const clubs = await this.prisma.club.findMany({
-      where: { clubStatus: 'APROBADO' },
-    });
+    const clubs = await this.prisma.club.findMany({ where: { clubStatus: 'APROBADO' } });
     const withRatings = await Promise.all(
       clubs.map(async (club) => {
         const reviews = await this.prisma.reviews.findMany({
@@ -233,17 +215,39 @@ export class ClubsService {
     } else if (userRole !== 'ADMIN') {
       throw new ForbiddenException('No autorizado para editar clubes');
     }
-    const updated = await this.prisma.club.update({
-      where: { id },
-      data: dto,
-    });
+    const updated = await this.prisma.club.update({ where: { id }, data: dto });
+    return sanitizeClub(updated);
+  }
+
+  async updateLogo(id: number, userId: number, userRole: string, logoFile: Express.Multer.File) {
+    if (!logoFile) throw new BadRequestException('Se requiere una imagen para el logo');
+
+    const club = await this.prisma.club.findUnique({ where: { id } });
+    if (!club) throw new NotFoundException('Club no encontrado');
+
+    if (userRole === 'OWNER') {
+      const association = await this.prisma.entrepreneur_Club.findFirst({
+        where: { idEntrepreneurs: userId, idClub: id },
+      });
+      if (!association) throw new ForbiddenException('No eres el owner de este club');
+    } else if (userRole !== 'ADMIN') {
+      throw new ForbiddenException('No autorizado para editar clubes');
+    }
+
+    if (club.logoUrl) {
+      try {
+        const publicId = this.cloudinary.extractPublicId(club.logoUrl);
+        await this.cloudinary.deleteImage(publicId);
+      } catch {}
+    }
+
+    const logoUrl = await this.cloudinary.uploadImage(logoFile, 'aurabox/clubs/logos');
+    const updated = await this.prisma.club.update({ where: { id }, data: { logoUrl } });
     return sanitizeClub(updated);
   }
 
   async remove(id: number, userRole: string) {
-    if (userRole !== 'ADMIN') {
-      throw new ForbiddenException('Solo los administradores pueden eliminar clubes');
-    }
+    if (userRole !== 'ADMIN') throw new ForbiddenException('Solo los administradores pueden eliminar clubes');
     const club = await this.prisma.club.findUnique({ where: { id } });
     if (!club) throw new NotFoundException('Club no encontrado');
     await this.prisma.club.delete({ where: { id } });

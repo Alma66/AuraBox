@@ -6,6 +6,7 @@ import {
   Param,
   Delete,
   Put,
+  Patch,
   UseGuards,
   UsePipes,
   ValidationPipe,
@@ -13,7 +14,6 @@ import {
   ParseIntPipe,
   UseInterceptors,
   UploadedFile,
-  Optional,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { memoryStorage } from 'multer';
@@ -81,6 +81,28 @@ export class ClubsController {
     @Request() req,
   ) {
     return this.clubsService.update(id, req.user.id, req.user.role, dto);
+  }
+
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('OWNER', 'ADMIN')
+  @Patch(':id/logo')
+  @UseInterceptors(FileInterceptor('logo', {
+    storage: memoryStorage(),
+    limits: { fileSize: 5 * 1024 * 1024 },
+    fileFilter: (req, file, callback) => {
+      if (!file.mimetype.match(/\/(jpg|jpeg|png|gif|webp)$/)) {
+        callback(new Error('Solo se permiten imágenes'), false);
+      } else {
+        callback(null, true);
+      }
+    },
+  }))
+  async updateLogo(
+    @Param('id', ParseIntPipe) id: number,
+    @UploadedFile() logo: Express.Multer.File,
+    @Request() req,
+  ) {
+    return this.clubsService.updateLogo(id, req.user.id, req.user.role, logo);
   }
 
   @UseGuards(JwtAuthGuard, RolesGuard)
