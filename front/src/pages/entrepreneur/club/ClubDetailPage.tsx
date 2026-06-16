@@ -64,7 +64,7 @@ const NETWORK_TYPES = [
 const ASPECT_RATIOS: Record<CropTarget, number> = {
   logo: 1,
   banner: 16 / 5,
-  history: 16 / 9,
+  history: 4 / 3,
 };
 
 async function getCroppedBlob(imageSrc: string, croppedAreaPixels: any): Promise<Blob> {
@@ -326,8 +326,7 @@ const ClubDetailPage: React.FC = () => {
                 </svg>
               </button>
             </div>
-
-            <div className="relative bg-gray-900" style={{ height: cropState.target === 'logo' ? '320px' : '260px' }}>
+            <div className="relative bg-gray-900" style={{ height: cropState.target === 'logo' ? '320px' : '280px' }}>
               <Cropper
                 image={cropState.imageSrc}
                 crop={cropState.crop}
@@ -340,7 +339,6 @@ const ClubDetailPage: React.FC = () => {
                 onCropComplete={(_, croppedAreaPixels) => setCropState((prev) => (prev ? { ...prev, croppedAreaPixels } : null))}
               />
             </div>
-
             <div className="px-6 py-4 bg-gray-50">
               <div className="flex items-center gap-3 mb-4">
                 <svg className="w-4 h-4 text-gray-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -374,25 +372,25 @@ const ClubDetailPage: React.FC = () => {
       )}
 
       <div className="relative overflow-hidden shadow-lg">
-        <div className="h-56 md:h-80">
+        <div className="h-72 md:h-96">
           {bannerList.length > 0 ? (
             <Slider {...bannerSliderSettings}>
               {bannerList.map((imgSrc, index) => (
                 <div key={index}>
-                  <img src={imgSrc} alt={`Banner ${index + 1}`} className="w-full h-56 md:h-80 object-cover object-center" />
+                  <img src={imgSrc} alt={`Banner ${index + 1}`} className="w-full h-72 md:h-96 object-cover object-center" />
                 </div>
               ))}
             </Slider>
           ) : (
-            <div className="w-full h-56 md:h-80 bg-gradient-to-br from-blue-600 to-purple-700" />
+            <div className="w-full h-72 md:h-96 bg-gradient-to-br from-blue-600 to-purple-700" />
           )}
         </div>
 
         <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent pointer-events-none" />
 
-        <div className="absolute bottom-0 left-0 w-full px-6 pb-5 flex items-end gap-5">
-          <div className="relative flex-shrink-0 -mb-12">
-            <div className="w-24 h-24 md:w-28 md:h-28 rounded-full border-4 border-white shadow-2xl overflow-hidden bg-white">
+        <div className="absolute bottom-0 left-0 w-full px-6 pb-6 flex items-end gap-5">
+          <div className="relative flex-shrink-0 -mb-16">
+            <div className="w-28 h-28 md:w-32 md:h-32 rounded-full border-4 border-white shadow-2xl overflow-hidden bg-white">
               {logoSrc ? (
                 <img src={logoSrc} alt={`${club.name} logo`} className="w-full h-full object-cover" />
               ) : (
@@ -405,10 +403,10 @@ const ClubDetailPage: React.FC = () => {
               <>
                 <button
                   onClick={() => logoInputRef.current?.click()}
-                  className="absolute bottom-0.5 right-0.5 bg-white text-gray-700 rounded-full p-1.5 shadow-lg hover:bg-gray-50 border border-gray-200 transition-colors"
+                  className="absolute bottom-1 right-1 bg-white text-gray-700 rounded-full p-2 shadow-lg hover:bg-gray-50 border border-gray-200 transition-colors"
                   title="Cambiar logo"
                 >
-                  <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
                   </svg>
@@ -418,18 +416,18 @@ const ClubDetailPage: React.FC = () => {
             )}
           </div>
 
-          <div className="flex-1 min-w-0 pb-1">
+          <div className="flex-1 min-w-0 pb-2">
             <h1 className="text-2xl md:text-4xl font-extrabold text-white drop-shadow-lg truncate">{club.name}</h1>
             {club.slogan && <p className="text-white/85 text-sm md:text-base drop-shadow mt-1">{club.slogan}</p>}
           </div>
 
           {isOwner && (
-            <div className="flex-shrink-0 pb-1">
+            <div className="flex-shrink-0 pb-2">
               <button
                 onClick={() => bannerInputRef.current?.click()}
-                className="bg-white/15 hover:bg-white/25 text-white text-xs px-3 py-2 rounded-lg backdrop-blur-sm border border-white/20 transition-colors flex items-center gap-1.5 font-medium"
+                className="bg-white/15 hover:bg-white/25 text-white text-sm px-4 py-2.5 rounded-xl backdrop-blur-sm border border-white/30 transition-colors flex items-center gap-2 font-medium shadow-sm"
               >
-                <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
                 </svg>
                 Cambiar banner
@@ -440,7 +438,7 @@ const ClubDetailPage: React.FC = () => {
         </div>
       </div>
 
-      <div className="container mx-auto px-4 pt-16 pb-8">
+      <div className="container mx-auto px-4 pt-20 pb-8">
         <button onClick={() => navigate(-1)} className="mb-6 flex items-center text-blue-600 hover:text-blue-800 transition-colors text-sm font-medium">
           <svg className="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
@@ -495,21 +493,21 @@ const ClubDetailPage: React.FC = () => {
                 {isOwner && !editingDescription && (
                   <button
                     onClick={() => setEditingDescription(true)}
-                    className="flex items-center gap-1.5 text-xs font-medium text-blue-600 hover:text-blue-700 bg-blue-50 hover:bg-blue-100 px-3 py-1.5 rounded-lg transition-colors"
+                    className="inline-flex items-center gap-2 text-sm font-semibold text-white bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded-lg transition-colors shadow-sm"
                   >
-                    <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                     </svg>
-                    Editar
+                    Editar descripción
                   </button>
                 )}
               </div>
               {editingDescription && isOwner ? (
-                <div>
+                <div className="bg-gray-50 rounded-xl p-4 border border-gray-200">
                   <textarea
                     value={editDescription}
                     onChange={(e) => setEditDescription(e.target.value)}
-                    className="w-full border border-gray-200 rounded-xl p-3 h-36 text-sm text-gray-700 focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none resize-none transition-all"
+                    className="w-full border border-gray-200 rounded-xl p-3 h-36 text-sm text-gray-700 focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none resize-none transition-all bg-white"
                     placeholder="Contá de qué se trata tu club..."
                     autoFocus
                   />
@@ -517,13 +515,13 @@ const ClubDetailPage: React.FC = () => {
                     <button
                       onClick={handleSaveDescription}
                       disabled={saving}
-                      className="bg-blue-600 text-white text-sm px-5 py-2 rounded-lg font-medium hover:bg-blue-700 disabled:opacity-50 transition-colors"
+                      className="bg-blue-600 text-white text-sm px-5 py-2.5 rounded-lg font-semibold hover:bg-blue-700 disabled:opacity-50 transition-colors shadow-sm"
                     >
                       {saving ? 'Guardando...' : 'Guardar cambios'}
                     </button>
                     <button
                       onClick={() => { setEditingDescription(false); setEditDescription(club.shortDescription || ''); }}
-                      className="text-gray-500 text-sm px-4 py-2 rounded-lg hover:bg-gray-100 transition-colors"
+                      className="text-gray-600 text-sm px-4 py-2.5 rounded-lg hover:bg-gray-200 transition-colors font-medium"
                     >
                       Cancelar
                     </button>
@@ -541,9 +539,9 @@ const ClubDetailPage: React.FC = () => {
                     <h2 className="text-xl font-bold text-gray-900">Imagen de historia</h2>
                     <button
                       onClick={() => historyInputRef.current?.click()}
-                      className="flex items-center gap-1.5 text-xs font-medium text-blue-600 hover:text-blue-700 bg-blue-50 hover:bg-blue-100 px-3 py-1.5 rounded-lg transition-colors"
+                      className="inline-flex items-center gap-2 text-sm font-semibold text-white bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded-lg transition-colors shadow-sm"
                     >
-                      <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
                       </svg>
@@ -551,9 +549,9 @@ const ClubDetailPage: React.FC = () => {
                     </button>
                   </div>
                   {historyImage ? (
-                    <img src={historyImage} alt="Historia" className="w-full h-44 object-cover rounded-xl border border-gray-100 shadow-sm" />
+                    <img src={historyImage} alt="Historia" className="w-full h-56 object-cover rounded-xl border border-gray-100 shadow-sm" />
                   ) : (
-                    <div className="w-full h-44 rounded-xl border-2 border-dashed border-gray-200 bg-gray-50 flex flex-col items-center justify-center gap-2">
+                    <div className="w-full h-56 rounded-xl border-2 border-dashed border-gray-200 bg-gray-50 flex flex-col items-center justify-center gap-2">
                       <svg className="w-8 h-8 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
                       </svg>
@@ -565,11 +563,11 @@ const ClubDetailPage: React.FC = () => {
                 </div>
               ) : (
                 club.fullHistory && (
-                  <div className="relative group cursor-pointer h-full min-h-[176px]">
+                  <div className="relative group cursor-pointer h-full min-h-[224px]">
                     <img
                       src={historyImage || '/assets/default-banner.jpg'}
                       alt="Nuestra Historia"
-                      className="w-full h-44 object-cover rounded-xl shadow-sm group-hover:brightness-75 transition-all duration-300"
+                      className="w-full h-56 object-cover rounded-xl shadow-sm group-hover:brightness-75 transition-all duration-300"
                     />
                     <div className="absolute inset-0 flex items-center justify-center rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                       <Link
@@ -640,7 +638,7 @@ const ClubDetailPage: React.FC = () => {
                     <button
                       onClick={handleAddSocial}
                       disabled={socialSaving || !newSocialUrl.trim()}
-                      className="bg-blue-600 text-white text-sm px-5 py-2 rounded-lg font-medium hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                      className="bg-blue-600 text-white text-sm px-5 py-2.5 rounded-lg font-semibold hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors shadow-sm"
                     >
                       {socialSaving ? 'Agregando...' : 'Agregar'}
                     </button>
