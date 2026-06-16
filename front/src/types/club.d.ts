@@ -25,6 +25,8 @@ export interface SubscriptionPlan {
   descuentoTransferencia?: number;
   descuentoEfectivo?: number;
   activo?: boolean;
+  cashDiscount?: number;
+  transferDiscount?: number;
 }
 
 export interface FeaturedReview {
@@ -93,6 +95,8 @@ export interface Club {
   mainImage?: string;
   logoImage?: string;
   bannerImages?: string[];
+  bannerImagesRaw?: { id: number; imageUrl: string; description?: string }[];
+  historyImageRaw?: { id: number; imageUrl: string }[];
   fullHistory?: string;
   historyBanner?: string;
   socialMedia?: SocialMediaLinks;
