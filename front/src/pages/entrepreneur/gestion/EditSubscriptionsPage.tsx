@@ -160,7 +160,7 @@ const EditSubscriptionsPage: React.FC = () => {
   const buildPayload = () => ({
     name: formData.name,
     description: formData.description,
-    basePrice: Number(formData.price),
+    price: Number(formData.price),
     frequency: formData.frequency,
     cashDiscount: Number(formData.descuentoEfectivo) || 0,
     transferDiscount: Number(formData.descuentoTransferencia) || 0,
