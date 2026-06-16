@@ -53,7 +53,17 @@ export class EntrepreneursService {
   async findOne(id: number) {
     const ent = await this.prisma.entrepreneurs.findUnique({ where: { id } });
     if (!ent) throw new NotFoundException('Emprendedor no encontrado');
-    return sanitize(ent);
+
+    // Buscar club asociado para exponer managedClubId al frontend
+    const association = await this.prisma.entrepreneur_Club.findFirst({
+      where: { idEntrepreneurs: id },
+      orderBy: { associationDate: 'asc' },
+    });
+
+    return {
+      ...sanitize(ent),
+      managedClubId: association?.idClub ?? null,
+    };
   }
 
   async findByEmail(email: string) {

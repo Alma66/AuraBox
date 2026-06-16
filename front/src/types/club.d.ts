@@ -24,7 +24,8 @@ export interface SubscriptionPlan {
   specifications: { type: string; value: string }[];
   descuentoTransferencia?: number;
   descuentoEfectivo?: number;
-  activo?: boolean;
+  activo?: boolean;    
+  active?: boolean;    
   cashDiscount?: number;
   transferDiscount?: number;
 }

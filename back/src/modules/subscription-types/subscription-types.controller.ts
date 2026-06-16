@@ -30,21 +30,25 @@ export class SubscriptionTypesController {
   @Post()
   @UsePipes(new ValidationPipe({ whitelist: true, transform: true }))
   async create(@Body() dto: CreateSubscriptionTypeDto, @Request() req) {
-    return this.svc.create(dto);
+    return this.svc.create(dto, req.user?.id, req.user?.role);
   }
 
   @UseGuards(RolesGuard)
   @Roles('entrepreneur', 'admin')
   @Put(':id')
   @UsePipes(new ValidationPipe({ whitelist: true, transform: true }))
-  async update(@Param('id', ParseIntPipe) id: number, @Body() dto: UpdateSubscriptionTypeDto, @Request() req) {
-    return this.svc.update(id, dto, req.user?.role);
+  async update(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() dto: UpdateSubscriptionTypeDto,
+    @Request() req,
+  ) {
+    return this.svc.update(id, dto, req.user?.id, req.user?.role);
   }
 
   @UseGuards(RolesGuard)
-  @Roles('admin')
+  @Roles('entrepreneur', 'admin')  // ← antes era solo 'admin'
   @Delete(':id')
-  async remove(@Param('id', ParseIntPipe) id: number) {
-    return this.svc.remove(id);
+  async remove(@Param('id', ParseIntPipe) id: number, @Request() req) {
+    return this.svc.remove(id, req.user?.id, req.user?.role);
   }
 }
