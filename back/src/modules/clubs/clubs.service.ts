@@ -135,7 +135,7 @@ export class ClubsService {
       return acc;
     }, {});
 
-    const bannerImages = images
+   const bannerImages = images
   .filter((img) => img.contentType === 'Imagen' && img.description !== 'historia')
   .map((img) => img.imageUrl);
 
@@ -176,9 +176,10 @@ export class ClubsService {
       totalReviews,
       category: categories.map((c) => c.name).join(', ') || 'Sin categoría',
       bannerImages,
-      bannerImagesRaw: images.filter((img) => img.contentType === 'Imagen').map((img) => ({ id: img.id, imageUrl: img.imageUrl })),
-      mainImage: bannerImages[0] || null,
-      socialMedia: Object.keys(socialMedia).length ? socialMedia : null,
+      bannerImagesRaw: images
+  .filter((img) => img.contentType === 'Imagen' && img.description !== 'historia')
+  .map((img) => ({ id: img.id, imageUrl: img.imageUrl, description: img.description })),
+      mainImage: images.find((img) => img.contentType === 'Imagen' && img.description !== 'historia')?.imageUrl || null,      socialMedia: Object.keys(socialMedia).length ? socialMedia : null,
       socialNetworksRaw,
       subscriptionPlans: mappedPlans,
       paymentMethods: paymentMethods.map((pm) => pm.method),
