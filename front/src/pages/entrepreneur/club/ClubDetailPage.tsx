@@ -672,6 +672,9 @@ const ClubDetailPage: React.FC = () => {
                   includes: plan.includes || [],
                   shippingAreas: plan.shippingAreas || '',
                   specifications: plan.specifications || [],
+                  activo: plan.active,
+                  cashDiscount: plan.cashDiscount,
+                  transferDiscount: plan.transferDiscount,
                 };
                 return (
                   <SubscriptionPlanCard key={plan.planId} plan={planForCard} clubName={club.name} detailsLink={`/club/${club.id}/plan/${plan.planId}`} />

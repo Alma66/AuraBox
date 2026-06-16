@@ -219,7 +219,14 @@ export class ClubsService {
   }
 
   async findFeatured() {
-    const clubs = await this.prisma.club.findMany({ where: { clubStatus: 'APROBADO' } });
+    const isDev = process.env.NODE_ENV !== 'production';
+    const clubs = await this.prisma.club.findMany({
+      where: {
+        clubStatus: isDev
+          ? { in: ['APROBADO', 'PENDIENTE_APROBACION'] }
+          : 'APROBADO',
+      },
+    });
     const withRatings = await Promise.all(
       clubs.map(async (club) => {
         const reviews = await this.prisma.reviews.findMany({
@@ -292,6 +299,10 @@ export class ClubsService {
       where: { idEntrepreneurs: entrepreneurId },
     });
     if (!association) return null;
-    return this.findOne(association.idClub, entrepreneurId);
+    try {
+      return await this.findOne(association.idClub, entrepreneurId);
+    } catch {
+      return null;
+    }
   }
 }

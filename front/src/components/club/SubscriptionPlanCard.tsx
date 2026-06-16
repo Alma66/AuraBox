@@ -20,6 +20,9 @@ export interface SubscriptionPlan {
   descuentoTransferencia?: number;
   descuentoEfectivo?: number;
   activo?: boolean;
+  cashDiscount?: number;
+  transferDiscount?: number;
+  active?: boolean;
 }
 
 export interface SubscriptionPlanCardProps {
@@ -38,7 +41,11 @@ const SubscriptionPlanCard: React.FC<SubscriptionPlanCardProps> = ({ plan, clubN
   const specifications = plan.specifications ?? [];
   const description = plan.description ?? '';
 
-  const descuento = Math.max(plan.descuentoTransferencia || 0, plan.descuentoEfectivo || 0);
+  const isActive = plan.activo ?? plan.active ?? true;
+  const descuento = Math.max(
+    plan.cashDiscount ?? plan.descuentoEfectivo ?? 0,
+    plan.transferDiscount ?? plan.descuentoTransferencia ?? 0,
+  );
   const precioFinal = plan.price * (1 - descuento / 100);
 
   const handleAddToWishlist = () => {
@@ -47,7 +54,7 @@ const SubscriptionPlanCard: React.FC<SubscriptionPlanCardProps> = ({ plan, clubN
 
   return (
     <div className="relative bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden flex flex-col animate-fadeInUp hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
-      {!plan.activo && (
+      {!isActive && (
         <div className="absolute top-2 left-2 bg-red-500 text-white text-xs font-bold px-2 py-1 rounded z-10">
           Inactivo
         </div>
@@ -76,10 +83,7 @@ const SubscriptionPlanCard: React.FC<SubscriptionPlanCardProps> = ({ plan, clubN
           <p className="text-gray-700 text-sm leading-relaxed">
             {showFullDescription ? description : `${description.substring(0, 120)}${description.length > 120 ? '...' : ''}`}
             {description.length > 120 && (
-              <button
-                onClick={() => setShowFullDescription(!showFullDescription)}
-                className="text-blue-500 hover:underline ml-1 text-xs"
-              >
+              <button onClick={() => setShowFullDescription(!showFullDescription)} className="text-blue-500 hover:underline ml-1 text-xs">
                 {showFullDescription ? 'Ver menos' : 'Ver más'}
               </button>
             )}
@@ -92,10 +96,7 @@ const SubscriptionPlanCard: React.FC<SubscriptionPlanCardProps> = ({ plan, clubN
               <li key={index}>{item}</li>
             ))}
             {includes.length > 2 && (
-              <button
-                onClick={() => setShowFullIncludes(!showFullIncludes)}
-                className="text-blue-500 hover:underline ml-1 text-xs"
-              >
+              <button onClick={() => setShowFullIncludes(!showFullIncludes)} className="text-blue-500 hover:underline ml-1 text-xs">
                 {showFullIncludes ? 'Ver menos' : 'Ver más'}
               </button>
             )}
@@ -111,10 +112,7 @@ const SubscriptionPlanCard: React.FC<SubscriptionPlanCardProps> = ({ plan, clubN
                 </span>
               ))}
               {specifications.length > 3 && (
-                <button
-                  onClick={() => setShowFullSpecs(!showFullSpecs)}
-                  className="text-blue-500 hover:underline ml-1 text-xs"
-                >
+                <button onClick={() => setShowFullSpecs(!showFullSpecs)} className="text-blue-500 hover:underline ml-1 text-xs">
                   {showFullSpecs ? 'Ver menos' : 'Ver más'}
                 </button>
               )}
@@ -145,17 +143,11 @@ const SubscriptionPlanCard: React.FC<SubscriptionPlanCardProps> = ({ plan, clubN
             )}
           </div>
           {detailsLink ? (
-            <Link
-              to={detailsLink}
-              className="bg-blue-600 text-white px-6 py-3 rounded-lg font-extrabold text-md hover:bg-blue-700 transition-all duration-300 transform hover:scale-105 active:scale-95 shadow-md"
-            >
+            <Link to={detailsLink} className="bg-blue-600 text-white px-6 py-3 rounded-lg font-extrabold text-md hover:bg-blue-700 transition-all duration-300 transform hover:scale-105 active:scale-95 shadow-md">
               Ver Detalles
             </Link>
           ) : (
-            <button
-              disabled
-              className="bg-gray-400 text-white px-6 py-3 rounded-lg font-extrabold text-md cursor-not-allowed"
-            >
+            <button disabled className="bg-gray-400 text-white px-6 py-3 rounded-lg font-extrabold text-md cursor-not-allowed">
               Ver Detalles
             </button>
           )}
