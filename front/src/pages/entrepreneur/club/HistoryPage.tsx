@@ -1,5 +1,6 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
+import Cropper from 'react-easy-crop';
 import api, { getResponseData } from '../../../api/config';
 import { Club, Milestone } from '../../../types/club';
 import { useAuth } from '../../../App';
@@ -10,6 +11,30 @@ const AnimatedSection: React.FC<{ children: React.ReactNode; delay?: string }> =
     {children}
   </div>
 );
+
+interface CropState {
+  imageSrc: string;
+  entrepreneurId: number;
+  crop: { x: number; y: number };
+  zoom: number;
+  croppedAreaPixels: any;
+}
+
+async function getCroppedBlob(imageSrc: string, croppedAreaPixels: any): Promise<Blob> {
+  return new Promise((resolve, reject) => {
+    const image = new Image();
+    image.src = imageSrc;
+    image.onload = () => {
+      const canvas = document.createElement('canvas');
+      canvas.width = croppedAreaPixels.width;
+      canvas.height = croppedAreaPixels.height;
+      const ctx = canvas.getContext('2d')!;
+      ctx.drawImage(image, croppedAreaPixels.x, croppedAreaPixels.y, croppedAreaPixels.width, croppedAreaPixels.height, 0, 0, croppedAreaPixels.width, croppedAreaPixels.height);
+      canvas.toBlob((blob) => { if (blob) resolve(blob); else reject(new Error('Canvas is empty')); }, 'image/jpeg', 0.95);
+    };
+    image.onerror = reject;
+  });
+}
 
 const HistoryPage: React.FC = () => {
   const { clubId } = useParams<{ clubId: string }>();
@@ -31,31 +56,45 @@ const HistoryPage: React.FC = () => {
   const [tempCommunityText, setTempCommunityText] = useState('');
   const [savingCommunity, setSavingCommunity] = useState(false);
 
-  const [teamPhotoUploading, setTeamPhotoUploading] = useState<number | null>(null);
+  const [selectedEntrepreneurIds, setSelectedEntrepreneurIds] = useState<number[]>([]);
   const [editingBioId, setEditingBioId] = useState<number | null>(null);
   const [tempBio, setTempBio] = useState('');
   const [savingBioId, setSavingBioId] = useState<number | null>(null);
 
+  const [cropState, setCropState] = useState<CropState | null>(null);
+  const [uploading, setUploading] = useState(false);
+
   const photoInputRef = useRef<HTMLInputElement>(null);
   const photoUploadTargetId = useRef<number | null>(null);
 
-  useEffect(() => {
-    const fetchClub = async () => {
-      try {
-        const response = await api.get(`/clubs/${clubId}`);
-        const clubData = getResponseData(response);
-        setClub(clubData);
-        setTempHistory(clubData.history || '');
-        setTempMilestones(clubData.milestones || []);
-        setTempCommunityText(clubData.communityText || '');
-      } catch (error) {
-        console.error('Error fetching club:', error);
-      } finally {
-        setLoading(false);
+  const [toast, setToast] = useState<{ msg: string; type: 'success' | 'error' } | null>(null);
+
+  const showToast = (msg: string, type: 'success' | 'error' = 'success') => {
+    setToast({ msg, type });
+    setTimeout(() => setToast(null), 3500);
+  };
+
+  const fetchClub = useCallback(async () => {
+    try {
+      const response = await api.get(`/clubs/${clubId}`);
+      const clubData = getResponseData(response);
+      setClub(clubData);
+      setTempHistory(clubData.history || '');
+      setTempMilestones(clubData.milestones || []);
+      setTempCommunityText(clubData.communityText || '');
+      if (clubData.entrepreneurs && clubData.entrepreneurs.length > 0) {
+        setSelectedEntrepreneurIds(clubData.entrepreneurs.slice(0, 3).map((e: any) => e.id));
       }
-    };
-    if (clubId) fetchClub();
+    } catch (error) {
+      console.error('Error fetching club:', error);
+    } finally {
+      setLoading(false);
+    }
   }, [clubId]);
+
+  useEffect(() => {
+    if (clubId) fetchClub();
+  }, [clubId, fetchClub]);
 
   const isOwner = userRole === 'entrepreneur' && !!club?.isOwner;
 
@@ -66,8 +105,9 @@ const HistoryPage: React.FC = () => {
       await api.put(`/clubs/${club.id}`, { history: tempHistory });
       setClub({ ...club, history: tempHistory, fullHistory: tempHistory });
       setIsEditingOrigins(false);
+      showToast('Historia guardada');
     } catch {
-      alert('Error al guardar la historia');
+      showToast('Error al guardar la historia', 'error');
     } finally {
       setSavingOrigins(false);
     }
@@ -80,8 +120,9 @@ const HistoryPage: React.FC = () => {
       await api.put(`/clubs/${club.id}`, { milestones: JSON.stringify(tempMilestones) });
       setClub({ ...club, milestones: tempMilestones });
       setIsEditingMilestones(false);
+      showToast('Hitos guardados');
     } catch {
-      alert('Error al guardar los hitos');
+      showToast('Error al guardar los hitos', 'error');
     } finally {
       setSavingMilestones(false);
     }
@@ -102,8 +143,9 @@ const HistoryPage: React.FC = () => {
       await api.put(`/clubs/${club.id}`, { communityText: tempCommunityText });
       setClub({ ...club, communityText: tempCommunityText });
       setIsEditingCommunity(false);
+      showToast('Texto de comunidad guardado');
     } catch {
-      alert('Error al guardar el texto de comunidad');
+      showToast('Error al guardar el texto de comunidad', 'error');
     } finally {
       setSavingCommunity(false);
     }
@@ -117,17 +159,24 @@ const HistoryPage: React.FC = () => {
         if (!prev) return prev;
         return {
           ...prev,
-          entrepreneurs: prev.entrepreneurs?.map((e) =>
-            e.id === entrepreneurId ? { ...e, bio: tempBio } : e
-          ),
+          entrepreneurs: prev.entrepreneurs?.map((e) => e.id === entrepreneurId ? { ...e, bio: tempBio } : e),
         };
       });
       setEditingBioId(null);
+      showToast('Bio guardada');
     } catch {
-      alert('Error al guardar la bio');
+      showToast('Error al guardar la bio', 'error');
     } finally {
       setSavingBioId(null);
     }
+  };
+
+  const toggleEntrepreneur = (id: number) => {
+    setSelectedEntrepreneurIds((prev) => {
+      if (prev.includes(id)) return prev.filter((x) => x !== id);
+      if (prev.length >= 3) return prev;
+      return [...prev, id];
+    });
   };
 
   const handlePhotoClick = (entrepreneurId: number) => {
@@ -135,38 +184,55 @@ const HistoryPage: React.FC = () => {
     photoInputRef.current?.click();
   };
 
-  const handlePhotoChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handlePhotoFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     const targetId = photoUploadTargetId.current;
-    if (!file || !targetId || !club) return;
-    setTeamPhotoUploading(targetId);
+    if (!file || !targetId) return;
+    const reader = new FileReader();
+    reader.onload = () => {
+      setCropState({
+        imageSrc: reader.result as string,
+        entrepreneurId: targetId,
+        crop: { x: 0, y: 0 },
+        zoom: 1,
+        croppedAreaPixels: null,
+      });
+    };
+    reader.readAsDataURL(file);
+    e.target.value = '';
+  };
+
+  const handleCropConfirm = async () => {
+    if (!cropState || !cropState.croppedAreaPixels || !club) return;
+    setUploading(true);
     try {
+      const blob = await getCroppedBlob(cropState.imageSrc, cropState.croppedAreaPixels);
+      const file = new File([blob], 'team-photo.jpg', { type: 'image/jpeg' });
       const formData = new FormData();
       formData.append('image', file);
       formData.append('idClub', String(club.id));
       formData.append('contentType', 'Imagen');
-      formData.append('description', `team-${targetId}`);
-      const existingImage = club.historyImageRaw?.find((img: any) => img.description === `team-${targetId}`);
+      formData.append('description', `team-${cropState.entrepreneurId}`);
+      const existingImage = (club.historyImageRaw as any[])?.find((img) => img.description === `team-${cropState.entrepreneurId}`);
       if (existingImage) {
         await api.delete(`/image-club/${existingImage.id}`);
       }
-      const response = await api.post('/image-club', formData, {
-        headers: { 'Content-Type': 'multipart/form-data' },
-      });
+      const response = await api.post('/image-club', formData, { headers: { 'Content-Type': 'multipart/form-data' } });
       const newImage = getResponseData(response);
       setClub((prev) => {
         if (!prev) return prev;
-        const filtered = (prev.historyImageRaw || []).filter((img: any) => img.description !== `team-${targetId}`);
+        const filtered = ((prev.historyImageRaw as any[]) || []).filter((img) => img.description !== `team-${cropState.entrepreneurId}`);
         return {
           ...prev,
-          historyImageRaw: [...filtered, { id: newImage.id, imageUrl: newImage.imageUrl, description: `team-${targetId}` }],
+          historyImageRaw: [...filtered, { id: newImage.id, imageUrl: newImage.imageUrl, description: `team-${cropState.entrepreneurId}` }],
         };
       });
+      setCropState(null);
+      showToast('Foto actualizada');
     } catch {
-      alert('Error al subir la foto');
+      showToast('Error al subir la foto', 'error');
     } finally {
-      setTeamPhotoUploading(null);
-      e.target.value = '';
+      setUploading(false);
     }
   };
 
@@ -183,11 +249,8 @@ const HistoryPage: React.FC = () => {
     return (
       <div className="container mx-auto px-4 py-8 text-center">
         <h1 className="text-4xl font-bold text-red-600 mb-4">Club no encontrado</h1>
-        <p className="text-lg text-gray-700 mb-8">El club que buscas no existe o fue eliminado.</p>
-        <button
-          onClick={() => navigate(-1)}
-          className="bg-blue-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-700 transition-colors duration-200"
-        >
+        <p className="text-lg text-gray-700 mb-8">El club que buscás no existe o fue eliminado.</p>
+        <button onClick={() => navigate(-1)} className="bg-blue-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-700 transition-colors duration-200">
           Volver
         </button>
       </div>
@@ -216,10 +279,87 @@ const HistoryPage: React.FC = () => {
 
   const communityTextToDisplay = club.communityText || 'Más allá de las cajas, somos una familia de entusiastas. Conéctate con nosotros y otros suscriptores en nuestras redes sociales.';
 
-  const entrepreneurs = club.entrepreneurs || [];
+  const allEntrepreneurs = club.entrepreneurs || [];
+  const displayedEntrepreneurs = allEntrepreneurs.filter((e) => selectedEntrepreneurIds.includes(e.id));
+
+  const teamGridClass =
+    displayedEntrepreneurs.length === 1
+      ? 'flex justify-center'
+      : displayedEntrepreneurs.length === 2
+        ? 'flex justify-center gap-8'
+        : 'grid grid-cols-1 md:grid-cols-3 gap-8';
+
+  const reviews = (club as any).featuredReviews || [];
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-blue-100">
+      {toast && (
+        <div className={`fixed top-20 right-4 z-50 px-5 py-3 rounded-lg shadow-lg text-white text-sm font-medium ${toast.type === 'success' ? 'bg-green-500' : 'bg-red-500'}`}>
+          {toast.msg}
+        </div>
+      )}
+
+      {cropState && (
+        <div className="fixed inset-0 z-50 bg-black/80 flex flex-col items-center justify-center p-4">
+          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-2xl overflow-hidden">
+            <div className="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
+              <div>
+                <h3 className="text-lg font-semibold text-gray-900">Ajustar foto del equipo</h3>
+                <p className="text-sm text-gray-500 mt-0.5">Mové y hacé zoom para encuadrar la imagen</p>
+              </div>
+              <button onClick={() => setCropState(null)} className="text-gray-400 hover:text-gray-600 transition-colors">
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+            <div className="relative bg-gray-900" style={{ height: '320px' }}>
+              <Cropper
+                image={cropState.imageSrc}
+                crop={cropState.crop}
+                zoom={cropState.zoom}
+                aspect={1}
+                cropShape="round"
+                showGrid={false}
+                onCropChange={(crop) => setCropState((prev) => prev ? { ...prev, crop } : null)}
+                onZoomChange={(zoom) => setCropState((prev) => prev ? { ...prev, zoom } : null)}
+                onCropComplete={(_, croppedAreaPixels) => setCropState((prev) => prev ? { ...prev, croppedAreaPixels } : null)}
+              />
+            </div>
+            <div className="px-6 py-4 bg-gray-50">
+              <div className="flex items-center gap-3 mb-4">
+                <svg className="w-4 h-4 text-gray-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7" />
+                </svg>
+                <input
+                  type="range"
+                  min={1}
+                  max={3}
+                  step={0.01}
+                  value={cropState.zoom}
+                  onChange={(e) => setCropState((prev) => prev ? { ...prev, zoom: Number(e.target.value) } : null)}
+                  className="flex-1 accent-blue-600"
+                />
+              </div>
+              <div className="flex gap-3">
+                <button onClick={() => setCropState(null)} className="flex-1 px-4 py-2.5 rounded-xl border border-gray-200 text-gray-700 text-sm font-medium hover:bg-gray-100 transition-colors">
+                  Cancelar
+                </button>
+                <button
+                  onClick={handleCropConfirm}
+                  disabled={uploading}
+                  className="flex-1 px-4 py-2.5 rounded-xl bg-blue-600 text-white text-sm font-semibold hover:bg-blue-700 disabled:opacity-50 transition-colors"
+                >
+                  {uploading ? 'Guardando...' : 'Guardar imagen'}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      <input type="file" accept="image/*" ref={photoInputRef} className="hidden" onChange={handlePhotoFileSelect} />
+
       <div className="relative h-80 md:h-96 overflow-hidden shadow-xl">
         <img
           src={club.logoUrl || '/assets/default-history-banner.jpg'}
@@ -237,11 +377,7 @@ const HistoryPage: React.FC = () => {
         <AnimatedSection delay="0.2s">
           <div className="flex flex-col md:flex-row items-center justify-center md:justify-start space-y-6 md:space-y-0 md:space-x-8 mb-16 p-8 bg-white rounded-3xl shadow-2xl border border-blue-200 transform hover:scale-[1.01] transition-transform duration-300">
             {club.logoUrl && (
-              <img
-                src={club.logoUrl}
-                alt={`${club.name} logo`}
-                className="w-32 h-32 md:w-40 md:h-40 rounded-full border-4 border-blue-600 shadow-xl object-cover"
-              />
+              <img src={club.logoUrl} alt={`${club.name} logo`} className="w-32 h-32 md:w-40 md:h-40 rounded-full border-4 border-blue-600 shadow-xl object-cover" />
             )}
             <div className="text-center md:text-left">
               <h2 className="text-4xl font-bold text-gray-900 mb-2">{club.name}</h2>
@@ -272,17 +408,10 @@ const HistoryPage: React.FC = () => {
                   onChange={(e) => setTempHistory(e.target.value)}
                 />
                 <div className="flex justify-end gap-3 mt-3">
-                  <button
-                    onClick={() => setIsEditingOrigins(false)}
-                    className="px-5 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-100 transition-colors duration-200"
-                  >
+                  <button onClick={() => setIsEditingOrigins(false)} className="px-5 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-100 transition-colors duration-200">
                     Cancelar
                   </button>
-                  <button
-                    onClick={handleSaveOrigins}
-                    disabled={savingOrigins}
-                    className="px-5 py-2 bg-green-600 text-white rounded-lg font-semibold hover:bg-green-700 transition-colors duration-200 disabled:opacity-60"
-                  >
+                  <button onClick={handleSaveOrigins} disabled={savingOrigins} className="px-5 py-2 bg-green-600 text-white rounded-lg font-semibold hover:bg-green-700 transition-colors duration-200 disabled:opacity-60">
                     {savingOrigins ? 'Guardando...' : 'Guardar'}
                   </button>
                 </div>
@@ -344,32 +473,19 @@ const HistoryPage: React.FC = () => {
                         placeholder="Descripción"
                       />
                     </div>
-                    <button
-                      onClick={() => handleRemoveMilestone(index)}
-                      className="self-start text-red-500 hover:text-red-700 text-xl font-bold px-2"
-                    >
+                    <button onClick={() => handleRemoveMilestone(index)} className="self-start text-red-500 hover:text-red-700 text-xl font-bold px-2">
                       ×
                     </button>
                   </div>
                 ))}
-                <button
-                  onClick={handleAddMilestone}
-                  className="mb-4 px-4 py-2 border border-orange-400 text-orange-700 rounded-lg hover:bg-orange-50 transition-colors duration-200 text-sm font-semibold"
-                >
+                <button onClick={handleAddMilestone} className="mb-4 px-4 py-2 border border-orange-400 text-orange-700 rounded-lg hover:bg-orange-50 transition-colors duration-200 text-sm font-semibold">
                   + Agregar hito
                 </button>
                 <div className="flex justify-end gap-3 mt-2">
-                  <button
-                    onClick={() => setIsEditingMilestones(false)}
-                    className="px-5 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-100 transition-colors duration-200"
-                  >
+                  <button onClick={() => setIsEditingMilestones(false)} className="px-5 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-100 transition-colors duration-200">
                     Cancelar
                   </button>
-                  <button
-                    onClick={handleSaveMilestones}
-                    disabled={savingMilestones}
-                    className="px-5 py-2 bg-green-600 text-white rounded-lg font-semibold hover:bg-green-700 transition-colors duration-200 disabled:opacity-60"
-                  >
+                  <button onClick={handleSaveMilestones} disabled={savingMilestones} className="px-5 py-2 bg-green-600 text-white rounded-lg font-semibold hover:bg-green-700 transition-colors duration-200 disabled:opacity-60">
                     {savingMilestones ? 'Guardando...' : 'Guardar'}
                   </button>
                 </div>
@@ -401,9 +517,7 @@ const HistoryPage: React.FC = () => {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
               <div className="bg-blue-50 p-6 rounded-lg shadow-md border border-blue-200">
                 <h4 className="text-xl font-semibold mb-2 text-blue-700">Rating Promedio</h4>
-                <p className="text-3xl font-extrabold text-blue-600">
-                  {club.averageRating ? `${club.averageRating} / 5` : 'Sin reseñas aún'}
-                </p>
+                <p className="text-3xl font-extrabold text-blue-600">{club.averageRating ? `${club.averageRating} / 5` : 'Sin reseñas aún'}</p>
               </div>
               <div className="bg-blue-50 p-6 rounded-lg shadow-md border border-blue-200">
                 <h4 className="text-xl font-semibold mb-2 text-blue-700">Total de Reseñas</h4>
@@ -417,20 +531,35 @@ const HistoryPage: React.FC = () => {
           </section>
         </AnimatedSection>
 
-        {entrepreneurs.length > 0 && (
+        {allEntrepreneurs.length > 0 && (
           <AnimatedSection delay="1.2s">
             <section className="mb-20 p-8 bg-white rounded-3xl shadow-2xl border border-red-200">
               <h3 className="text-3xl font-bold text-red-800 mb-10">Conoce a Nuestro Equipo</h3>
-              <input
-                type="file"
-                accept="image/*"
-                ref={photoInputRef}
-                className="hidden"
-                onChange={handlePhotoChange}
-              />
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                {entrepreneurs.map((member) => (
-                  <div key={member.id} className="flex flex-col items-center text-center bg-red-50 p-6 rounded-lg shadow-md border border-red-200">
+
+              {isOwner && allEntrepreneurs.length > 1 && (
+                <div className="mb-8 p-4 bg-red-50 rounded-xl border border-red-100">
+                  <p className="text-sm font-semibold text-red-700 mb-3">Seleccioná quiénes aparecen en esta sección (máximo 3):</p>
+                  <div className="flex flex-wrap gap-2">
+                    {allEntrepreneurs.map((e) => (
+                      <button
+                        key={e.id}
+                        onClick={() => toggleEntrepreneur(e.id)}
+                        className={`px-4 py-2 rounded-full text-sm font-semibold border transition-colors duration-200 ${
+                          selectedEntrepreneurIds.includes(e.id)
+                            ? 'bg-red-600 text-white border-red-600'
+                            : 'bg-white text-red-700 border-red-300 hover:bg-red-50'
+                        }`}
+                      >
+                        {e.firstName} {e.lastName}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              <div className={teamGridClass}>
+                {displayedEntrepreneurs.map((member) => (
+                  <div key={member.id} className={`flex flex-col items-center text-center bg-red-50 p-6 rounded-lg shadow-md border border-red-200 ${displayedEntrepreneurs.length < 3 ? 'w-full max-w-xs' : ''}`}>
                     <div className="relative mb-4">
                       <img
                         src={getTeamPhoto(member.id)}
@@ -440,17 +569,12 @@ const HistoryPage: React.FC = () => {
                       {isOwner && (
                         <button
                           onClick={() => handlePhotoClick(member.id)}
-                          disabled={teamPhotoUploading === member.id}
-                          className="absolute bottom-0 right-0 bg-blue-600 text-white rounded-full w-8 h-8 flex items-center justify-center shadow-md hover:bg-blue-700 transition-colors duration-200 disabled:opacity-60"
+                          className="absolute bottom-0 right-0 bg-blue-600 text-white rounded-full w-8 h-8 flex items-center justify-center shadow-md hover:bg-blue-700 transition-colors duration-200"
                         >
-                          {teamPhotoUploading === member.id ? (
-                            <span className="text-xs">...</span>
-                          ) : (
-                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
-                            </svg>
-                          )}
+                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
+                          </svg>
                         </button>
                       )}
                     </div>
@@ -465,10 +589,7 @@ const HistoryPage: React.FC = () => {
                           placeholder="Escribí una bio..."
                         />
                         <div className="flex justify-center gap-2 mt-2">
-                          <button
-                            onClick={() => setEditingBioId(null)}
-                            className="px-3 py-1 border border-gray-300 rounded-lg text-gray-600 text-sm hover:bg-gray-100 transition-colors duration-200"
-                          >
+                          <button onClick={() => setEditingBioId(null)} className="px-3 py-1 border border-gray-300 rounded-lg text-gray-600 text-sm hover:bg-gray-100 transition-colors duration-200">
                             Cancelar
                           </button>
                           <button
@@ -482,9 +603,11 @@ const HistoryPage: React.FC = () => {
                       </div>
                     ) : (
                       <div className="w-full">
-                        <p className="text-gray-700 text-sm leading-relaxed">
-                          {member.bio || <span className="italic text-gray-400">Sin bio aún.</span>}
-                        </p>
+                        {member.bio ? (
+                          <p className="text-gray-700 text-sm leading-relaxed">{member.bio}</p>
+                        ) : (
+                          <p className="italic text-gray-400 text-sm">Sin bio aún.</p>
+                        )}
                         {isOwner && (
                           <button
                             onClick={() => { setEditingBioId(member.id); setTempBio(member.bio || ''); }}
@@ -523,45 +646,58 @@ const HistoryPage: React.FC = () => {
                   onChange={(e) => setTempCommunityText(e.target.value)}
                 />
                 <div className="flex justify-end gap-3 mt-3">
-                  <button
-                    onClick={() => setIsEditingCommunity(false)}
-                    className="px-5 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-100 transition-colors duration-200"
-                  >
+                  <button onClick={() => setIsEditingCommunity(false)} className="px-5 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-100 transition-colors duration-200">
                     Cancelar
                   </button>
-                  <button
-                    onClick={handleSaveCommunity}
-                    disabled={savingCommunity}
-                    className="px-5 py-2 bg-green-600 text-white rounded-lg font-semibold hover:bg-green-700 transition-colors duration-200 disabled:opacity-60"
-                  >
+                  <button onClick={handleSaveCommunity} disabled={savingCommunity} className="px-5 py-2 bg-green-600 text-white rounded-lg font-semibold hover:bg-green-700 transition-colors duration-200 disabled:opacity-60">
                     {savingCommunity ? 'Guardando...' : 'Guardar'}
                   </button>
                 </div>
               </div>
             ) : (
               <>
-                <p className="text-center text-gray-700 max-w-3xl mx-auto mb-8 text-lg">
-                  {communityTextToDisplay}
-                </p>
+                <p className="text-center text-gray-700 max-w-3xl mx-auto mb-8 text-lg">{communityTextToDisplay}</p>
                 {club.socialMedia && <ClubSocialMedia socialMedia={club.socialMedia} />}
               </>
             )}
           </section>
         </AnimatedSection>
 
+        {reviews.length > 0 && (
+          <AnimatedSection delay="1.5s">
+            <section className="mb-20 p-8 bg-white rounded-3xl shadow-2xl border border-yellow-200">
+              <h3 className="text-3xl font-bold text-yellow-800 mb-10">Lo que dicen nuestros suscriptores</h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {reviews.map((review: any, idx: number) => (
+                  <div key={review.id || idx} className="bg-yellow-50 p-6 rounded-xl shadow-md border border-yellow-200 flex flex-col gap-3">
+                    <div className="flex items-center gap-1">
+                      {Array.from({ length: 5 }).map((_, i) => (
+                        <svg key={i} className={`w-5 h-5 ${i < review.rating ? 'text-yellow-400' : 'text-gray-200'}`} fill="currentColor" viewBox="0 0 20 20">
+                          <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                        </svg>
+                      ))}
+                    </div>
+                    {review.title && <h4 className="font-bold text-gray-800 text-base">{review.title}</h4>}
+                    {review.comment && <p className="text-gray-600 text-sm leading-relaxed">{review.comment}</p>}
+                    <p className="text-xs text-gray-400 mt-auto">{review.userName || 'Usuario'}</p>
+                  </div>
+                ))}
+              </div>
+            </section>
+          </AnimatedSection>
+        )}
+
         <AnimatedSection delay="1.6s">
           <div className="text-center py-20 bg-gradient-to-r from-blue-600 to-purple-700 text-white rounded-3xl shadow-2xl">
-            <h2 className="text-4xl md:text-5xl font-extrabold mb-6">
-              ¿Listo para ser parte de nuestra historia?
-            </h2>
+            <h2 className="text-4xl md:text-5xl font-extrabold mb-6">¿Listo para ser parte de nuestra historia?</h2>
             <p className="text-xl md:text-2xl mb-10 max-w-4xl mx-auto">
-              Descubre nuestros planes de suscripción y comienza tu propia aventura con {club.name}.
+              Descubrí nuestros planes de suscripción y comenzá tu propia aventura con {club.name}.
             </p>
             <Link
               to={`/club/${club.id}`}
               className="inline-block bg-white text-blue-600 px-12 py-5 rounded-full font-bold text-xl hover:bg-blue-100 transition-all duration-300 shadow-lg"
             >
-              ¡Suscríbete Ahora!
+              ¡Suscribite Ahora!
             </Link>
           </div>
         </AnimatedSection>

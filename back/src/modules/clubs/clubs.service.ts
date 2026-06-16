@@ -150,7 +150,7 @@ export class ClubsService {
     }, {});
 
     const bannerImages = images
-      .filter((img) => img.contentType === 'Imagen' && img.description !== 'historia')
+      .filter((img) => img.contentType === 'Imagen' && img.description !== 'historia' && !img.description?.startsWith('team-'))
       .map((img) => img.imageUrl);
 
     const socialNetworksRaw = socialNetworks.map((sn) => ({
@@ -199,12 +199,12 @@ export class ClubsService {
       category: categories.map((c) => c.name).join(', ') || 'Sin categoría',
       bannerImages,
       bannerImagesRaw: images
-        .filter((img) => img.contentType === 'Imagen' && img.description !== 'historia')
+        .filter((img) => img.contentType === 'Imagen' && img.description !== 'historia' && !img.description?.startsWith('team-'))
         .map((img) => ({ id: img.id, imageUrl: img.imageUrl, description: img.description })),
       historyImageRaw: images
-        .filter((img) => img.description === 'historia')
-        .map((img) => ({ id: img.id, imageUrl: img.imageUrl })),
-      mainImage: images.find((img) => img.contentType === 'Imagen' && img.description !== 'historia')?.imageUrl || null,
+        .filter((img) => img.description === 'historia' || img.description?.startsWith('team-'))
+        .map((img) => ({ id: img.id, imageUrl: img.imageUrl, description: img.description })),
+      mainImage: images.find((img) => img.contentType === 'Imagen' && img.description !== 'historia' && !img.description?.startsWith('team-'))?.imageUrl || null,
       socialMedia: Object.keys(socialMedia).length ? socialMedia : null,
       socialNetworksRaw,
       subscriptionPlans: mappedPlans,
