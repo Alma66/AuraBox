@@ -35,6 +35,7 @@ interface ClubData extends Club {
   isOwner?: boolean;
   socialNetworksRaw?: SocialNetworkRaw[];
   bannerImagesRaw?: { id: number; imageUrl: string; description?: string }[];
+  historyImageRaw?: { id: number; imageUrl: string }[];
   logoUrl?: string;
   logoImage?: string;
 }
@@ -86,10 +87,14 @@ async function getCroppedBlob(imageSrc: string, croppedAreaPixels: any): Promise
         croppedAreaPixels.width,
         croppedAreaPixels.height,
       );
-      canvas.toBlob((blob) => {
-        if (blob) resolve(blob);
-        else reject(new Error('Canvas is empty'));
-      }, 'image/jpeg', 0.95);
+      canvas.toBlob(
+        (blob) => {
+          if (blob) resolve(blob);
+          else reject(new Error('Canvas is empty'));
+        },
+        'image/jpeg',
+        0.95,
+      );
     };
     image.onerror = reject;
   });
@@ -291,7 +296,7 @@ const ClubDetailPage: React.FC = () => {
 
   const logoSrc = club.logoUrl || club.logoImage || null;
   const bannerList = club.bannerImages && club.bannerImages.length > 0 ? club.bannerImages : [];
-  const historyImage = club.bannerImagesRaw?.find((img) => img.description === 'historia')?.imageUrl || null;
+  const historyImage = club.historyImageRaw?.[0]?.imageUrl || null;
   const socialMediaForDisplay: SocialMediaLinks = (socialNetworks || []).reduce(
     (acc, sn) => ({ ...acc, [sn.networkType.toLowerCase()]: sn.profileUrl }),
     {} as SocialMediaLinks,
@@ -330,9 +335,9 @@ const ClubDetailPage: React.FC = () => {
                 aspect={ASPECT_RATIOS[cropState.target]}
                 cropShape={cropState.target === 'logo' ? 'round' : 'rect'}
                 showGrid={cropState.target !== 'logo'}
-                onCropChange={(crop) => setCropState((prev) => prev ? { ...prev, crop } : null)}
-                onZoomChange={(zoom) => setCropState((prev) => prev ? { ...prev, zoom } : null)}
-                onCropComplete={(_, croppedAreaPixels) => setCropState((prev) => prev ? { ...prev, croppedAreaPixels } : null)}
+                onCropChange={(crop) => setCropState((prev) => (prev ? { ...prev, crop } : null))}
+                onZoomChange={(zoom) => setCropState((prev) => (prev ? { ...prev, zoom } : null))}
+                onCropComplete={(_, croppedAreaPixels) => setCropState((prev) => (prev ? { ...prev, croppedAreaPixels } : null))}
               />
             </div>
 
@@ -347,7 +352,7 @@ const ClubDetailPage: React.FC = () => {
                   max={3}
                   step={0.01}
                   value={cropState.zoom}
-                  onChange={(e) => setCropState((prev) => prev ? { ...prev, zoom: Number(e.target.value) } : null)}
+                  onChange={(e) => setCropState((prev) => (prev ? { ...prev, zoom: Number(e.target.value) } : null))}
                   className="flex-1 accent-blue-600"
                 />
               </div>
@@ -546,11 +551,7 @@ const ClubDetailPage: React.FC = () => {
                     </button>
                   </div>
                   {historyImage ? (
-                    <img
-                      src={historyImage}
-                      alt="Historia"
-                      className="w-full h-44 object-cover rounded-xl border border-gray-100 shadow-sm"
-                    />
+                    <img src={historyImage} alt="Historia" className="w-full h-44 object-cover rounded-xl border border-gray-100 shadow-sm" />
                   ) : (
                     <div className="w-full h-44 rounded-xl border-2 border-dashed border-gray-200 bg-gray-50 flex flex-col items-center justify-center gap-2">
                       <svg className="w-8 h-8 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -585,9 +586,7 @@ const ClubDetailPage: React.FC = () => {
           </div>
 
           <div className="border-t border-gray-100 pt-6">
-            <div className="flex items-center gap-2 mb-4">
-              <h3 className="text-sm font-semibold text-gray-700 uppercase tracking-wider">Redes Sociales</h3>
-            </div>
+            <h3 className="text-sm font-semibold text-gray-700 uppercase tracking-wider mb-4">Redes Sociales</h3>
 
             {!isOwner && <ClubSocialMedia socialMedia={socialMediaForDisplay} />}
 

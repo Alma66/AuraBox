@@ -135,9 +135,9 @@ export class ClubsService {
       return acc;
     }, {});
 
-   const bannerImages = images
-  .filter((img) => img.contentType === 'Imagen' && img.description !== 'historia')
-  .map((img) => img.imageUrl);
+    const bannerImages = images
+      .filter((img) => img.contentType === 'Imagen' && img.description !== 'historia')
+      .map((img) => img.imageUrl);
 
     const socialNetworksRaw = socialNetworks.map((sn) => ({
       id: sn.id,
@@ -177,9 +177,13 @@ export class ClubsService {
       category: categories.map((c) => c.name).join(', ') || 'Sin categoría',
       bannerImages,
       bannerImagesRaw: images
-  .filter((img) => img.contentType === 'Imagen' && img.description !== 'historia')
-  .map((img) => ({ id: img.id, imageUrl: img.imageUrl, description: img.description })),
-      mainImage: images.find((img) => img.contentType === 'Imagen' && img.description !== 'historia')?.imageUrl || null,      socialMedia: Object.keys(socialMedia).length ? socialMedia : null,
+        .filter((img) => img.contentType === 'Imagen' && img.description !== 'historia')
+        .map((img) => ({ id: img.id, imageUrl: img.imageUrl, description: img.description })),
+      historyImageRaw: images
+        .filter((img) => img.description === 'historia')
+        .map((img) => ({ id: img.id, imageUrl: img.imageUrl })),
+      mainImage: images.find((img) => img.contentType === 'Imagen' && img.description !== 'historia')?.imageUrl || null,
+      socialMedia: Object.keys(socialMedia).length ? socialMedia : null,
       socialNetworksRaw,
       subscriptionPlans: mappedPlans,
       paymentMethods: paymentMethods.map((pm) => pm.method),
@@ -223,32 +227,31 @@ export class ClubsService {
   }
 
   async updateLogo(id: number, userId: number, userRole: string, logoFile: Express.Multer.File) {
-  if (!logoFile) throw new BadRequestException('Se requiere una imagen para el logo');
+    if (!logoFile) throw new BadRequestException('Se requiere una imagen para el logo');
 
-  const club = await this.prisma.club.findUnique({ where: { id } });
-  if (!club) throw new NotFoundException('Club no encontrado');
+    const club = await this.prisma.club.findUnique({ where: { id } });
+    if (!club) throw new NotFoundException('Club no encontrado');
 
-  if (userRole === 'entrepreneur') {
-    const association = await this.prisma.entrepreneur_Club.findFirst({
-      where: { idEntrepreneurs: userId, idClub: id },
-    });
-    if (!association) throw new ForbiddenException('No eres el owner de este club');
-  } else if (userRole !== 'admin') {
-    throw new ForbiddenException('No autorizado para editar clubes');
-  }
-
-  if (club.logoUrl) {
-    try {
-      const publicId = this.cloudinary.extractPublicId(club.logoUrl);
-      await this.cloudinary.deleteImage(publicId);
-    } catch {
+    if (userRole === 'entrepreneur') {
+      const association = await this.prisma.entrepreneur_Club.findFirst({
+        where: { idEntrepreneurs: userId, idClub: id },
+      });
+      if (!association) throw new ForbiddenException('No eres el owner de este club');
+    } else if (userRole !== 'admin') {
+      throw new ForbiddenException('No autorizado para editar clubes');
     }
-  }
 
-  const logoUrl = await this.cloudinary.uploadImage(logoFile, 'aurabox/clubs/logos');
-  const updated = await this.prisma.club.update({ where: { id }, data: { logoUrl } });
-  return sanitizeClub(updated);
-}
+    if (club.logoUrl) {
+      try {
+        const publicId = this.cloudinary.extractPublicId(club.logoUrl);
+        await this.cloudinary.deleteImage(publicId);
+      } catch {}
+    }
+
+    const logoUrl = await this.cloudinary.uploadImage(logoFile, 'aurabox/clubs/logos');
+    const updated = await this.prisma.club.update({ where: { id }, data: { logoUrl } });
+    return sanitizeClub(updated);
+  }
 
   async remove(id: number, userRole: string) {
     if (userRole !== 'admin') throw new ForbiddenException('Solo los administradores pueden eliminar clubes');
