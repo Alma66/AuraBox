@@ -135,7 +135,9 @@ export class ClubsService {
       return acc;
     }, {});
 
-    const bannerImages = images.filter((img) => img.contentType === 'Imagen').map((img) => img.imageUrl);
+    const bannerImages = images
+  .filter((img) => img.contentType === 'Imagen' && img.description !== 'historia')
+  .map((img) => img.imageUrl);
 
     const socialNetworksRaw = socialNetworks.map((sn) => ({
       id: sn.id,
