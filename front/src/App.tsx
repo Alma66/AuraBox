@@ -173,7 +173,7 @@ const AppContent: React.FC = () => {
           <Route path="/contact" element={<ContactPage />} />
           <Route path="/logout" element={<Logout />} />
 
-          <Route path="/club/:clubId" element={<ClubDetailPage userRole={userRole} />} />
+          <Route path="/club/:clubId" element={<ClubDetailPage />} />
           <Route path="/club/:clubId/history" element={<HistoryPage />} />
           <Route path="/club/:clubId/terms-and-conditions" element={<TermsAndConditionsPage />} />
           <Route path="/club/:clubId/privacy-and-security" element={<PrivacyAndSecurityPolicyPage />} />

@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import Slider from 'react-slick';
+import Cropper from 'react-easy-crop';
 import api, { getResponseData } from '../../../api/config';
 import { useAuth } from '../../../App';
 import { Club } from '../../../types/club';
@@ -33,9 +34,19 @@ interface SocialNetworkRaw {
 interface ClubData extends Club {
   isOwner?: boolean;
   socialNetworksRaw?: SocialNetworkRaw[];
-  bannerImagesRaw?: { id: number; imageUrl: string }[];
+  bannerImagesRaw?: { id: number; imageUrl: string; description?: string }[];
   logoUrl?: string;
   logoImage?: string;
+}
+
+type CropTarget = 'logo' | 'banner' | 'history';
+
+interface CropState {
+  target: CropTarget;
+  imageSrc: string;
+  crop: { x: number; y: number };
+  zoom: number;
+  croppedAreaPixels: any;
 }
 
 const NETWORK_TYPES = [
@@ -49,6 +60,41 @@ const NETWORK_TYPES = [
   { key: 'website', label: 'Sitio Web' },
 ];
 
+const ASPECT_RATIOS: Record<CropTarget, number> = {
+  logo: 1,
+  banner: 16 / 5,
+  history: 16 / 9,
+};
+
+async function getCroppedBlob(imageSrc: string, croppedAreaPixels: any): Promise<Blob> {
+  return new Promise((resolve, reject) => {
+    const image = new Image();
+    image.src = imageSrc;
+    image.onload = () => {
+      const canvas = document.createElement('canvas');
+      canvas.width = croppedAreaPixels.width;
+      canvas.height = croppedAreaPixels.height;
+      const ctx = canvas.getContext('2d')!;
+      ctx.drawImage(
+        image,
+        croppedAreaPixels.x,
+        croppedAreaPixels.y,
+        croppedAreaPixels.width,
+        croppedAreaPixels.height,
+        0,
+        0,
+        croppedAreaPixels.width,
+        croppedAreaPixels.height,
+      );
+      canvas.toBlob((blob) => {
+        if (blob) resolve(blob);
+        else reject(new Error('Canvas is empty'));
+      }, 'image/jpeg', 0.95);
+    };
+    image.onerror = reject;
+  });
+}
+
 const ClubDetailPage: React.FC = () => {
   const { clubId } = useParams<{ clubId: string }>();
   const navigate = useNavigate();
@@ -58,29 +104,18 @@ const ClubDetailPage: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
-  const [editingField, setEditingField] = useState<string | null>(null);
-  const [editName, setEditName] = useState('');
-  const [editSlogan, setEditSlogan] = useState('');
+  const [editingDescription, setEditingDescription] = useState(false);
   const [editDescription, setEditDescription] = useState('');
+  const [saving, setSaving] = useState(false);
 
-  const [logoFile, setLogoFile] = useState<File | null>(null);
-  const [logoPreview, setLogoPreview] = useState<string | null>(null);
-  const [logoUploading, setLogoUploading] = useState(false);
-
-  const [bannerFile, setBannerFile] = useState<File | null>(null);
-  const [bannerPreview, setBannerPreview] = useState<string | null>(null);
-  const [bannerUploading, setBannerUploading] = useState(false);
-
-  const [historyImageFile, setHistoryImageFile] = useState<File | null>(null);
-  const [historyImagePreview, setHistoryImagePreview] = useState<string | null>(null);
-  const [historyImageUploading, setHistoryImageUploading] = useState(false);
+  const [cropState, setCropState] = useState<CropState | null>(null);
+  const [uploading, setUploading] = useState(false);
 
   const [socialNetworks, setSocialNetworks] = useState<SocialNetworkRaw[]>([]);
   const [newSocialType, setNewSocialType] = useState('instagram');
   const [newSocialUrl, setNewSocialUrl] = useState('');
   const [socialSaving, setSocialSaving] = useState(false);
 
-  const [saving, setSaving] = useState(false);
   const [toast, setToast] = useState<{ msg: string; type: 'success' | 'error' } | null>(null);
 
   const logoInputRef = useRef<HTMLInputElement>(null);
@@ -100,8 +135,6 @@ const ClubDetailPage: React.FC = () => {
       const response = await api.get(`/clubs/${clubId}`);
       const data: ClubData = getResponseData(response);
       setClub(data);
-      setEditName(data.name || '');
-      setEditSlogan(data.slogan || '');
       setEditDescription(data.shortDescription || '');
       setSocialNetworks(data.socialNetworksRaw || []);
     } catch {
@@ -115,59 +148,81 @@ const ClubDetailPage: React.FC = () => {
     if (clubId) fetchClub();
   }, [clubId, fetchClub]);
 
-  const handleLogoFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    setLogoFile(file);
-    setLogoPreview(URL.createObjectURL(file));
+  const openCropper = (target: CropTarget, file: File) => {
+    const reader = new FileReader();
+    reader.onload = () => {
+      setCropState({
+        target,
+        imageSrc: reader.result as string,
+        crop: { x: 0, y: 0 },
+        zoom: 1,
+        croppedAreaPixels: null,
+      });
+    };
+    reader.readAsDataURL(file);
   };
 
-  const handleLogoUpload = async () => {
-    if (!logoFile || !clubId) return;
-    setLogoUploading(true);
+  const handleFileSelect = (target: CropTarget) => (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    openCropper(target, file);
+    e.target.value = '';
+  };
+
+  const handleCropConfirm = async () => {
+    if (!cropState || !cropState.croppedAreaPixels || !clubId) return;
+    setUploading(true);
     try {
+      const blob = await getCroppedBlob(cropState.imageSrc, cropState.croppedAreaPixels);
+      const file = new File([blob], 'image.jpg', { type: 'image/jpeg' });
       const formData = new FormData();
-      formData.append('logo', logoFile);
-      await api.patch(`/clubs/${clubId}/logo`, formData, {
-        headers: { 'Content-Type': 'multipart/form-data' },
-      });
-      showToast('Logo actualizado correctamente');
-      setLogoFile(null);
-      setLogoPreview(null);
+
+      if (cropState.target === 'logo') {
+        formData.append('logo', file);
+        await api.patch(`/clubs/${clubId}/logo`, formData, {
+          headers: { 'Content-Type': 'multipart/form-data' },
+        });
+        showToast('Logo actualizado correctamente');
+      } else if (cropState.target === 'banner') {
+        formData.append('image', file);
+        formData.append('idClub', clubId);
+        formData.append('contentType', 'Imagen');
+        await api.post(`/image-club`, formData, {
+          headers: { 'Content-Type': 'multipart/form-data' },
+        });
+        showToast('Banner agregado correctamente');
+      } else if (cropState.target === 'history') {
+        formData.append('image', file);
+        formData.append('idClub', clubId);
+        formData.append('contentType', 'Imagen');
+        formData.append('description', 'historia');
+        await api.post(`/image-club`, formData, {
+          headers: { 'Content-Type': 'multipart/form-data' },
+        });
+        showToast('Imagen de historia actualizada');
+      }
+
+      setCropState(null);
       fetchClub();
     } catch {
-      showToast('Error al subir el logo', 'error');
+      showToast('Error al subir la imagen', 'error');
     } finally {
-      setLogoUploading(false);
+      setUploading(false);
     }
   };
 
-  const handleBannerFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    setBannerFile(file);
-    setBannerPreview(URL.createObjectURL(file));
-  };
-
-  const handleBannerUpload = async () => {
-    if (!bannerFile || !clubId) return;
-    setBannerUploading(true);
+  const handleSaveDescription = async () => {
+    if (!clubId) return;
+    setSaving(true);
     try {
-      const formData = new FormData();
-      formData.append('image', bannerFile);
-      formData.append('idClub', clubId);
-      formData.append('contentType', 'Imagen');
-      await api.post(`/image-club`, formData, {
-        headers: { 'Content-Type': 'multipart/form-data' },
-      });
-      showToast('Banner agregado correctamente');
-      setBannerFile(null);
-      setBannerPreview(null);
+      await api.put(`/clubs/${clubId}`, { shortDescription: editDescription });
+      showToast('Descripción guardada');
+      setEditingDescription(false);
       fetchClub();
     } catch {
-      showToast('Error al subir el banner', 'error');
+      showToast('Error al guardar', 'error');
     } finally {
-      setBannerUploading(false);
+      setSaving(false);
     }
   };
 
@@ -178,55 +233,6 @@ const ClubDetailPage: React.FC = () => {
       fetchClub();
     } catch {
       showToast('Error al eliminar el banner', 'error');
-    }
-  };
-
-  const handleHistoryImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    setHistoryImageFile(file);
-    setHistoryImagePreview(URL.createObjectURL(file));
-  };
-
-  const handleHistoryImageUpload = async () => {
-    if (!historyImageFile || !clubId) return;
-    setHistoryImageUploading(true);
-    try {
-      const formData = new FormData();
-      formData.append('image', historyImageFile);
-      formData.append('idClub', clubId);
-      formData.append('contentType', 'Imagen');
-      formData.append('description', 'historia');
-      await api.post(`/image-club`, formData, {
-        headers: { 'Content-Type': 'multipart/form-data' },
-      });
-      showToast('Imagen de historia actualizada');
-      setHistoryImageFile(null);
-      setHistoryImagePreview(null);
-      fetchClub();
-    } catch {
-      showToast('Error al subir la imagen', 'error');
-    } finally {
-      setHistoryImageUploading(false);
-    }
-  };
-
-  const handleSaveText = async (field: 'name' | 'slogan' | 'shortDescription') => {
-    if (!clubId) return;
-    setSaving(true);
-    try {
-      const payload: Record<string, string> = {};
-      if (field === 'name') payload.name = editName;
-      if (field === 'slogan') payload.slogan = editSlogan;
-      if (field === 'shortDescription') payload.shortDescription = editDescription;
-      await api.put(`/clubs/${clubId}`, payload);
-      showToast('Guardado correctamente');
-      setEditingField(null);
-      fetchClub();
-    } catch {
-      showToast('Error al guardar', 'error');
-    } finally {
-      setSaving(false);
     }
   };
 
@@ -275,23 +281,17 @@ const ClubDetailPage: React.FC = () => {
     return (
       <div className="container mx-auto px-4 py-8 text-center">
         <h1 className="text-4xl font-bold text-red-600 mb-4">Club no encontrado</h1>
-        <p className="text-lg text-gray-700 mb-8">Parece que el club que buscas no existe o fue eliminado.</p>
-        <button
-          onClick={() => navigate('/')}
-          className="bg-blue-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-700 transition-all"
-        >
+        <p className="text-lg text-gray-700 mb-8">El club que buscás no existe o fue eliminado.</p>
+        <button onClick={() => navigate('/')} className="bg-blue-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-700 transition-all">
           Volver al inicio
         </button>
       </div>
     );
   }
 
-  const logoSrc = logoPreview || club.logoUrl || club.logoImage || null;
+  const logoSrc = club.logoUrl || club.logoImage || null;
   const bannerList = club.bannerImages && club.bannerImages.length > 0 ? club.bannerImages : [];
-  const historyImage = club.bannerImagesRaw?.find((img) => (img as any).description === 'historia')?.imageUrl
-    || club.mainImage
-    || null;
-
+  const historyImage = club.bannerImagesRaw?.find((img) => img.description === 'historia')?.imageUrl || club.mainImage || null;
   const socialMediaForDisplay: SocialMediaLinks = (socialNetworks || []).reduce(
     (acc, sn) => ({ ...acc, [sn.networkType.toLowerCase()]: sn.profileUrl }),
     {} as SocialMediaLinks,
@@ -300,8 +300,71 @@ const ClubDetailPage: React.FC = () => {
   return (
     <div className="bg-gray-50 min-h-screen">
       {toast && (
-        <div className={`fixed top-20 right-4 z-50 px-5 py-3 rounded-lg shadow-lg text-white text-sm font-medium transition-all ${toast.type === 'success' ? 'bg-green-500' : 'bg-red-500'}`}>
+        <div className={`fixed top-20 right-4 z-50 px-5 py-3 rounded-lg shadow-lg text-white text-sm font-medium ${toast.type === 'success' ? 'bg-green-500' : 'bg-red-500'}`}>
           {toast.msg}
+        </div>
+      )}
+
+      {cropState && (
+        <div className="fixed inset-0 z-50 bg-black/80 flex flex-col items-center justify-center p-4">
+          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-2xl overflow-hidden">
+            <div className="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
+              <div>
+                <h3 className="text-lg font-semibold text-gray-900">
+                  {cropState.target === 'logo' ? 'Ajustar logo' : cropState.target === 'banner' ? 'Ajustar banner' : 'Ajustar imagen de historia'}
+                </h3>
+                <p className="text-sm text-gray-500 mt-0.5">Mové y hacé zoom para encuadrar la imagen</p>
+              </div>
+              <button onClick={() => setCropState(null)} className="text-gray-400 hover:text-gray-600 transition-colors">
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+
+            <div className="relative bg-gray-900" style={{ height: cropState.target === 'logo' ? '320px' : '260px' }}>
+              <Cropper
+                image={cropState.imageSrc}
+                crop={cropState.crop}
+                zoom={cropState.zoom}
+                aspect={ASPECT_RATIOS[cropState.target]}
+                cropShape={cropState.target === 'logo' ? 'round' : 'rect'}
+                showGrid={cropState.target !== 'logo'}
+                onCropChange={(crop) => setCropState((prev) => prev ? { ...prev, crop } : null)}
+                onZoomChange={(zoom) => setCropState((prev) => prev ? { ...prev, zoom } : null)}
+                onCropComplete={(_, croppedAreaPixels) => setCropState((prev) => prev ? { ...prev, croppedAreaPixels } : null)}
+              />
+            </div>
+
+            <div className="px-6 py-4 bg-gray-50">
+              <div className="flex items-center gap-3 mb-4">
+                <svg className="w-4 h-4 text-gray-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7" />
+                </svg>
+                <input
+                  type="range"
+                  min={1}
+                  max={3}
+                  step={0.01}
+                  value={cropState.zoom}
+                  onChange={(e) => setCropState((prev) => prev ? { ...prev, zoom: Number(e.target.value) } : null)}
+                  className="flex-1 accent-blue-600"
+                />
+              </div>
+              <div className="flex gap-3">
+                <button onClick={() => setCropState(null)} className="flex-1 px-4 py-2.5 rounded-xl border border-gray-200 text-gray-700 text-sm font-medium hover:bg-gray-100 transition-colors">
+                  Cancelar
+                </button>
+                <button
+                  onClick={handleCropConfirm}
+                  disabled={uploading}
+                  className="flex-1 px-4 py-2.5 rounded-xl bg-blue-600 text-white text-sm font-semibold hover:bg-blue-700 disabled:opacity-50 transition-colors"
+                >
+                  {uploading ? 'Guardando...' : 'Guardar imagen'}
+                </button>
+              </div>
+            </div>
+          </div>
         </div>
       )}
 
@@ -320,11 +383,11 @@ const ClubDetailPage: React.FC = () => {
           )}
         </div>
 
-        <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent pointer-events-none" />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent pointer-events-none" />
 
-        <div className="absolute bottom-0 left-0 w-full px-6 pb-4 flex items-end gap-4">
-          <div className="relative flex-shrink-0 -mb-10">
-            <div className="w-24 h-24 md:w-28 md:h-28 rounded-full border-4 border-white shadow-xl overflow-hidden bg-gray-100">
+        <div className="absolute bottom-0 left-0 w-full px-6 pb-5 flex items-end gap-5">
+          <div className="relative flex-shrink-0 -mb-12">
+            <div className="w-24 h-24 md:w-28 md:h-28 rounded-full border-4 border-white shadow-2xl overflow-hidden bg-white">
               {logoSrc ? (
                 <img src={logoSrc} alt={`${club.name} logo`} className="w-full h-full object-cover" />
               ) : (
@@ -337,243 +400,170 @@ const ClubDetailPage: React.FC = () => {
               <>
                 <button
                   onClick={() => logoInputRef.current?.click()}
-                  className="absolute bottom-0 right-0 bg-blue-600 text-white rounded-full p-1.5 shadow hover:bg-blue-700 transition-colors"
+                  className="absolute bottom-0.5 right-0.5 bg-white text-gray-700 rounded-full p-1.5 shadow-lg hover:bg-gray-50 border border-gray-200 transition-colors"
                   title="Cambiar logo"
                 >
                   <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15.232 5.232l3.536 3.536M9 13l6.586-6.586a2 2 0 112.828 2.828L11.828 15.828A2 2 0 019 17H7v-2a2 2 0 01.586-1.414z" />
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
                   </svg>
                 </button>
-                <input ref={logoInputRef} type="file" accept="image/*" className="hidden" onChange={handleLogoFileChange} />
+                <input ref={logoInputRef} type="file" accept="image/*" className="hidden" onChange={handleFileSelect('logo')} />
               </>
             )}
           </div>
 
           <div className="flex-1 min-w-0 pb-1">
-            {editingField === 'name' && isOwner ? (
-              <div className="flex items-center gap-2">
-                <input
-                  value={editName}
-                  onChange={(e) => setEditName(e.target.value)}
-                  className="text-2xl md:text-4xl font-extrabold bg-transparent border-b-2 border-white text-white outline-none flex-1"
-                  autoFocus
-                />
-                <button onClick={() => handleSaveText('name')} disabled={saving} className="text-green-400 hover:text-green-300 text-sm font-semibold">
-                  {saving ? '...' : 'Guardar'}
-                </button>
-                <button onClick={() => setEditingField(null)} className="text-gray-300 hover:text-white text-sm">
-                  Cancelar
-                </button>
-              </div>
-            ) : (
-              <div className="flex items-center gap-2">
-                <h1 className="text-2xl md:text-4xl font-extrabold text-white drop-shadow-lg truncate">{club.name}</h1>
-                {isOwner && (
-                  <button onClick={() => setEditingField('name')} className="text-white/70 hover:text-white" title="Editar nombre">
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15.232 5.232l3.536 3.536M9 13l6.586-6.586a2 2 0 112.828 2.828L11.828 15.828A2 2 0 019 17H7v-2a2 2 0 01.586-1.414z" />
-                    </svg>
-                  </button>
-                )}
-              </div>
-            )}
-
-            {editingField === 'slogan' && isOwner ? (
-              <div className="flex items-center gap-2 mt-1">
-                <input
-                  value={editSlogan}
-                  onChange={(e) => setEditSlogan(e.target.value)}
-                  className="text-base bg-transparent border-b border-white text-white outline-none flex-1"
-                  placeholder="Slogan..."
-                  autoFocus
-                />
-                <button onClick={() => handleSaveText('slogan')} disabled={saving} className="text-green-400 hover:text-green-300 text-sm font-semibold">
-                  {saving ? '...' : 'Guardar'}
-                </button>
-                <button onClick={() => setEditingField(null)} className="text-gray-300 hover:text-white text-sm">
-                  Cancelar
-                </button>
-              </div>
-            ) : (
-              <div className="flex items-center gap-2 mt-1">
-                {club.slogan && <p className="text-white/90 text-sm md:text-base drop-shadow">{club.slogan}</p>}
-                {isOwner && (
-                  <button onClick={() => setEditingField('slogan')} className="text-white/70 hover:text-white" title="Editar slogan">
-                    <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15.232 5.232l3.536 3.536M9 13l6.586-6.586a2 2 0 112.828 2.828L11.828 15.828A2 2 0 019 17H7v-2a2 2 0 01.586-1.414z" />
-                    </svg>
-                  </button>
-                )}
-              </div>
-            )}
+            <h1 className="text-2xl md:text-4xl font-extrabold text-white drop-shadow-lg truncate">{club.name}</h1>
+            {club.slogan && <p className="text-white/85 text-sm md:text-base drop-shadow mt-1">{club.slogan}</p>}
           </div>
 
           {isOwner && (
             <div className="flex-shrink-0 pb-1">
               <button
                 onClick={() => bannerInputRef.current?.click()}
-                className="bg-white/20 hover:bg-white/30 text-white text-xs px-3 py-1.5 rounded-lg backdrop-blur transition-colors flex items-center gap-1.5"
+                className="bg-white/15 hover:bg-white/25 text-white text-xs px-3 py-2 rounded-lg backdrop-blur-sm border border-white/20 transition-colors flex items-center gap-1.5 font-medium"
               >
                 <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
                 </svg>
-                Agregar banner
+                Cambiar banner
               </button>
-              <input ref={bannerInputRef} type="file" accept="image/*" className="hidden" onChange={handleBannerFileChange} />
+              <input ref={bannerInputRef} type="file" accept="image/*" className="hidden" onChange={handleFileSelect('banner')} />
             </div>
           )}
         </div>
       </div>
 
-      {isOwner && (logoFile || bannerFile) && (
-        <div className="bg-blue-50 border-b border-blue-100 px-6 py-3 flex flex-wrap gap-3 items-center mt-10">
-          {logoFile && (
-            <div className="flex items-center gap-2">
-              <img src={logoPreview!} alt="preview logo" className="w-10 h-10 rounded-full object-cover border-2 border-blue-300" />
-              <span className="text-sm text-blue-700">Nuevo logo listo</span>
-              <button onClick={handleLogoUpload} disabled={logoUploading} className="bg-blue-600 text-white text-xs px-3 py-1 rounded-lg hover:bg-blue-700 disabled:opacity-50">
-                {logoUploading ? 'Subiendo...' : 'Guardar logo'}
-              </button>
-              <button onClick={() => { setLogoFile(null); setLogoPreview(null); }} className="text-gray-400 hover:text-gray-600 text-xs">
-                Cancelar
-              </button>
-            </div>
-          )}
-          {bannerFile && (
-            <div className="flex items-center gap-2">
-              <img src={bannerPreview!} alt="preview banner" className="w-16 h-10 rounded object-cover border-2 border-blue-300" />
-              <span className="text-sm text-blue-700">Nuevo banner listo</span>
-              <button onClick={handleBannerUpload} disabled={bannerUploading} className="bg-blue-600 text-white text-xs px-3 py-1 rounded-lg hover:bg-blue-700 disabled:opacity-50">
-                {bannerUploading ? 'Subiendo...' : 'Guardar banner'}
-              </button>
-              <button onClick={() => { setBannerFile(null); setBannerPreview(null); }} className="text-gray-400 hover:text-gray-600 text-xs">
-                Cancelar
-              </button>
-            </div>
-          )}
-        </div>
-      )}
-
-      <div className={`container mx-auto px-4 py-8 ${isOwner && !logoFile && !bannerFile ? 'mt-10' : ''}`}>
-        <button
-          onClick={() => navigate(-1)}
-          className="mb-6 flex items-center text-blue-600 hover:text-blue-800 transition-colors"
-        >
-          <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <div className="container mx-auto px-4 pt-16 pb-8">
+        <button onClick={() => navigate(-1)} className="mb-6 flex items-center text-blue-600 hover:text-blue-800 transition-colors text-sm font-medium">
+          <svg className="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
           </svg>
           Volver
         </button>
 
         {isOwner && club.bannerImagesRaw && club.bannerImagesRaw.length > 0 && (
-          <div className="bg-white rounded-xl shadow p-4 mb-6">
-            <h3 className="text-sm font-semibold text-gray-700 mb-3">Banners actuales</h3>
+          <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-5 mb-6">
+            <div className="flex items-center gap-2 mb-4">
+              <div className="w-1 h-5 bg-blue-600 rounded-full" />
+              <h3 className="text-sm font-semibold text-gray-800">Banners del club</h3>
+              <span className="ml-auto text-xs text-gray-400">{club.bannerImagesRaw.length} imagen{club.bannerImagesRaw.length !== 1 ? 'es' : ''}</span>
+            </div>
             <div className="flex flex-wrap gap-3">
               {club.bannerImagesRaw.map((img) => (
                 <div key={img.id} className="relative group">
-                  <img src={img.imageUrl} alt="banner" className="w-32 h-20 object-cover rounded-lg border border-gray-200" />
-                  <button
-                    onClick={() => handleDeleteBanner(img.id)}
-                    className="absolute top-1 right-1 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs opacity-0 group-hover:opacity-100 transition-opacity"
-                    title="Eliminar banner"
-                  >
-                    ×
-                  </button>
+                  <img src={img.imageUrl} alt="banner" className="w-36 h-24 object-cover rounded-xl border border-gray-100 shadow-sm" />
+                  <div className="absolute inset-0 bg-black/40 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                    <button
+                      onClick={() => handleDeleteBanner(img.id)}
+                      className="bg-red-500 text-white rounded-lg px-3 py-1.5 text-xs font-medium hover:bg-red-600 transition-colors"
+                    >
+                      Eliminar
+                    </button>
+                  </div>
                 </div>
               ))}
             </div>
           </div>
         )}
 
-        <div className="bg-white rounded-xl shadow-lg p-8 mb-8">
+        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 md:p-8 mb-6">
           <div className="flex justify-between items-center mb-6">
-            <span className="inline-block bg-purple-100 text-purple-800 text-sm font-semibold px-3 py-1 rounded-full">
+            <span className="inline-flex items-center bg-purple-50 text-purple-700 text-xs font-semibold px-3 py-1.5 rounded-full border border-purple-100">
               {club.category}
             </span>
             {!isOwner && (
-              <button className="bg-gray-200 text-gray-700 px-4 py-2 rounded-full flex items-center space-x-2 hover:bg-red-100 hover:text-red-600 transition-all">
-                <svg className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+              <button className="flex items-center gap-2 text-gray-500 hover:text-red-500 text-sm font-medium transition-colors px-3 py-1.5 rounded-lg hover:bg-red-50">
+                <svg className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
                   <path fillRule="evenodd" d="M3.172 5.172a4.5 4.5 0 015.656 0L10 6.343l1.172-1.171a4.5 4.5 0 115.656 5.656L10 17.657l-6.828-6.829a4.5 4.5 0 010-5.656z" clipRule="evenodd" />
                 </svg>
-                <span>Favorito</span>
+                Guardar en favoritos
               </button>
             )}
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
             <div>
-              <div className="flex items-center gap-2 mb-3">
-                <h2 className="text-2xl font-bold text-gray-800">Sobre Nosotros</h2>
-                {isOwner && editingField !== 'shortDescription' && (
-                  <button onClick={() => setEditingField('shortDescription')} className="text-gray-400 hover:text-blue-600" title="Editar descripción">
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15.232 5.232l3.536 3.536M9 13l6.586-6.586a2 2 0 112.828 2.828L11.828 15.828A2 2 0 019 17H7v-2a2 2 0 01.586-1.414z" />
+              <div className="flex items-center justify-between mb-3">
+                <h2 className="text-xl font-bold text-gray-900">Sobre Nosotros</h2>
+                {isOwner && !editingDescription && (
+                  <button
+                    onClick={() => setEditingDescription(true)}
+                    className="flex items-center gap-1.5 text-xs font-medium text-blue-600 hover:text-blue-700 bg-blue-50 hover:bg-blue-100 px-3 py-1.5 rounded-lg transition-colors"
+                  >
+                    <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                     </svg>
+                    Editar
                   </button>
                 )}
               </div>
-              {editingField === 'shortDescription' && isOwner ? (
+              {editingDescription && isOwner ? (
                 <div>
                   <textarea
                     value={editDescription}
                     onChange={(e) => setEditDescription(e.target.value)}
-                    className="border rounded w-full p-2 h-32 focus:ring-2 focus:ring-blue-300 outline-none text-sm"
-                    placeholder="Descripción del club..."
+                    className="w-full border border-gray-200 rounded-xl p-3 h-36 text-sm text-gray-700 focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none resize-none transition-all"
+                    placeholder="Contá de qué se trata tu club..."
                     autoFocus
                   />
-                  <div className="flex gap-2 mt-2">
-                    <button onClick={() => handleSaveText('shortDescription')} disabled={saving} className="bg-blue-600 text-white text-xs px-4 py-1.5 rounded-lg hover:bg-blue-700 disabled:opacity-50">
-                      {saving ? 'Guardando...' : 'Guardar'}
+                  <div className="flex gap-2 mt-3">
+                    <button
+                      onClick={handleSaveDescription}
+                      disabled={saving}
+                      className="bg-blue-600 text-white text-sm px-5 py-2 rounded-lg font-medium hover:bg-blue-700 disabled:opacity-50 transition-colors"
+                    >
+                      {saving ? 'Guardando...' : 'Guardar cambios'}
                     </button>
-                    <button onClick={() => setEditingField(null)} className="text-gray-500 text-xs hover:text-gray-700">
+                    <button
+                      onClick={() => { setEditingDescription(false); setEditDescription(club.shortDescription || ''); }}
+                      className="text-gray-500 text-sm px-4 py-2 rounded-lg hover:bg-gray-100 transition-colors"
+                    >
                       Cancelar
                     </button>
                   </div>
                 </div>
               ) : (
-                <p className="text-gray-700 leading-relaxed">{club.shortDescription}</p>
+                <p className="text-gray-600 leading-relaxed text-sm">{club.shortDescription}</p>
               )}
             </div>
 
-            <div className="relative group">
+            <div>
               {isOwner ? (
                 <div>
-                  <div className="relative cursor-pointer" onClick={() => historyInputRef.current?.click()}>
-                    <img
-                      src={historyImagePreview || historyImage || '/assets/default-banner.jpg'}
-                      alt="Nuestra Historia"
-                      className="w-full h-48 object-cover rounded-lg shadow-md group-hover:brightness-75 transition-all"
-                    />
-                    <div className="absolute inset-0 flex items-center justify-center rounded-lg opacity-0 group-hover:opacity-100 transition-opacity">
-                      <span className="bg-blue-600 text-white text-sm font-semibold px-4 py-2 rounded-full">
-                        Cambiar imagen
-                      </span>
-                    </div>
+                  <div className="flex items-center justify-between mb-3">
+                    <h2 className="text-xl font-bold text-gray-900">Imagen de historia</h2>
+                    <button
+                      onClick={() => historyInputRef.current?.click()}
+                      className="flex items-center gap-1.5 text-xs font-medium text-blue-600 hover:text-blue-700 bg-blue-50 hover:bg-blue-100 px-3 py-1.5 rounded-lg transition-colors"
+                    >
+                      <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
+                      </svg>
+                      Cambiar imagen
+                    </button>
                   </div>
-                  <input ref={historyInputRef} type="file" accept="image/*" className="hidden" onChange={handleHistoryImageChange} />
-                  {historyImageFile && (
-                    <div className="flex gap-2 mt-2">
-                      <button onClick={handleHistoryImageUpload} disabled={historyImageUploading} className="bg-blue-600 text-white text-xs px-4 py-1.5 rounded-lg hover:bg-blue-700 disabled:opacity-50">
-                        {historyImageUploading ? 'Subiendo...' : 'Guardar imagen'}
-                      </button>
-                      <button onClick={() => { setHistoryImageFile(null); setHistoryImagePreview(null); }} className="text-gray-500 text-xs hover:text-gray-700">
-                        Cancelar
-                      </button>
-                    </div>
-                  )}
+                  <img
+                    src={historyImage || 'https://via.placeholder.com/600x338?text=Sin+imagen'}
+                    alt="Historia"
+                    className="w-full h-44 object-cover rounded-xl border border-gray-100 shadow-sm"
+                  />
+                  <input ref={historyInputRef} type="file" accept="image/*" className="hidden" onChange={handleFileSelect('history')} />
                 </div>
               ) : (
                 club.fullHistory && (
-                  <div>
+                  <div className="relative group cursor-pointer h-full min-h-[176px]">
                     <img
                       src={historyImage || '/assets/default-banner.jpg'}
                       alt="Nuestra Historia"
-                      className="w-full h-48 object-cover rounded-lg shadow-md group-hover:scale-105 transition-transform duration-300"
+                      className="w-full h-44 object-cover rounded-xl shadow-sm group-hover:brightness-75 transition-all duration-300"
                     />
-                    <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center rounded-lg opacity-0 group-hover:opacity-100 transition-opacity">
+                    <div className="absolute inset-0 flex items-center justify-center rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                       <Link
                         to={`/club/${club.id}/history`}
-                        className="text-white text-lg font-semibold px-6 py-3 bg-blue-600 rounded-full hover:bg-blue-700 transition-colors"
+                        className="text-white text-sm font-semibold px-5 py-2.5 bg-blue-600 rounded-full hover:bg-blue-700 transition-colors shadow-lg"
                       >
                         Conocer Nuestra Historia
                       </Link>
@@ -584,76 +574,85 @@ const ClubDetailPage: React.FC = () => {
             </div>
           </div>
 
-          <div className="border-t pt-6">
-            <h3 className="text-sm font-semibold text-gray-600 mb-3 uppercase tracking-wide">Redes Sociales</h3>
+          <div className="border-t border-gray-100 pt-6">
+            <div className="flex items-center gap-2 mb-4">
+              <h3 className="text-sm font-semibold text-gray-700 uppercase tracking-wider">Redes Sociales</h3>
+            </div>
 
             {!isOwner && <ClubSocialMedia socialMedia={socialMediaForDisplay} />}
 
             {isOwner && (
               <div>
-                <div className="flex flex-wrap gap-3 mb-4">
-                  {socialNetworks.map((sn) => (
-                    <div key={sn.id} className="flex items-center gap-2 bg-gray-100 rounded-lg px-3 py-1.5">
-                      <span className="text-xs font-medium text-gray-700 capitalize">{sn.networkType}</span>
-                      <span className="text-xs text-gray-500 max-w-[140px] truncate">{sn.profileUrl}</span>
-                      <button
-                        onClick={() => handleDeleteSocial(sn.id)}
-                        className="text-red-400 hover:text-red-600 ml-1"
-                        title="Eliminar"
+                {socialNetworks.length > 0 && (
+                  <div className="flex flex-wrap gap-2 mb-5">
+                    {socialNetworks.map((sn) => (
+                      <div key={sn.id} className="flex items-center gap-2 bg-gray-50 border border-gray-200 rounded-xl px-3 py-2">
+                        <span className="text-xs font-semibold text-gray-700 capitalize">{sn.networkType}</span>
+                        <span className="text-xs text-gray-400 max-w-[120px] truncate">{sn.profileUrl}</span>
+                        <button
+                          onClick={() => handleDeleteSocial(sn.id)}
+                          className="text-gray-300 hover:text-red-500 transition-colors ml-1"
+                          title="Eliminar"
+                        >
+                          <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+                          </svg>
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                <div className="bg-gray-50 rounded-xl border border-gray-200 p-4">
+                  <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-3">Agregar red social</p>
+                  <div className="flex flex-wrap gap-3 items-end">
+                    <div>
+                      <label className="block text-xs text-gray-500 mb-1.5">Plataforma</label>
+                      <select
+                        value={newSocialType}
+                        onChange={(e) => setNewSocialType(e.target.value)}
+                        className="border border-gray-200 rounded-lg px-3 py-2 text-sm bg-white focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
                       >
-                        <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
-                        </svg>
-                      </button>
+                        {NETWORK_TYPES.map((n) => (
+                          <option key={n.key} value={n.key}>{n.label}</option>
+                        ))}
+                      </select>
                     </div>
-                  ))}
-                </div>
-
-                <div className="flex flex-wrap gap-2 items-end">
-                  <div>
-                    <label className="block text-xs text-gray-500 mb-1">Red social</label>
-                    <select
-                      value={newSocialType}
-                      onChange={(e) => setNewSocialType(e.target.value)}
-                      className="border rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-300 outline-none"
+                    <div className="flex-1 min-w-[200px]">
+                      <label className="block text-xs text-gray-500 mb-1.5">URL del perfil</label>
+                      <input
+                        type="url"
+                        value={newSocialUrl}
+                        onChange={(e) => setNewSocialUrl(e.target.value)}
+                        placeholder="https://..."
+                        className="border border-gray-200 rounded-lg px-3 py-2 text-sm w-full bg-white focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
+                      />
+                    </div>
+                    <button
+                      onClick={handleAddSocial}
+                      disabled={socialSaving || !newSocialUrl.trim()}
+                      className="bg-blue-600 text-white text-sm px-5 py-2 rounded-lg font-medium hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                     >
-                      {NETWORK_TYPES.map((n) => (
-                        <option key={n.key} value={n.key}>{n.label}</option>
-                      ))}
-                    </select>
+                      {socialSaving ? 'Agregando...' : 'Agregar'}
+                    </button>
                   </div>
-                  <div className="flex-1 min-w-[200px]">
-                    <label className="block text-xs text-gray-500 mb-1">URL / Link</label>
-                    <input
-                      type="url"
-                      value={newSocialUrl}
-                      onChange={(e) => setNewSocialUrl(e.target.value)}
-                      placeholder="https://..."
-                      className="border rounded-lg px-3 py-2 text-sm w-full focus:ring-2 focus:ring-blue-300 outline-none"
-                    />
-                  </div>
-                  <button
-                    onClick={handleAddSocial}
-                    disabled={socialSaving || !newSocialUrl.trim()}
-                    className="bg-blue-600 text-white text-sm px-4 py-2 rounded-lg hover:bg-blue-700 disabled:opacity-50 transition-colors"
-                  >
-                    {socialSaving ? 'Agregando...' : 'Agregar'}
-                  </button>
                 </div>
 
-                <div className="mt-4">
-                  <p className="text-xs text-gray-500 mb-1">Vista previa del cliente:</p>
-                  <ClubSocialMedia socialMedia={socialMediaForDisplay} />
-                </div>
+                {socialNetworks.length > 0 && (
+                  <div className="mt-4">
+                    <p className="text-xs text-gray-400 mb-2">Vista previa para el cliente:</p>
+                    <ClubSocialMedia socialMedia={socialMediaForDisplay} />
+                  </div>
+                )}
               </div>
             )}
           </div>
         </div>
 
         {club.subscriptionPlans && club.subscriptionPlans.length > 0 && (
-          <div className="mb-12">
-            <h2 className="text-3xl font-bold text-gray-800 mb-6 text-center">Nuestros Planes de Suscripción</h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          <div className="mb-10">
+            <h2 className="text-2xl font-bold text-gray-900 mb-6 text-center">Nuestros Planes de Suscripción</h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {club.subscriptionPlans.map((plan) => {
                 const planForCard: SubscriptionPlanCardType = {
                   planId: plan.planId,
@@ -668,12 +667,7 @@ const ClubDetailPage: React.FC = () => {
                   specifications: plan.specifications || [],
                 };
                 return (
-                  <SubscriptionPlanCard
-                    key={plan.planId}
-                    plan={planForCard}
-                    clubName={club.name}
-                    detailsLink={`/club/${club.id}/plan/${plan.planId}`}
-                  />
+                  <SubscriptionPlanCard key={plan.planId} plan={planForCard} clubName={club.name} detailsLink={`/club/${club.id}/plan/${plan.planId}`} />
                 );
               })}
             </div>
@@ -681,21 +675,19 @@ const ClubDetailPage: React.FC = () => {
         )}
 
         {(club.paymentMethods || club.shippingInfo) && (
-          <div className="mb-12">
+          <div className="mb-10">
             <ClubPaymentShippingInfo paymentMethods={club.paymentMethods} shippingInfo={club.shippingInfo} />
           </div>
         )}
 
         {club.featuredReviews && club.featuredReviews.length > 0 && (
-          <div className="mb-12">
+          <div className="mb-10">
             <ClubFeaturedReviews reviews={club.featuredReviews} clubName={club.name} clubId={String(club.id)} />
           </div>
         )}
 
         {(club.legalInfo?.termsAndConditionsSections?.length || club.legalInfo?.privacyAndSecurityPolicySections?.length) && (
-          <div>
-            <ClubLegalInfo legalInfo={club.legalInfo} clubId={String(club.id)} />
-          </div>
+          <ClubLegalInfo legalInfo={club.legalInfo} clubId={String(club.id)} />
         )}
       </div>
     </div>
