@@ -62,7 +62,7 @@ const Toast: React.FC<{ message: string; type: 'success' | 'error'; onClose: () 
 const EditSubscriptionsPage: React.FC = () => {
   const { clubId } = useParams<{ clubId: string }>();
   const navigate = useNavigate();
-  const { user, userRole } = useAuth();
+  const { userRole } = useAuth();
 
   const [club, setClub] = useState<Club | null>(null);
   const [plans, setPlans] = useState<SubscriptionPlan[]>([]);
