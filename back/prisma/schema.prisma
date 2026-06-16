@@ -148,6 +148,8 @@ model Club {
   creationDate     DateTime  @default(now()) @map("Creation_Date")
   averageRating    Decimal?  @db.Decimal(3,1) @map("Average_Rating")
   totalReviews     Int       @default(0) @map("Total_Reviews")
+  milestones       String?   @map("Milestones")
+  communityText    String?   @map("Community_Text")
 
   @@map("Club")
 }
