@@ -58,7 +58,7 @@ export interface HistoryMoment {
 }
 
 export interface Milestone {
-  id: string;
+  id?: string;
   year: number;
   description: string;
 }
@@ -115,4 +115,6 @@ export interface Club {
   keyFigures?: KeyFigure[];
   teamMembers?: TeamMember[];
   communityText?: string;
+  entrepreneurs?: { id: number; firstName: string; lastName: string; bio?: string | null }[];
+  isOwner?: boolean;
 }
