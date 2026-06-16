@@ -28,6 +28,7 @@ export class CreateSubscriptionTypeDto {
   basePrice?: string;
 
   @IsOptional()
+  @Transform(({ value }) => value !== undefined && value !== null ? String(value) : undefined)
   @IsString()
   price?: string;
 
