@@ -291,7 +291,7 @@ const ClubDetailPage: React.FC = () => {
 
   const logoSrc = club.logoUrl || club.logoImage || null;
   const bannerList = club.bannerImages && club.bannerImages.length > 0 ? club.bannerImages : [];
-  const historyImage = club.bannerImagesRaw?.find((img) => img.description === 'historia')?.imageUrl || club.mainImage || null;
+  const historyImage = club.bannerImagesRaw?.find((img) => img.description === 'historia')?.imageUrl || null;
   const socialMediaForDisplay: SocialMediaLinks = (socialNetworks || []).reduce(
     (acc, sn) => ({ ...acc, [sn.networkType.toLowerCase()]: sn.profileUrl }),
     {} as SocialMediaLinks,
