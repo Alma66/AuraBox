@@ -220,31 +220,32 @@ export class ClubsService {
   }
 
   async updateLogo(id: number, userId: number, userRole: string, logoFile: Express.Multer.File) {
-    if (!logoFile) throw new BadRequestException('Se requiere una imagen para el logo');
+  if (!logoFile) throw new BadRequestException('Se requiere una imagen para el logo');
 
-    const club = await this.prisma.club.findUnique({ where: { id } });
-    if (!club) throw new NotFoundException('Club no encontrado');
+  const club = await this.prisma.club.findUnique({ where: { id } });
+  if (!club) throw new NotFoundException('Club no encontrado');
 
-    if (userRole === 'entrepreneur') {
-      const association = await this.prisma.entrepreneur_Club.findFirst({
-        where: { idEntrepreneurs: userId, idClub: id },
-      });
-      if (!association) throw new ForbiddenException('No eres el owner de este club');
-    } else if (userRole !== 'admin') {
-      throw new ForbiddenException('No autorizado para editar clubes');
-    }
-
-    if (club.logoUrl) {
-      try {
-        const publicId = this.cloudinary.extractPublicId(club.logoUrl);
-        await this.cloudinary.deleteImage(publicId);
-      } catch {}
-    }
-
-    const logoUrl = await this.cloudinary.uploadImage(logoFile, 'aurabox/clubs/logos');
-    const updated = await this.prisma.club.update({ where: { id }, data: { logoUrl } });
-    return sanitizeClub(updated);
+  if (userRole === 'entrepreneur') {
+    const association = await this.prisma.entrepreneur_Club.findFirst({
+      where: { idEntrepreneurs: userId, idClub: id },
+    });
+    if (!association) throw new ForbiddenException('No eres el owner de este club');
+  } else if (userRole !== 'admin') {
+    throw new ForbiddenException('No autorizado para editar clubes');
   }
+
+  if (club.logoUrl) {
+    try {
+      const publicId = this.cloudinary.extractPublicId(club.logoUrl);
+      await this.cloudinary.deleteImage(publicId);
+    } catch {
+    }
+  }
+
+  const logoUrl = await this.cloudinary.uploadImage(logoFile, 'aurabox/clubs/logos');
+  const updated = await this.prisma.club.update({ where: { id }, data: { logoUrl } });
+  return sanitizeClub(updated);
+}
 
   async remove(id: number, userRole: string) {
     if (userRole !== 'admin') throw new ForbiddenException('Solo los administradores pueden eliminar clubes');

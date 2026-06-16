@@ -545,11 +545,21 @@ const ClubDetailPage: React.FC = () => {
                       Cambiar imagen
                     </button>
                   </div>
-                  <img
-                    src={historyImage || 'https://via.placeholder.com/600x338?text=Sin+imagen'}
-                    alt="Historia"
-                    className="w-full h-44 object-cover rounded-xl border border-gray-100 shadow-sm"
-                  />
+                  {historyImage ? (
+                    <img
+                      src={historyImage}
+                      alt="Historia"
+                      className="w-full h-44 object-cover rounded-xl border border-gray-100 shadow-sm"
+                    />
+                  ) : (
+                    <div className="w-full h-44 rounded-xl border-2 border-dashed border-gray-200 bg-gray-50 flex flex-col items-center justify-center gap-2">
+                      <svg className="w-8 h-8 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                      </svg>
+                      <span className="text-xs text-gray-400 font-medium">Sin imagen de historia</span>
+                      <span className="text-xs text-gray-300">Hacé click en "Cambiar imagen" para agregar una</span>
+                    </div>
+                  )}
                   <input ref={historyInputRef} type="file" accept="image/*" className="hidden" onChange={handleFileSelect('history')} />
                 </div>
               ) : (
