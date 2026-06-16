@@ -20,11 +20,16 @@ export class CreateSubscriptionTypeDto {
   @IsString()
   description?: string;
 
+  @IsOptional()
   @Transform(({ value, obj }) => {
     const v = value ?? obj?.price;
     return v !== undefined ? String(v) : v;
   })
-  basePrice!: string;
+  basePrice?: string;
+
+  @IsOptional()
+  @IsString()
+  price?: string;
 
   @IsEnum(Frequency)
   @Transform(({ value, obj }) => {

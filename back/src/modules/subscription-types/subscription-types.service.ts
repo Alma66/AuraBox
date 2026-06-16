@@ -48,7 +48,7 @@ export class SubscriptionTypesService {
       idClub: dto.idClub,
       name: dto.name,
       description: dto.description ?? null,
-      basePrice: dto.basePrice as any,
+      basePrice: (dto.basePrice ?? dto.price) as any,
       frequency: dto.frequency as Frequency,
       cashDiscount: dto.cashDiscount ?? undefined,
       transferDiscount: dto.transferDiscount ?? undefined,
@@ -92,7 +92,9 @@ export class SubscriptionTypesService {
     const data: Prisma.Subscription_TypesUpdateInput = {};
     if (dto.name !== undefined) data.name = dto.name;
     if (dto.description !== undefined) data.description = dto.description;
-    if (dto.basePrice !== undefined) data.basePrice = dto.basePrice as any;
+    if (dto.basePrice !== undefined || (dto as any).price !== undefined) {
+  data.basePrice = (dto.basePrice ?? (dto as any).price) as any;
+}
     if (dto.frequency !== undefined) data.frequency = dto.frequency as any;
     if (dto.cashDiscount !== undefined) data.cashDiscount = dto.cashDiscount as any;
     if (dto.transferDiscount !== undefined) data.transferDiscount = dto.transferDiscount as any;
