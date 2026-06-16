@@ -1,155 +1,80 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
-generator client {
-  provider = "prisma-client-js"
-}
-
-/* ENUMS (mantengo los @map ya definidos) */
-
-enum AssignedToType {
-  Admins        @map("Admins")
-  Entrepreneur  @map("Entrepreneur")
-}
-
-enum DocumentType {
-  DNI         @map("DNI")
-  Pasaporte   @map("Pasaporte")
-  LC          @map("LC")
-  LE          @map("LE")
-}
-
-enum ClubStatus {
-  PENDIENTE_APROBACION @map("Pendiente_Aprobacion")
-  APROBADO             @map("Aprobado")
-  SUSPENDIDO           @map("Suspendido")
-  INACTIVO             @map("Inactivo")
-}
-
-enum VerificationStatus {
-  PENDIENTE @map("Pendiente")
-  APROBADO  @map("Aprobado")
-  RECHAZADO @map("Rechazado")
-}
-
-enum ContentType {
-  Imagen @map("Imagen")
-  Video  @map("Video")
-}
-
-enum Frequency {
-  Unica         @map("Unica")
-  Mensual       @map("Mensual")
-  Bimestral     @map("Bimestral")
-  Trimestral    @map("Trimestral")
-  Cuatrimestral @map("Cuatrimestral")
-  Quinquemestral @map("Quinquemestral")
-  Semestral     @map("Semestral")
-  Anual         @map("Anual")
-}
-
-enum PaymentStatus {
-  Exitoso   @map("Exitoso")
-  Pendiente @map("Pendiente")
-  Rechazado @map("Rechazado")
-  Reembolsado @map("Reembolsado")
-}
-
-enum ShipmentStatus {
-  Pendiente @map("Pendiente")
-  En_Camino @map("En_Camino")
-  Entregado @map("Entregado")
-  Problema  @map("Problema")
-  Devuelto  @map("Devuelto")
-}
-
-enum SubscriptionStatus {
-  Activa         @map("Activa")
-  Pendiente_Pago @map("Pendiente_Pago")
-  Cancelada      @map("Cancelada")
-  Pausada        @map("Pausada")
-  Finalizada     @map("Finalizada")
-}
-
-enum RoleScope {
-  PLATFORM @map("PLATFORM")
-  CLUB     @map("CLUB")
-}
-
-/* -------------------------
-   MODELS
-   ------------------------- */
-
 model AdminOrEntrepreneurRole {
-  id               Int              @id @default(autoincrement()) @map("ID")
-  idRole           Int                               @map("ID_Role")
-  assignedToType   AssignedToType                  @map("Assigned_To_Type")
-  assignedTo       Int                               @map("Assigned_To")
-  assignedByType   AssignedToType                  @map("Assigned_By_Type")
-  assignedBy       Int                               @map("Assigned_By")
-  assignedAt       DateTime     @default(now())      @map("Assigned_At")
+  id             Int            @id @default(autoincrement()) @map("ID")
+  idRole         Int            @map("ID_Role")
+  assignedToType AssignedToType @map("Assigned_To_Type")
+  assignedTo     Int            @map("Assigned_To")
+  assignedByType AssignedToType @map("Assigned_By_Type")
+  assignedBy     Int            @map("Assigned_By")
+  assignedAt     DateTime       @default(now()) @map("Assigned_At")
 
   @@map("AdminOrEntrepreneur_Role")
 }
 
 model Admins {
-  id             Int      @id @default(autoincrement()) @map("ID")
-  firstName      String   @map("First_Name")
-  lastName       String   @map("Last_Name")
-  email          String   @unique @map("Email")
-  passwordHash   String   @map("Password_Hash")
+  id             Int          @id @default(autoincrement()) @map("ID")
+  firstName      String       @map("First_Name")
+  lastName       String       @map("Last_Name")
+  email          String       @unique @map("Email")
+  passwordHash   String       @map("Password_Hash")
   documentType   DocumentType @map("Document_Type")
-  documentNumber Int      @unique @map("Document_Number")
-  phoneNumber    Int?     @map("Phone_Number")
-  active         Boolean  @default(true) @map("Active")
-  createdAt      DateTime @default(now()) @map("Created_At")
-  updatedAt      DateTime? @map("Updated_At")
-  notes          String?  @map("Notes")
+  active         Boolean      @default(true) @map("Active")
+  createdAt      DateTime     @default(now()) @map("Created_At")
+  updatedAt      DateTime?    @map("Updated_At")
+  notes          String?      @map("Notes")
+  phoneNumber    Int?         @map("Phone_Number")
+  documentNumber Int          @unique @map("Document_Number")
 
   @@map("Admins")
 }
 
 model BoxContentHistory {
-  id                     Int     @id @default(autoincrement()) @map("ID")
-  idSubscriptionTypes    Int     @map("ID_Subscription_Types")
-  deliveryMonthYear      String  @map("Delivery_Month_Year")
-  productName            String  @map("Product_Name")
-  productDescription     String  @map("Product_Description")
-  usageInstructions      String? @map("Usage_Instructions")
-  productExpirationDate  DateTime? @map("Product_Expiration_Date")
-  productImageUrl        String? @map("Product_Image_URL")
-  productVideoUrl        String? @map("Product_Video_URL")
-  additionalNotes        String? @map("Additional_Notes")
-  publicationDate        DateTime? @map("Publication_Date")
+  id                    Int       @id @default(autoincrement()) @map("ID")
+  idSubscriptionTypes   Int       @map("ID_Subscription_Types")
+  deliveryMonthYear     String    @map("Delivery_Month_Year")
+  productName           String    @map("Product_Name")
+  productDescription    String    @map("Product_Description")
+  usageInstructions     String?   @map("Usage_Instructions")
+  productExpirationDate DateTime? @map("Product_Expiration_Date")
+  productImageUrl       String?   @map("Product_Image_URL")
+  productVideoUrl       String?   @map("Product_Video_URL")
+  additionalNotes       String?   @map("Additional_Notes")
+  publicationDate       DateTime? @map("Publication_Date")
 
   @@map("Box_Content_History")
 }
 
 model Categories {
-  id          Int     @id @default(autoincrement()) @map("ID")
-  name        String  @map("Name")
-  description String  @map("Description")
+  id          Int    @id @default(autoincrement()) @map("ID")
+  name        String @map("Name")
+  description String @map("Description")
 
   @@map("Categories")
 }
 
 model Club {
-  id               Int      @id @default(autoincrement()) @map("ID")
-  name             String   @map("Name")
-  logoUrl          String   @map("Logo_URL")
-  slogan           String?  @map("Slogan")
-  history          String?  @map("History")
-  shortDescription String   @map("Short_Description")
-  contactEmail     String   @map("Contact_Email")
-  whatsappContact  String?  @map("Whatsapp_Contact")
+  id               Int        @id @default(autoincrement()) @map("ID")
+  name             String     @map("Name")
+  logoUrl          String     @map("Logo_URL")
+  slogan           String?    @map("Slogan")
+  history          String?    @map("History")
+  shortDescription String     @map("Short_Description")
+  contactEmail     String     @map("Contact_Email")
+  whatsappContact  String?    @map("Whatsapp_Contact")
   clubStatus       ClubStatus @default(PENDIENTE_APROBACION) @map("Club_Status")
-  creationDate     DateTime  @default(now()) @map("Creation_Date")
-  averageRating    Decimal?  @db.Decimal(3,1) @map("Average_Rating")
-  totalReviews     Int       @default(0) @map("Total_Reviews")
-  milestones       String?   @map("Milestones")
-  communityText    String?   @map("Community_Text")
+  creationDate     DateTime   @default(now()) @map("Creation_Date")
+  averageRating    Decimal?   @map("Average_Rating") @db.Decimal(3, 1)
+  totalReviews     Int        @default(0) @map("Total_Reviews")
+  communityText    String?    @map("Community_Text")
+  milestones       String?    @map("Milestones")
 
   @@map("Club")
 }
@@ -180,106 +105,106 @@ model Club_Social_Networks {
 }
 
 model Club_Status_History {
-  id             Int      @id @default(autoincrement()) @map("ID")
-  idClub         Int      @map("ID_Club")
-  idAdmins       Int      @map("ID_Admins")
+  id             Int        @id @default(autoincrement()) @map("ID")
+  idClub         Int        @map("ID_Club")
+  idAdmins       Int        @map("ID_Admins")
   previousStatus ClubStatus @map("Previous_Status")
   newStatus      ClubStatus @map("New_Status")
-  changeDate     DateTime  @default(now()) @map("Change_Date")
-  changeReason   String?  @map("Change_Reason")
+  changeReason   String?    @map("Change_Reason")
+  changeDate     DateTime   @default(now()) @map("Change_Date")
 
   @@map("Club_Status_History")
 }
 
 model Entrepreneurs {
-  id               Int      @id @default(autoincrement()) @map("ID")
-  firstName        String   @map("First_Name")
-  lastName         String   @map("Last_Name")
-  email            String   @unique @map("Email")
-  passwordHash     String   @map("Password_Hash")
+  id               Int          @id @default(autoincrement()) @map("ID")
+  firstName        String       @map("First_Name")
+  lastName         String       @map("Last_Name")
+  email            String       @unique @map("Email")
+  passwordHash     String       @map("Password_Hash")
   documentType     DocumentType @map("Document_Type")
-  documentNumber   Int      @unique @map("Document_Number")
-  cuitCuil         BigInt?     @unique @map("CUIT_CUIL")
-  phoneNumber      Int?     @map("Phone_Number")
-  registrationDate DateTime @default(now()) @map("Registration_Date")
-  birthDate        DateTime? @map("Birth_Date")
-  city             String?  @map("City")
-  province         String?  @map("Province")
-  active           Boolean  @default(true) @map("Active")
+  documentNumber   Int          @unique @map("Document_Number")
+  cuitCuil         BigInt?      @unique @map("CUIT_CUIL")
+  registrationDate DateTime     @default(now()) @map("Registration_Date")
+  city             String?      @map("City")
+  province         String?      @map("Province")
+  active           Boolean      @default(true) @map("Active")
+  birthDate        DateTime?    @map("Birth_Date")
+  phoneNumber      Int?         @map("Phone_Number")
 
   @@map("Entrepreneurs")
 }
 
 model Entrepreneur_Club {
-  id              Int @id @default(autoincrement()) @map("ID")
-  idEntrepreneurs Int @map("ID_Entrepreneurs")
-  idClub          Int @map("ID_Club")
+  id              Int      @id @default(autoincrement()) @map("ID")
+  idEntrepreneurs Int      @map("ID_Entrepreneurs")
+  idClub          Int      @map("ID_Club")
   associationDate DateTime @default(now()) @map("Association_Date")
 
   @@map("Entrepreneur_Club")
 }
 
 model Entrepreneur_Licenses {
-  id                 Int @id @default(autoincrement()) @map("ID")
-  idEntrepreneurs    Int @map("ID_Entrepreneurs")
-  idLicenseTypes     Int @map("ID_License_Types")
-  issueDate          DateTime? @map("Issue_Date")
-  expirationDate     DateTime? @map("Expiration_Date")
-  documentUrl        String? @map("Document_URL")
+  id                 Int                @id @default(autoincrement()) @map("ID")
+  idEntrepreneurs    Int                @map("ID_Entrepreneurs")
+  idLicenseTypes     Int                @map("ID_License_Types")
+  issueDate          DateTime?          @map("Issue_Date")
+  expirationDate     DateTime?          @map("Expiration_Date")
+  documentUrl        String?            @map("Document_URL")
   verificationStatus VerificationStatus @default(PENDIENTE) @map("Verification_Status")
-  verificationDate   DateTime? @map("Verification_Date")
-  verificationNotes  String? @map("Verification_Notes")
+  verificationDate   DateTime?          @map("Verification_Date")
+  verificationNotes  String?            @map("Verification_Notes")
 
   @@map("Entrepreneur_Licenses")
 }
 
 model Favorites {
-  id        Int @id @default(autoincrement()) @map("ID")
-  idUser    Int @map("ID_User")
-  idClub    Int @map("ID_Club")
+  id        Int      @id @default(autoincrement()) @map("ID")
+  idUser    Int      @map("ID_User")
+  idClub    Int      @map("ID_Club")
   dateAdded DateTime @default(now()) @map("Date_Added")
 
   @@map("Favorites")
 }
 
 model Image_Club {
-  id          Int    @id @default(autoincrement()) @map("ID")
-  idClub      Int    @map("ID_Club")
-  imageUrl    String @map("Image_URL")
-  description String? @map("Description")
+  id          Int         @id @default(autoincrement()) @map("ID")
+  idClub      Int         @map("ID_Club")
+  imageUrl    String      @map("Image_URL")
+  description String?     @map("Description")
   contentType ContentType @default(Imagen) @map("Content_Type")
-  uploadDate  DateTime @default(now()) @map("Upload_Date")
+  uploadDate  DateTime    @default(now()) @map("Upload_Date")
 
   @@map("Image_Club")
 }
 
 model License_Types {
-  id   Int    @id @default(autoincrement()) @map("ID")
-  name String @unique @map("Name")
+  id          Int     @id @default(autoincrement()) @map("ID")
+  name        String  @unique @map("Name")
   description String? @map("Description")
 
   @@map("License_Types")
 }
 
 model Payment {
-  id                  Int     @id @default(autoincrement()) @map("ID")
-  idUserSubscription  Int     @map("ID_User_Subscription")
-  idUser              Int     @map("ID_User")
-  idClub              Int     @map("ID_Club")
-  idGatewayTransaction String? @map("ID_Gateway_Transaction")
-  idPaymentMethods    Int?    @map("ID_Payment_Methods")
-  totalAmountPaid     Decimal @db.Decimal(10,2) @map("Total_Amount_Paid")
-  clubAmount          Decimal @db.Decimal(10,2) @map("Club_Amount")
-  commissionAmount    Decimal @db.Decimal(10,2) @map("Commission_Amount")
-  paymentDate         DateTime @default(now()) @map("Payment_Date")
-  paymentStatus       PaymentStatus @map("Payment_Status")
+  id                   Int           @id @default(autoincrement()) @map("ID")
+  idUserSubscription   Int           @map("ID_User_Subscription")
+  idUser               Int           @map("ID_User")
+  idClub               Int           @map("ID_Club")
+  idGatewayTransaction String?       @map("ID_Gateway_Transaction")
+  idPaymentMethods     Int?          @map("ID_Payment_Methods")
+  totalAmountPaid      Decimal       @map("Total_Amount_Paid") @db.Decimal(10, 2)
+  clubAmount           Decimal       @map("Club_Amount") @db.Decimal(10, 2)
+  commissionAmount     Decimal       @map("Commission_Amount") @db.Decimal(10, 2)
+  paymentDate          DateTime      @default(now()) @map("Payment_Date")
+  paymentStatus        PaymentStatus @map("Payment_Status")
 
   @@map("Payment")
 }
 
 model Payment_Methods {
-  id     Int  @id @default(autoincrement()) @map("ID")
-  method String @unique @map("Method")
+  id     Int     @id @default(autoincrement()) @map("ID")
+  method String  @unique @map("Method")
   active Boolean @default(true) @map("Active")
 
   @@map("Payment_Methods")
@@ -296,10 +221,10 @@ model Permissions {
 }
 
 model Platform_Rules {
-  id              Int     @id @default(autoincrement()) @map("ID")
-  title           String  @map("Title")
-  content         String  @map("Content")
-  version         String  @map("Version")
+  id              Int      @id @default(autoincrement()) @map("ID")
+  title           String   @map("Title")
+  content         String   @map("Content")
+  version         String   @map("Version")
   publicationDate DateTime @default(now()) @map("Publication_Date")
   active          Boolean  @default(true) @map("Active")
   ruleType        String   @map("Rule_Type")
@@ -308,138 +233,207 @@ model Platform_Rules {
 }
 
 model Reviews {
-  id           Int      @id @default(autoincrement()) @map("ID")
-  idUser       Int      @map("ID_User")
-  idClub       Int      @map("ID_Club")
-  rating       Int      @map("Rating")
-  title        String?  @map("Title")
-  comment      String?  @map("Comment")
-  reviewDate   DateTime @default(now()) @map("Review_Date")
+  id           Int       @id @default(autoincrement()) @map("ID")
+  idUser       Int       @map("ID_User")
+  idClub       Int       @map("ID_Club")
+  rating       Int       @map("Rating")
+  title        String?   @map("Title")
+  comment      String?   @map("Comment")
+  reviewDate   DateTime  @default(now()) @map("Review_Date")
   lastEditDate DateTime? @map("Last_Edit_Date")
-  active       Boolean  @default(true) @map("Active")
+  active       Boolean   @default(true) @map("Active")
 
   @@map("Reviews")
 }
 
 model Role {
-  id         Int      @id @default(autoincrement()) @map("ID")
-  code       String   @unique @map("Code")
-  name       String   @map("Name")
-  description String  @map("Description")
-  scope      RoleScope @default(PLATFORM) @map("Scope")
-  createdAt  DateTime @default(now()) @map("Created_At")
+  id          Int       @id @default(autoincrement()) @map("ID")
+  code        String    @unique @map("Code")
+  name        String    @map("Name")
+  description String    @map("Description")
+  scope       RoleScope @default(PLATFORM) @map("Scope")
+  createdAt   DateTime  @default(now()) @map("Created_At")
 
   @@map("Role")
 }
 
 model Role_Permissions {
-  id            Int @id @default(autoincrement()) @map("ID")
-  idRole        Int @map("ID_Role")
-  idPermissions Int @map("ID_Permissions")
-  grantedById   Int @map("Granted_By_ID")
+  id            Int      @id @default(autoincrement()) @map("ID")
+  idRole        Int      @map("ID_Role")
+  idPermissions Int      @map("ID_Permissions")
+  grantedById   Int      @map("Granted_By_ID")
   grantedAt     DateTime @default(now()) @map("Granted_At")
 
   @@map("Role_Permissions")
 }
 
 model Shipments {
-  id                          Int      @id @default(autoincrement()) @map("ID")
-  idUser                      Int      @map("ID_User")
-  idUserSubscriptions         Int      @map("ID_User_Subscriptions")
-  idClub                      Int?     @map("ID_Club")
-  boxMonthYear                String   @map("Box_Month_Year")
-  estimatedDeliveryStartDate  DateTime? @map("Estimated_Delivery_START_Date")
-  estimatedDeliveryEndDate    DateTime? @map("Estimated_Delivery_END_Date")
-  actualDeliveryDate          DateTime? @map("Actual_Delivery_Date")
-  shipmentStatus              ShipmentStatus @map("Shipment_Status")
-  trackingNumber              String?  @map("Tracking_Number")
-  logisticsCompany            String?  @map("Logistics_Company")
-  shippingCost                Decimal? @db.Decimal(10,2) @map("Shipping_Cost")
-  shippingNotes               String?  @map("Shipping_Notes")
+  id                         Int            @id @default(autoincrement()) @map("ID")
+  idUser                     Int            @map("ID_User")
+  idUserSubscriptions        Int            @map("ID_User_Subscriptions")
+  idClub                     Int?           @map("ID_Club")
+  boxMonthYear               String         @map("Box_Month_Year")
+  estimatedDeliveryStartDate DateTime?      @map("Estimated_Delivery_START_Date")
+  estimatedDeliveryEndDate   DateTime?      @map("Estimated_Delivery_END_Date")
+  actualDeliveryDate         DateTime?      @map("Actual_Delivery_Date")
+  shipmentStatus             ShipmentStatus @map("Shipment_Status")
+  trackingNumber             String?        @map("Tracking_Number")
+  logisticsCompany           String?        @map("Logistics_Company")
+  shippingCost               Decimal?       @map("Shipping_Cost") @db.Decimal(10, 2)
+  shippingNotes              String?        @map("Shipping_Notes")
 
   @@map("Shipments")
 }
 
 model Subscription_Types {
-  id               Int     @id @default(autoincrement()) @map("ID")
-  idClub           Int     @map("ID_Club")
-  name             String  @map("Name")
-  description      String? @map("Description")
-  basePrice        Decimal @db.Decimal(10,2) @map("Base_Price")
+  id               Int       @id @default(autoincrement()) @map("ID")
+  idClub           Int       @map("ID_Club")
+  name             String    @map("Name")
+  description      String?   @map("Description")
+  basePrice        Decimal   @map("Base_Price") @db.Decimal(10, 2)
   frequency        Frequency @map("Frequency")
-  cashDiscount     Decimal? @db.Decimal(5,2) @map("Cash_Discount")
-  transferDiscount Decimal? @db.Decimal(5,2) @map("Transfer_Discount")
-  active           Boolean @default(true) @map("Active")
+  cashDiscount     Decimal?  @map("Cash_Discount") @db.Decimal(5, 2)
+  transferDiscount Decimal?  @map("Transfer_Discount") @db.Decimal(5, 2)
+  active           Boolean   @default(true) @map("Active")
 
   @@map("Subscription_Types")
 }
 
 model Transaction_History {
-  id                    Int     @id @default(autoincrement()) @map("ID")
-  idUser                Int     @map("ID_User")
-  idUserSubscriptions   Int     @map("ID_User_Subscriptions")
-  idGatewayTransaction  String? @map("ID_Gateway_Transaction")
-  idClub                Int?    @map("ID_Club")
-  idPaymentMethods      Int?    @map("ID_Payment_Methods")
-  totalAmountPaid       Decimal @db.Decimal(10,2) @map("Total_Amount_Paid")
-  clubAmount            Decimal @db.Decimal(10,2) @map("Club_Amount")
-  commissionAmount      Decimal @db.Decimal(10,2) @map("Commission_Amount")
-  paymentDate           DateTime @default(now()) @map("Payment_Date")
-  paymentStatus         PaymentStatus @map("Payment_Status")
-  paymentNotes          String?  @map("Payment_Notes")
+  id                   Int           @id @default(autoincrement()) @map("ID")
+  idUser               Int           @map("ID_User")
+  idUserSubscriptions  Int           @map("ID_User_Subscriptions")
+  idGatewayTransaction String?       @map("ID_Gateway_Transaction")
+  idClub               Int?          @map("ID_Club")
+  idPaymentMethods     Int?          @map("ID_Payment_Methods")
+  totalAmountPaid      Decimal       @map("Total_Amount_Paid") @db.Decimal(10, 2)
+  clubAmount           Decimal       @map("Club_Amount") @db.Decimal(10, 2)
+  commissionAmount     Decimal       @map("Commission_Amount") @db.Decimal(10, 2)
+  paymentDate          DateTime      @default(now()) @map("Payment_Date")
+  paymentStatus        PaymentStatus @map("Payment_Status")
+  paymentNotes         String?       @map("Payment_Notes")
 
   @@map("Transaction_History")
 }
 
 model User {
-  id               Int      @id @default(autoincrement()) @map("ID")
-  firstName        String   @map("First_Name")
-  lastName         String   @map("Last_Name")
-  email            String   @unique @map("Email")
-  passwordHash     String   @map("Password_Hash")
+  id               Int          @id @default(autoincrement()) @map("ID")
+  firstName        String       @map("First_Name")
+  lastName         String       @map("Last_Name")
+  email            String       @unique @map("Email")
+  passwordHash     String       @map("Password_Hash")
   documentType     DocumentType @map("Document_Type")
-  documentNumber   Int      @unique @map("Document_Number")
-  phoneNumber      Int?     @map("Phone_Number")
-  registrationDate DateTime @default(now()) @map("Registration_Date")
-  birthDate        DateTime? @map("Birth_Date")
-  balanceAvailable Decimal? @db.Decimal(10,2) @map("Balance_Available")
-  streetAddress    String?  @map("Street_Address")
-  addressNumber    Int?     @map("Address_Number")
-  floorNumber      String?  @map("Floor_Number")
-  addressDetails   String?  @map("Address_Details")
-  city             String?  @map("City")
-  province         String?  @map("Province")
-  postalCode       String?  @map("Postal_Code")
-  active           Boolean  @default(true) @map("Active")
+  documentNumber   Int          @unique @map("Document_Number")
+  registrationDate DateTime     @default(now()) @map("Registration_Date")
+  balanceAvailable Decimal?     @map("Balance_Available") @db.Decimal(10, 2)
+  streetAddress    String?      @map("Street_Address")
+  addressNumber    Int?         @map("Address_Number")
+  floorNumber      String?      @map("Floor_Number")
+  addressDetails   String?      @map("Address_Details")
+  city             String?      @map("City")
+  province         String?      @map("Province")
+  postalCode       String?      @map("Postal_Code")
+  active           Boolean      @default(true) @map("Active")
+  birthDate        DateTime?    @map("Birth_Date")
+  phoneNumber      Int?         @map("Phone_Number")
 
   @@map("User")
 }
 
 model User_Club_Preferences {
-  id                   Int @id @default(autoincrement()) @map("ID")
-  idUser               Int @map("ID_User")
-  idSubscriptionTypes  Int @map("ID_Subscription_Types")
-  idClub               Int @map("ID_Club")
-  preferenceType       String @map("Preference_Type")
-  preferenceValue      String @map("Preference_Value")
-  updateDate           DateTime @default(now()) @map("Update_Date")
+  id                  Int      @id @default(autoincrement()) @map("ID")
+  idUser              Int      @map("ID_User")
+  idSubscriptionTypes Int      @map("ID_Subscription_Types")
+  idClub              Int      @map("ID_Club")
+  preferenceType      String   @map("Preference_Type")
+  preferenceValue     String   @map("Preference_Value")
+  updateDate          DateTime @default(now()) @map("Update_Date")
 
   @@map("User_Club_Preferences")
 }
 
 model User_Subscriptions {
-  id                    Int @id @default(autoincrement()) @map("ID")
-  idUser                Int @map("ID_User")
-  idPaymentMethods      Int? @map("ID_Payment_Methods")
-  idSubscriptionTypes   Int @map("ID_Subscription_Types")
-  startDate             DateTime @map("Start_Date")
-  expectedEndDate       DateTime? @map("Expected_End_Date")
-  subscriptionStatus    SubscriptionStatus @map("Subscription_Status")
-  lastPaymentDate       DateTime? @map("Last_Payment_Date")
-  nextPaymentDate       DateTime? @map("Next_Payment_Date")
-  monthlyAmountPaid     Decimal? @db.Decimal(10,2) @map("Monthly_Amount_Paid")
-  cancellationReason    String? @map("Cancellation_Reason")
-  cancellationDate      DateTime? @map("Cancellation_Date")
+  id                  Int                @id @default(autoincrement()) @map("ID")
+  idUser              Int                @map("ID_User")
+  idPaymentMethods    Int?               @map("ID_Payment_Methods")
+  idSubscriptionTypes Int                @map("ID_Subscription_Types")
+  startDate           DateTime           @map("Start_Date")
+  expectedEndDate     DateTime?          @map("Expected_End_Date")
+  subscriptionStatus  SubscriptionStatus @map("Subscription_Status")
+  lastPaymentDate     DateTime?          @map("Last_Payment_Date")
+  nextPaymentDate     DateTime?          @map("Next_Payment_Date")
+  monthlyAmountPaid   Decimal?           @map("Monthly_Amount_Paid") @db.Decimal(10, 2)
+  cancellationReason  String?            @map("Cancellation_Reason")
+  cancellationDate    DateTime?          @map("Cancellation_Date")
 
   @@map("User_Subscriptions")
+}
+
+enum AssignedToType {
+  Admins       @map("Admins")
+  Entrepreneur @map("Entrepreneur")
+}
+
+enum DocumentType {
+  DNI       @map("DNI")
+  Pasaporte @map("Pasaporte")
+  LC        @map("LC")
+  LE        @map("LE")
+}
+
+enum ClubStatus {
+  PENDIENTE_APROBACION @map("Pendiente_Aprobacion")
+  APROBADO             @map("Aprobado")
+  SUSPENDIDO           @map("Suspendido")
+  INACTIVO             @map("Inactivo")
+}
+
+enum VerificationStatus {
+  PENDIENTE @map("Pendiente")
+  APROBADO  @map("Aprobado")
+  RECHAZADO @map("Rechazado")
+}
+
+enum ContentType {
+  Imagen @map("Imagen")
+  Video  @map("Video")
+}
+
+enum Frequency {
+  Unica          @map("Unica")
+  Mensual        @map("Mensual")
+  Bimestral      @map("Bimestral")
+  Trimestral     @map("Trimestral")
+  Cuatrimestral  @map("Cuatrimestral")
+  Quinquemestral @map("Quinquemestral")
+  Semestral      @map("Semestral")
+  Anual          @map("Anual")
+}
+
+enum PaymentStatus {
+  Exitoso     @map("Exitoso")
+  Pendiente   @map("Pendiente")
+  Rechazado   @map("Rechazado")
+  Reembolsado @map("Reembolsado")
+}
+
+enum ShipmentStatus {
+  Pendiente @map("Pendiente")
+  En_Camino @map("En_Camino")
+  Entregado @map("Entregado")
+  Problema  @map("Problema")
+  Devuelto  @map("Devuelto")
+}
+
+enum SubscriptionStatus {
+  Activa         @map("Activa")
+  Pendiente_Pago @map("Pendiente_Pago")
+  Cancelada      @map("Cancelada")
+  Pausada        @map("Pausada")
+  Finalizada     @map("Finalizada")
+}
+
+enum RoleScope {
+  PLATFORM @map("PLATFORM")
+  CLUB     @map("CLUB")
 }

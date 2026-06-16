@@ -37,4 +37,12 @@ export class CreateClubDto {
   @IsOptional()
   @IsEnum(ClubStatus)
   clubStatus?: ClubStatus;
+
+  @IsOptional()
+  @IsString()
+  milestones?: string;
+
+  @IsOptional()
+  @IsString()
+  communityText?: string;
 }
