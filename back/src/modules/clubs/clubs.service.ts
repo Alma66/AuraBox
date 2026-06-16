@@ -130,6 +130,20 @@ export class ClubsService {
       isOwner = !!association;
     }
 
+    const entrepreneurAssociations = await this.prisma.entrepreneur_Club.findMany({
+      where: { idClub: id },
+    });
+
+    const entrepreneurs = await Promise.all(
+      entrepreneurAssociations.map(async (assoc) => {
+        const e = await this.prisma.entrepreneurs.findUnique({
+          where: { id: assoc.idEntrepreneurs },
+          select: { id: true, firstName: true, lastName: true },
+        });
+        return e ? { id: e.id, firstName: e.firstName, lastName: e.lastName } : null;
+      }),
+    );
+
     const socialMedia = socialNetworks.reduce((acc: Record<string, string>, sn) => {
       acc[sn.networkType.toLowerCase()] = sn.profileUrl;
       return acc;
@@ -159,6 +173,11 @@ export class ClubsService {
       transferDiscount: plan.transferDiscount ? Number(plan.transferDiscount) : undefined,
     }));
 
+    let parsedMilestones = [];
+    try {
+      parsedMilestones = club.milestones ? JSON.parse(club.milestones) : [];
+    } catch {}
+
     return sanitizeClub({
       id: club.id,
       name: club.name,
@@ -174,6 +193,9 @@ export class ClubsService {
       creationDate: club.creationDate,
       averageRating,
       totalReviews,
+      milestones: parsedMilestones,
+      communityText: club.communityText || '',
+      entrepreneurs: entrepreneurs.filter(Boolean),
       category: categories.map((c) => c.name).join(', ') || 'Sin categoría',
       bannerImages,
       bannerImagesRaw: images
