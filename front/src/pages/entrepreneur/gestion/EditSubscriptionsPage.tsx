@@ -24,7 +24,7 @@ function mapPlanFromApi(raw: any): SubscriptionPlan {
     description: raw.description ?? '',
     price: Number(raw.basePrice ?? raw.price ?? 0),
     currency: 'ARS',
-    image: raw.imageUrl ?? '/assets/default-plan.jpg',
+    image: raw.imageUrl ?? '',
     deliveryFrequency: raw.frequency ?? raw.deliveryFrequency ?? 'Mensual',
     includes: raw.includes ?? [],
     shippingAreas: raw.shippingAreas ?? '',
@@ -441,7 +441,7 @@ const EditSubscriptionsPage: React.FC = () => {
                       <div key={plan.planId} className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-md transition-shadow">
                         <div className="relative">
                           <img
-                            src={plan.image || '/assets/default-plan.jpg'}
+                            src={plan.image && !plan.image.includes('/assets/') ? plan.image : 'https://placehold.co/400x200/e2e8f0/94a3b8?text=Sin+imagen'}
                             alt={plan.name}
                             className="w-full h-40 object-cover"
                           />
