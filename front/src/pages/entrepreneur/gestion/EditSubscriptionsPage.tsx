@@ -166,7 +166,7 @@ const EditSubscriptionsPage: React.FC = () => {
     transferDiscount: Number(formData.descuentoTransferencia) || 0,
     active: formData.activo,
     shippingAreas: formData.shippingAreas,
-    includes: formData.includes,
+    includes: JSON.stringify(formData.includes ?? []),
   });
 
   const handleSave = async () => {

@@ -296,9 +296,13 @@ model Subscription_Types {
   cashDiscount     Decimal?  @map("Cash_Discount") @db.Decimal(5, 2)
   transferDiscount Decimal?  @map("Transfer_Discount") @db.Decimal(5, 2)
   active           Boolean   @default(true) @map("Active")
+  shippingAreas    String?   @map("Shipping_Areas")
+  includes         String?   @map("Includes")
+  imageUrl         String?   @map("Image_URL")
 
   @@map("Subscription_Types")
 }
+
 
 model Transaction_History {
   id                   Int           @id @default(autoincrement()) @map("ID")

@@ -1,5 +1,5 @@
-import { 
-  IsBoolean, IsInt, IsOptional, IsString, MinLength, IsEnum, IsNumber,
+import {
+  IsBoolean, IsInt, IsOptional, IsString, MinLength, IsEnum,
 } from 'class-validator';
 import { Transform } from 'class-transformer';
 import { Frequency } from '@prisma/client';
@@ -64,4 +64,16 @@ export class CreateSubscriptionTypeDto {
     return v !== undefined ? Boolean(v) : true;
   })
   active?: boolean;
+
+  @IsOptional()
+  @IsString()
+  shippingAreas?: string;
+
+  @IsOptional()
+  @IsString()
+  includes?: string;
+
+  @IsOptional()
+  @IsString()
+  imageUrl?: string;
 }

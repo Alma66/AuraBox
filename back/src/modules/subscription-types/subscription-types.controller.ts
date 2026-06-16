@@ -1,7 +1,10 @@
 import {
   Body, Controller, Delete, Get, Param, ParseIntPipe,
-  Post, Put, UseGuards, Request, UsePipes, ValidationPipe, Query,
+  Post, Put, Patch, UseGuards, Request, UsePipes,
+  ValidationPipe, Query, UseInterceptors, UploadedFile,
 } from '@nestjs/common';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { memoryStorage } from 'multer';
 import { SubscriptionTypesService } from './subscription-types.service';
 import { CreateSubscriptionTypeDto } from './dto/create-subscription-types.dto';
 import { UpdateSubscriptionTypeDto } from './dto/update-subscription-types.dto';
@@ -46,7 +49,29 @@ export class SubscriptionTypesController {
   }
 
   @UseGuards(RolesGuard)
-  @Roles('entrepreneur', 'admin')  // ← antes era solo 'admin'
+  @Roles('entrepreneur', 'admin')
+  @Patch(':id/image')
+  @UseInterceptors(FileInterceptor('file', {
+    storage: memoryStorage(),
+    limits: { fileSize: 5 * 1024 * 1024 },
+    fileFilter: (req, file, callback) => {
+      if (!file.mimetype.match(/\/(jpg|jpeg|png|gif|webp)$/)) {
+        callback(new Error('Solo se permiten imágenes'), false);
+      } else {
+        callback(null, true);
+      }
+    },
+  }))
+  async updateImage(
+    @Param('id', ParseIntPipe) id: number,
+    @UploadedFile() file: Express.Multer.File,
+    @Request() req,
+  ) {
+    return this.svc.updateImage(id, file, req.user?.id, req.user?.role);
+  }
+
+  @UseGuards(RolesGuard)
+  @Roles('entrepreneur', 'admin')
   @Delete(':id')
   async remove(@Param('id', ParseIntPipe) id: number, @Request() req) {
     return this.svc.remove(id, req.user?.id, req.user?.role);
