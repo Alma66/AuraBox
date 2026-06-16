@@ -667,7 +667,7 @@ const ClubDetailPage: React.FC = () => {
                   price: plan.price,
                   currency: plan.currency,
                   description: plan.description,
-                  image: plan.image || '/assets/default-plan.jpg',
+                  image: plan.image && !plan.image.includes('/assets/') ? plan.image : '',
                   deliveryFrequency: plan.deliveryFrequency || '',
                   includes: plan.includes || [],
                   shippingAreas: plan.shippingAreas || '',

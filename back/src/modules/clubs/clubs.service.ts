@@ -166,11 +166,15 @@ export class ClubsService {
       currency: 'ARS',
       description: plan.description || '',
       deliveryFrequency: plan.frequency,
-      includes: [],
-      shippingAreas: '',
+      includes: (() => {
+        try { return plan.includes ? JSON.parse(plan.includes) : []; } catch { return []; }
+      })(),
+      shippingAreas: plan.shippingAreas || '',
       specifications: [],
+      image: plan.imageUrl || '',
       cashDiscount: plan.cashDiscount ? Number(plan.cashDiscount) : undefined,
       transferDiscount: plan.transferDiscount ? Number(plan.transferDiscount) : undefined,
+      active: plan.active,
     }));
 
     let parsedMilestones = [];
