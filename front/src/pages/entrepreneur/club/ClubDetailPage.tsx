@@ -371,7 +371,7 @@ const ClubDetailPage: React.FC = () => {
         </div>
       )}
 
-      <div className="relative overflow-hidden shadow-lg">
+      <div className="relative shadow-lg">
         <div className="h-72 md:h-96">
           {bannerList.length > 0 ? (
             <Slider {...bannerSliderSettings}>
