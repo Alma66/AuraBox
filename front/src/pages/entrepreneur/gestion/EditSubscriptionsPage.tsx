@@ -18,19 +18,18 @@ const FREQUENCY_OPTIONS = [
   { label: 'Anual', value: 'Anual' },
 ];
 
-// Convierte un plan de la BD al formato SubscriptionPlan del frontend
 function mapPlanFromApi(raw: any): SubscriptionPlan {
   return {
     planId: String(raw.id),
-    name: raw.name,
-    description: raw.description || '',
+    name: raw.name ?? '',
+    description: raw.description ?? '',
     price: Number(raw.basePrice ?? raw.price ?? 0),
     currency: 'ARS',
     image: '/assets/default-plan.jpg',
     deliveryFrequency: raw.frequency ?? raw.deliveryFrequency ?? 'Mensual',
-    includes: [],
-    shippingAreas: '',
-    specifications: [],
+    includes: raw.includes ?? [],           // ← garantizamos array
+    shippingAreas: raw.shippingAreas ?? '',
+    specifications: raw.specifications ?? [], // ← garantizamos array
     descuentoTransferencia: raw.transferDiscount ? Number(raw.transferDiscount) : 0,
     descuentoEfectivo: raw.cashDiscount ? Number(raw.cashDiscount) : 0,
     activo: raw.active ?? true,

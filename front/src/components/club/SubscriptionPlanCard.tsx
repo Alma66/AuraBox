@@ -34,6 +34,10 @@ const SubscriptionPlanCard: React.FC<SubscriptionPlanCardProps> = ({ plan, clubN
   const [showFullIncludes, setShowFullIncludes] = useState(false);
   const [showFullSpecs, setShowFullSpecs] = useState(false);
 
+  const includes = plan.includes ?? [];
+  const specifications = plan.specifications ?? [];
+  const description = plan.description ?? '';
+
   const descuento = Math.max(plan.descuentoTransferencia || 0, plan.descuentoEfectivo || 0);
   const precioFinal = plan.price * (1 - descuento / 100);
 
@@ -68,11 +72,10 @@ const SubscriptionPlanCard: React.FC<SubscriptionPlanCardProps> = ({ plan, clubN
       <div className="p-6 flex-grow flex flex-col">
         <h3 className="text-2xl font-bold text-gray-900 mb-2">{plan.name}</h3>
         <p className="text-gray-600 text-sm mb-3">Frecuencia: <span className="font-semibold">{plan.deliveryFrequency}</span></p>
-       
         <div className="mb-4">
           <p className="text-gray-700 text-sm leading-relaxed">
-            {showFullDescription ? plan.description : `${plan.description.substring(0, 120)}...`}
-            {plan.description.length > 120 && (
+            {showFullDescription ? description : `${description.substring(0, 120)}${description.length > 120 ? '...' : ''}`}
+            {description.length > 120 && (
               <button
                 onClick={() => setShowFullDescription(!showFullDescription)}
                 className="text-blue-500 hover:underline ml-1 text-xs"
@@ -82,14 +85,13 @@ const SubscriptionPlanCard: React.FC<SubscriptionPlanCardProps> = ({ plan, clubN
             )}
           </p>
         </div>
-
         <div className="mb-4">
           <h4 className="text-md font-semibold text-gray-800 mb-2">¿Qué incluye?</h4>
           <ul className="list-disc list-inside text-gray-700 text-sm">
-            {plan.includes.slice(0, showFullIncludes ? plan.includes.length : 2).map((item, index) => (
+            {includes.slice(0, showFullIncludes ? includes.length : 2).map((item, index) => (
               <li key={index}>{item}</li>
             ))}
-            {plan.includes.length > 2 && (
+            {includes.length > 2 && (
               <button
                 onClick={() => setShowFullIncludes(!showFullIncludes)}
                 className="text-blue-500 hover:underline ml-1 text-xs"
@@ -99,17 +101,16 @@ const SubscriptionPlanCard: React.FC<SubscriptionPlanCardProps> = ({ plan, clubN
             )}
           </ul>
         </div>
-
-        {plan.specifications && plan.specifications.length > 0 && (
+        {specifications.length > 0 && (
           <div className="mb-4">
             <h4 className="text-md font-semibold text-gray-800 mb-2">Especificaciones:</h4>
             <div className="flex flex-wrap gap-2 text-sm">
-              {plan.specifications.slice(0, showFullSpecs ? plan.specifications.length : 3).map((spec, index) => (
+              {specifications.slice(0, showFullSpecs ? specifications.length : 3).map((spec, index) => (
                 <span key={index} className="bg-gray-100 text-gray-700 px-2 py-1 rounded-full text-xs font-medium">
                   {spec.type}: {spec.value}
                 </span>
               ))}
-              {plan.specifications.length > 3 && (
+              {specifications.length > 3 && (
                 <button
                   onClick={() => setShowFullSpecs(!showFullSpecs)}
                   className="text-blue-500 hover:underline ml-1 text-xs"
@@ -120,18 +121,15 @@ const SubscriptionPlanCard: React.FC<SubscriptionPlanCardProps> = ({ plan, clubN
             </div>
           </div>
         )}
-
         <div className="mb-4">
           <h4 className="text-md font-semibold text-gray-800 mb-2">Zonas de Envío:</h4>
           <p className="text-gray-700 text-sm">{plan.shippingAreas}</p>
         </div>
-
         {promoEspecial && (
           <div className="mb-4 p-3 bg-purple-50 rounded-lg border-l-4 border-purple-500">
             <p className="text-purple-800 font-semibold text-sm">{promoEspecial}</p>
           </div>
         )}
-
         <div className="mt-auto flex justify-between items-center border-t pt-4">
           <div>
             <span className={`text-3xl font-bold ${descuento > 0 ? 'text-gray-500 line-through' : 'text-gray-800'}`}>
