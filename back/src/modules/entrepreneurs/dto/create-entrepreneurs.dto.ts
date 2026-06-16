@@ -51,4 +51,8 @@ export class CreateEntrepreneurDto {
 
   @IsOptional()
   active?: boolean;
+
+  @IsOptional()
+  @IsString()
+  bio?: string;
 }

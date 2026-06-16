@@ -138,9 +138,9 @@ export class ClubsService {
       entrepreneurAssociations.map(async (assoc) => {
         const e = await this.prisma.entrepreneurs.findUnique({
           where: { id: assoc.idEntrepreneurs },
-          select: { id: true, firstName: true, lastName: true },
+          select: { id: true, firstName: true, lastName: true, bio: true },
         });
-        return e ? { id: e.id, firstName: e.firstName, lastName: e.lastName } : null;
+        return e ? { id: e.id, firstName: e.firstName, lastName: e.lastName, bio: e.bio } : null;
       }),
     );
 
