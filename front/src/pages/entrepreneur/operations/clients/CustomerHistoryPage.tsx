@@ -29,33 +29,33 @@ const CustomerHistoryPage: React.FC = () => {
 
   const managedClubId = clubId || user?.managedClubId;
 
-  useEffect(() => {
-    if (userRole !== 'entrepreneur' || !managedClubId || !customerId) { navigate('/'); return; }
-    const fetchData = async () => {
-      try {
-        const [clubRes, subsRes, customersRes] = await Promise.all([
-          api.get(`/clubs/${managedClubId}`),
-          api.get(`/clubs/${managedClubId}/user-subscriptions`),
-          api.get(`/clubs/${managedClubId}/customers`),
-        ]);
-        const clubData = getResponseData(clubRes);
-        const subsData: Subscription[] = getResponseData(subsRes) || [];
-        const usersData: User[] = getResponseData(customersRes) || [];
-
-        setClub(clubData);
-        const found = usersData.find(u => String(u.id) === customerId);
-        setCustomer(found || null);
-        setSubscriptions(subsData.filter(s => String(s.idUser) === customerId).sort((a, b) =>
-          new Date(b.startDate).getTime() - new Date(a.startDate).getTime()
-        ));
-      } catch {
-        navigate('/');
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchData();
-  }, [managedClubId, customerId, userRole, navigate]);
+ useEffect(() => {
+  if (userRole === null) return;
+  if (userRole !== 'entrepreneur' || !managedClubId || !customerId) { navigate('/'); return; }
+  const fetchData = async () => {
+    try {
+      const [clubRes, subsRes, customersRes] = await Promise.all([
+        api.get(`/clubs/${managedClubId}`),
+        api.get(`/clubs/${managedClubId}/user-subscriptions`),
+        api.get(`/clubs/${managedClubId}/customers`),
+      ]);
+      const clubData = getResponseData(clubRes);
+      const subsData: Subscription[] = getResponseData(subsRes) || [];
+      const usersData: User[] = getResponseData(customersRes) || [];
+      setClub(clubData);
+      const found = usersData.find(u => String(u.id) === customerId);
+      setCustomer(found || null);
+      setSubscriptions(subsData.filter(s => String(s.idUser) === customerId).sort((a, b) =>
+        new Date(b.startDate).getTime() - new Date(a.startDate).getTime()
+      ));
+    } catch {
+      navigate('/');
+    } finally {
+      setLoading(false);
+    }
+  };
+  fetchData();
+}, [managedClubId, customerId, userRole, navigate]);
 
   if (loading) return (
     <div className="min-h-screen flex items-center justify-center">
