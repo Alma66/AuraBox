@@ -1,308 +1,278 @@
-import { Injectable, NotFoundException, ForbiddenException, BadRequestException } from '@nestjs/common';
+import { Injectable, NotFoundException, BadRequestException, ForbiddenException } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
 import { CreateClubDto } from './dto/create-club.dto';
 import { UpdateClubDto } from './dto/update-club.dto';
 import { CloudinaryService } from '../cloudinary/cloudinary.service';
-
-function sanitizeClub(club: any) {
-  if (!club) return club;
-  if (club.creationDate instanceof Date) {
-    club.creationDate = club.creationDate.toISOString();
-  }
-  return club;
-}
-
-function computeRating(reviews: { rating: number }[]): { averageRating: number; totalReviews: number } {
-  if (!reviews || reviews.length === 0) return { averageRating: 0, totalReviews: 0 };
-  const sum = reviews.reduce((acc, r) => acc + r.rating, 0);
-  return {
-    averageRating: Math.round((sum / reviews.length) * 10) / 10,
-    totalReviews: reviews.length,
-  };
-}
+import { Prisma } from '@prisma/client';
 
 @Injectable()
 export class ClubsService {
   constructor(
     private readonly prisma: PrismaService,
-    private readonly cloudinary: CloudinaryService,
+    private readonly cloudinaryService: CloudinaryService,
   ) {}
 
-  async create(ownerId: number, dto: CreateClubDto, logoFile?: Express.Multer.File) {
-    const entrepreneur = await this.prisma.entrepreneurs.findUnique({ where: { id: ownerId } });
-    if (!entrepreneur) throw new ForbiddenException('Solo entrepreneurs pueden crear clubs');
-
-    let logoUrl = dto.logoUrl ?? '';
-    if (logoFile) {
-      logoUrl = await this.cloudinary.uploadImage(logoFile, 'aurabox/clubs/logos');
+  async create(dto: CreateClubDto) {
+    if (!dto.logoUrl) {
+      throw new BadRequestException('logoUrl es requerido');
     }
 
-    const club = await this.prisma.club.create({
-      data: {
-        name: dto.name,
-        logoUrl,
-        slogan: dto.slogan,
-        history: dto.history,
-        shortDescription: dto.shortDescription,
-        contactEmail: dto.contactEmail,
-        whatsappContact: dto.whatsappContact,
-        clubStatus: dto.clubStatus ?? 'PENDIENTE_APROBACION',
-      },
-    });
-
-    await this.prisma.entrepreneur_Club.create({
-      data: { idEntrepreneurs: ownerId, idClub: club.id },
-    });
-
-    return sanitizeClub(club);
+    const data: Prisma.ClubCreateInput = {
+      name: dto.name,
+      logoUrl: dto.logoUrl,
+      slogan: dto.slogan,
+      history: dto.history,
+      shortDescription: dto.shortDescription,
+      contactEmail: dto.contactEmail,
+      whatsappContact: dto.whatsappContact,
+      milestones: dto.milestones,
+      communityText: dto.communityText,
+    };
+    if (dto.clubStatus !== undefined) {
+      data.clubStatus = dto.clubStatus;
+    }
+    return this.prisma.club.create({ data });
   }
 
   async findAll() {
-    const clubs = await this.prisma.club.findMany({ orderBy: { creationDate: 'desc' } });
-    const clubsWithRatings = await Promise.all(
-      clubs.map(async (club) => {
-        const reviews = await this.prisma.reviews.findMany({
-          where: { idClub: club.id, active: true },
-          select: { rating: true },
-        });
-        const { averageRating, totalReviews } = computeRating(reviews);
-        return sanitizeClub({ ...club, averageRating, totalReviews });
-      }),
-    );
-    return clubsWithRatings;
-  }
-
-  async findOne(id: number, requesterId?: number) {
-    const club = await this.prisma.club.findUnique({ where: { id } });
-    if (!club) throw new NotFoundException('Club no encontrado');
-
-    const reviews = await this.prisma.reviews.findMany({
-      where: { idClub: id, active: true },
-      select: { id: true, rating: true, title: true, comment: true, reviewDate: true, idUser: true },
-      orderBy: { reviewDate: 'desc' },
-      take: 10,
-    });
-
-    const { averageRating, totalReviews } = computeRating(reviews);
-
-    const enrichedReviews = await Promise.all(
-      reviews.map(async (r) => {
-        const user = await this.prisma.user.findUnique({
-          where: { id: r.idUser },
-          select: { firstName: true, lastName: true },
-        });
-        return {
-          ...r,
-          reviewDate: r.reviewDate instanceof Date ? r.reviewDate.toISOString() : r.reviewDate,
-          userName: user ? `${user.firstName} ${user.lastName}` : 'Usuario',
-        };
-      }),
-    );
-
-    const socialNetworks = await this.prisma.club_Social_Networks.findMany({ where: { idClub: id } });
-
-    const images = await this.prisma.image_Club.findMany({
-      where: { idClub: id },
-      orderBy: { uploadDate: 'desc' },
-    });
-
-    const subscriptionPlans = await this.prisma.subscription_Types.findMany({
-      where: { idClub: id, active: true },
-    });
-
-    const clubPaymentMethods = await this.prisma.club_Payment_Method.findMany({ where: { idClub: id } });
-    const paymentMethodIds = clubPaymentMethods.map((cpm) => cpm.idPaymentMethod);
-    const paymentMethods = paymentMethodIds.length
-      ? await this.prisma.payment_Methods.findMany({ where: { id: { in: paymentMethodIds }, active: true } })
-      : [];
-
-    const clubCategories = await this.prisma.club_Categories.findMany({ where: { idClub: id } });
-    const categoryIds = clubCategories.map((cc) => cc.idCategories);
-    const categories = categoryIds.length
-      ? await this.prisma.categories.findMany({ where: { id: { in: categoryIds } } })
-      : [];
-
-    let isOwner = false;
-    if (requesterId) {
-      const association = await this.prisma.entrepreneur_Club.findFirst({
-        where: { idEntrepreneurs: requesterId, idClub: id },
-      });
-      isOwner = !!association;
-    }
-
-    const entrepreneurAssociations = await this.prisma.entrepreneur_Club.findMany({
-      where: { idClub: id },
-    });
-
-    const entrepreneurs = await Promise.all(
-      entrepreneurAssociations.map(async (assoc) => {
-        const e = await this.prisma.entrepreneurs.findUnique({
-          where: { id: assoc.idEntrepreneurs },
-          select: { id: true, firstName: true, lastName: true, bio: true },
-        });
-        return e ? { id: e.id, firstName: e.firstName, lastName: e.lastName, bio: e.bio } : null;
-      }),
-    );
-
-    const socialMedia = socialNetworks.reduce((acc: Record<string, string>, sn) => {
-      acc[sn.networkType.toLowerCase()] = sn.profileUrl;
-      return acc;
-    }, {});
-
-    const bannerImages = images
-      .filter((img) => img.contentType === 'Imagen' && img.description !== 'historia' && !img.description?.startsWith('team-'))
-      .map((img) => img.imageUrl);
-
-    const socialNetworksRaw = socialNetworks.map((sn) => ({
-      id: sn.id,
-      networkType: sn.networkType,
-      profileUrl: sn.profileUrl,
-    }));
-
-    const mappedPlans = subscriptionPlans.map((plan) => ({
-      planId: String(plan.id),
-      name: plan.name,
-      price: Number(plan.basePrice),
-      currency: 'ARS',
-      description: plan.description || '',
-      deliveryFrequency: plan.frequency,
-      includes: (() => {
-        try { return plan.includes ? JSON.parse(plan.includes) : []; } catch { return []; }
-      })(),
-      shippingAreas: plan.shippingAreas || '',
-      specifications: [],
-      image: plan.imageUrl || '',
-      cashDiscount: plan.cashDiscount ? Number(plan.cashDiscount) : undefined,
-      transferDiscount: plan.transferDiscount ? Number(plan.transferDiscount) : undefined,
-      active: plan.active,
-    }));
-
-    let parsedMilestones = [];
-    try {
-      parsedMilestones = club.milestones ? JSON.parse(club.milestones) : [];
-    } catch {}
-
-    return sanitizeClub({
-      id: club.id,
-      name: club.name,
-      slogan: club.slogan,
-      shortDescription: club.shortDescription,
-      logoUrl: club.logoUrl,
-      logoImage: club.logoUrl,
-      history: club.history,
-      fullHistory: club.history,
-      contactEmail: club.contactEmail,
-      whatsappContact: club.whatsappContact,
-      clubStatus: club.clubStatus,
-      creationDate: club.creationDate,
-      averageRating,
-      totalReviews,
-      milestones: parsedMilestones,
-      communityText: club.communityText || '',
-      entrepreneurs: entrepreneurs.filter(Boolean),
-      category: categories.map((c) => c.name).join(', ') || 'Sin categoría',
-      bannerImages,
-      bannerImagesRaw: images
-        .filter((img) => img.contentType === 'Imagen' && img.description !== 'historia' && !img.description?.startsWith('team-'))
-        .map((img) => ({ id: img.id, imageUrl: img.imageUrl, description: img.description })),
-      historyImageRaw: images
-        .filter((img) => img.description === 'historia' || img.description?.startsWith('team-'))
-        .map((img) => ({ id: img.id, imageUrl: img.imageUrl, description: img.description })),
-      mainImage: images.find((img) => img.contentType === 'Imagen' && img.description !== 'historia' && !img.description?.startsWith('team-'))?.imageUrl || null,
-      socialMedia: Object.keys(socialMedia).length ? socialMedia : null,
-      socialNetworksRaw,
-      subscriptionPlans: mappedPlans,
-      paymentMethods: paymentMethods.map((pm) => pm.method),
-      featuredReviews: enrichedReviews,
-      isOwner,
-    });
+    return this.prisma.club.findMany({ orderBy: { creationDate: 'desc' } });
   }
 
   async findFeatured() {
-    const isDev = process.env.NODE_ENV !== 'production';
     const clubs = await this.prisma.club.findMany({
-      where: {
-        clubStatus: isDev
-          ? { in: ['APROBADO', 'PENDIENTE_APROBACION'] }
-          : 'APROBADO',
-      },
+      where: { clubStatus: 'APROBADO' },
+      orderBy: { averageRating: 'desc' },
+      take: 12,
     });
-    const withRatings = await Promise.all(
-      clubs.map(async (club) => {
-        const reviews = await this.prisma.reviews.findMany({
-          where: { idClub: club.id, active: true },
-          select: { rating: true },
-        });
-        const { averageRating, totalReviews } = computeRating(reviews);
-        return { ...club, averageRating, totalReviews };
-      }),
+    return clubs.map((c) => this.sanitizeClub(c));
+  }
+
+  async findOne(id: number, requestingUserId?: number) {
+    const club = await this.prisma.club.findUnique({ where: { id } });
+    if (!club) throw new NotFoundException('Club no encontrado');
+
+    const entrepreneurClub = await this.prisma.entrepreneur_Club.findMany({
+      where: { idClub: id },
+    });
+    const entrepreneurIds = entrepreneurClub.map((ec) => ec.idEntrepreneurs);
+
+    let isOwner = false;
+    if (requestingUserId) {
+      isOwner = entrepreneurIds.includes(requestingUserId);
+    }
+
+    const entrepreneurs = await this.prisma.entrepreneurs.findMany({
+      where: { id: { in: entrepreneurIds } },
+      select: { id: true, firstName: true, lastName: true, bio: true },
+    });
+
+    const images = await this.prisma.image_Club.findMany({ where: { idClub: id } });
+
+    const bannerImagesRaw = images.filter(
+      (img) => img.description !== 'historia' && !(img.description ?? '').startsWith('team-'),
     );
-    const sorted = withRatings.sort((a, b) => {
-      if (b.averageRating !== a.averageRating) return b.averageRating - a.averageRating;
-      return b.totalReviews - a.totalReviews;
-    });
-    return sorted.slice(0, 5).map(sanitizeClub);
+    const historyImageRaw = images.filter((img) => img.description === 'historia');
+
+    const socialNetworksRaw = await this.prisma.club_Social_Networks.findMany({ where: { idClub: id } });
+
+    const plans = await this.prisma.subscription_Types.findMany({ where: { idClub: id } });
+    const mappedPlans = plans.map((p) => this.mapPlan(p));
+
+    return {
+      ...this.sanitizeClub(club),
+      isOwner,
+      entrepreneurs,
+      bannerImagesRaw,
+      historyImageRaw,
+      socialNetworksRaw,
+      subscriptionPlans: mappedPlans,
+    };
   }
 
-  async update(id: number, userId: number, userRole: string, dto: UpdateClubDto) {
-    const club = await this.prisma.club.findUnique({ where: { id } });
-    if (!club) throw new NotFoundException('Club no encontrado');
-    if (userRole === 'entrepreneur') {
-      const association = await this.prisma.entrepreneur_Club.findFirst({
-        where: { idEntrepreneurs: userId, idClub: id },
-      });
-      if (!association) throw new ForbiddenException('No eres el owner de este club');
-    } else if (userRole !== 'admin') {
-      throw new ForbiddenException('No autorizado para editar clubes');
+  async update(id: number, dto: UpdateClubDto, entrepreneurId: number) {
+    await this.assertOwnership(id, entrepreneurId);
+
+    const data: Prisma.ClubUpdateInput = {};
+    if (dto.name !== undefined) data.name = dto.name;
+    if (dto.slogan !== undefined) data.slogan = dto.slogan;
+    if (dto.history !== undefined) data.history = dto.history;
+    if (dto.shortDescription !== undefined) data.shortDescription = dto.shortDescription;
+    if (dto.contactEmail !== undefined) data.contactEmail = dto.contactEmail;
+    if (dto.whatsappContact !== undefined) data.whatsappContact = dto.whatsappContact;
+    if (dto.communityText !== undefined) data.communityText = dto.communityText;
+    if (dto.milestones !== undefined) data.milestones = dto.milestones;
+
+    try {
+      const updated = await this.prisma.club.update({ where: { id }, data });
+      return this.sanitizeClub(updated);
+    } catch (err: any) {
+      if (err instanceof Prisma.PrismaClientKnownRequestError && err.code === 'P2025') {
+        throw new NotFoundException('Club no encontrado');
+      }
+      throw err;
     }
-    const updated = await this.prisma.club.update({ where: { id }, data: dto });
-    return sanitizeClub(updated);
   }
 
-  async updateLogo(id: number, userId: number, userRole: string, logoFile: Express.Multer.File) {
-    if (!logoFile) throw new BadRequestException('Se requiere una imagen para el logo');
+  async updateLogo(id: number, file: Express.Multer.File, entrepreneurId: number) {
+    await this.assertOwnership(id, entrepreneurId);
 
     const club = await this.prisma.club.findUnique({ where: { id } });
     if (!club) throw new NotFoundException('Club no encontrado');
-
-    if (userRole === 'entrepreneur') {
-      const association = await this.prisma.entrepreneur_Club.findFirst({
-        where: { idEntrepreneurs: userId, idClub: id },
-      });
-      if (!association) throw new ForbiddenException('No eres el owner de este club');
-    } else if (userRole !== 'admin') {
-      throw new ForbiddenException('No autorizado para editar clubes');
-    }
 
     if (club.logoUrl) {
       try {
-        const publicId = this.cloudinary.extractPublicId(club.logoUrl);
-        await this.cloudinary.deleteImage(publicId);
+        const publicId = this.cloudinaryService.extractPublicId(club.logoUrl);
+        await this.cloudinaryService.deleteImage(publicId);
       } catch {}
     }
 
-    const logoUrl = await this.cloudinary.uploadImage(logoFile, 'aurabox/clubs/logos');
-    const updated = await this.prisma.club.update({ where: { id }, data: { logoUrl } });
-    return sanitizeClub(updated);
-  }
+    const secureUrl = await this.cloudinaryService.uploadImage(file, 'aurabox/clubs/logos');
 
-  async remove(id: number, userRole: string) {
-    if (userRole !== 'admin') throw new ForbiddenException('Solo los administradores pueden eliminar clubes');
-    const club = await this.prisma.club.findUnique({ where: { id } });
-    if (!club) throw new NotFoundException('Club no encontrado');
-    await this.prisma.club.delete({ where: { id } });
-    return { message: 'Club eliminado correctamente' };
-  }
-
-  async findClubByEntrepreneur(entrepreneurId: number) {
-    const association = await this.prisma.entrepreneur_Club.findFirst({
-      where: { idEntrepreneurs: entrepreneurId },
+    const updated = await this.prisma.club.update({
+      where: { id },
+      data: { logoUrl: secureUrl },
     });
-    if (!association) return null;
+
+    return this.sanitizeClub(updated);
+  }
+
+  async remove(id: number) {
     try {
-      return await this.findOne(association.idClub, entrepreneurId);
-    } catch {
-      return null;
+      await this.prisma.club.delete({ where: { id } });
+      return { ok: true };
+    } catch (err: any) {
+      if (err instanceof Prisma.PrismaClientKnownRequestError && err.code === 'P2025') {
+        throw new NotFoundException('Club no encontrado');
+      }
+      throw err;
     }
+  }
+
+  async findSubscriptionsByClub(clubId: number, entrepreneurId: number) {
+    await this.assertOwnership(clubId, entrepreneurId);
+
+    const plans = await this.prisma.subscription_Types.findMany({
+      where: { idClub: clubId },
+      select: { id: true },
+    });
+    const planIds = plans.map((p) => p.id);
+
+    if (planIds.length === 0) return [];
+
+    const subs = await this.prisma.user_Subscriptions.findMany({
+      where: { idSubscriptionTypes: { in: planIds } },
+      orderBy: { startDate: 'desc' },
+    });
+
+    return subs.map((s) => this.sanitizeSubscription(s));
+  }
+
+  async findCustomersByClub(clubId: number, entrepreneurId: number) {
+    await this.assertOwnership(clubId, entrepreneurId);
+
+    const plans = await this.prisma.subscription_Types.findMany({
+      where: { idClub: clubId },
+      select: { id: true },
+    });
+    const planIds = plans.map((p) => p.id);
+
+    if (planIds.length === 0) return [];
+
+    const subs = await this.prisma.user_Subscriptions.findMany({
+      where: { idSubscriptionTypes: { in: planIds } },
+      select: { idUser: true },
+      distinct: ['idUser'],
+    });
+
+    const userIds = subs.map((s) => s.idUser);
+    if (userIds.length === 0) return [];
+
+    const users = await this.prisma.user.findMany({
+      where: { id: { in: userIds } },
+      select: {
+        id: true,
+        firstName: true,
+        lastName: true,
+        email: true,
+        phoneNumber: true,
+        streetAddress: true,
+        addressNumber: true,
+        floorNumber: true,
+        addressDetails: true,
+        city: true,
+        province: true,
+        postalCode: true,
+        active: true,
+        registrationDate: true,
+        birthDate: true,
+      },
+    });
+
+    return users.map((u) => ({
+      ...u,
+      registrationDate: u.registrationDate.toISOString(),
+      birthDate: u.birthDate ? u.birthDate.toISOString() : null,
+    }));
+  }
+
+  private async assertOwnership(clubId: number, entrepreneurId: number) {
+    const ec = await this.prisma.entrepreneur_Club.findFirst({
+      where: { idClub: clubId, idEntrepreneurs: entrepreneurId },
+    });
+    if (!ec) throw new ForbiddenException('No tenés acceso a este club');
+    return ec;
+  }
+
+  private mapPlan(p: any) {
+    let includes: string[] = [];
+    if (p.includes) {
+      try {
+        includes = JSON.parse(p.includes);
+      } catch {
+        includes = [];
+      }
+    }
+    return {
+      planId: p.id,
+      name: p.name,
+      description: p.description,
+      price: p.basePrice ? Number(p.basePrice) : 0,
+      currency: 'ARS',
+      deliveryFrequency: p.frequency,
+      image: p.imageUrl ?? '',
+      includes,
+      shippingAreas: p.shippingAreas,
+      active: p.active,
+      cashDiscount: p.cashDiscount ? Number(p.cashDiscount) : 0,
+      transferDiscount: p.transferDiscount ? Number(p.transferDiscount) : 0,
+    };
+  }
+
+  private sanitizeClub(club: any) {
+    if (!club) return club;
+    const sanitized = { ...club };
+    if (sanitized.creationDate instanceof Date) {
+      sanitized.creationDate = sanitized.creationDate.toISOString();
+    }
+    if (sanitized.averageRating !== undefined && sanitized.averageRating !== null) {
+      try {
+        sanitized.averageRating = sanitized.averageRating.toString();
+      } catch {}
+    }
+    return sanitized;
+  }
+
+  private sanitizeSubscription(sub: any) {
+    if (!sub) return sub;
+    const sanitized = { ...sub };
+    if (sanitized.monthlyAmountPaid !== undefined && sanitized.monthlyAmountPaid !== null) {
+      try {
+        sanitized.monthlyAmountPaid = sanitized.monthlyAmountPaid.toString();
+      } catch {}
+    }
+    ['startDate', 'expectedEndDate', 'lastPaymentDate', 'nextPaymentDate', 'cancellationDate'].forEach((k) => {
+      if (sanitized[k] instanceof Date) sanitized[k] = sanitized[k].toISOString();
+    });
+    return sanitized;
   }
 }

@@ -2,17 +2,17 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../../../App';
 import { Club } from '../../../../types/club';
-import { Subscription } from '../../../../types/subscription';
+import { Subscription, normalizeStatus } from '../../../../types/subscription';
 import { User } from '../../../../types/user';
 import api, { getResponseData } from '../../../../api/config';
 
 interface CustomerWithSubscriptions extends User {
   subscriptionsInfo: {
-    id: string;
-    planId: string;
-    status: string;
+    id: number;
+    idSubscriptionTypes: number;
+    subscriptionStatus: Subscription['subscriptionStatus'];
     startDate: string;
-    cancelDate?: string;
+    cancellationDate?: string | null;
   }[];
 }
 
@@ -27,59 +27,52 @@ const CustomerHistoryPage: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    const fetchData = async () => {
-      if (userRole !== 'entrepreneur' || !user?.managedClubId || user.managedClubId !== clubId) {
-        navigate('/login');
-        return;
-      }
+    if (userRole !== 'entrepreneur' || !user?.managedClubId || String(user.managedClubId) !== clubId) {
+      navigate('/login');
+      return;
+    }
 
+    const fetchData = async () => {
       try {
-        const [clubResponse, subscriptionsResponse, usersResponse] = await Promise.all([
+        const [clubRes, subsRes, customersRes] = await Promise.all([
           api.get(`/clubs/${clubId}`),
           api.get(`/clubs/${clubId}/user-subscriptions`),
-          api.get('/users')
+          api.get(`/clubs/${clubId}/customers`),
         ]);
 
-        const clubData = getResponseData(clubResponse);
-        const subscriptionsData = getResponseData(subscriptionsResponse);
-        const usersData = getResponseData(usersResponse);
+        const clubData = getResponseData(clubRes);
+        const subsData: Subscription[] = getResponseData(subsRes) || [];
+        const usersData: User[] = getResponseData(customersRes) || [];
 
         if (!clubData) {
           setError('Club no encontrado.');
-          setLoading(false);
           return;
         }
 
         setClub(clubData);
 
-        const clubSubscriptions = (subscriptionsData || []).filter((sub: Subscription) => sub.clubId === clubId);
-        const uniqueCustomerIds = Array.from(new Set(clubSubscriptions.map((sub: Subscription) => sub.userId)));
+        const uniqueUserIds = Array.from(new Set(subsData.map(s => s.idUser)));
 
-        const detailedCustomers = uniqueCustomerIds
-          .map((userId) => {
-            const customer = (usersData || []).find((u: User) => u.id === userId);
+        const detailed: CustomerWithSubscriptions[] = uniqueUserIds
+          .map(userId => {
+            const customer = usersData.find(u => u.id === userId);
             if (!customer) return null;
-
-            const customerSubsForClub = clubSubscriptions.filter((sub: Subscription) => sub.userId === userId);
-
-            const subscriptionsInfo = customerSubsForClub.map((sub: Subscription) => ({
-              id: sub.id,
-              planId: sub.planId,
-              status: sub.status,
-              startDate: sub.startDate,
-              cancelDate: sub.status === 'cancelled' ? sub.nextBillingDate : undefined,
-            }));
-
+            const customerSubs = subsData.filter(s => s.idUser === userId);
             return {
               ...customer,
-              subscriptionsInfo,
+              subscriptionsInfo: customerSubs.map(s => ({
+                id: s.id,
+                idSubscriptionTypes: s.idSubscriptionTypes,
+                subscriptionStatus: s.subscriptionStatus,
+                startDate: s.startDate,
+                cancellationDate: s.cancellationDate,
+              })),
             } as CustomerWithSubscriptions;
           })
           .filter(Boolean) as CustomerWithSubscriptions[];
 
-        setAllCustomers(detailedCustomers);
-      } catch (err) {
-        console.error("Error fetching data:", err);
+        setAllCustomers(detailed);
+      } catch {
         setError('Error al cargar datos.');
       } finally {
         setLoading(false);
@@ -89,30 +82,28 @@ const CustomerHistoryPage: React.FC = () => {
     if (clubId) fetchData();
   }, [clubId, user, userRole, navigate]);
 
-  const handleViewSubscription = (subscriptionId: string) => {
-    navigate(`/entrepreneur/club/${clubId}/subscription/${subscriptionId}`);
+  if (loading) return <div className="container mx-auto px-4 py-8 text-center">Cargando historial...</div>;
+  if (error) return <div className="container mx-auto px-4 py-8 text-center text-red-600">{error}</div>;
+  if (!club) return <div className="container mx-auto px-4 py-8 text-center text-red-600">Acceso denegado</div>;
+
+  const statusLabel: Record<string, string> = {
+    active: 'Activa',
+    paused: 'Pausada',
+    cancelled: 'Cancelada',
+    pending: 'Pago pendiente',
+    finished: 'Finalizada',
   };
-
-  if (loading) {
-    return <div className="container mx-auto px-4 py-8 text-center">Cargando historial de clientes...</div>;
-  }
-
-  if (error) {
-    return <div className="container mx-auto px-4 py-8 text-center text-red-600">{error}</div>;
-  }
-
-  if (!club) {
-    return <div className="container mx-auto px-4 py-8 text-center text-red-600">Acceso denegado</div>;
-  }
 
   return (
     <div className="container mx-auto px-4 py-8 animate-fadeIn">
       <button onClick={() => navigate(-1)} className="mb-6 flex items-center text-blue-600 hover:text-blue-800">
-        <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+        <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+        </svg>
         Volver
       </button>
 
-      <h1 className="text-4xl font-extrabold mb-8 text-center">Historial de Clientes de {club.name}</h1>
+      <h1 className="text-4xl font-extrabold mb-8 text-center">Historial de Clientes — {club.name}</h1>
 
       {allCustomers.length === 0 ? (
         <p className="text-center text-gray-700">No hay clientes registrados en este club.</p>
@@ -123,49 +114,48 @@ const CustomerHistoryPage: React.FC = () => {
               <tr className="bg-gray-100 text-gray-600 uppercase text-sm leading-normal">
                 <th className="py-3 px-6 text-left">Nombre</th>
                 <th className="py-3 px-6 text-left">Email</th>
-                <th className="py-3 px-6 text-left">Suscripciones</th>
+                <th className="py-3 px-6 text-left">Plan</th>
                 <th className="py-3 px-6 text-left">Estado</th>
-                <th className="py-3 px-6 text-left">Fecha Registro</th>
-                <th className="py-3 px-6 text-left">Fecha Cancelación</th>
+                <th className="py-3 px-6 text-left">Inicio</th>
+                <th className="py-3 px-6 text-left">Cancelación</th>
                 <th className="py-3 px-6 text-center">Acciones</th>
               </tr>
             </thead>
-            <tbody className="text-gray-700 text-sm font-light">
-              {allCustomers.map((customer) => (
-                <tr key={customer.id} className="border-b border-gray-200 hover:bg-gray-50">
-                  <td className="py-3 px-6 text-left whitespace-nowrap">{customer.firstName} {customer.lastName}</td>
-                  <td className="py-3 px-6 text-left">{customer.email}</td>
-                  <td className="py-3 px-6 text-left">
-                    {customer.subscriptionsInfo.map((sub) => {
-                      const plan = club.subscriptionPlans?.find((p) => p.planId === sub.planId);
-                      return (
-                        <div key={sub.id} className="flex items-center justify-between mb-1">
-                          <span>{plan?.name || sub.planId}</span>
-                          <button onClick={() => handleViewSubscription(sub.id)} className="ml-2 text-blue-600 hover:text-blue-800 text-xs font-semibold">Ver</button>
-                        </div>
-                      );
-                    })}
-                  </td>
-                  <td className="py-3 px-6 text-left">
-                    {customer.subscriptionsInfo.map((sub) => (
-                      <div key={sub.id} className="mb-1">{sub.status.charAt(0).toUpperCase() + sub.status.slice(1)}</div>
-                    ))}
-                  </td>
-                  <td className="py-3 px-6 text-left">
-                    {customer.subscriptionsInfo.length > 0 ? new Date(customer.subscriptionsInfo[0].startDate).toLocaleDateString('es-AR') : '-'}
-                  </td>
-                  <td className="py-3 px-6 text-left">
-                    {customer.subscriptionsInfo.some((sub) => sub.status === 'cancelled')
-                      ? customer.subscriptionsInfo.filter((sub) => sub.status === 'cancelled').map((sub) => sub.cancelDate ? new Date(sub.cancelDate).toLocaleDateString('es-AR') : '-').join(', ')
-                      : '-'}
-                  </td>
-                  <td className="py-3 px-6 text-center">
-                    <button onClick={() => alert(`Ver detalles de ${customer.firstName}`)} className="text-blue-600 hover:text-blue-800 font-medium">
-                      <svg className="h-5 w-5 inline-block" fill="currentColor" viewBox="0 0 20 20"><path d="M10 3a7 7 0 00-7 7v1a7 7 0 0014 0v-1a7 7 0 00-7-7z" /><path d="M10 11a3 3 0 100-6 3 3 0 000 6z" /></svg>
-                    </button>
-                  </td>
-                </tr>
-              ))}
+            <tbody className="text-gray-700 text-sm">
+              {allCustomers.map(customer =>
+                customer.subscriptionsInfo.map((sub, idx) => {
+                  const plan = club.subscriptionPlans?.find(p => Number(p.planId) === sub.idSubscriptionTypes);
+                  const normalized = normalizeStatus(sub.subscriptionStatus);
+                  return (
+                    <tr key={`${customer.id}-${sub.id}`} className="border-b border-gray-200 hover:bg-gray-50">
+                      {idx === 0 && (
+                        <>
+                          <td className="py-3 px-6 whitespace-nowrap" rowSpan={customer.subscriptionsInfo.length}>
+                            {customer.firstName} {customer.lastName}
+                          </td>
+                          <td className="py-3 px-6" rowSpan={customer.subscriptionsInfo.length}>
+                            {customer.email}
+                          </td>
+                        </>
+                      )}
+                      <td className="py-3 px-6">{plan?.name || `Plan #${sub.idSubscriptionTypes}`}</td>
+                      <td className="py-3 px-6">{statusLabel[normalized] ?? normalized}</td>
+                      <td className="py-3 px-6">{new Date(sub.startDate).toLocaleDateString('es-AR')}</td>
+                      <td className="py-3 px-6">
+                        {sub.cancellationDate ? new Date(sub.cancellationDate).toLocaleDateString('es-AR') : '-'}
+                      </td>
+                      <td className="py-3 px-6 text-center">
+                        <button
+                          onClick={() => navigate(`/entrepreneur/club/${clubId}/subscription/${sub.id}`)}
+                          className="text-blue-600 hover:text-blue-800 font-medium text-sm"
+                        >
+                          Ver
+                        </button>
+                      </td>
+                    </tr>
+                  );
+                })
+              )}
             </tbody>
           </table>
         </div>

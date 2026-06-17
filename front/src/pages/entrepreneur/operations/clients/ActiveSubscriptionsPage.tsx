@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../../../App';
-import { Subscription } from '../../../../types/subscription';
+import { Subscription, NormalizedStatus, normalizeStatus } from '../../../../types/subscription';
 import { User } from '../../../../types/user';
 import { SubscriptionPlan, Club } from '../../../../types/club';
 import api, { getResponseData } from '../../../../api/config';
@@ -13,42 +13,38 @@ const ActiveSubscriptionsPage: React.FC = () => {
 
   const [subscriptions, setSubscriptions] = useState<Subscription[]>([]);
   const [filteredSubscriptions, setFilteredSubscriptions] = useState<Subscription[]>([]);
-  const [clients, setClients] = useState<User[]>([]);
+  const [customers, setCustomers] = useState<User[]>([]);
   const [clubPlans, setClubPlans] = useState<SubscriptionPlan[]>([]);
   const [club, setClub] = useState<Club | null>(null);
   const [loading, setLoading] = useState(true);
 
   const [searchTerm, setSearchTerm] = useState('');
-  const [statusFilter, setStatusFilter] = useState<'all' | 'active' | 'paused' | 'expiring'>('all');
+  const [statusFilter, setStatusFilter] = useState<'all' | 'active' | 'paused' | 'cancelled' | 'pending'>('all');
   const [planFilter, setPlanFilter] = useState('all');
 
   const managedClubId = user?.managedClubId;
 
   useEffect(() => {
-    const fetchData = async () => {
-      if (!managedClubId) {
-        navigate('/entrepreneur/dashboard');
-        return;
-      }
+    if (!managedClubId) {
+      navigate('/entrepreneur/profile');
+      return;
+    }
 
+    const fetchData = async () => {
       try {
-        const [clubResponse, subscriptionsResponse, usersResponse] = await Promise.all([
+        const [clubRes, subsRes, customersRes] = await Promise.all([
           api.get(`/clubs/${managedClubId}`),
           api.get(`/clubs/${managedClubId}/user-subscriptions`),
-          api.get('/users')
+          api.get(`/clubs/${managedClubId}/customers`),
         ]);
 
-        const clubData = getResponseData(clubResponse);
-        const subscriptionsData = getResponseData(subscriptionsResponse);
-        const usersData = getResponseData(usersResponse);
-
+        const clubData = getResponseData(clubRes);
         setClub(clubData);
-        setClubPlans(clubData.subscriptionPlans || []);
-        setSubscriptions(subscriptionsData || []);
-        setClients(usersData || []);
-
+        setClubPlans(clubData?.subscriptionPlans || []);
+        setSubscriptions(getResponseData(subsRes) || []);
+        setCustomers(getResponseData(customersRes) || []);
       } catch (error) {
-        console.error("Error fetching data:", error);
+        console.error('Error fetching data:', error);
       } finally {
         setLoading(false);
       }
@@ -58,44 +54,35 @@ const ActiveSubscriptionsPage: React.FC = () => {
   }, [managedClubId, navigate]);
 
   useEffect(() => {
-    if (!subscriptions.length) {
-      setFilteredSubscriptions([]);
-      return;
-    }
-
-    let tempSubs = [...subscriptions];
+    let temp = [...subscriptions];
 
     if (searchTerm) {
-      tempSubs = tempSubs.filter(sub => {
-        const client = clients.find(c => c.id === sub.userId);
-        const plan = clubPlans.find(p => p.planId === sub.planId);
-        const clientName = client ? `${client.firstName} ${client.lastName}`.toLowerCase() : '';
+      temp = temp.filter(sub => {
+        const customer = customers.find(c => c.id === sub.idUser);
+        const plan = clubPlans.find(p => Number(p.planId) === sub.idSubscriptionTypes);
+        const name = customer ? `${customer.firstName} ${customer.lastName}`.toLowerCase() : '';
         const planName = plan ? plan.name.toLowerCase() : '';
-        return clientName.includes(searchTerm.toLowerCase()) || planName.includes(searchTerm.toLowerCase());
+        return name.includes(searchTerm.toLowerCase()) || planName.includes(searchTerm.toLowerCase());
       });
     }
 
     if (statusFilter !== 'all') {
-      const today = new Date();
-      tempSubs = tempSubs.filter(sub => {
-        if (statusFilter === 'active') return sub.status === 'active';
-        if (statusFilter === 'paused') return sub.status === 'paused';
-        if (statusFilter === 'expiring') {
-          const billingDate = new Date(sub.nextBillingDate);
-          const diffTime = billingDate.getTime() - today.getTime();
-          const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-          return sub.status === 'active' && billingDate > today && diffDays <= 30;
-        }
-        return false;
+      temp = temp.filter(sub => {
+        const normalized = normalizeStatus(sub.subscriptionStatus);
+        if (statusFilter === 'active') return normalized === 'active';
+        if (statusFilter === 'paused') return normalized === 'paused';
+        if (statusFilter === 'cancelled') return normalized === 'cancelled';
+        if (statusFilter === 'pending') return normalized === 'pending';
+        return true;
       });
     }
 
     if (planFilter !== 'all') {
-      tempSubs = tempSubs.filter(sub => sub.planId === planFilter);
+      temp = temp.filter(sub => sub.idSubscriptionTypes === Number(planFilter));
     }
 
-    setFilteredSubscriptions(tempSubs);
-  }, [subscriptions, searchTerm, statusFilter, planFilter, clients, clubPlans]);
+    setFilteredSubscriptions(temp);
+  }, [subscriptions, searchTerm, statusFilter, planFilter, customers, clubPlans]);
 
   if (loading) {
     return <div className="text-center py-20">Cargando suscripciones...</div>;
@@ -105,29 +92,21 @@ const ActiveSubscriptionsPage: React.FC = () => {
     return <div className="text-center py-10 text-red-500">Acceso denegado.</div>;
   }
 
-  const currentClubName = club?.name || 'Tu Club';
-
-  const totalActive = subscriptions.filter(sub => sub.status === 'active').length;
-  const totalPaused = subscriptions.filter(sub => sub.status === 'paused').length;
-  const totalExpiring = subscriptions.filter(sub => {
-    const today = new Date();
-    const billingDate = new Date(sub.nextBillingDate);
-    const diffTime = billingDate.getTime() - today.getTime();
-    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-    return sub.status === 'active' && billingDate > today && diffDays <= 30;
-  }).length;
+  const totalActive = subscriptions.filter(s => normalizeStatus(s.subscriptionStatus) === 'active').length;
+  const totalPaused = subscriptions.filter(s => normalizeStatus(s.subscriptionStatus) === 'paused').length;
+  const totalPending = subscriptions.filter(s => normalizeStatus(s.subscriptionStatus) === 'pending').length;
 
   const estimatedMonthlyRevenue = subscriptions
-    .filter(sub => sub.status === 'active')
+    .filter(s => normalizeStatus(s.subscriptionStatus) === 'active')
     .reduce((sum, sub) => {
-      const plan = clubPlans.find(p => p.planId === sub.planId);
+      const plan = clubPlans.find(p => Number(p.planId) === sub.idSubscriptionTypes);
       return sum + (plan ? plan.price : 0);
     }, 0);
 
   return (
     <div className="container mx-auto px-4 py-8 animate-fadeIn">
       <h1 className="text-4xl font-extrabold text-gray-900 mb-6 text-center">
-        Suscripciones de {currentClubName}
+        Suscripciones de {club?.name || 'Tu Club'}
       </h1>
 
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
@@ -140,8 +119,8 @@ const ActiveSubscriptionsPage: React.FC = () => {
           <p className="text-3xl font-bold text-gray-900">{totalPaused}</p>
         </div>
         <div className="bg-white p-6 rounded-lg shadow-md border-l-4 border-orange-500">
-          <p className="text-sm font-medium text-gray-500">Vencen Pronto</p>
-          <p className="text-3xl font-bold text-gray-900">{totalExpiring}</p>
+          <p className="text-sm font-medium text-gray-500">Pago Pendiente</p>
+          <p className="text-3xl font-bold text-gray-900">{totalPending}</p>
         </div>
         <div className="bg-white p-6 rounded-lg shadow-md border-l-4 border-blue-500">
           <p className="text-sm font-medium text-gray-500">Ingreso Mensual Estimado</p>
@@ -165,7 +144,8 @@ const ActiveSubscriptionsPage: React.FC = () => {
           <option value="all">Todos los estados</option>
           <option value="active">Activas</option>
           <option value="paused">Pausadas</option>
-          <option value="expiring">Vencen pronto</option>
+          <option value="cancelled">Canceladas</option>
+          <option value="pending">Pago pendiente</option>
         </select>
         <select
           className="p-2 border border-gray-300 rounded-md"
@@ -184,15 +164,15 @@ const ActiveSubscriptionsPage: React.FC = () => {
       {filteredSubscriptions.length > 0 ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {filteredSubscriptions.map(sub => {
-            const customer = clients.find(c => c.id === sub.userId);
-            const plan = clubPlans.find(p => p.planId === sub.planId);
+            const customer = customers.find(c => c.id === sub.idUser);
+            const plan = clubPlans.find(p => Number(p.planId) === sub.idSubscriptionTypes);
             return (
               <SubscriptionCardForEntrepreneur
                 key={sub.id}
                 subscription={sub}
-                club={club!} 
-                plan={plan!}
-                customer={customer!}
+                club={club!}
+                plan={plan}
+                customer={customer}
               />
             );
           })}
