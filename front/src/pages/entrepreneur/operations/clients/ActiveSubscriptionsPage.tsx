@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../../../App';
-import { Subscription, NormalizedStatus, normalizeStatus } from '../../../../types/subscription';
+import { Subscription, normalizeStatus } from '../../../../types/subscription';
 import { User } from '../../../../types/user';
 import { SubscriptionPlan, Club } from '../../../../types/club';
 import api, { getResponseData } from '../../../../api/config';
