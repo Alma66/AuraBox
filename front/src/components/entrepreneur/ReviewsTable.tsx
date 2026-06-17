@@ -3,13 +3,14 @@ import { Link } from 'react-router-dom';
 import { User } from '../../types/user';
 
 interface Review {
-  id: string;
-  clubId: string;
-  userId: string;
+  id: number;
+  idClub: number;
+  idUser: number;
   rating: number;
-  comment: string;
-  date: string;
-  status: 'approved' | 'pending' | 'blocked';
+  title?: string;
+  comment?: string;
+  reviewDate: string;
+  active: boolean;
 }
 
 interface ReviewsTableProps {
@@ -19,8 +20,8 @@ interface ReviewsTableProps {
 }
 
 const ReviewsTable: React.FC<ReviewsTableProps> = ({ reviews, usersData, clubId }) => {
-  const getUserName = (userId: string) => {
-    const user = usersData.find(u => u.id === userId);
+  const getUserName = (idUser: number) => {
+    const user = usersData.find(u => Number(u.id) === idUser);
     return user ? `${user.firstName} ${user.lastName}` : 'Anónimo';
   };
 
@@ -41,7 +42,7 @@ const ReviewsTable: React.FC<ReviewsTableProps> = ({ reviews, usersData, clubId 
           <tbody>
             {reviews.map((review) => (
               <tr key={review.id} className="border-b hover:bg-gray-50">
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{getUserName(review.userId)}</td>
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{getUserName(review.idUser)}</td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm">
                   <span className="text-yellow-500">{review.rating} ★</span>
                 </td>
@@ -49,14 +50,13 @@ const ReviewsTable: React.FC<ReviewsTableProps> = ({ reviews, usersData, clubId 
                   {review.comment}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                  {new Date(review.date).toLocaleDateString('es-AR')}
+                  {new Date(review.reviewDate).toLocaleDateString('es-AR')}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">
                   <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
-                    review.status === 'approved' ? 'bg-green-100 text-green-800' :
-                    review.status === 'pending' ? 'bg-yellow-100 text-yellow-800' : 'bg-red-100 text-red-800'
+                    review.active ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
                   }`}>
-                    {review.status.charAt(0).toUpperCase() + review.status.slice(1)}
+                    {review.active ? 'Aprobada' : 'Inactiva'}
                   </span>
                 </td>
               </tr>
