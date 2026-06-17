@@ -158,5 +158,5 @@ const SalesReportsPage: React.FC = () => {
       </div>
     </div>
   );
-};3
+};
 export default SalesReportsPage;
