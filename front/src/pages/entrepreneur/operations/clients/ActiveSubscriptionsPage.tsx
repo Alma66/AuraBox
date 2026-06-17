@@ -13,7 +13,6 @@ const STATUS_LABEL: Record<NormalizedStatus, string> = {
   pending: 'Pago pendiente',
   finished: 'Finalizada',
 };
-
 const STATUS_COLOR: Record<NormalizedStatus, string> = {
   active: 'bg-green-100 text-green-800',
   paused: 'bg-yellow-100 text-yellow-800',
@@ -21,7 +20,6 @@ const STATUS_COLOR: Record<NormalizedStatus, string> = {
   pending: 'bg-orange-100 text-orange-800',
   finished: 'bg-gray-100 text-gray-700',
 };
-
 const STATUS_BORDER: Record<NormalizedStatus, string> = {
   active: 'border-green-500',
   paused: 'border-yellow-500',
@@ -59,10 +57,7 @@ const ActiveSubscriptionsPage: React.FC = () => {
   };
 
   useEffect(() => {
-    if (userRole !== 'entrepreneur' || !managedClubId) {
-      navigate('/');
-      return;
-    }
+    if (userRole !== 'entrepreneur' || !managedClubId) { navigate('/'); return; }
     const fetchData = async () => {
       try {
         const [clubRes, subsRes, customersRes] = await Promise.all([
@@ -187,26 +182,44 @@ const ActiveSubscriptionsPage: React.FC = () => {
             <span>›</span>
             <Link to={`/entrepreneur/club/${managedClubId}`} className="hover:text-indigo-600">{club?.name || 'Club'}</Link>
             <span>›</span>
-            <span className="text-gray-700">Suscripciones activas</span>
+            <span className="text-gray-700">Monitor de suscripciones</span>
           </nav>
-          <h1 className="text-2xl font-bold text-gray-900">Suscriptores — {club?.name}</h1>
-          <p className="text-sm text-gray-500 mt-0.5">Seguimiento y gestión de clientes suscriptos a tu club.</p>
+          <div className="flex items-center justify-between mt-1">
+            <div>
+              <h1 className="text-2xl font-bold text-gray-900">Monitor de Suscripciones</h1>
+              <p className="text-sm text-gray-500 mt-0.5">Estado en tiempo real · Cambiá estados · Actuá rápido sobre pagos pendientes.</p>
+            </div>
+            <Link
+              to={`/entrepreneur/club/${managedClubId}/manage-customers`}
+              className="hidden md:flex items-center gap-2 text-sm font-medium text-indigo-600 border border-indigo-200 rounded-lg px-4 py-2 hover:bg-indigo-50 transition"
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" />
+              </svg>
+              Directorio de clientes
+            </Link>
+          </div>
         </div>
       </div>
 
       <div className="container mx-auto px-4 py-6">
         <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-6">
           {[
-            { label: 'Activas', value: totalActive, color: 'border-green-500', text: 'text-green-700' },
-            { label: 'Pausadas', value: totalPaused, color: 'border-yellow-500', text: 'text-yellow-700' },
-            { label: 'Pago pendiente', value: totalPending, color: 'border-orange-500', text: 'text-orange-700' },
-            { label: 'Canceladas', value: totalCancelled, color: 'border-red-400', text: 'text-red-700' },
-            { label: 'Ingreso mensual est.', value: `$${estimatedRevenue.toLocaleString('es-AR')}`, color: 'border-indigo-500', text: 'text-indigo-700' },
+            { label: 'Activas', value: totalActive, color: 'border-green-500', text: 'text-green-700', bg: 'bg-green-50', filter: 'active' as NormalizedStatus },
+            { label: 'Pausadas', value: totalPaused, color: 'border-yellow-500', text: 'text-yellow-700', bg: 'bg-yellow-50', filter: 'paused' as NormalizedStatus },
+            { label: 'Pago pendiente', value: totalPending, color: 'border-orange-500', text: 'text-orange-700', bg: 'bg-orange-50', filter: 'pending' as NormalizedStatus },
+            { label: 'Canceladas', value: totalCancelled, color: 'border-red-400', text: 'text-red-700', bg: 'bg-red-50', filter: 'cancelled' as NormalizedStatus },
+            { label: 'Ingreso mensual est.', value: `$${estimatedRevenue.toLocaleString('es-AR')}`, color: 'border-indigo-500', text: 'text-indigo-700', bg: 'bg-indigo-50', filter: null },
           ].map(stat => (
-            <div key={stat.label} className={`bg-white rounded-xl shadow-sm border-l-4 ${stat.color} px-4 py-4`}>
+            <button
+              key={stat.label}
+              onClick={() => stat.filter && setStatusFilter(statusFilter === stat.filter ? 'all' : stat.filter)}
+              className={`text-left bg-white rounded-xl shadow-sm border-l-4 ${stat.color} px-4 py-4 transition hover:shadow-md ${stat.filter && statusFilter === stat.filter ? stat.bg : ''} ${stat.filter ? 'cursor-pointer' : 'cursor-default'}`}
+            >
               <p className="text-xs text-gray-500 font-medium uppercase tracking-wide">{stat.label}</p>
               <p className={`text-2xl font-bold mt-1 ${stat.text}`}>{stat.value}</p>
-            </div>
+              {stat.filter && <p className="text-xs text-gray-400 mt-1">{statusFilter === stat.filter ? 'Filtrando ↑' : 'Click para filtrar'}</p>}
+            </button>
           ))}
         </div>
 
@@ -245,6 +258,14 @@ const ActiveSubscriptionsPage: React.FC = () => {
               <option key={plan.planId} value={plan.planId}>{plan.name}</option>
             ))}
           </select>
+          {(searchTerm || statusFilter !== 'all' || planFilter !== 'all') && (
+            <button
+              onClick={() => { setSearchTerm(''); setStatusFilter('all'); setPlanFilter('all'); }}
+              className="text-xs text-red-500 hover:text-red-700 border border-red-200 rounded-lg px-3 py-2 whitespace-nowrap hover:bg-red-50 transition"
+            >
+              Limpiar filtros
+            </button>
+          )}
           <span className="text-sm text-gray-500 whitespace-nowrap">{filtered.length} resultado{filtered.length !== 1 ? 's' : ''}</span>
         </div>
 
@@ -285,10 +306,11 @@ const ActiveSubscriptionsPage: React.FC = () => {
                   const customer = getCustomer(sub.idUser);
                   const plan = getPlan(sub.idSubscriptionTypes);
                   const status = normalizeStatus(sub.subscriptionStatus);
+                  const isOverdue = sub.nextPaymentDate && new Date(sub.nextPaymentDate) < new Date() && status !== 'cancelled' && status !== 'finished';
                   return (
                     <tr
                       key={sub.id}
-                      className={`hover:bg-indigo-50/40 transition-colors cursor-pointer ${selectedSub?.id === sub.id ? 'bg-indigo-50' : ''}`}
+                      className={`hover:bg-indigo-50/40 transition-colors cursor-pointer ${selectedSub?.id === sub.id ? 'bg-indigo-50' : ''} ${isOverdue ? 'border-l-2 border-l-red-400' : ''}`}
                       onClick={() => setSelectedSub(sub)}
                     >
                       <td className="px-4 py-3">
@@ -316,8 +338,13 @@ const ActiveSubscriptionsPage: React.FC = () => {
                       <td className="px-4 py-3 text-sm text-gray-600">
                         {sub.startDate ? new Date(sub.startDate).toLocaleDateString('es-AR') : '—'}
                       </td>
-                      <td className="px-4 py-3 text-sm text-gray-600">
-                        {sub.nextPaymentDate ? new Date(sub.nextPaymentDate).toLocaleDateString('es-AR') : '—'}
+                      <td className="px-4 py-3 text-sm">
+                        {sub.nextPaymentDate ? (
+                          <span className={isOverdue ? 'text-red-600 font-semibold' : 'text-gray-600'}>
+                            {new Date(sub.nextPaymentDate).toLocaleDateString('es-AR')}
+                            {isOverdue && <span className="ml-1 text-xs bg-red-100 text-red-600 px-1.5 py-0.5 rounded-full">Vencido</span>}
+                          </span>
+                        ) : '—'}
                       </td>
                       <td className="px-4 py-3 text-sm font-semibold text-indigo-700">
                         {plan ? `$${plan.price.toLocaleString('es-AR')}` : '—'}
@@ -327,7 +354,7 @@ const ActiveSubscriptionsPage: React.FC = () => {
                           onClick={e => { e.stopPropagation(); setSelectedSub(sub); }}
                           className="text-xs text-indigo-600 hover:text-indigo-800 font-medium px-3 py-1.5 rounded-lg border border-indigo-200 hover:bg-indigo-50 transition"
                         >
-                          Ver detalle
+                          Gestionar
                         </button>
                       </td>
                     </tr>
@@ -347,7 +374,10 @@ const ActiveSubscriptionsPage: React.FC = () => {
             onClick={e => e.stopPropagation()}
           >
             <div className="sticky top-0 bg-white border-b px-6 py-4 flex items-center justify-between z-10">
-              <h2 className="text-lg font-bold text-gray-900">Detalle del suscriptor</h2>
+              <div>
+                <h2 className="text-lg font-bold text-gray-900">Gestión de suscripción</h2>
+                <p className="text-xs text-gray-400">Cambiá el estado o navegá al perfil del cliente</p>
+              </div>
               <button onClick={() => setSelectedSub(null)} className="text-gray-400 hover:text-gray-600">
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
@@ -357,14 +387,14 @@ const ActiveSubscriptionsPage: React.FC = () => {
 
             <div className="p-6 space-y-6">
               <div className="flex items-center gap-4">
-                <div className="w-14 h-14 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-700 text-2xl font-bold shrink-0">
+                <div className="w-12 h-12 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-700 text-xl font-bold shrink-0">
                   {selectedCustomer ? selectedCustomer.firstName[0].toUpperCase() : '?'}
                 </div>
                 <div>
-                  <p className="text-lg font-bold text-gray-900">
+                  <p className="text-base font-bold text-gray-900">
                     {selectedCustomer ? `${selectedCustomer.firstName} ${selectedCustomer.lastName}` : `Usuario #${selectedSub.idUser}`}
                   </p>
-                  <p className="text-sm text-gray-500">{selectedCustomer?.email || '—'}</p>
+                  <p className="text-xs text-gray-500">{selectedCustomer?.email || '—'}</p>
                   {selectedStatus && (
                     <span className={`inline-flex mt-1 px-2.5 py-0.5 rounded-full text-xs font-semibold ${STATUS_COLOR[selectedStatus]}`}>
                       {STATUS_LABEL[selectedStatus]}
@@ -374,28 +404,11 @@ const ActiveSubscriptionsPage: React.FC = () => {
               </div>
 
               <div className="bg-gray-50 rounded-xl p-4 space-y-2">
-                <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-2">Datos del cliente</p>
-                {[
-                  { label: 'Email', value: selectedCustomer?.email },
-                  { label: 'Teléfono', value: selectedCustomer?.phoneNumber ? String(selectedCustomer.phoneNumber) : null },
-                  { label: 'Documento', value: selectedCustomer?.documentNumber ? `${selectedCustomer.documentType || 'DNI'} ${selectedCustomer.documentNumber}` : null },
-                  { label: 'Ciudad', value: selectedCustomer?.city },
-                  { label: 'Provincia', value: selectedCustomer?.province },
-                  { label: 'Dirección', value: selectedCustomer?.streetAddress ? `${selectedCustomer.streetAddress} ${selectedCustomer.addressNumber || ''}` : null },
-                ].map(({ label, value }) => value ? (
-                  <div key={label} className="flex justify-between text-sm">
-                    <span className="text-gray-500">{label}</span>
-                    <span className="text-gray-800 font-medium text-right max-w-[60%] truncate">{value}</span>
-                  </div>
-                ) : null)}
-              </div>
-
-              <div className="bg-gray-50 rounded-xl p-4 space-y-2">
-                <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-2">Suscripción</p>
+                <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-2">Esta suscripción</p>
                 {[
                   { label: 'Plan', value: selectedPlan?.name || `#${selectedSub.idSubscriptionTypes}` },
                   { label: 'Frecuencia', value: selectedPlan?.deliveryFrequency },
-                  { label: 'Monto', value: selectedPlan ? `$${selectedPlan.price.toLocaleString('es-AR')}` : null },
+                  { label: 'Precio del plan', value: selectedPlan ? `$${selectedPlan.price.toLocaleString('es-AR')}` : null },
                   { label: 'Monto pagado', value: selectedSub.monthlyAmountPaid ? `$${Number(selectedSub.monthlyAmountPaid).toLocaleString('es-AR')}` : null },
                   { label: 'Inicio', value: selectedSub.startDate ? new Date(selectedSub.startDate).toLocaleDateString('es-AR') : null },
                   { label: 'Fin esperado', value: selectedSub.expectedEndDate ? new Date(selectedSub.expectedEndDate).toLocaleDateString('es-AR') : null },
@@ -436,15 +449,24 @@ const ActiveSubscriptionsPage: React.FC = () => {
                 </div>
               </div>
 
-              <div className="pt-2 border-t border-gray-100">
+              <div className="pt-2 border-t border-gray-100 flex flex-col gap-2">
+                <Link
+                  to={`/entrepreneur/club/${managedClubId}/manage-customers?customerId=${selectedSub.idUser}`}
+                  className="flex items-center justify-center gap-2 w-full py-2.5 text-sm font-medium text-indigo-700 border border-indigo-200 rounded-lg hover:bg-indigo-50 transition"
+                >
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                  </svg>
+                  Ver ficha del cliente
+                </Link>
                 <Link
                   to={`/entrepreneur/club/${managedClubId}/customer-history/${selectedSub.idUser}`}
-                  className="flex items-center justify-center gap-2 w-full py-2.5 text-sm font-medium text-indigo-700 border border-indigo-200 rounded-lg hover:bg-indigo-50 transition"
+                  className="flex items-center justify-center gap-2 w-full py-2.5 text-sm font-medium text-gray-600 border border-gray-200 rounded-lg hover:bg-gray-50 transition"
                 >
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                   </svg>
-                  Ver historial del cliente
+                  Ver historial completo
                 </Link>
               </div>
             </div>
