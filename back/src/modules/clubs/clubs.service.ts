@@ -215,6 +215,19 @@ export class ClubsService {
     }));
   }
 
+  async findClubByEntrepreneur(entrepreneurId: number) {
+    const association = await this.prisma.entrepreneur_Club.findFirst({
+      where: { idEntrepreneurs: entrepreneurId },
+      orderBy: { associationDate: 'asc' },
+    });
+    if (!association) return null;
+
+    const club = await this.prisma.club.findUnique({ where: { id: association.idClub } });
+    if (!club) return null;
+
+    return this.sanitizeClub(club);
+  }
+
   private async assertOwnership(clubId: number, entrepreneurId: number) {
     const ec = await this.prisma.entrepreneur_Club.findFirst({
       where: { idClub: clubId, idEntrepreneurs: entrepreneurId },
