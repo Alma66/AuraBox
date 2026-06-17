@@ -92,16 +92,13 @@ const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => 
           registeredDate: payload.registeredDate || new Date().toISOString(),
           lastLogin: payload.lastLogin || new Date().toISOString(),
         };
-
         if (role === 'entrepreneur') {
           try {
             const response = await api.get('/entrepreneurs/me');
             const data = response.data?.data ?? response.data;
             baseUser.managedClubId = data.managedClubId ? String(data.managedClubId) : undefined;
-          } catch {
-          }
+          } catch {}
         }
-
         setUser(baseUser);
         setUserRole(role);
         setIsAuthenticated(true);
@@ -111,7 +108,6 @@ const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => 
         setLoading(false);
       }
     };
-
     initAuth();
   }, []);
 
@@ -121,9 +117,7 @@ const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => 
         const response = await api.get('/entrepreneurs/me');
         const data = response.data?.data ?? response.data;
         loggedInUser.managedClubId = data.managedClubId ? String(data.managedClubId) : undefined;
-      } catch {
-        // seguimos sin clubId
-      }
+      } catch {}
     }
     setUser(loggedInUser);
     setUserRole(loggedInUser.role);
@@ -156,7 +150,6 @@ const Logout: React.FC = () => {
 
 const AppContent: React.FC = () => {
   const { userRole, isAuthenticated, logout, login } = useAuth();
-
   return (
     <>
       <Navbar userRole={userRole} isAuthenticated={isAuthenticated} onLogout={logout} />
@@ -172,19 +165,16 @@ const AppContent: React.FC = () => {
           <Route path="/about-us" element={<AboutUsPage />} />
           <Route path="/contact" element={<ContactPage />} />
           <Route path="/logout" element={<Logout />} />
-
           <Route path="/club/:clubId" element={<ClubDetailPage />} />
           <Route path="/club/:clubId/history" element={<HistoryPage />} />
           <Route path="/club/:clubId/terms-and-conditions" element={<TermsAndConditionsPage />} />
           <Route path="/club/:clubId/privacy-and-security" element={<PrivacyAndSecurityPolicyPage />} />
           <Route path="/club/:clubId/plan/:planId" element={<SubscriptionPlanDetailPage />} />
-
           <Route path="/customer/profile" element={<PrivateRoute isAuthenticated={isAuthenticated} allowedRoles={['customer']} userRole={userRole}><UserProfilePage /></PrivateRoute>} />
           <Route path="/customer/reviews" element={<PrivateRoute isAuthenticated={isAuthenticated} allowedRoles={['customer']} userRole={userRole}><MisReviewsPage /></PrivateRoute>} />
           <Route path="/customer/wishlist" element={<PrivateRoute isAuthenticated={isAuthenticated} allowedRoles={['customer']} userRole={userRole}><WishlistPage /></PrivateRoute>} />
           <Route path="/cart" element={<PrivateRoute isAuthenticated={isAuthenticated} allowedRoles={['customer']} userRole={userRole}><CartPage /></PrivateRoute>} />
           <Route path="/checkout" element={<PrivateRoute isAuthenticated={isAuthenticated} allowedRoles={['customer']} userRole={userRole}><CheckoutPage /></PrivateRoute>} />
-
           <Route path="/entrepreneur/profile" element={<PrivateRoute isAuthenticated={isAuthenticated} allowedRoles={['entrepreneur']} userRole={userRole}><EntrepreneurProfilePage /></PrivateRoute>} />
           <Route path="/entrepreneur/club/:clubId/edit-terms" element={<PrivateRoute isAuthenticated={isAuthenticated} allowedRoles={['entrepreneur']} userRole={userRole}><EditClubLegalInfoPage /></PrivateRoute>} />
           <Route path="/entrepreneur/club/:clubId/edit-policies" element={<PrivateRoute isAuthenticated={isAuthenticated} allowedRoles={['entrepreneur']} userRole={userRole}><EditClubLegalInfoPage /></PrivateRoute>} />
@@ -194,12 +184,13 @@ const AppContent: React.FC = () => {
           <Route path="/entrepreneur/club/:clubId/general-settings" element={<PrivateRoute isAuthenticated={isAuthenticated} allowedRoles={['entrepreneur']} userRole={userRole}><GeneralSettingsPage /></PrivateRoute>} />
           <Route path="/entrepreneur/inventory-management" element={<PrivateRoute isAuthenticated={isAuthenticated} allowedRoles={['entrepreneur']} userRole={userRole}><InventoryManagementPage /></PrivateRoute>} />
           <Route path="/entrepreneur/club/:clubId/active-subscriptions" element={<PrivateRoute isAuthenticated={isAuthenticated} allowedRoles={['entrepreneur']} userRole={userRole}><ActiveSubscriptionsPage /></PrivateRoute>} />
+          <Route path="/entrepreneur/club/:clubId/customer-history" element={<PrivateRoute isAuthenticated={isAuthenticated} allowedRoles={['entrepreneur']} userRole={userRole}><CustomerHistoryPage /></PrivateRoute>} />
+          <Route path="/entrepreneur/club/:clubId/customer-history/:customerId" element={<PrivateRoute isAuthenticated={isAuthenticated} allowedRoles={['entrepreneur']} userRole={userRole}><CustomerHistoryPage /></PrivateRoute>} />
+          <Route path="/entrepreneur/club/:clubId/manage-customers" element={<PrivateRoute isAuthenticated={isAuthenticated} allowedRoles={['entrepreneur']} userRole={userRole}><ManageCustomersPage /></PrivateRoute>} />
           <Route path="/entrepreneur/club/:clubId/stats" element={<PrivateRoute isAuthenticated={isAuthenticated} allowedRoles={['entrepreneur']} userRole={userRole}><ClubStatsPage /></PrivateRoute>} />
           <Route path="/entrepreneur/club/:clubId/sales-reports" element={<PrivateRoute isAuthenticated={isAuthenticated} allowedRoles={['entrepreneur']} userRole={userRole}><SalesReportsPage /></PrivateRoute>} />
           <Route path="/entrepreneur/club/:clubId/feedback-trends" element={<PrivateRoute isAuthenticated={isAuthenticated} allowedRoles={['entrepreneur']} userRole={userRole}><FeedbackTrendsPage /></PrivateRoute>} />
           <Route path="/entrepreneur/club/:clubId/subscription/:subscriptionId" element={<PrivateRoute isAuthenticated={isAuthenticated} allowedRoles={['entrepreneur']} userRole={userRole}><SubscriptionDetailForEntrepreneurPage /></PrivateRoute>} />
-          <Route path="/entrepreneur/club/:clubId/customer-history" element={<PrivateRoute isAuthenticated={isAuthenticated} allowedRoles={['entrepreneur']} userRole={userRole}><CustomerHistoryPage /></PrivateRoute>} />
-          <Route path="/entrepreneur/club/:clubId/manage-customers" element={<PrivateRoute isAuthenticated={isAuthenticated} allowedRoles={['entrepreneur']} userRole={userRole}><ManageCustomersPage /></PrivateRoute>} />
           <Route path="/entrepreneur/club/:clubId/assign-deliveries" element={<PrivateRoute isAuthenticated={isAuthenticated} allowedRoles={['entrepreneur']} userRole={userRole}><AssignDeliveriesPage /></PrivateRoute>} />
           <Route path="/entrepreneur/club/:clubId/view-deliveries" element={<PrivateRoute isAuthenticated={isAuthenticated} allowedRoles={['entrepreneur']} userRole={userRole}><ViewDeliveriesPage /></PrivateRoute>} />
           <Route path="/entrepreneur/club/:clubId/delivery-history" element={<PrivateRoute isAuthenticated={isAuthenticated} allowedRoles={['entrepreneur']} userRole={userRole}><DeliveryHistoryPage /></PrivateRoute>} />
@@ -209,7 +200,6 @@ const AppContent: React.FC = () => {
           <Route path="/entrepreneur/club/:clubId/enviar-newsletters" element={<PrivateRoute isAuthenticated={isAuthenticated} allowedRoles={['entrepreneur']} userRole={userRole}><SendNewsletterPage /></PrivateRoute>} />
           <Route path="/entrepreneur/club/:clubId/moderate-reviews" element={<PrivateRoute isAuthenticated={isAuthenticated} allowedRoles={['entrepreneur']} userRole={userRole}><ModerateReviewsPage /></PrivateRoute>} />
           <Route path="/entrepreneur/club/:clubId/customer-support" element={<PrivateRoute isAuthenticated={isAuthenticated} allowedRoles={['entrepreneur']} userRole={userRole}><CustomerSupportPage /></PrivateRoute>} />
-
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </main>
