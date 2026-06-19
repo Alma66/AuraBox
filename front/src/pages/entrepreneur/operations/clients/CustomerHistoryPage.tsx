@@ -73,7 +73,7 @@ const CustomerHistoryPage: React.FC = () => {
     };
     fetchData();
     return () => { cancelled = true; };
-  }, [authLoading, managedClubId, customerId, userRole]);
+  }, [authLoading, managedClubId, customerId, userRole, clubId, user?.managedClubId]);
 
   if (authLoading || loading) return (
     <div className="min-h-screen flex items-center justify-center">
