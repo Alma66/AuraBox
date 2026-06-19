@@ -2,13 +2,11 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { UserRole } from '../../types/user';
 import { useAuth } from '../../App';
-
 interface NavbarProps {
   userRole: UserRole | null;
   isAuthenticated: boolean;
   onLogout: () => void;
 }
-
 const Navbar: React.FC<NavbarProps> = ({ userRole, isAuthenticated, onLogout }) => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
@@ -19,7 +17,6 @@ const Navbar: React.FC<NavbarProps> = ({ userRole, isAuthenticated, onLogout }) 
   const [isMarketingCommMenuOpen, setIsMarketingCommMenuOpen] = useState(false);
   const [isAdminToolsMenuOpen, setIsAdminToolsMenuOpen] = useState(false);
   const [isMobileSubMenuOpen, setIsMobileSubMenuOpen] = useState<string | null>(null);
-
   const userMenuRef = useRef<HTMLDivElement>(null);
   const helpMenuRef = useRef<HTMLDivElement>(null);
   const clubMenuRef = useRef<HTMLDivElement>(null);
@@ -27,10 +24,8 @@ const Navbar: React.FC<NavbarProps> = ({ userRole, isAuthenticated, onLogout }) 
   const operationsMenuRef = useRef<HTMLDivElement>(null);
   const marketingCommMenuRef = useRef<HTMLDivElement>(null);
   const adminToolsMenuRef = useRef<HTMLDivElement>(null);
-
   const navigate = useNavigate();
   const { user } = useAuth();
-
   const closeAllDropdowns = () => {
     setIsMobileMenuOpen(false);
     setIsUserMenuOpen(false);
@@ -42,66 +37,55 @@ const Navbar: React.FC<NavbarProps> = ({ userRole, isAuthenticated, onLogout }) 
     setIsAdminToolsMenuOpen(false);
     setIsMobileSubMenuOpen(null);
   };
-
   const toggleMobileMenu = () => {
     const next = !isMobileMenuOpen;
     closeAllDropdowns();
     setIsMobileMenuOpen(next);
   };
-
   const toggleUserMenu = () => {
     const next = !isUserMenuOpen;
     closeAllDropdowns();
     setIsUserMenuOpen(next);
   };
-
   const toggleHelpMenu = () => {
     const next = !isHelpMenuOpen;
     closeAllDropdowns();
     setIsHelpMenuOpen(next);
   };
-
   const toggleClubMenu = () => {
     const next = !isClubMenuOpen;
     closeAllDropdowns();
     setIsClubMenuOpen(next);
   };
-
   const toggleGestionMenu = () => {
     const next = !isGestionMenuOpen;
     closeAllDropdowns();
     setIsGestionMenuOpen(next);
   };
-
   const toggleOperationsMenu = () => {
     const next = !isOperationsMenuOpen;
     closeAllDropdowns();
     setIsOperationsMenuOpen(next);
   };
-
   const toggleMarketingCommMenu = () => {
     const next = !isMarketingCommMenuOpen;
     closeAllDropdowns();
     setIsMarketingCommMenuOpen(next);
   };
-
   const toggleAdminToolsMenu = () => {
     const next = !isAdminToolsMenuOpen;
     closeAllDropdowns();
     setIsAdminToolsMenuOpen(next);
   };
-
   const toggleMobileSubMenu = (menuName: string) => {
     setIsMobileSubMenuOpen(isMobileSubMenuOpen === menuName ? null : menuName);
   };
-
   const handleLogoutClick = () => {
     onLogout();
     localStorage.removeItem('access_token');
     closeAllDropdowns();
     navigate('/');
   };
-
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (userMenuRef.current && !userMenuRef.current.contains(event.target as Node)) setIsUserMenuOpen(false);
@@ -115,7 +99,6 @@ const Navbar: React.FC<NavbarProps> = ({ userRole, isAuthenticated, onLogout }) 
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
-
   const DropdownArrow = ({ isOpen }: { isOpen: boolean }) => (
     <svg
       className={`w-4 h-4 ml-1 transform ${isOpen ? 'rotate-180' : 'rotate-0'} transition-transform duration-200`}
@@ -126,11 +109,9 @@ const Navbar: React.FC<NavbarProps> = ({ userRole, isAuthenticated, onLogout }) 
       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
     </svg>
   );
-
   const btnClass = "flex items-center text-gray-700 hover:text-blue-600 px-2 py-2 rounded-md text-sm font-medium whitespace-nowrap";
   const linkClass = "block px-2 py-1.5 text-sm text-gray-700 hover:bg-gray-100 rounded";
   const subTitleClass = "block px-2 py-1 text-xs font-semibold text-gray-500 uppercase tracking-wide";
-
   const renderAuthButtons = () => {
     if (isAuthenticated) {
       return (
@@ -180,9 +161,7 @@ const Navbar: React.FC<NavbarProps> = ({ userRole, isAuthenticated, onLogout }) 
       </div>
     );
   };
-
   const isEntrepreneur = isAuthenticated && userRole === 'entrepreneur';
-
   const renderEntrepreneurDesktopMenus = () => {
     if (!isEntrepreneur) return null;
     const clubId = user?.managedClubId ?? '';
@@ -201,7 +180,6 @@ const Navbar: React.FC<NavbarProps> = ({ userRole, isAuthenticated, onLogout }) 
             </div>
           )}
         </div>
-
         <div className="relative" ref={gestionMenuRef}>
           <button onClick={toggleGestionMenu} className={btnClass}>
             Gestión <DropdownArrow isOpen={isGestionMenuOpen} />
@@ -215,7 +193,6 @@ const Navbar: React.FC<NavbarProps> = ({ userRole, isAuthenticated, onLogout }) 
             </div>
           )}
         </div>
-
         <div className="relative" ref={operationsMenuRef}>
           <button onClick={toggleOperationsMenu} className={btnClass}>
             Operaciones <DropdownArrow isOpen={isOperationsMenuOpen} />
@@ -225,7 +202,7 @@ const Navbar: React.FC<NavbarProps> = ({ userRole, isAuthenticated, onLogout }) 
               <div>
                 <p className={subTitleClass}>Clientes</p>
                 <Link to={`/entrepreneur/club/${clubId}/active-subscriptions`} className={linkClass} onClick={closeAllDropdowns}>Suscripciones Activas</Link>
-                <Link to={`/entrepreneur/club/${clubId}/customer-history`} className={linkClass} onClick={closeAllDropdowns}>Historial de Clientes</Link>
+                <Link to={`/entrepreneur/club/${clubId}/manage-customers`} className={linkClass} onClick={closeAllDropdowns}>Historial de Clientes</Link>
                 <Link to={`/entrepreneur/club/${clubId}/manage-customers`} className={linkClass} onClick={closeAllDropdowns}>Gestionar Clientes</Link>
               </div>
               <div>
@@ -238,7 +215,6 @@ const Navbar: React.FC<NavbarProps> = ({ userRole, isAuthenticated, onLogout }) 
             </div>
           )}
         </div>
-
         <div className="relative" ref={marketingCommMenuRef}>
           <button onClick={toggleMarketingCommMenu} className={btnClass}>
             Marketing y Comunicación <DropdownArrow isOpen={isMarketingCommMenuOpen} />
@@ -259,7 +235,6 @@ const Navbar: React.FC<NavbarProps> = ({ userRole, isAuthenticated, onLogout }) 
             </div>
           )}
         </div>
-
         <div className="relative" ref={adminToolsMenuRef}>
           <button onClick={toggleAdminToolsMenu} className={btnClass}>
             Administración <DropdownArrow isOpen={isAdminToolsMenuOpen} />
@@ -284,7 +259,6 @@ const Navbar: React.FC<NavbarProps> = ({ userRole, isAuthenticated, onLogout }) 
       </>
     );
   };
-
   const renderEntrepreneurMobileMenus = () => {
     if (!isEntrepreneur) return null;
     const clubId = user?.managedClubId ?? '';
@@ -301,7 +275,6 @@ const Navbar: React.FC<NavbarProps> = ({ userRole, isAuthenticated, onLogout }) 
             <Link to={`/club/${clubId}/privacy-and-security`} className="block text-sm text-gray-700 hover:bg-gray-100 py-1" onClick={closeAllDropdowns}>Políticas y Seguridad</Link>
           </div>
         )}
-
         <button onClick={() => toggleMobileSubMenu('gestion')} className="flex items-center justify-between w-full text-gray-700 hover:bg-gray-50 hover:text-blue-600 px-3 py-2 rounded-md text-base font-medium">
           Gestión <DropdownArrow isOpen={isMobileSubMenuOpen === 'gestion'} />
         </button>
@@ -313,7 +286,6 @@ const Navbar: React.FC<NavbarProps> = ({ userRole, isAuthenticated, onLogout }) 
             <Link to={`/entrepreneur/club/${clubId}/edit-policies`} className="block text-sm text-gray-700 hover:bg-gray-100 py-1" onClick={closeAllDropdowns}>Editar Políticas y Seguridad</Link>
           </div>
         )}
-
         <button onClick={() => toggleMobileSubMenu('operations')} className="flex items-center justify-between w-full text-gray-700 hover:bg-gray-50 hover:text-blue-600 px-3 py-2 rounded-md text-base font-medium">
           Operaciones <DropdownArrow isOpen={isMobileSubMenuOpen === 'operations'} />
         </button>
@@ -321,7 +293,7 @@ const Navbar: React.FC<NavbarProps> = ({ userRole, isAuthenticated, onLogout }) 
           <div className="pl-6 pr-3 py-1 space-y-1">
             <p className="block text-xs font-semibold text-gray-500 uppercase py-1">Clientes</p>
             <Link to={`/entrepreneur/club/${clubId}/active-subscriptions`} className="block text-sm text-gray-700 hover:bg-gray-100 py-1" onClick={closeAllDropdowns}>Suscripciones Activas</Link>
-            <Link to={`/entrepreneur/club/${clubId}/customer-history`} className="block text-sm text-gray-700 hover:bg-gray-100 py-1" onClick={closeAllDropdowns}>Historial de Clientes</Link>
+            <Link to={`/entrepreneur/club/${clubId}/manage-customers`} className="block text-sm text-gray-700 hover:bg-gray-100 py-1" onClick={closeAllDropdowns}>Historial de Clientes</Link>
             <Link to={`/entrepreneur/club/${clubId}/manage-customers`} className="block text-sm text-gray-700 hover:bg-gray-100 py-1" onClick={closeAllDropdowns}>Gestionar Clientes</Link>
             <p className="block text-xs font-semibold text-gray-500 uppercase py-1 mt-2">Logística</p>
             <Link to={`/entrepreneur/club/${clubId}/assign-deliveries`} className="block text-sm text-gray-700 hover:bg-gray-100 py-1" onClick={closeAllDropdowns}>Asignar Envíos</Link>
@@ -330,7 +302,6 @@ const Navbar: React.FC<NavbarProps> = ({ userRole, isAuthenticated, onLogout }) 
             <Link to={`/entrepreneur/club/${clubId}/manage-riders`} className="block text-sm text-gray-700 hover:bg-gray-100 py-1" onClick={closeAllDropdowns}>Gestionar Riders</Link>
           </div>
         )}
-
         <button onClick={() => toggleMobileSubMenu('marketingComm')} className="flex items-center justify-between w-full text-gray-700 hover:bg-gray-50 hover:text-blue-600 px-3 py-2 rounded-md text-base font-medium">
           Marketing y Comunicación <DropdownArrow isOpen={isMobileSubMenuOpen === 'marketingComm'} />
         </button>
@@ -345,7 +316,6 @@ const Navbar: React.FC<NavbarProps> = ({ userRole, isAuthenticated, onLogout }) 
             <Link to={`/entrepreneur/club/${clubId}/customer-support`} className="block text-sm text-gray-700 hover:bg-gray-100 py-1" onClick={closeAllDropdowns}>Atención Post-Venta</Link>
           </div>
         )}
-
         <button onClick={() => toggleMobileSubMenu('adminTools')} className="flex items-center justify-between w-full text-gray-700 hover:bg-gray-50 hover:text-blue-600 px-3 py-2 rounded-md text-base font-medium">
           Administración <DropdownArrow isOpen={isMobileSubMenuOpen === 'adminTools'} />
         </button>
@@ -364,25 +334,21 @@ const Navbar: React.FC<NavbarProps> = ({ userRole, isAuthenticated, onLogout }) 
       </>
     );
   };
-
   return (
     <nav className="bg-white shadow-md sticky top-0 z-50">
       <div className="max-w-full px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
-
           <div className="flex-shrink-0 pl-2">
             <Link to="/" onClick={closeAllDropdowns}>
               <img className="h-8 w-auto" src="/aurabox-logo.png" alt="AuraBox Logo" />
             </Link>
           </div>
-
           <div className="hidden md:flex md:items-center md:gap-x-1 flex-1 justify-center">
             {!isEntrepreneur && (
               <Link to="/explore" className={btnClass} onClick={closeAllDropdowns}>
                 Explorar Clubes
               </Link>
             )}
-
             <div className="relative" ref={helpMenuRef}>
               <button onClick={toggleHelpMenu} className={btnClass}>
                 Ayuda <DropdownArrow isOpen={isHelpMenuOpen} />
@@ -395,13 +361,11 @@ const Navbar: React.FC<NavbarProps> = ({ userRole, isAuthenticated, onLogout }) 
                 </div>
               )}
             </div>
-
             {!isEntrepreneur && (
               <Link to="/about-us" className={btnClass} onClick={closeAllDropdowns}>
                 Sobre Nosotros
               </Link>
             )}
-
             {isAuthenticated && userRole === 'customer' && (
               <>
                 <Link to="/customer/wishlist" className="text-gray-700 hover:text-red-500 p-2 rounded-md transition-colors duration-200" onClick={closeAllDropdowns} title="Mi Lista de Deseos">
@@ -416,10 +380,8 @@ const Navbar: React.FC<NavbarProps> = ({ userRole, isAuthenticated, onLogout }) 
                 </Link>
               </>
             )}
-
             {renderEntrepreneurDesktopMenus()}
           </div>
-
           <div className="flex items-center gap-x-2 pr-2">
             <div className="hidden md:flex">
               {renderAuthButtons()}
@@ -444,7 +406,6 @@ const Navbar: React.FC<NavbarProps> = ({ userRole, isAuthenticated, onLogout }) 
           </div>
         </div>
       </div>
-
       {isMobileMenuOpen && (
         <div className="md:hidden absolute top-16 left-0 w-full bg-white shadow-lg py-2 z-40 overflow-y-auto max-h-[calc(100vh-64px)]">
           <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3">
@@ -453,7 +414,6 @@ const Navbar: React.FC<NavbarProps> = ({ userRole, isAuthenticated, onLogout }) 
                 Explorar Clubes
               </Link>
             )}
-
             <button onClick={() => toggleMobileSubMenu('help')} className="flex items-center justify-between w-full text-gray-700 hover:bg-gray-50 hover:text-blue-600 px-3 py-2 rounded-md text-base font-medium">
               Ayuda <DropdownArrow isOpen={isMobileSubMenuOpen === 'help'} />
             </button>
@@ -464,13 +424,11 @@ const Navbar: React.FC<NavbarProps> = ({ userRole, isAuthenticated, onLogout }) 
                 <Link to="/contact" className="block text-sm text-gray-700 hover:bg-gray-100 py-1" onClick={closeAllDropdowns}>Contacto</Link>
               </div>
             )}
-
             {!isEntrepreneur && (
               <Link to="/about-us" className="text-gray-700 hover:bg-gray-50 hover:text-blue-600 block px-3 py-2 rounded-md text-base font-medium" onClick={closeAllDropdowns}>
                 Sobre Nosotros
               </Link>
             )}
-
             {isAuthenticated ? (
               <>
                 {userRole === 'customer' && (
@@ -506,5 +464,4 @@ const Navbar: React.FC<NavbarProps> = ({ userRole, isAuthenticated, onLogout }) 
     </nav>
   );
 };
-
 export default Navbar;
