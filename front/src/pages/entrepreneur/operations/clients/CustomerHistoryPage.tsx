@@ -31,8 +31,10 @@ const CustomerHistoryPage: React.FC = () => {
   const managedClubId = clubId || user?.managedClubId;
 
   useEffect(() => {
+    console.log('CustomerHistoryPage debug:', { authLoading, userRole, managedClubId, customerId, clubId, userManagedClubId: user?.managedClubId });
     if (authLoading) return;
     if (userRole !== 'entrepreneur' || !managedClubId || !customerId) {
+      setLoading(false);
       return;
     }
     let cancelled = false;
