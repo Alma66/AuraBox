@@ -26,22 +26,26 @@ const CustomerHistoryPage: React.FC = () => {
   const [customer, setCustomer] = useState<User | null>(null);
   const [subscriptions, setSubscriptions] = useState<Subscription[]>([]);
   const [loading, setLoading] = useState(true);
+  const [fetchError, setFetchError] = useState<string | null>(null);
 
   const managedClubId = clubId || user?.managedClubId;
 
   useEffect(() => {
     if (authLoading) return;
     if (userRole !== 'entrepreneur' || !managedClubId || !customerId) {
-      navigate('/');
       return;
     }
+    let cancelled = false;
     const fetchData = async () => {
+      setLoading(true);
+      setFetchError(null);
       try {
         const [clubRes, subsRes, customersRes] = await Promise.all([
           api.get(`/clubs/${managedClubId}`),
           api.get(`/clubs/${managedClubId}/user-subscriptions`),
           api.get(`/clubs/${managedClubId}/customers`),
         ]);
+        if (cancelled) return;
         const clubData = getResponseData(clubRes);
         const subsData: Subscription[] = getResponseData(subsRes) || [];
         const usersData: User[] = getResponseData(customersRes) || [];
@@ -53,18 +57,45 @@ const CustomerHistoryPage: React.FC = () => {
             .filter(s => String(s.idUser) === customerId)
             .sort((a, b) => new Date(b.startDate).getTime() - new Date(a.startDate).getTime())
         );
-      } catch {
-        navigate('/');
+      } catch (err: any) {
+        if (cancelled) return;
+        console.error('Error cargando historial de cliente:', err);
+        setFetchError(
+          err?.response?.data?.message ||
+          err?.message ||
+          'No se pudo cargar el historial del cliente.'
+        );
       } finally {
-        setLoading(false);
+        if (!cancelled) setLoading(false);
       }
     };
     fetchData();
-  }, [authLoading, managedClubId, customerId, userRole, navigate]);
+    return () => { cancelled = true; };
+  }, [authLoading, managedClubId, customerId, userRole]);
 
   if (authLoading || loading) return (
     <div className="min-h-screen flex items-center justify-center">
       <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-indigo-600" />
+    </div>
+  );
+
+  if (!authLoading && (userRole !== 'entrepreneur' || !managedClubId || !customerId)) {
+    return (
+      <div className="min-h-screen flex items-center justify-center text-gray-500">
+        Faltan datos para mostrar esta página (club o cliente no especificado).
+      </div>
+    );
+  }
+
+  if (fetchError) return (
+    <div className="min-h-screen flex flex-col items-center justify-center text-center gap-3 px-4">
+      <p className="text-red-500 font-medium">{fetchError}</p>
+      <button
+        onClick={() => navigate(-1)}
+        className="text-sm text-indigo-600 hover:underline"
+      >
+        Volver
+      </button>
     </div>
   );
 
