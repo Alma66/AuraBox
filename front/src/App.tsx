@@ -53,6 +53,7 @@ interface AuthContextType {
   user: User | null;
   isAuthenticated: boolean;
   userRole: UserRole | null;
+  loading: boolean;
   login: (user: User) => void;
   logout: () => void;
 }
@@ -131,12 +132,8 @@ const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => 
     localStorage.removeItem('access_token');
   };
 
-  if (loading) {
-    return <div className="min-h-screen flex items-center justify-center">Cargando...</div>;
-  }
-
   return (
-    <AuthContext.Provider value={{ user, isAuthenticated, userRole, login, logout }}>
+    <AuthContext.Provider value={{ user, isAuthenticated, userRole, loading, login, logout }}>
       {children}
     </AuthContext.Provider>
   );
@@ -149,7 +146,14 @@ const Logout: React.FC = () => {
 };
 
 const AppContent: React.FC = () => {
-  const { userRole, isAuthenticated, logout, login } = useAuth();
+  const { userRole, isAuthenticated, logout, login, loading } = useAuth();
+
+  const pr = (roles: UserRole[], element: React.ReactNode) => (
+    <PrivateRoute isAuthenticated={isAuthenticated} allowedRoles={roles} userRole={userRole} loading={loading}>
+      {element}
+    </PrivateRoute>
+  );
+
   return (
     <>
       <Navbar userRole={userRole} isAuthenticated={isAuthenticated} onLogout={logout} />
@@ -170,36 +174,38 @@ const AppContent: React.FC = () => {
           <Route path="/club/:clubId/terms-and-conditions" element={<TermsAndConditionsPage />} />
           <Route path="/club/:clubId/privacy-and-security" element={<PrivacyAndSecurityPolicyPage />} />
           <Route path="/club/:clubId/plan/:planId" element={<SubscriptionPlanDetailPage />} />
-          <Route path="/customer/profile" element={<PrivateRoute isAuthenticated={isAuthenticated} allowedRoles={['customer']} userRole={userRole}><UserProfilePage /></PrivateRoute>} />
-          <Route path="/customer/reviews" element={<PrivateRoute isAuthenticated={isAuthenticated} allowedRoles={['customer']} userRole={userRole}><MisReviewsPage /></PrivateRoute>} />
-          <Route path="/customer/wishlist" element={<PrivateRoute isAuthenticated={isAuthenticated} allowedRoles={['customer']} userRole={userRole}><WishlistPage /></PrivateRoute>} />
-          <Route path="/cart" element={<PrivateRoute isAuthenticated={isAuthenticated} allowedRoles={['customer']} userRole={userRole}><CartPage /></PrivateRoute>} />
-          <Route path="/checkout" element={<PrivateRoute isAuthenticated={isAuthenticated} allowedRoles={['customer']} userRole={userRole}><CheckoutPage /></PrivateRoute>} />
-          <Route path="/entrepreneur/profile" element={<PrivateRoute isAuthenticated={isAuthenticated} allowedRoles={['entrepreneur']} userRole={userRole}><EntrepreneurProfilePage /></PrivateRoute>} />
-          <Route path="/entrepreneur/club/:clubId/edit-terms" element={<PrivateRoute isAuthenticated={isAuthenticated} allowedRoles={['entrepreneur']} userRole={userRole}><EditClubLegalInfoPage /></PrivateRoute>} />
-          <Route path="/entrepreneur/club/:clubId/edit-policies" element={<PrivateRoute isAuthenticated={isAuthenticated} allowedRoles={['entrepreneur']} userRole={userRole}><EditClubLegalInfoPage /></PrivateRoute>} />
-          <Route path="/entrepreneur/club/:clubId/edit-subscriptions" element={<PrivateRoute isAuthenticated={isAuthenticated} allowedRoles={['entrepreneur']} userRole={userRole}><EditSubscriptionsPage /></PrivateRoute>} />
-          <Route path="/entrepreneur/club/:clubId/financial-management" element={<PrivateRoute isAuthenticated={isAuthenticated} allowedRoles={['entrepreneur']} userRole={userRole}><FinancialMovementsPage /></PrivateRoute>} />
-          <Route path="/entrepreneur/club/:clubId/manage-users-roles" element={<PrivateRoute isAuthenticated={isAuthenticated} allowedRoles={['entrepreneur']} userRole={userRole}><ManageUsersAndRolesPage /></PrivateRoute>} />
-          <Route path="/entrepreneur/club/:clubId/general-settings" element={<PrivateRoute isAuthenticated={isAuthenticated} allowedRoles={['entrepreneur']} userRole={userRole}><GeneralSettingsPage /></PrivateRoute>} />
-          <Route path="/entrepreneur/inventory-management" element={<PrivateRoute isAuthenticated={isAuthenticated} allowedRoles={['entrepreneur']} userRole={userRole}><InventoryManagementPage /></PrivateRoute>} />
-          <Route path="/entrepreneur/club/:clubId/active-subscriptions" element={<PrivateRoute isAuthenticated={isAuthenticated} allowedRoles={['entrepreneur']} userRole={userRole}><ActiveSubscriptionsPage /></PrivateRoute>} />
-          <Route path="/entrepreneur/club/:clubId/customer-history" element={<PrivateRoute isAuthenticated={isAuthenticated} allowedRoles={['entrepreneur']} userRole={userRole}><CustomerHistoryPage /></PrivateRoute>} />
-          <Route path="/entrepreneur/club/:clubId/customer-history/:customerId" element={<PrivateRoute isAuthenticated={isAuthenticated} allowedRoles={['entrepreneur']} userRole={userRole}><CustomerHistoryPage /></PrivateRoute>} />
-          <Route path="/entrepreneur/club/:clubId/manage-customers" element={<PrivateRoute isAuthenticated={isAuthenticated} allowedRoles={['entrepreneur']} userRole={userRole}><ManageCustomersPage /></PrivateRoute>} />
-          <Route path="/entrepreneur/club/:clubId/stats" element={<PrivateRoute isAuthenticated={isAuthenticated} allowedRoles={['entrepreneur']} userRole={userRole}><ClubStatsPage /></PrivateRoute>} />
-          <Route path="/entrepreneur/club/:clubId/sales-reports" element={<PrivateRoute isAuthenticated={isAuthenticated} allowedRoles={['entrepreneur']} userRole={userRole}><SalesReportsPage /></PrivateRoute>} />
-          <Route path="/entrepreneur/club/:clubId/feedback-trends" element={<PrivateRoute isAuthenticated={isAuthenticated} allowedRoles={['entrepreneur']} userRole={userRole}><FeedbackTrendsPage /></PrivateRoute>} />
-          <Route path="/entrepreneur/club/:clubId/subscription/:subscriptionId" element={<PrivateRoute isAuthenticated={isAuthenticated} allowedRoles={['entrepreneur']} userRole={userRole}><SubscriptionDetailForEntrepreneurPage /></PrivateRoute>} />
-          <Route path="/entrepreneur/club/:clubId/assign-deliveries" element={<PrivateRoute isAuthenticated={isAuthenticated} allowedRoles={['entrepreneur']} userRole={userRole}><AssignDeliveriesPage /></PrivateRoute>} />
-          <Route path="/entrepreneur/club/:clubId/view-deliveries" element={<PrivateRoute isAuthenticated={isAuthenticated} allowedRoles={['entrepreneur']} userRole={userRole}><ViewDeliveriesPage /></PrivateRoute>} />
-          <Route path="/entrepreneur/club/:clubId/delivery-history" element={<PrivateRoute isAuthenticated={isAuthenticated} allowedRoles={['entrepreneur']} userRole={userRole}><DeliveryHistoryPage /></PrivateRoute>} />
-          <Route path="/entrepreneur/club/:clubId/manage-riders" element={<PrivateRoute isAuthenticated={isAuthenticated} allowedRoles={['entrepreneur']} userRole={userRole}><ManageRidersPage /></PrivateRoute>} />
-          <Route path="/entrepreneur/club/:clubId/gestionar-imagenes" element={<PrivateRoute isAuthenticated={isAuthenticated} allowedRoles={['entrepreneur']} userRole={userRole}><ManageClubImagesPage /></PrivateRoute>} />
-          <Route path="/entrepreneur/club/:clubId/administrar-promociones" element={<PrivateRoute isAuthenticated={isAuthenticated} allowedRoles={['entrepreneur']} userRole={userRole}><ManagePromotionsPage /></PrivateRoute>} />
-          <Route path="/entrepreneur/club/:clubId/enviar-newsletters" element={<PrivateRoute isAuthenticated={isAuthenticated} allowedRoles={['entrepreneur']} userRole={userRole}><SendNewsletterPage /></PrivateRoute>} />
-          <Route path="/entrepreneur/club/:clubId/moderate-reviews" element={<PrivateRoute isAuthenticated={isAuthenticated} allowedRoles={['entrepreneur']} userRole={userRole}><ModerateReviewsPage /></PrivateRoute>} />
-          <Route path="/entrepreneur/club/:clubId/customer-support" element={<PrivateRoute isAuthenticated={isAuthenticated} allowedRoles={['entrepreneur']} userRole={userRole}><CustomerSupportPage /></PrivateRoute>} />
+
+          <Route path="/customer/profile" element={pr(['customer'], <UserProfilePage />)} />
+          <Route path="/customer/reviews" element={pr(['customer'], <MisReviewsPage />)} />
+          <Route path="/customer/wishlist" element={pr(['customer'], <WishlistPage />)} />
+          <Route path="/cart" element={pr(['customer'], <CartPage />)} />
+          <Route path="/checkout" element={pr(['customer'], <CheckoutPage />)} />
+
+          <Route path="/entrepreneur/profile" element={pr(['entrepreneur'], <EntrepreneurProfilePage />)} />
+          <Route path="/entrepreneur/club/:clubId/edit-terms" element={pr(['entrepreneur'], <EditClubLegalInfoPage />)} />
+          <Route path="/entrepreneur/club/:clubId/edit-policies" element={pr(['entrepreneur'], <EditClubLegalInfoPage />)} />
+          <Route path="/entrepreneur/club/:clubId/edit-subscriptions" element={pr(['entrepreneur'], <EditSubscriptionsPage />)} />
+          <Route path="/entrepreneur/club/:clubId/financial-management" element={pr(['entrepreneur'], <FinancialMovementsPage />)} />
+          <Route path="/entrepreneur/club/:clubId/manage-users-roles" element={pr(['entrepreneur'], <ManageUsersAndRolesPage />)} />
+          <Route path="/entrepreneur/club/:clubId/general-settings" element={pr(['entrepreneur'], <GeneralSettingsPage />)} />
+          <Route path="/entrepreneur/inventory-management" element={pr(['entrepreneur'], <InventoryManagementPage />)} />
+          <Route path="/entrepreneur/club/:clubId/active-subscriptions" element={pr(['entrepreneur'], <ActiveSubscriptionsPage />)} />
+          <Route path="/entrepreneur/club/:clubId/customer-history" element={pr(['entrepreneur'], <CustomerHistoryPage />)} />
+          <Route path="/entrepreneur/club/:clubId/customer-history/:customerId" element={pr(['entrepreneur'], <CustomerHistoryPage />)} />
+          <Route path="/entrepreneur/club/:clubId/manage-customers" element={pr(['entrepreneur'], <ManageCustomersPage />)} />
+          <Route path="/entrepreneur/club/:clubId/stats" element={pr(['entrepreneur'], <ClubStatsPage />)} />
+          <Route path="/entrepreneur/club/:clubId/sales-reports" element={pr(['entrepreneur'], <SalesReportsPage />)} />
+          <Route path="/entrepreneur/club/:clubId/feedback-trends" element={pr(['entrepreneur'], <FeedbackTrendsPage />)} />
+          <Route path="/entrepreneur/club/:clubId/subscription/:subscriptionId" element={pr(['entrepreneur'], <SubscriptionDetailForEntrepreneurPage />)} />
+          <Route path="/entrepreneur/club/:clubId/assign-deliveries" element={pr(['entrepreneur'], <AssignDeliveriesPage />)} />
+          <Route path="/entrepreneur/club/:clubId/view-deliveries" element={pr(['entrepreneur'], <ViewDeliveriesPage />)} />
+          <Route path="/entrepreneur/club/:clubId/delivery-history" element={pr(['entrepreneur'], <DeliveryHistoryPage />)} />
+          <Route path="/entrepreneur/club/:clubId/manage-riders" element={pr(['entrepreneur'], <ManageRidersPage />)} />
+          <Route path="/entrepreneur/club/:clubId/gestionar-imagenes" element={pr(['entrepreneur'], <ManageClubImagesPage />)} />
+          <Route path="/entrepreneur/club/:clubId/administrar-promociones" element={pr(['entrepreneur'], <ManagePromotionsPage />)} />
+          <Route path="/entrepreneur/club/:clubId/enviar-newsletters" element={pr(['entrepreneur'], <SendNewsletterPage />)} />
+          <Route path="/entrepreneur/club/:clubId/moderate-reviews" element={pr(['entrepreneur'], <ModerateReviewsPage />)} />
+          <Route path="/entrepreneur/club/:clubId/customer-support" element={pr(['entrepreneur'], <CustomerSupportPage />)} />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </main>
