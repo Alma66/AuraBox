@@ -20,7 +20,7 @@ const STATUS_DOT: Record<NormalizedStatus, string> = {
 const CustomerHistoryPage: React.FC = () => {
   const { clubId, customerId } = useParams<{ clubId: string; customerId: string }>();
   const navigate = useNavigate();
-  const { user, userRole } = useAuth();
+  const { user, userRole, loading: authLoading } = useAuth();
 
   const [club, setClub] = useState<Club | null>(null);
   const [customer, setCustomer] = useState<User | null>(null);
@@ -29,35 +29,40 @@ const CustomerHistoryPage: React.FC = () => {
 
   const managedClubId = clubId || user?.managedClubId;
 
- useEffect(() => {
-  if (userRole === null) return;
-  if (userRole !== 'entrepreneur' || !managedClubId || !customerId) { navigate('/'); return; }
-  const fetchData = async () => {
-    try {
-      const [clubRes, subsRes, customersRes] = await Promise.all([
-        api.get(`/clubs/${managedClubId}`),
-        api.get(`/clubs/${managedClubId}/user-subscriptions`),
-        api.get(`/clubs/${managedClubId}/customers`),
-      ]);
-      const clubData = getResponseData(clubRes);
-      const subsData: Subscription[] = getResponseData(subsRes) || [];
-      const usersData: User[] = getResponseData(customersRes) || [];
-      setClub(clubData);
-      const found = usersData.find(u => String(u.id) === customerId);
-      setCustomer(found || null);
-      setSubscriptions(subsData.filter(s => String(s.idUser) === customerId).sort((a, b) =>
-        new Date(b.startDate).getTime() - new Date(a.startDate).getTime()
-      ));
-    } catch {
+  useEffect(() => {
+    if (authLoading) return;
+    if (userRole !== 'entrepreneur' || !managedClubId || !customerId) {
       navigate('/');
-    } finally {
-      setLoading(false);
+      return;
     }
-  };
-  fetchData();
-}, [managedClubId, customerId, userRole, navigate]);
+    const fetchData = async () => {
+      try {
+        const [clubRes, subsRes, customersRes] = await Promise.all([
+          api.get(`/clubs/${managedClubId}`),
+          api.get(`/clubs/${managedClubId}/user-subscriptions`),
+          api.get(`/clubs/${managedClubId}/customers`),
+        ]);
+        const clubData = getResponseData(clubRes);
+        const subsData: Subscription[] = getResponseData(subsRes) || [];
+        const usersData: User[] = getResponseData(customersRes) || [];
+        setClub(clubData);
+        const found = usersData.find(u => String(u.id) === customerId);
+        setCustomer(found || null);
+        setSubscriptions(
+          subsData
+            .filter(s => String(s.idUser) === customerId)
+            .sort((a, b) => new Date(b.startDate).getTime() - new Date(a.startDate).getTime())
+        );
+      } catch {
+        navigate('/');
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchData();
+  }, [authLoading, managedClubId, customerId, userRole, navigate]);
 
-  if (loading) return (
+  if (authLoading || loading) return (
     <div className="min-h-screen flex items-center justify-center">
       <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-indigo-600" />
     </div>
