@@ -5913,7 +5913,57 @@ for (const club of clubsConEfectivo) {
   //#endregion
 
 //#endregion
+//#region 16. ENTREPRENEUR_CLUB
 
+await prisma.entrepreneur_Club.create({ data: { idEntrepreneurs: entrepreneur1.id, idClub: clubBonvivir.id } });
+await prisma.entrepreneur_Club.create({ data: { idEntrepreneurs: entrepreneur2.id, idClub: clubCafeSelecto.id } });
+await prisma.entrepreneur_Club.create({ data: { idEntrepreneurs: entrepreneur3.id, idClub: clubBotanicaBox.id } });
+await prisma.entrepreneur_Club.create({ data: { idEntrepreneurs: entrepreneur4.id, idClub: clubSnackBox.id } });
+await prisma.entrepreneur_Club.create({ data: { idEntrepreneurs: entrepreneur5.id, idClub: clubSkincareNatural.id } });
+await prisma.entrepreneur_Club.create({ data: { idEntrepreneurs: entrepreneur6.id, idClub: clubManjarLiterario.id } });
+await prisma.entrepreneur_Club.create({ data: { idEntrepreneurs: entrepreneur7.id, idClub: clubTeaBlends.id } });
+await prisma.entrepreneur_Club.create({ data: { idEntrepreneurs: entrepreneur8.id, idClub: clubGinTonicClub.id } });
+await prisma.entrepreneur_Club.create({ data: { idEntrepreneurs: entrepreneur9.id, idClub: clubMyPetBox.id } });
+await prisma.entrepreneur_Club.create({ data: { idEntrepreneurs: entrepreneur10.id, idClub: clubElClubDeLosQuesos.id } });
+await prisma.entrepreneur_Club.create({ data: { idEntrepreneurs: entrepreneur11.id, idClub: clubSweetBox.id } });
+await prisma.entrepreneur_Club.create({ data: { idEntrepreneurs: entrepreneur12.id, idClub: clubGamingBox.id } });
+await prisma.entrepreneur_Club.create({ data: { idEntrepreneurs: entrepreneur13.id, idClub: clubVelasAromaticas.id } });
+await prisma.entrepreneur_Club.create({ data: { idEntrepreneurs: entrepreneur14.id, idClub: clubBlackBox.id } });
+await prisma.entrepreneur_Club.create({ data: { idEntrepreneurs: entrepreneur15.id, idClub: clubPapeleriaBox.id } });
+await prisma.entrepreneur_Club.create({ data: { idEntrepreneurs: entrepreneur16.id, idClub: clubChocolateBox.id } });
+await prisma.entrepreneur_Club.create({ data: { idEntrepreneurs: entrepreneur17.id, idClub: clubYogaBox.id } });
+await prisma.entrepreneur_Club.create({ data: { idEntrepreneurs: entrepreneur18.id, idClub: clubEspeciasClub.id } });
+await prisma.entrepreneur_Club.create({ data: { idEntrepreneurs: entrepreneur19.id, idClub: clubJoyeriaBox.id } });
+await prisma.entrepreneur_Club.create({ data: { idEntrepreneurs: entrepreneur20.id, idClub: clubTarotBox.id } });
+await prisma.entrepreneur_Club.create({ data: { idEntrepreneurs: entrepreneur21.id, idClub: clubBookerly.id } });
+await prisma.entrepreneur_Club.create({ data: { idEntrepreneurs: entrepreneur22.id, idClub: clubClubWoopy.id } });
+await prisma.entrepreneur_Club.create({ data: { idEntrepreneurs: entrepreneur23.id, idClub: clubEncantadaLibros.id } });
+await prisma.entrepreneur_Club.create({ data: { idEntrepreneurs: entrepreneur24.id, idClub: clubWinexperts.id } });
+await prisma.entrepreneur_Club.create({ data: { idEntrepreneurs: entrepreneur25.id, idClub: clubBodegaPrivada.id } });
+await prisma.entrepreneur_Club.create({ data: { idEntrepreneurs: entrepreneur26.id, idClub: clubWineOClock.id } });
+await prisma.entrepreneur_Club.create({ data: { idEntrepreneurs: entrepreneur27.id, idClub: clubCafeSelecto.id } });
+await prisma.entrepreneur_Club.create({ data: { idEntrepreneurs: entrepreneur28.id, idClub: clubCerveceroClub.id } });
+await prisma.entrepreneur_Club.create({ data: { idEntrepreneurs: entrepreneur29.id, idClub: clubBeerBox.id } });
+await prisma.entrepreneur_Club.create({ data: { idEntrepreneurs: entrepreneur30.id, idClub: clubYerbaClub.id } });
+await prisma.entrepreneur_Club.create({ data: { idEntrepreneurs: entrepreneur31.id, idClub: clubAlmaBox.id } });
+await prisma.entrepreneur_Club.create({ data: { idEntrepreneurs: entrepreneur32.id, idClub: clubGlossyBox.id } });
+await prisma.entrepreneur_Club.create({ data: { idEntrepreneurs: entrepreneur33.id, idClub: clubWellnessBox.id } });
+await prisma.entrepreneur_Club.create({ data: { idEntrepreneurs: entrepreneur34.id, idClub: clubSuculentasClub.id } });
+await prisma.entrepreneur_Club.create({ data: { idEntrepreneurs: entrepreneur35.id, idClub: clubArteBox.id } });
+await prisma.entrepreneur_Club.create({ data: { idEntrepreneurs: entrepreneur36.id, idClub: clubLootCrateAR.id } });
+await prisma.entrepreneur_Club.create({ data: { idEntrepreneurs: entrepreneur37.id, idClub: clubAnimeBox.id } });
+await prisma.entrepreneur_Club.create({ data: { idEntrepreneurs: entrepreneur38.id, idClub: clubCristalesClub.id } });
+await prisma.entrepreneur_Club.create({ data: { idEntrepreneurs: entrepreneur39.id, idClub: clubKiwiCoAR.id } });
+await prisma.entrepreneur_Club.create({ data: { idEntrepreneurs: entrepreneur40.id, idClub: clubNinosBox.id } });
+await prisma.entrepreneur_Club.create({ data: { idEntrepreneurs: entrepreneur41.id, idClub: clubOutdoorBox.id } });
+await prisma.entrepreneur_Club.create({ data: { idEntrepreneurs: entrepreneur42.id, idClub: clubModaBox.id } });
+await prisma.entrepreneur_Club.create({ data: { idEntrepreneurs: entrepreneur43.id, idClub: clubMediasClub.id } });
+await prisma.entrepreneur_Club.create({ data: { idEntrepreneurs: entrepreneur44.id, idClub: clubFosilesClub.id } });
+await prisma.entrepreneur_Club.create({ data: { idEntrepreneurs: entrepreneur45.id, idClub: clubCharcuterieBox.id } });
+await prisma.entrepreneur_Club.create({ data: { idEntrepreneurs: entrepreneur46.id, idClub: clubRopaInteriorBox.id } });
+await prisma.entrepreneur_Club.create({ data: { idEntrepreneurs: entrepreneur47.id, idClub: clubHolaVeggie.id } });
+
+//#endregion
 //#region 17. ENTREPRENEUR_LICENSES
 
   //#region 17.1. Luciana Mendoza - Manjar Literario

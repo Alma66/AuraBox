@@ -105,7 +105,7 @@ export class ClubsController {
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles('entrepreneur')
   @Patch(':id/logo')
-  @UseInterceptors(FileInterceptor('file'))
+  @UseInterceptors(FileInterceptor('logo'))
   async updateLogo(
     @Param('id', ParseIntPipe) id: number,
     @UploadedFile() file: Express.Multer.File,
