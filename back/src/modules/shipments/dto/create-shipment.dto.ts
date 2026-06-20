@@ -1,11 +1,11 @@
-import { 
-  IsInt, 
-  IsOptional, 
-  IsDateString, 
-  IsString, 
-  IsNumber, 
+import {
+  IsInt,
+  IsOptional,
+  IsDateString,
+  IsString,
+  IsNumber,
   IsEnum,
- } from 'class-validator';
+} from 'class-validator';
 import { Transform } from 'class-transformer';
 import { ShipmentStatus } from '@prisma/client';
 
@@ -19,6 +19,10 @@ export class CreateShipmentDto {
   @IsOptional()
   @IsInt()
   idClub?: number;
+
+  @IsOptional()
+  @IsInt()
+  idAssignedRider?: number;
 
   @IsString()
   boxMonthYear!: string;
@@ -51,6 +55,46 @@ export class CreateShipmentDto {
   @IsOptional()
   @IsString()
   shippingNotes?: string;
+
+  @IsOptional()
+  @IsString()
+  street?: string;
+
+  @IsOptional()
+  @IsString()
+  addressNumber?: string;
+
+  @IsOptional()
+  @IsString()
+  locality?: string;
+
+  @IsOptional()
+  @IsString()
+  city?: string;
+
+  @IsOptional()
+  @IsString()
+  postalCode?: string;
+
+  @IsOptional()
+  @IsString()
+  province?: string;
+
+  @IsOptional()
+  @IsString()
+  instructions?: string;
+
+  @IsOptional()
+  @IsString()
+  boxContent?: string;
+
+  @IsOptional()
+  @IsString()
+  deliveryWindowFrom?: string;
+
+  @IsOptional()
+  @IsString()
+  deliveryWindowTo?: string;
 
   @IsEnum(ShipmentStatus)
   shipmentStatus!: ShipmentStatus;

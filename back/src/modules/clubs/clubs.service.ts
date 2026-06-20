@@ -228,7 +228,7 @@ export class ClubsService {
     return this.sanitizeClub(club);
   }
 
-  private async assertOwnership(clubId: number, entrepreneurId: number) {
+  async assertOwnership(clubId: number, entrepreneurId: number) {
     const ec = await this.prisma.entrepreneur_Club.findFirst({
       where: { idClub: clubId, idEntrepreneurs: entrepreneurId },
     });

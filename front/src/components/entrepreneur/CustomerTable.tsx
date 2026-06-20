@@ -2,7 +2,7 @@ import React, { useState, useMemo } from 'react';
 import { User } from '../../types/user';
 
 interface CustomerTableProps {
-  customers: (User  & { subscriptionStatus?: string; subscriptionId?: string; clubId: string })[];
+  customers: (User & { subscriptionStatus?: string; subscriptionId?: string; clubId: string })[];
   onViewCustomer: (customerId: string) => void;
   onViewSubscription?: (subscriptionId: string) => void;
 }
@@ -73,7 +73,7 @@ const CustomerTable: React.FC<CustomerTableProps> = ({ customers, onViewCustomer
               </thead>
               <tbody className="text-gray-700 text-sm font-light">
                 {currentCustomers.map((customer) => (
-                  <tr key={customer.id} className="border-b border-gray-200 hover:bg-gray-50">
+                  <tr key={String(customer.id)} className="border-b border-gray-200 hover:bg-gray-50">
                     <td className="py-3 px-6 text-left whitespace-nowrap">
                       {customer.firstName} {customer.lastName}
                     </td>
@@ -88,11 +88,13 @@ const CustomerTable: React.FC<CustomerTableProps> = ({ customers, onViewCustomer
                       </span>
                     </td>
                     <td className="py-3 px-6 text-left">
-                      {new Date(customer.registeredDate).toLocaleDateString('es-AR')}
+                      {customer.registeredDate
+                        ? new Date(customer.registeredDate).toLocaleDateString('es-AR')
+                        : 'N/D'}
                     </td>
                     <td className="py-3 px-6 text-center">
                       <button
-                        onClick={() => onViewCustomer(customer.id)}
+                        onClick={() => onViewCustomer(String(customer.id))}
                         className="text-blue-600 hover:text-blue-800 font-medium"
                         title="Ver/Editar Cliente"
                       >

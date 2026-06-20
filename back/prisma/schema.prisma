@@ -273,6 +273,7 @@ model Shipments {
   idUser                     Int            @map("ID_User")
   idUserSubscriptions        Int            @map("ID_User_Subscriptions")
   idClub                     Int?           @map("ID_Club")
+  idAssignedRider            Int?           @map("ID_Assigned_Rider")
   boxMonthYear               String         @map("Box_Month_Year")
   estimatedDeliveryStartDate DateTime?      @map("Estimated_Delivery_START_Date")
   estimatedDeliveryEndDate   DateTime?      @map("Estimated_Delivery_END_Date")
@@ -282,8 +283,31 @@ model Shipments {
   logisticsCompany           String?        @map("Logistics_Company")
   shippingCost               Decimal?       @map("Shipping_Cost") @db.Decimal(10, 2)
   shippingNotes              String?        @map("Shipping_Notes")
+  street                     String?        @map("Street")
+  addressNumber              String?        @map("Address_Number")
+  locality                   String?        @map("Locality")
+  city                       String?        @map("City")
+  postalCode                 String?        @map("Postal_Code")
+  province                   String?        @map("Province")
+  instructions               String?        @map("Instructions")
+  boxContent                 String?        @map("Box_Content")
+  deliveryWindowFrom         String?        @map("Delivery_Window_From")
+  deliveryWindowTo           String?        @map("Delivery_Window_To")
 
   @@map("Shipments")
+}
+
+model Rider_Profile {
+  id             Int         @id @default(autoincrement()) @map("ID")
+  idEntrepreneur Int         @unique @map("ID_Entrepreneur")
+  vehicleType    VehicleType @map("Vehicle_Type")
+  licensePlate   String?     @map("License_Plate")
+  availability   Boolean     @default(true) @map("Availability")
+  zonesCovered   String?     @map("Zones_Covered")
+  isActive       Boolean     @default(true) @map("Is_Active")
+  createdAt      DateTime    @default(now()) @map("Created_At")
+
+  @@map("Rider_Profile")
 }
 
 model Subscription_Types {
@@ -424,6 +448,7 @@ enum PaymentStatus {
 
 enum ShipmentStatus {
   Pendiente @map("Pendiente")
+  Asignado  @map("Asignado")
   En_Camino @map("En_Camino")
   Entregado @map("Entregado")
   Problema  @map("Problema")
@@ -441,4 +466,11 @@ enum SubscriptionStatus {
 enum RoleScope {
   PLATFORM @map("PLATFORM")
   CLUB     @map("CLUB")
+}
+
+enum VehicleType {
+  Moto      @map("Moto")
+  Auto      @map("Auto")
+  Bicicleta @map("Bicicleta")
+  A_Pie     @map("A_Pie")
 }

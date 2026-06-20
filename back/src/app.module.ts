@@ -29,6 +29,7 @@ import { PaymentsModule } from './modules/payments/payments.module';
 import { PermissionsModule } from './modules/permissions/permissions.module';
 import { PlatformRulesModule } from './modules/platform-rules/platform-rules.module';
 import { ReviewsModule } from './modules/reviews/reviews.module';
+import { RiderProfileModule } from './modules/rider-profile/rider-profile.module';
 import { RoleModule } from './modules/role/role.module';
 import { RolePermissionsModule } from './modules/role-permissions/role-permissions.module';
 import { ShipmentsModule } from './modules/shipments/shipments.module';
@@ -74,6 +75,7 @@ import { AllExceptionsFilter } from './common/filters/all-exceptions.filter';
     PermissionsModule,
     PlatformRulesModule,
     ReviewsModule,
+    RiderProfileModule,
     RoleModule,
     RolePermissionsModule,
     ShipmentsModule,
