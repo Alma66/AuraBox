@@ -6,6 +6,7 @@ import {
 import { ShipmentsService } from './shipments.service';
 import { CreateShipmentDto } from './dto/create-shipment.dto';
 import { UpdateShipmentDto } from './dto/update-shipment.dto';
+import { AssignDeliveryDto, AssignNewShipmentDto } from './dto/assign-delivery.dto';
 import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
 import { RolesGuard } from '../auth/roles.guard';
 import { Roles } from '../auth/roles.decorator';
@@ -22,6 +23,14 @@ export class ShipmentsController {
       throw new ForbiddenException('No autorizado para crear este envío');
     }
     return this.shipmentsService.create(dto);
+  }
+
+  @UseGuards(RolesGuard)
+  @Roles('entrepreneur', 'admin')
+  @Post('assign')
+  @UsePipes(new ValidationPipe({ whitelist: true, transform: true }))
+  async assignNew(@Body() dto: AssignNewShipmentDto) {
+    return this.shipmentsService.assignNewShipment(dto);
   }
 
   @UseGuards(RolesGuard)
@@ -46,6 +55,13 @@ export class ShipmentsController {
     return this.shipmentsService.findByClub(idClub);
   }
 
+  @UseGuards(RolesGuard)
+  @Roles('entrepreneur', 'admin')
+  @Get('pending-by-club/:idClub')
+  async findPendingByClub(@Param('idClub', ParseIntPipe) idClub: number) {
+    return this.shipmentsService.getPendingForClub(idClub);
+  }
+
   @Get(':id')
   async findOne(@Param('id', ParseIntPipe) id: number, @Request() req) {
     const shipment = await this.shipmentsService.findOne(id);
@@ -53,6 +69,18 @@ export class ShipmentsController {
       throw new ForbiddenException('No autorizado para ver este envío');
     }
     return shipment;
+  }
+
+  @UseGuards(RolesGuard)
+  @Roles('entrepreneur', 'admin')
+  @Put(':id/assign/:idClub')
+  @UsePipes(new ValidationPipe({ whitelist: true, transform: true }))
+  async assignExisting(
+    @Param('id', ParseIntPipe) id: number,
+    @Param('idClub', ParseIntPipe) idClub: number,
+    @Body() dto: AssignDeliveryDto,
+  ) {
+    return this.shipmentsService.assignRiderForClub(id, idClub, dto);
   }
 
   @UseGuards(RolesGuard)

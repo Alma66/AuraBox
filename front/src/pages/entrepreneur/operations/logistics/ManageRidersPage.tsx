@@ -1,24 +1,26 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../../../App';
 import api, { getResponseData } from '../../../../api/config';
-import { Rider } from '../../../../types/delivery';
+import { RiderProfile, Courier } from '../../../../types/delivery';
 import { Club } from '../../../../types/club';
+
+const VEHICLE_OPTIONS = ['Moto', 'Auto', 'Bicicleta', 'A_Pie'];
 
 const ManageRidersPage: React.FC = () => {
   const { clubId } = useParams<{ clubId: string }>();
   const { user, userRole } = useAuth();
   const navigate = useNavigate();
-  const [riders, setRiders] = useState<Rider[]>([]);
+
   const [club, setClub] = useState<Club | null>(null);
+  const [riders, setRiders] = useState<RiderProfile[]>([]);
+  const [allCouriers, setAllCouriers] = useState<Courier[]>([]);
+  const [enabledCourierIds, setEnabledCourierIds] = useState<number[]>([]);
+  const [activeTab, setActiveTab] = useState<'riders' | 'couriers'>('riders');
+  const [editingRider, setEditingRider] = useState<RiderProfile | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [newRider, setNewRider] = useState<Partial<Rider>>({
-    name: '', email: '', phoneNumber: '', vehicleType: 'moto', licensePlate: '', availability: true, zonesCovered: ['CABA'], isActive: true
-  });
-  const [editingRider, setEditingRider] = useState<Rider | null>(null);
-  const [filterActive, setFilterActive] = useState<'all' | 'active' | 'inactive'>('all');
-  const [searchTerm, setSearchTerm] = useState('');
+  const [savingCouriers, setSavingCouriers] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -26,180 +28,226 @@ const ManageRidersPage: React.FC = () => {
         navigate('/login');
         return;
       }
-
       try {
-        const [clubResponse, ridersResponse] = await Promise.all([
+        const [clubRes, ridersRes, allCouriersRes, clubCouriersRes] = await Promise.all([
           api.get(`/clubs/${clubId}`),
-          api.get(`/clubs/${clubId}/riders`)
+          api.get(`/rider-profile/by-club/${clubId}`),
+          api.get('/courier'),
+          api.get(`/courier/by-club/${clubId}`),
         ]);
-
-        const clubData = getResponseData(clubResponse);
-        const ridersData = getResponseData(ridersResponse);
-
-        setClub(clubData);
-        setRiders(ridersData || []);
+        setClub(getResponseData(clubRes));
+        setRiders(getResponseData(ridersRes) || []);
+        setAllCouriers(getResponseData(allCouriersRes) || []);
+        setEnabledCourierIds((getResponseData(clubCouriersRes) || []).map((c: Courier) => c.id));
       } catch (err) {
-        console.error("Error fetching data:", err);
-        setError('Error al cargar riders.');
+        console.error(err);
+        setError('No se pudo cargar la información de logística.');
       } finally {
         setLoading(false);
       }
     };
-
     fetchData();
   }, [clubId, user, userRole, navigate]);
 
-  const addRider = async () => {
-    if (!newRider.name || !newRider.email || !newRider.phoneNumber) {
-      alert('Por favor completa los campos obligatorios.');
-      return;
-    }
+  const toggleCourier = (courierId: number) => {
+    setEnabledCourierIds((prev) =>
+      prev.includes(courierId) ? prev.filter((id) => id !== courierId) : [...prev, courierId]
+    );
+  };
+
+  const saveCouriers = async () => {
+    setSavingCouriers(true);
     try {
-      const response = await api.post(`/clubs/${clubId}/riders`, newRider);
-      const created = getResponseData(response);
-      setRiders(prev => [...prev, created]);
-      setNewRider({ name: '', email: '', phoneNumber: '', vehicleType: 'moto', licensePlate: '', availability: true, zonesCovered: ['CABA'], isActive: true });
-      alert('Rider agregado.');
+      await api.put(`/courier/by-club/${clubId}`, { courierIds: enabledCourierIds });
+      alert('Métodos de envío actualizados.');
     } catch (err) {
-      console.error("Error adding rider:", err);
-      alert('Error al agregar rider.');
+      console.error(err);
+      alert('No se pudieron guardar los métodos de envío.');
+    } finally {
+      setSavingCouriers(false);
     }
   };
 
-  const updateRider = async (updatedRider: Rider) => {
+  const saveRider = async () => {
+    if (!editingRider) return;
     try {
-      await api.put(`/clubs/${clubId}/riders/${updatedRider.id}`, updatedRider);
-      setRiders(prev => prev.map(r => r.id === updatedRider.id ? updatedRider : r));
+      await api.put(`/rider-profile/${editingRider.id}`, {
+        vehicleType: editingRider.vehicleType,
+        licensePlate: editingRider.licensePlate,
+        availability: editingRider.availability,
+        zonesCovered: editingRider.zonesCovered,
+        isActive: editingRider.isActive,
+      });
+      setRiders((prev) => prev.map((r) => (r.id === editingRider.id ? editingRider : r)));
       setEditingRider(null);
-      alert('Rider actualizado.');
     } catch (err) {
-      console.error("Error updating rider:", err);
-      alert('Error al actualizar.');
+      console.error(err);
+      alert('No se pudo actualizar el rider.');
     }
   };
 
-  const deleteRider = async (riderId: string) => {
-    if (!window.confirm('¿Estás seguro de eliminar este rider?')) return;
+  const deactivateRider = async (riderId: number) => {
+    if (!window.confirm('¿Dar de baja a este rider?')) return;
     try {
-      await api.delete(`/clubs/${clubId}/riders/${riderId}`);
-      setRiders(prev => prev.map(r => r.id === riderId ? { ...r, isActive: false } : r));
-      alert('Rider eliminado.');
+      await api.put(`/rider-profile/${riderId}`, { isActive: false, availability: false });
+      setRiders((prev) => prev.map((r) => (r.id === riderId ? { ...r, isActive: false, availability: false } : r)));
     } catch (err) {
-      console.error("Error deleting rider:", err);
-      alert('Error al eliminar.');
+      console.error(err);
+      alert('No se pudo dar de baja al rider.');
     }
   };
 
-  const filteredRiders = riders
-    .filter(r => filterActive === 'all' || (filterActive === 'active' ? r.isActive : !r.isActive))
-    .filter(r => r.name.toLowerCase().includes(searchTerm.toLowerCase()) || r.email.toLowerCase().includes(searchTerm.toLowerCase()));
-
-  if (loading) return <div className="text-center py-10">Cargando riders...</div>;
-  if (error || !club) return <div className="text-center py-10 text-red-500">{error || 'Club no encontrado.'}</div>;
+  if (loading) return <div className="text-center py-16 text-gray-500">Cargando...</div>;
+  if (error || !club) return <div className="text-center py-16 text-red-500">{error || 'Club no encontrado.'}</div>;
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <h1 className="text-3xl font-bold mb-6">Gestionar Riders - {club.name}</h1>
-      
-      <div className="mb-6 grid grid-cols-1 md:grid-cols-3 gap-4">
-        <div className="bg-white p-4 rounded-lg shadow"><h3 className="text-sm font-medium text-gray-500">Total</h3><p className="text-2xl font-bold">{riders.length}</p></div>
-        <div className="bg-white p-4 rounded-lg shadow"><h3 className="text-sm font-medium text-gray-500">Activos</h3><p className="text-2xl font-bold text-green-600">{riders.filter(r => r.isActive).length}</p></div>
-        <div className="bg-white p-4 rounded-lg shadow"><h3 className="text-sm font-medium text-gray-500">Inactivos</h3><p className="text-2xl font-bold text-red-600">{riders.filter(r => !r.isActive).length}</p></div>
+    <div className="container mx-auto px-4 py-10 max-w-6xl">
+      <div className="mb-8">
+        <h1 className="text-2xl font-bold text-gray-900">Gestionar Logística</h1>
+        <p className="text-sm text-gray-500 mt-1">{club.name}</p>
       </div>
 
-      <div className="mb-6 flex gap-4">
-        <input type="text" placeholder="Buscar..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} className="flex-1 px-4 py-2 border rounded-md" />
-        <select value={filterActive} onChange={(e) => setFilterActive(e.target.value as any)} className="px-4 py-2 border rounded-md">
-          <option value="all">Todos</option>
-          <option value="active">Solo Activos</option>
-          <option value="inactive">Solo Inactivos</option>
-        </select>
+      <div className="flex gap-2 mb-6 border-b border-gray-200">
+        <button
+          onClick={() => setActiveTab('riders')}
+          className={`px-4 py-2 text-sm font-medium border-b-2 -mb-px transition-colors ${activeTab === 'riders' ? 'border-blue-600 text-blue-600' : 'border-transparent text-gray-500 hover:text-gray-700'}`}
+        >
+          Mis Riders
+        </button>
+        <button
+          onClick={() => setActiveTab('couriers')}
+          className={`px-4 py-2 text-sm font-medium border-b-2 -mb-px transition-colors ${activeTab === 'couriers' ? 'border-blue-600 text-blue-600' : 'border-transparent text-gray-500 hover:text-gray-700'}`}
+        >
+          Empresas de Envío
+        </button>
       </div>
 
-      <div className="mb-6 bg-white p-6 rounded-lg shadow-md">
-        <h2 className="text-xl font-semibold mb-4">Agregar Rider</h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-          <input type="text" placeholder="Nombre" value={newRider.name || ''} onChange={(e) => setNewRider({ ...newRider, name: e.target.value })} className="px-3 py-2 border rounded-md" required />
-          <input type="email" placeholder="Email" value={newRider.email || ''} onChange={(e) => setNewRider({ ...newRider, email: e.target.value })} className="px-3 py-2 border rounded-md" required />
-          <input type="tel" placeholder="Teléfono" value={newRider.phoneNumber || ''} onChange={(e) => setNewRider({ ...newRider, phoneNumber: e.target.value })} className="px-3 py-2 border rounded-md" required />
-          <select value={newRider.vehicleType || 'moto'} onChange={(e) => setNewRider({ ...newRider, vehicleType: e.target.value as any })} className="px-3 py-2 border rounded-md">
-            <option value="moto">Moto</option>
-            <option value="auto">Auto</option>
-            <option value="bicicleta">Bicicleta</option>
-            <option value="a_pie">A Pie</option>
-          </select>
-          <input type="text" placeholder="Patente" value={newRider.licensePlate || ''} onChange={(e) => setNewRider({ ...newRider, licensePlate: e.target.value })} className="px-3 py-2 border rounded-md" />
-          <select value={newRider.availability ? 'true' : 'false'} onChange={(e) => setNewRider({ ...newRider, availability: e.target.value === 'true' })} className="px-3 py-2 border rounded-md">
-            <option value="true">Disponible</option>
-            <option value="false">No Disponible</option>
-          </select>
-          <input type="text" placeholder="Zonas (CABA,GBA)" value={(newRider.zonesCovered || []).join(',')} onChange={(e) => setNewRider({ ...newRider, zonesCovered: e.target.value.split(',') })} className="px-3 py-2 border rounded-md" />
-          <div className="flex items-center"><label className="flex items-center"><input type="checkbox" checked={newRider.isActive || false} onChange={(e) => setNewRider({ ...newRider, isActive: e.target.checked })} className="mr-2" /><span>Activo</span></label></div>
-        </div>
-        <button onClick={addRider} className="mt-4 px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">Agregar Rider</button>
-      </div>
-
-      <div className="bg-white rounded-lg shadow-md overflow-hidden">
-        <div className="overflow-x-auto">
-          <table className="min-w-full divide-y divide-gray-200">
-            <thead className="bg-gray-50">
-              <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Nombre</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Email</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Teléfono</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Vehículo</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Disponible</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Calificación</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Estado</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Acciones</th>
-              </tr>
-            </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
-              {filteredRiders.map((rider) => (
-                <tr key={rider.id} className="hover:bg-gray-50">
-                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">{rider.name}</td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm">{rider.email}</td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm">{rider.phoneNumber}</td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm">{rider.vehicleType.toUpperCase()}</td>
-                  <td className="px-6 py-4 whitespace-nowrap"><span className={`px-2 py-1 text-xs rounded-full ${rider.availability ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>{rider.availability ? 'Sí' : 'No'}</span></td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm">{rider.rating}/5</td>
-                  <td className="px-6 py-4 whitespace-nowrap"><span className={`px-2 py-1 text-xs rounded-full ${rider.isActive ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>{rider.isActive ? 'Activo' : 'Inactivo'}</span></td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                    <button onClick={() => setEditingRider(rider)} className="text-blue-600 hover:text-blue-900 mr-3">Editar</button>
-                    <button onClick={() => deleteRider(rider.id)} className="text-red-600 hover:text-red-900">Eliminar</button>
-                  </td>
+      {activeTab === 'riders' && (
+        <div className="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden">
+          <div className="overflow-x-auto">
+            <table className="min-w-full divide-y divide-gray-100">
+              <thead className="bg-gray-50">
+                <tr>
+                  <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase">Nombre</th>
+                  <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase">Contacto</th>
+                  <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase">Vehículo</th>
+                  <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase">Zonas</th>
+                  <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase">Disponible</th>
+                  <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase">Entregas</th>
+                  <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase">Estado</th>
+                  <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase">Acciones</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody className="divide-y divide-gray-100">
+                {riders.map((rider) => (
+                  <tr key={rider.id} className="hover:bg-gray-50">
+                    <td className="px-6 py-4 text-sm font-medium text-gray-900 whitespace-nowrap">{rider.firstName} {rider.lastName}</td>
+                    <td className="px-6 py-4 text-sm text-gray-600 whitespace-nowrap">{rider.email}{rider.phoneNumber ? ` · ${rider.phoneNumber}` : ''}</td>
+                    <td className="px-6 py-4 text-sm text-gray-600 whitespace-nowrap">{rider.vehicleType ?? '—'}</td>
+                    <td className="px-6 py-4 text-sm text-gray-600 max-w-xs truncate">{rider.zonesCovered ?? '—'}</td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <span className={`px-2 py-1 text-xs font-medium rounded-full border ${rider.availability ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : 'bg-gray-100 text-gray-600 border-gray-200'}`}>
+                        {rider.availability ? 'Sí' : 'No'}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4 text-sm text-gray-600 whitespace-nowrap">{rider.totalDeliveries} ({rider.currentAssignments} activas)</td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <span className={`px-2 py-1 text-xs font-medium rounded-full border ${rider.isActive ? 'bg-blue-50 text-blue-700 border-blue-200' : 'bg-red-50 text-red-700 border-red-200'}`}>
+                        {rider.isActive ? 'Activo' : 'Inactivo'}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4 text-sm whitespace-nowrap">
+                      <button onClick={() => setEditingRider(rider)} className="text-blue-600 hover:text-blue-800 font-medium mr-4">Editar</button>
+                      {rider.isActive && (
+                        <button onClick={() => deactivateRider(rider.id)} className="text-red-600 hover:text-red-800 font-medium">Dar de baja</button>
+                      )}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+          {riders.length === 0 && <div className="text-center py-16 text-gray-500">Todavía no asignaste el rol de rider a ningún emprendedor de este club.</div>}
         </div>
-      </div>
+      )}
+
+      {activeTab === 'couriers' && (
+        <div className="bg-white border border-gray-200 rounded-xl shadow-sm p-6">
+          <h2 className="text-base font-semibold text-gray-900 mb-1">Métodos de envío habilitados</h2>
+          <p className="text-sm text-gray-500 mb-5">Elegí con qué empresas u opciones de entrega trabaja este club. Los clientes solo podrán elegir entre las opciones marcadas.</p>
+          <div className="space-y-3">
+            {allCouriers.map((courier) => (
+              <label key={courier.id} className="flex items-center gap-3 px-4 py-3 border border-gray-200 rounded-lg cursor-pointer hover:bg-gray-50">
+                <input
+                  type="checkbox"
+                  checked={enabledCourierIds.includes(courier.id)}
+                  onChange={() => toggleCourier(courier.id)}
+                  className="h-4 w-4 text-blue-600 rounded border-gray-300 focus:ring-blue-500"
+                />
+                <span className="text-sm font-medium text-gray-900">{courier.name}</span>
+                {courier.isInternal && <span className="text-xs text-gray-400">(Riders propios)</span>}
+              </label>
+            ))}
+          </div>
+          <button
+            onClick={saveCouriers}
+            disabled={savingCouriers}
+            className="mt-6 px-5 py-2.5 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 disabled:opacity-50 transition-colors"
+          >
+            {savingCouriers ? 'Guardando...' : 'Guardar cambios'}
+          </button>
+        </div>
+      )}
 
       {editingRider && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white p-6 rounded-lg max-w-md w-full mx-4">
-            <h2 className="text-xl font-semibold mb-4">Editar Rider: {editingRider.name}</h2>
+        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 px-4">
+          <div className="bg-white rounded-xl shadow-xl max-w-md w-full p-6">
+            <h2 className="text-lg font-semibold text-gray-900 mb-4">Editar rider: {editingRider.firstName} {editingRider.lastName}</h2>
             <div className="space-y-4">
-              <input type="text" value={editingRider.name} onChange={(e) => setEditingRider({ ...editingRider, name: e.target.value })} className="w-full px-3 py-2 border rounded-md" />
-              <input type="email" value={editingRider.email} onChange={(e) => setEditingRider({ ...editingRider, email: e.target.value })} className="w-full px-3 py-2 border rounded-md" />
-              <input type="tel" value={editingRider.phoneNumber} onChange={(e) => setEditingRider({ ...editingRider, phoneNumber: e.target.value })} className="w-full px-3 py-2 border rounded-md" />
-              <select value={editingRider.vehicleType} onChange={(e) => setEditingRider({ ...editingRider, vehicleType: e.target.value as any })} className="w-full px-3 py-2 border rounded-md">
-                <option value="moto">Moto</option>
-                <option value="auto">Auto</option>
-                <option value="bicicleta">Bicicleta</option>
-                <option value="a_pie">A Pie</option>
-              </select>
-              <input type="text" value={editingRider.licensePlate || ''} onChange={(e) => setEditingRider({ ...editingRider, licensePlate: e.target.value })} className="w-full px-3 py-2 border rounded-md" />
-              <select value={editingRider.availability ? 'true' : 'false'} onChange={(e) => setEditingRider({ ...editingRider, availability: e.target.value === 'true' })} className="w-full px-3 py-2 border rounded-md">
-                <option value="true">Disponible</option>
-                <option value="false">No Disponible</option>
-              </select>
-              <input type="text" value={editingRider.zonesCovered.join(',')} onChange={(e) => setEditingRider({ ...editingRider, zonesCovered: e.target.value.split(',') })} className="w-full px-3 py-2 border rounded-md" />
-              <label className="flex items-center"><input type="checkbox" checked={editingRider.isActive} onChange={(e) => setEditingRider({ ...editingRider, isActive: e.target.checked })} className="mr-2" /><span>Activo</span></label>
+              <div>
+                <label className="block text-xs font-medium text-gray-500 mb-1">Vehículo</label>
+                <select
+                  value={editingRider.vehicleType ?? ''}
+                  onChange={(e) => setEditingRider({ ...editingRider, vehicleType: e.target.value as any })}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm"
+                >
+                  {VEHICLE_OPTIONS.map((v) => (
+                    <option key={v} value={v}>{v}</option>
+                  ))}
+                </select>
+              </div>
+              <div>
+                <label className="block text-xs font-medium text-gray-500 mb-1">Patente</label>
+                <input
+                  type="text"
+                  value={editingRider.licensePlate ?? ''}
+                  onChange={(e) => setEditingRider({ ...editingRider, licensePlate: e.target.value })}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm"
+                />
+              </div>
+              <div>
+                <label className="block text-xs font-medium text-gray-500 mb-1">Zonas cubiertas</label>
+                <input
+                  type="text"
+                  value={editingRider.zonesCovered ?? ''}
+                  onChange={(e) => setEditingRider({ ...editingRider, zonesCovered: e.target.value })}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm"
+                  placeholder="CABA, GBA"
+                />
+              </div>
+              <label className="flex items-center gap-2">
+                <input
+                  type="checkbox"
+                  checked={editingRider.availability}
+                  onChange={(e) => setEditingRider({ ...editingRider, availability: e.target.checked })}
+                  className="h-4 w-4 text-blue-600 rounded border-gray-300"
+                />
+                <span className="text-sm text-gray-700">Disponible</span>
+              </label>
             </div>
-            <div className="flex justify-end space-x-3 mt-6">
-              <button onClick={() => setEditingRider(null)} className="px-4 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400">Cancelar</button>
-              <button onClick={() => updateRider(editingRider)} className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">Guardar</button>
+            <div className="flex justify-end gap-3 mt-6">
+              <button onClick={() => setEditingRider(null)} className="px-4 py-2 text-sm font-medium text-gray-600 hover:text-gray-800">Cancelar</button>
+              <button onClick={saveRider} className="px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700">Guardar</button>
             </div>
           </div>
         </div>

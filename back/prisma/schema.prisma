@@ -116,6 +116,38 @@ model Club_Status_History {
   @@map("Club_Status_History")
 }
 
+model Courier {
+  id         Int      @id @default(autoincrement()) @map("ID")
+  code       String   @unique @map("Code")
+  name       String   @map("Name")
+  isInternal Boolean  @default(false) @map("Is_Internal")
+  active     Boolean  @default(true) @map("Active")
+
+  @@map("Courier")
+}
+
+model Club_Courier {
+  id        Int      @id @default(autoincrement()) @map("ID")
+  idClub    Int      @map("ID_Club")
+  idCourier Int      @map("ID_Courier")
+  active    Boolean  @default(true) @map("Active")
+  createdAt DateTime @default(now()) @map("Created_At")
+
+  @@unique([idClub, idCourier])
+  @@map("Club_Courier")
+}
+
+model User_Courier_Preference {
+  id        Int     @id @default(autoincrement()) @map("ID")
+  idUser    Int     @map("ID_User")
+  idClub    Int     @map("ID_Club")
+  idCourier Int     @map("ID_Courier")
+  active    Boolean @default(true) @map("Active")
+
+  @@unique([idUser, idClub, idCourier])
+  @@map("User_Courier_Preference")
+}
+
 model Entrepreneurs {
   id               Int      @id @default(autoincrement()) @map("ID")
   firstName        String   @map("First_Name")
@@ -274,22 +306,22 @@ model Shipments {
   idUserSubscriptions        Int            @map("ID_User_Subscriptions")
   idClub                     Int?           @map("ID_Club")
   idAssignedRider            Int?           @map("ID_Assigned_Rider")
+  idCourier                  Int?           @map("ID_Courier")
   boxMonthYear               String         @map("Box_Month_Year")
   estimatedDeliveryStartDate DateTime?      @map("Estimated_Delivery_START_Date")
   estimatedDeliveryEndDate   DateTime?      @map("Estimated_Delivery_END_Date")
   actualDeliveryDate         DateTime?      @map("Actual_Delivery_Date")
   shipmentStatus             ShipmentStatus @map("Shipment_Status")
   trackingNumber             String?        @map("Tracking_Number")
-  logisticsCompany           String?        @map("Logistics_Company")
   shippingCost               Decimal?       @map("Shipping_Cost") @db.Decimal(10, 2)
-  shippingNotes              String?        @map("Shipping_Notes")
+  shippingNotes               String?        @map("Shipping_Notes")
   street                     String?        @map("Street")
   addressNumber              String?        @map("Address_Number")
   locality                   String?        @map("Locality")
   city                       String?        @map("City")
   postalCode                 String?        @map("Postal_Code")
   province                   String?        @map("Province")
-  instructions               String?        @map("Instructions")
+  instructions                String?        @map("Instructions")
   boxContent                 String?        @map("Box_Content")
   deliveryWindowFrom         String?        @map("Delivery_Window_From")
   deliveryWindowTo           String?        @map("Delivery_Window_To")
@@ -326,7 +358,6 @@ model Subscription_Types {
 
   @@map("Subscription_Types")
 }
-
 
 model Transaction_History {
   id                   Int           @id @default(autoincrement()) @map("ID")

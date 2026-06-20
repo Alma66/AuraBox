@@ -24,6 +24,10 @@ export class CreateShipmentDto {
   @IsInt()
   idAssignedRider?: number;
 
+  @IsOptional()
+  @IsInt()
+  idCourier?: number;
+
   @IsString()
   boxMonthYear!: string;
 
@@ -42,10 +46,6 @@ export class CreateShipmentDto {
   @IsOptional()
   @IsString()
   trackingNumber?: string;
-
-  @IsOptional()
-  @IsString()
-  logisticsCompany?: string;
 
   @IsOptional()
   @Transform(({ value }) => (value === null || value === undefined ? value : parseFloat(String(value))))

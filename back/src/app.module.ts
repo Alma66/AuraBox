@@ -38,6 +38,7 @@ import { TransactionHistoryModule } from './modules/transaction-history/transact
 import { UserClubPreferencesModule } from './modules/user-club-preferences/user-club-preferences.module';
 import { UserSubscriptionsModule } from './modules/user-subscriptions/user-subscriptions.module';
 import { UsersModule } from './modules/users/users.module';
+import { CourierModule } from './modules/courier/courier.module';
 
 import { JwtAuthGuard } from './common/guards/jwt-auth.guard';
 import { TransformInterceptor } from './common/interceptors/transform.interceptor';
@@ -84,6 +85,7 @@ import { AllExceptionsFilter } from './common/filters/all-exceptions.filter';
     UserClubPreferencesModule,
     UserSubscriptionsModule,
     UsersModule,
+    CourierModule,
   ],
   controllers: [AppController],
 
