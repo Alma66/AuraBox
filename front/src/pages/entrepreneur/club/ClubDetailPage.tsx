@@ -104,29 +104,22 @@ const ClubDetailPage: React.FC = () => {
   const { clubId } = useParams<{ clubId: string }>();
   const navigate = useNavigate();
   const { userRole } = useAuth();
-
   const [club, setClub] = useState<ClubData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-
   const [editingDescription, setEditingDescription] = useState(false);
   const [editDescription, setEditDescription] = useState('');
   const [saving, setSaving] = useState(false);
-
   const [cropState, setCropState] = useState<CropState | null>(null);
   const [uploading, setUploading] = useState(false);
-
   const [socialNetworks, setSocialNetworks] = useState<SocialNetworkRaw[]>([]);
   const [newSocialType, setNewSocialType] = useState('instagram');
   const [newSocialUrl, setNewSocialUrl] = useState('');
   const [socialSaving, setSocialSaving] = useState(false);
-
   const [toast, setToast] = useState<{ msg: string; type: 'success' | 'error' } | null>(null);
-
   const logoInputRef = useRef<HTMLInputElement>(null);
   const bannerInputRef = useRef<HTMLInputElement>(null);
   const historyInputRef = useRef<HTMLInputElement>(null);
-
   const isOwner = userRole === 'entrepreneur' && !!club?.isOwner;
 
   const showToast = (msg: string, type: 'success' | 'error' = 'success') => {
@@ -181,7 +174,6 @@ const ClubDetailPage: React.FC = () => {
       const blob = await getCroppedBlob(cropState.imageSrc, cropState.croppedAreaPixels);
       const file = new File([blob], 'image.jpg', { type: 'image/jpeg' });
       const formData = new FormData();
-
       if (cropState.target === 'logo') {
         formData.append('logo', file);
         await api.patch(`/clubs/${clubId}/logo`, formData, {
@@ -206,7 +198,6 @@ const ClubDetailPage: React.FC = () => {
         });
         showToast('Imagen de historia actualizada');
       }
-
       setCropState(null);
       fetchClub();
     } catch {
@@ -295,7 +286,9 @@ const ClubDetailPage: React.FC = () => {
   }
 
   const logoSrc = club.logoUrl || club.logoImage || null;
-  const bannerList = club.bannerImages && club.bannerImages.length > 0 ? club.bannerImages : [];
+  const bannerList = club.bannerImagesRaw && club.bannerImagesRaw.length > 0
+    ? club.bannerImagesRaw.map((img) => img.imageUrl)
+    : [];
   const historyImage = club.historyImageRaw?.[0]?.imageUrl || null;
   const socialMediaForDisplay: SocialMediaLinks = (socialNetworks || []).reduce(
     (acc, sn) => ({ ...acc, [sn.networkType.toLowerCase()]: sn.profileUrl }),
@@ -309,7 +302,6 @@ const ClubDetailPage: React.FC = () => {
           {toast.msg}
         </div>
       )}
-
       {cropState && (
         <div className="fixed inset-0 z-50 bg-black/80 flex flex-col items-center justify-center p-4">
           <div className="bg-white rounded-2xl shadow-2xl w-full max-w-2xl overflow-hidden">
@@ -370,7 +362,6 @@ const ClubDetailPage: React.FC = () => {
           </div>
         </div>
       )}
-
       <div className="relative shadow-lg">
         <div className="h-72 md:h-96">
           {bannerList.length > 0 ? (
@@ -385,9 +376,7 @@ const ClubDetailPage: React.FC = () => {
             <div className="w-full h-72 md:h-96 bg-gradient-to-br from-blue-600 to-purple-700" />
           )}
         </div>
-
         <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent pointer-events-none" />
-
         <div className="absolute bottom-0 left-0 w-full px-6 pb-6 flex items-end gap-5">
           <div className="relative flex-shrink-0 -mb-16">
             <div className="w-28 h-28 md:w-32 md:h-32 rounded-full border-4 border-white shadow-2xl overflow-hidden bg-white">
@@ -415,12 +404,10 @@ const ClubDetailPage: React.FC = () => {
               </>
             )}
           </div>
-
           <div className="flex-1 min-w-0 pb-2">
             <h1 className="text-2xl md:text-4xl font-extrabold text-white drop-shadow-lg truncate">{club.name}</h1>
             {club.slogan && <p className="text-white/85 text-sm md:text-base drop-shadow mt-1">{club.slogan}</p>}
           </div>
-
           {isOwner && (
             <div className="flex-shrink-0 pb-2">
               <button
@@ -437,7 +424,6 @@ const ClubDetailPage: React.FC = () => {
           )}
         </div>
       </div>
-
       <div className="container mx-auto px-4 pt-20 pb-8">
         <button onClick={() => navigate(-1)} className="mb-6 flex items-center text-blue-600 hover:text-blue-800 transition-colors text-sm font-medium">
           <svg className="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -445,7 +431,6 @@ const ClubDetailPage: React.FC = () => {
           </svg>
           Volver
         </button>
-
         {isOwner && club.bannerImagesRaw && club.bannerImagesRaw.length > 0 && (
           <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-5 mb-6">
             <div className="flex items-center gap-2 mb-4">
@@ -470,7 +455,6 @@ const ClubDetailPage: React.FC = () => {
             </div>
           </div>
         )}
-
         <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 md:p-8 mb-6">
           <div className="flex justify-between items-center mb-6">
             <span className="inline-flex items-center bg-purple-50 text-purple-700 text-xs font-semibold px-3 py-1.5 rounded-full border border-purple-100">
@@ -485,7 +469,6 @@ const ClubDetailPage: React.FC = () => {
               </button>
             )}
           </div>
-
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
             <div>
               <div className="flex items-center justify-between mb-3">
@@ -531,7 +514,6 @@ const ClubDetailPage: React.FC = () => {
                 <p className="text-gray-600 leading-relaxed text-sm">{club.shortDescription}</p>
               )}
             </div>
-
             <div>
               {isOwner ? (
                 <div>
@@ -582,12 +564,9 @@ const ClubDetailPage: React.FC = () => {
               )}
             </div>
           </div>
-
           <div className="border-t border-gray-100 pt-6">
             <h3 className="text-sm font-semibold text-gray-700 uppercase tracking-wider mb-4">Redes Sociales</h3>
-
             {!isOwner && <ClubSocialMedia socialMedia={socialMediaForDisplay} />}
-
             {isOwner && (
               <div>
                 {socialNetworks.length > 0 && (
@@ -609,7 +588,6 @@ const ClubDetailPage: React.FC = () => {
                     ))}
                   </div>
                 )}
-
                 <div className="bg-gray-50 rounded-xl border border-gray-200 p-4">
                   <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-3">Agregar red social</p>
                   <div className="flex flex-wrap gap-3 items-end">
@@ -644,7 +622,6 @@ const ClubDetailPage: React.FC = () => {
                     </button>
                   </div>
                 </div>
-
                 {socialNetworks.length > 0 && (
                   <div className="mt-4">
                     <p className="text-xs text-gray-400 mb-2">Vista previa para el cliente:</p>
@@ -655,7 +632,6 @@ const ClubDetailPage: React.FC = () => {
             )}
           </div>
         </div>
-
         {club.subscriptionPlans && club.subscriptionPlans.length > 0 && (
           <div className="mb-10">
             <h2 className="text-2xl font-bold text-gray-900 mb-6 text-center">Nuestros Planes de Suscripción</h2>
@@ -683,19 +659,16 @@ const ClubDetailPage: React.FC = () => {
             </div>
           </div>
         )}
-
         {(club.paymentMethods || club.shippingInfo) && (
           <div className="mb-10">
             <ClubPaymentShippingInfo paymentMethods={club.paymentMethods} shippingInfo={club.shippingInfo} />
           </div>
         )}
-
         {club.featuredReviews && club.featuredReviews.length > 0 && (
           <div className="mb-10">
             <ClubFeaturedReviews reviews={club.featuredReviews} clubName={club.name} clubId={String(club.id)} />
           </div>
         )}
-
         {(club.legalInfo?.termsAndConditionsSections?.length || club.legalInfo?.privacyAndSecurityPolicySections?.length) && (
           <ClubLegalInfo legalInfo={club.legalInfo} clubId={String(club.id)} />
         )}
