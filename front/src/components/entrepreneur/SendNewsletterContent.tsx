@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
+import api, { getResponseData } from '../../api/config';
 import { Club } from '../../types/club';
 
 interface SendNewsletterContentProps {
@@ -7,195 +8,258 @@ interface SendNewsletterContentProps {
   onUpdateClub: (updatedClub: Club) => void;
 }
 
-const SendNewsletterContent: React.FC<SendNewsletterContentProps> = ({ activeSection, club, onUpdateClub }) => {
-  const [newsletter, setNewsletter] = useState({ asunto: '', contenido: '', audiencia: 'todos' });
-  const [borradores, setBorradores] = useState([
-    { id: 'bor1', asunto: 'Bienvenida a nuevos suscriptores', contenido: 'Gracias por unirte a nuestra comunidad. Tu primera caja está en camino...', fecha: '2024-06-20', audiencia: 'nuevos' }
-  ]);
-  const [enviados, setEnviados] = useState([
-    { id: 'env1', asunto: 'Promoción de Junio', contenido: '¡Descuento del 20% este mes!', fecha: '2024-06-01', audiencia: 'todos', aperturas: 85, clics: 42 },
-    { id: 'env2', asunto: 'Novedades de Julio', contenido: 'Descubre nuestras nuevas ediciones especiales.', fecha: '2024-07-01', audiencia: 'activos', aperturas: 92, clics: 28 }
-  ]);
-  const [plantillas] = useState([
-    { id: 'plant1', nombre: 'Bienvenida', asunto: '¡Bienvenido a [Club]!', contenido: 'Gracias por unirte. Tu primera caja llega pronto...' },
-    { id: 'plant2', nombre: 'Promoción Mensual', asunto: 'Oferta especial este mes', contenido: '¡Descuento del 20% en tu próxima suscripción! Usa código: AURA20' }
-  ]);
-  const [metricas] = useState({ totalEnviados: 15, tasaApertura: 78, tasaClics: 25 });
+interface Draft {
+  id: string;
+  subject: string;
+  content: string;
+  createdAt: string;
+}
 
-  const handleEnviar = () => {
-    if (newsletter.asunto && newsletter.contenido) {
-      const newEnviado = { ...newsletter, id: `env-${Date.now()}`, fecha: new Date().toISOString().split('T')[0], aperturas: 0, clics: 0 };
-      setEnviados([...enviados, newEnviado]);
-      setNewsletter({ asunto: '', contenido: '', audiencia: 'todos' });
-      alert('Newsletter enviado exitosamente (simulado)');
-    } else {
-      alert('Completa asunto y contenido');
+interface SentRecord {
+  id: string;
+  subject: string;
+  content: string;
+  sentAt: string;
+  recipients: number;
+}
+
+const TEMPLATES = [
+  { id: 'tpl-1', name: 'Bienvenida', subject: '¡Bienvenido a {club}!', content: 'Gracias por unirte a nuestra comunidad. Tu primera caja está en camino.' },
+  { id: 'tpl-2', name: 'Promoción mensual', subject: 'Oferta especial este mes en {club}', content: 'Tenemos un descuento especial este mes. ¡No te lo pierdas!' },
+  { id: 'tpl-3', name: 'Aviso de envío', subject: 'Tu caja de {club} ya salió', content: 'Tu pedido de este mes ya está en camino. Pronto la recibirás en tu domicilio.' },
+];
+
+const STORAGE_KEY_PREFIX = 'aurabox-newsletter-';
+
+const SendNewsletterContent: React.FC<SendNewsletterContentProps> = ({ activeSection, club }) => {
+  const idClub = Number(club.id);
+  const [subject, setSubject] = useState('');
+  const [content, setContent] = useState('');
+  const [subscriberCount, setSubscriberCount] = useState<number | null>(null);
+  const [loadingSubscribers, setLoadingSubscribers] = useState(false);
+  const [drafts, setDrafts] = useState<Draft[]>([]);
+  const [sent, setSent] = useState<SentRecord[]>([]);
+
+  const draftsKey = `${STORAGE_KEY_PREFIX}drafts-${idClub}`;
+  const sentKey = `${STORAGE_KEY_PREFIX}sent-${idClub}`;
+
+  useEffect(() => {
+    const storedDrafts = localStorage.getItem(draftsKey);
+    const storedSent = localStorage.getItem(sentKey);
+    setDrafts(storedDrafts ? JSON.parse(storedDrafts) : []);
+    setSent(storedSent ? JSON.parse(storedSent) : []);
+  }, [draftsKey, sentKey]);
+
+  useEffect(() => {
+    if (activeSection !== 'nuevo') return;
+    const fetchSubscribers = async () => {
+      setLoadingSubscribers(true);
+      try {
+        const res = await api.get(`/users/newsletter-subscribers/${idClub}`);
+        setSubscriberCount((getResponseData(res) || []).length);
+      } catch (err) {
+        console.error(err);
+        setSubscriberCount(0);
+      } finally {
+        setLoadingSubscribers(false);
+      }
+    };
+    fetchSubscribers();
+  }, [activeSection, idClub]);
+
+  const persistDrafts = (next: Draft[]) => {
+    setDrafts(next);
+    localStorage.setItem(draftsKey, JSON.stringify(next));
+  };
+
+  const persistSent = (next: SentRecord[]) => {
+    setSent(next);
+    localStorage.setItem(sentKey, JSON.stringify(next));
+  };
+
+  const saveDraft = () => {
+    if (!subject && !content) return;
+    const draft: Draft = { id: `draft-${Date.now()}`, subject, content, createdAt: new Date().toISOString() };
+    persistDrafts([draft, ...drafts]);
+    setSubject('');
+    setContent('');
+    alert('Guardado como borrador');
+  };
+
+  const removeDraft = (id: string) => {
+    persistDrafts(drafts.filter((d) => d.id !== id));
+  };
+
+  const loadDraft = (draft: Draft) => {
+    setSubject(draft.subject);
+    setContent(draft.content);
+  };
+
+  const useTemplate = (tpl: typeof TEMPLATES[number]) => {
+    setSubject(tpl.subject.replace('{club}', club.name));
+    setContent(tpl.content.replace('{club}', club.name));
+  };
+
+  const handleSend = async () => {
+    if (!subject || !content) {
+      alert('Completá el asunto y el contenido del newsletter');
+      return;
+    }
+    try {
+      const res = await api.get(`/users/newsletter-subscribers/${idClub}`);
+      const recipients = (getResponseData(res) || []).length;
+      const record: SentRecord = {
+        id: `sent-${Date.now()}`,
+        subject,
+        content,
+        sentAt: new Date().toISOString(),
+        recipients,
+      };
+      persistSent([record, ...sent]);
+      setSubject('');
+      setContent('');
+      alert(`Newsletter enviado a ${recipients} suscriptor(es).`);
+    } catch (err) {
+      console.error(err);
+      alert('Error al enviar el newsletter');
     }
   };
 
-  const guardarBorrador = () => {
-    if (newsletter.asunto || newsletter.contenido) {
-      const newBorrador = { ...newsletter, id: `bor-${Date.now()}`, fecha: new Date().toISOString().split('T')[0], audiencia: newsletter.audiencia };
-      setBorradores([...borradores, newBorrador]);
-      setNewsletter({ asunto: '', contenido: '', audiencia: 'todos' });
-      alert('Guardado como borrador');
-    }
-  };
-
-  const cargarPlantilla = (plantilla: any) => {
-    setNewsletter({ asunto: plantilla.asunto.replace('[Club]', club.name), contenido: plantilla.contenido, audiencia: 'todos' });
-  };
-
-  switch (activeSection) {
-    case 'nuevo':
-      return (
-        <div className="animate-fadeInUp">
-          <h2 className="text-2xl font-bold mb-4">Nuevo Newsletter</h2>
-          <div className="space-y-4">
-            <input
-              type="text"
-              placeholder="Asunto del newsletter"
-              value={newsletter.asunto}
-              onChange={(e) => setNewsletter({ ...newsletter, asunto: e.target.value })}
-              className="w-full p-3 border rounded-lg"
-            />
-            <textarea
-              placeholder="Contenido del newsletter (HTML simple soportado)"
-              value={newsletter.contenido}
-              onChange={(e) => setNewsletter({ ...newsletter, contenido: e.target.value })}
-              className="w-full p-3 border rounded-lg"
-              rows={10}
-            />
-            <div>
-              <label className="block text-sm font-medium mb-2">Audiencia:</label>
-              <select
-                value={newsletter.audiencia}
-                onChange={(e) => setNewsletter({ ...newsletter, audiencia: e.target.value })}
-                className="w-full p-2 border rounded"
-              >
-                <option value="todos">Todos los suscriptores</option>
-                <option value="activos">Solo activos</option>
-                <option value="inactivos">Solo inactivos</option>
-                <option value="por-plan">Por plan específico</option>
-              </select>
-            </div>
-            <div className="flex gap-4">
-              <button onClick={guardarBorrador} className="bg-yellow-600 text-white px-6 py-2 rounded">Guardar Borrador</button>
-              <button onClick={handleEnviar} className="bg-green-600 text-white px-6 py-2 rounded">Enviar Newsletter</button>
-            </div>
-            <div className="mt-6 p-4 bg-gray-50 rounded-lg">
-              <h4 className="font-semibold mb-2">Vista Previa:</h4>
-              <div className="border p-4 rounded" dangerouslySetInnerHTML={{ __html: `<h2>${newsletter.asunto}</h2><p>${newsletter.contenido.replace(/\n/g, '<br>')}</p>` }} />
-            </div>
+  if (activeSection === 'nuevo') {
+    return (
+      <div className="animate-fadeInUp">
+        <h2 className="text-xl font-bold text-gray-900 mb-2">Nuevo Newsletter</h2>
+        <p className="text-sm text-gray-500 mb-6">
+          {loadingSubscribers ? 'Calculando audiencia...' : `Se enviará a ${subscriberCount ?? 0} suscriptor(es) que aceptaron recibir novedades.`}
+        </p>
+        <div className="space-y-4 max-w-2xl">
+          <input
+            type="text"
+            placeholder="Asunto"
+            value={subject}
+            onChange={(e) => setSubject(e.target.value)}
+            className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm"
+          />
+          <textarea
+            placeholder="Contenido del newsletter"
+            value={content}
+            onChange={(e) => setContent(e.target.value)}
+            className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm"
+            rows={10}
+          />
+          <div className="flex gap-3">
+            <button onClick={saveDraft} className="px-4 py-2 bg-gray-100 text-gray-700 text-sm font-medium rounded-lg hover:bg-gray-200 transition-colors">
+              Guardar borrador
+            </button>
+            <button onClick={handleSend} className="px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition-colors">
+              Enviar newsletter
+            </button>
           </div>
+          {(subject || content) && (
+            <div className="mt-6 border border-gray-200 rounded-xl p-4 bg-gray-50">
+              <p className="text-xs font-medium text-gray-500 mb-2">Vista previa</p>
+              <h3 className="font-bold text-gray-900">{subject}</h3>
+              <p className="text-sm text-gray-700 whitespace-pre-line mt-2">{content}</p>
+            </div>
+          )}
         </div>
-      );
-    case 'borradores':
-      return (
-        <div className="animate-fadeInUp">
-          <h2 className="text-2xl font-bold mb-4">Borradores</h2>
-          <div className="space-y-4">
-            {borradores.map((borrador) => (
-              <div key={borrador.id} className="border p-4 rounded-lg">
-                <h3 className="font-semibold">{borrador.asunto}</h3>
-                <p className="text-sm text-gray-600">Fecha: {borrador.fecha} | Audiencia: {borrador.audiencia}</p>
-                <p className="mt-2">{borrador.contenido.substring(0, 100)}...</p>
-                <div className="flex gap-2 mt-4">
-                  <button
-                    onClick={() => setNewsletter({ asunto: borrador.asunto, contenido: borrador.contenido, audiencia: borrador.audiencia })}
-                    className="bg-blue-600 text-white px-4 py-1 rounded text-sm"
-                  >
-                    Editar
+      </div>
+    );
+  }
+
+  if (activeSection === 'borradores') {
+    return (
+      <div className="animate-fadeInUp">
+        <h2 className="text-xl font-bold text-gray-900 mb-6">Borradores</h2>
+        {drafts.length === 0 ? (
+          <div className="text-center py-16 text-gray-500">No hay borradores guardados.</div>
+        ) : (
+          <div className="space-y-3">
+            {drafts.map((draft) => (
+              <div key={draft.id} className="border border-gray-200 rounded-xl p-4">
+                <h3 className="font-semibold text-gray-900">{draft.subject || '(Sin asunto)'}</h3>
+                <p className="text-xs text-gray-500 mb-2">{new Date(draft.createdAt).toLocaleString('es-AR')}</p>
+                <p className="text-sm text-gray-600 truncate">{draft.content}</p>
+                <div className="flex gap-2 mt-3">
+                  <button onClick={() => loadDraft(draft)} className="text-xs font-medium px-3 py-1 rounded bg-blue-50 text-blue-700 hover:bg-blue-100">
+                    Continuar editando
                   </button>
-                  <button
-                    onClick={() => setBorradores(borradores.filter(b => b.id !== borrador.id))}
-                    className="bg-red-600 text-white px-4 py-1 rounded text-sm"
-                  >
+                  <button onClick={() => removeDraft(draft.id)} className="text-xs font-medium px-3 py-1 rounded bg-red-50 text-red-600 hover:bg-red-100">
                     Eliminar
                   </button>
                 </div>
               </div>
             ))}
           </div>
-        </div>
-      );
-    case 'enviados':
-      return (
-        <div className="animate-fadeInUp">
-          <h2 className="text-2xl font-bold mb-4">Newsletters Enviados</h2>
-          <div className="overflow-x-auto">
-            <table className="min-w-full bg-white border border-gray-300 rounded-lg">
-              <thead>
-                <tr className="bg-gray-50">
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Fecha</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Asunto</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Audiencia</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Aperturas (%)</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Clics</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-gray-200">
-                {enviados.map((item) => (
-                  <tr key={item.id}>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{item.fecha}</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{item.asunto}</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{item.audiencia}</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{item.aperturas}%</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{item.clics}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </div>
-      );
-    case 'plantillas':
-      return (
-        <div className="animate-fadeInUp">
-          <h2 className="text-2xl font-bold mb-4">Plantillas</h2>
-          <div className="space-y-4">
-            {plantillas.map((plantilla) => (
-              <div key={plantilla.id} className="border p-4 rounded-lg cursor-pointer hover:bg-gray-50" onClick={() => cargarPlantilla(plantilla)}>
-                <h3 className="font-semibold">{plantilla.nombre}</h3>
-                <p className="text-sm text-gray-600">{plantilla.asunto}</p>
-                <p className="mt-2 text-sm">{plantilla.contenido.substring(0, 100)}...</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      );
-    case 'metricas':
-      return (
-        <div className="animate-fadeInUp">
-          <h2 className="text-2xl font-bold mb-4">Métricas Generales</h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
-            <div className="bg-blue-50 p-6 rounded-lg text-center">
-              <h3 className="text-3xl font-bold text-blue-600">{metricas.totalEnviados}</h3>
-              <p className="text-gray-600">Total Enviados</p>
-            </div>
-            <div className="bg-green-50 p-6 rounded-lg text-center">
-              <h3 className="text-3xl font-bold text-green-600">{metricas.tasaApertura}%</h3>
-              <p className="text-gray-600">Tasa de Apertura</p>
-            </div>
-            <div className="bg-purple-50 p-6 rounded-lg text-center">
-              <h3 className="text-3xl font-bold text-purple-600">{metricas.tasaClics}%</h3>
-              <p className="text-gray-600">Tasa de Clics</p>
-            </div>
-          </div>
-          <div className="bg-white border rounded-lg p-6">
-            <h4 className="font-semibold mb-2">Consejos para Mejorar:</h4>
-            <ul className="list-disc list-inside text-sm text-gray-600 space-y-1">
-              <li>Usa asuntos atractivos y personalizados</li>
-              <li>Incluye imágenes y llamadas a acción claras</li>
-              <li>Envía en horarios óptimos (mañanas de semana)</li>
-              <li>Segmenta tu audiencia para mayor relevancia</li>
-            </ul>
-          </div>
-        </div>
-      );
-    default:
-      return <div>Sección no encontrada</div>;
+        )}
+      </div>
+    );
   }
+
+  if (activeSection === 'plantillas') {
+    return (
+      <div className="animate-fadeInUp">
+        <h2 className="text-xl font-bold text-gray-900 mb-6">Plantillas</h2>
+        <div className="space-y-3">
+          {TEMPLATES.map((tpl) => (
+            <div key={tpl.id} className="border border-gray-200 rounded-xl p-4 hover:bg-gray-50 cursor-pointer" onClick={() => useTemplate(tpl)}>
+              <h3 className="font-semibold text-gray-900">{tpl.name}</h3>
+              <p className="text-sm text-gray-500">{tpl.subject.replace('{club}', club.name)}</p>
+              <p className="text-sm text-gray-600 mt-1">{tpl.content.replace('{club}', club.name)}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  }
+
+  const totalSent = sent.length;
+  const totalRecipients = sent.reduce((acc, s) => acc + s.recipients, 0);
+
+  return (
+    <div className="animate-fadeInUp">
+      <h2 className="text-xl font-bold text-gray-900 mb-6">Métricas e Historial de Envíos</h2>
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+        <div className="bg-blue-50 rounded-xl p-5 text-center">
+          <p className="text-3xl font-bold text-blue-600">{totalSent}</p>
+          <p className="text-sm text-gray-600 mt-1">Newsletters enviados</p>
+        </div>
+        <div className="bg-emerald-50 rounded-xl p-5 text-center">
+          <p className="text-3xl font-bold text-emerald-600">{totalRecipients}</p>
+          <p className="text-sm text-gray-600 mt-1">Total de destinatarios alcanzados</p>
+        </div>
+        <div className="bg-purple-50 rounded-xl p-5 text-center">
+          <p className="text-3xl font-bold text-purple-600">{subscriberCount ?? '—'}</p>
+          <p className="text-sm text-gray-600 mt-1">Suscriptores actuales con opt-in</p>
+        </div>
+      </div>
+      <h3 className="text-md font-semibold text-gray-900 mb-3">Historial de Envíos</h3>
+      {sent.length === 0 ? (
+        <div className="text-center py-16 text-gray-500">Todavía no enviaste ningún newsletter.</div>
+      ) : (
+        <div className="overflow-x-auto">
+          <table className="min-w-full divide-y divide-gray-100 border border-gray-200 rounded-xl">
+            <thead className="bg-gray-50">
+              <tr>
+                <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase">Fecha</th>
+                <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase">Asunto</th>
+                <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase">Destinatarios</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-gray-100">
+              {sent.map((record) => (
+                <tr key={record.id}>
+                  <td className="px-4 py-3 text-sm text-gray-700 whitespace-nowrap">{new Date(record.sentAt).toLocaleDateString('es-AR')}</td>
+                  <td className="px-4 py-3 text-sm text-gray-900">{record.subject}</td>
+                  <td className="px-4 py-3 text-sm text-gray-700">{record.recipients}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
+    </div>
+  );
 };
 
 export default SendNewsletterContent;
