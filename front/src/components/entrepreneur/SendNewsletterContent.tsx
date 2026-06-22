@@ -95,7 +95,7 @@ const SendNewsletterContent: React.FC<SendNewsletterContentProps> = ({ activeSec
     setContent(draft.content);
   };
 
-  const useTemplate = (tpl: typeof TEMPLATES[number]) => {
+  const applyTemplate = (tpl: typeof TEMPLATES[number]) => {
     setSubject(tpl.subject.replace('{club}', club.name));
     setContent(tpl.content.replace('{club}', club.name));
   };
@@ -202,7 +202,7 @@ const SendNewsletterContent: React.FC<SendNewsletterContentProps> = ({ activeSec
         <h2 className="text-xl font-bold text-gray-900 mb-6">Plantillas</h2>
         <div className="space-y-3">
           {TEMPLATES.map((tpl) => (
-            <div key={tpl.id} className="border border-gray-200 rounded-xl p-4 hover:bg-gray-50 cursor-pointer" onClick={() => useTemplate(tpl)}>
+            <div key={tpl.id} className="border border-gray-200 rounded-xl p-4 hover:bg-gray-50 cursor-pointer" onClick={() => applyTemplate(tpl)}>
               <h3 className="font-semibold text-gray-900">{tpl.name}</h3>
               <p className="text-sm text-gray-500">{tpl.subject.replace('{club}', club.name)}</p>
               <p className="text-sm text-gray-600 mt-1">{tpl.content.replace('{club}', club.name)}</p>
