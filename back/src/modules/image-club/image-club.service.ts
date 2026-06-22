@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
 import { CreateImageClubDto } from './dto/create-image-club.dto';
 import { UpdateImageClubDto } from './dto/update-image-club.dto';
@@ -25,6 +25,17 @@ export class ImageClubService {
     if (imageFile) {
       imageUrl = await this.cloudinary.uploadImage(imageFile, 'aurabox/clubs/gallery');
     }
+    if (!imageUrl) throw new BadRequestException('Se requiere una imagen');
+
+    const section = dto.section ?? 'Banner';
+    const isActive = dto.isActive ?? false;
+
+    if (isActive && section === 'Logo') {
+      await this.prisma.image_Club.updateMany({
+        where: { idClub: dto.idClub, section: 'Logo', isActive: true },
+        data: { isActive: false },
+      });
+    }
 
     const created = await this.prisma.image_Club.create({
       data: {
@@ -33,6 +44,9 @@ export class ImageClubService {
         description: dto.description ?? null,
         contentType: dto.contentType ?? 'Imagen',
         uploadDate: dto.uploadDate ? new Date(dto.uploadDate) : new Date(),
+        uploadedBy: dto.uploadedBy ?? null,
+        section,
+        isActive,
       },
     });
     return sanitize(created);
@@ -43,9 +57,9 @@ export class ImageClubService {
     return images.map(sanitize);
   }
 
-  async findByClub(idClub: number) {
+  async findByClub(idClub: number, section?: string) {
     const images = await this.prisma.image_Club.findMany({
-      where: { idClub },
+      where: { idClub, ...(section ? { section: section as any } : {}) },
       orderBy: { id: 'desc' },
     });
     return images.map(sanitize);
@@ -60,6 +74,17 @@ export class ImageClubService {
   async update(id: number, dto: UpdateImageClubDto) {
     const item = await this.prisma.image_Club.findUnique({ where: { id } });
     if (!item) throw new NotFoundException('Imagen no encontrada');
+
+    const targetSection = dto.section ?? item.section;
+    const targetActive = dto.isActive ?? item.isActive;
+
+    if (targetActive && targetSection === 'Logo') {
+      await this.prisma.image_Club.updateMany({
+        where: { idClub: item.idClub, section: 'Logo', isActive: true, id: { not: id } },
+        data: { isActive: false },
+      });
+    }
+
     const updated = await this.prisma.image_Club.update({
       where: { id },
       data: {
@@ -81,5 +106,19 @@ export class ImageClubService {
 
     await this.prisma.image_Club.delete({ where: { id } });
     return { message: 'Imagen eliminada correctamente' };
+  }
+
+  async removeMany(ids: number[]) {
+    const items = await this.prisma.image_Club.findMany({ where: { id: { in: ids } } });
+    for (const item of items) {
+      if (item.imageUrl) {
+        try {
+          const publicId = this.cloudinary.extractPublicId(item.imageUrl);
+          await this.cloudinary.deleteImage(publicId);
+        } catch {}
+      }
+    }
+    await this.prisma.image_Club.deleteMany({ where: { id: { in: ids } } });
+    return { message: `${items.length} imágenes eliminadas correctamente` };
   }
 }

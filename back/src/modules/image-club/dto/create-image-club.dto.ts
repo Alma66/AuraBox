@@ -5,9 +5,10 @@ import {
   IsUrl,
   IsEnum,
   IsDateString,
+  IsBoolean,
 } from 'class-validator';
 import { Transform } from 'class-transformer';
-import { ContentType } from '@prisma/client';
+import { ContentType, ImageSection } from '@prisma/client';
 
 export class CreateImageClubDto {
   @Transform(({ value }) => parseInt(value, 10))
@@ -29,4 +30,18 @@ export class CreateImageClubDto {
   @IsOptional()
   @IsDateString()
   uploadDate?: string;
+
+  @IsOptional()
+  @Transform(({ value }) => (value === undefined || value === null || value === '' ? undefined : parseInt(value, 10)))
+  @IsInt()
+  uploadedBy?: number;
+
+  @IsOptional()
+  @IsEnum(ImageSection)
+  section?: ImageSection;
+
+  @IsOptional()
+  @Transform(({ value }) => (value === 'true' || value === true))
+  @IsBoolean()
+  isActive?: boolean;
 }

@@ -37,6 +37,13 @@ export class UsersController {
     return this.usersService.update(req.user.id, dto);
   }
 
+  @Get('newsletter-subscribers/:idClub')
+  @UseGuards(RolesGuard)
+  @Roles('entrepreneur', 'admin')
+  async getNewsletterSubscribers(@Param('idClub', ParseIntPipe) idClub: number) {
+    return this.usersService.findSubscribersByClub(idClub);
+  }
+
   @Get()
   @UseGuards(RolesGuard)
   @Roles('admin')

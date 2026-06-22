@@ -1,7 +1,7 @@
 import {
   Body, Controller, Get, Post, Put, Delete,
   Param, ParseIntPipe, UseGuards, Request, UsePipes,
-  ValidationPipe, UseInterceptors, UploadedFile,
+  ValidationPipe, UseInterceptors, UploadedFile, Query,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { memoryStorage } from 'multer';
@@ -44,8 +44,8 @@ export class ImageClubController {
   }
 
   @Get('by-club/:idClub')
-  async findByClub(@Param('idClub', ParseIntPipe) idClub: number) {
-    return this.imageClubService.findByClub(idClub);
+  async findByClub(@Param('idClub', ParseIntPipe) idClub: number, @Query('section') section?: string) {
+    return this.imageClubService.findByClub(idClub, section);
   }
 
   @Get(':id')
@@ -59,6 +59,13 @@ export class ImageClubController {
   @UsePipes(new ValidationPipe({ whitelist: true, transform: true }))
   async update(@Param('id', ParseIntPipe) id: number, @Body() dto: UpdateImageClubDto) {
     return this.imageClubService.update(id, dto);
+  }
+
+  @UseGuards(RolesGuard)
+  @Roles('entrepreneur', 'admin')
+  @Delete('bulk')
+  async removeMany(@Body() body: { ids: number[] }) {
+    return this.imageClubService.removeMany(body.ids);
   }
 
   @UseGuards(RolesGuard)

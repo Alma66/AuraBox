@@ -207,6 +207,9 @@ model Image_Club {
   description String?     @map("Description")
   contentType ContentType @default(Imagen) @map("Content_Type")
   uploadDate  DateTime    @default(now()) @map("Upload_Date")
+  uploadedBy  Int?        @map("Uploaded_By")
+  section     ImageSection @default(Banner) @map("Section")
+  isActive    Boolean     @default(false) @map("Is_Active")
 
   @@map("Image_Club")
 }
@@ -264,6 +267,29 @@ model Platform_Rules {
 
   @@map("Platform_Rules")
 }
+
+model Promotion {
+  id                  Int             @id @default(autoincrement()) @map("ID")
+  idClub              Int             @map("ID_Club")
+  name                String          @map("Name")
+  description         String?         @map("Description")
+  promotionType       PromotionType   @map("Promotion_Type")
+  discountPercentage  Decimal?        @map("Discount_Percentage") @db.Decimal(5, 2)
+  idSubscriptionTypes Int?            @map("ID_Subscription_Types")
+  comboSubscriptionIds String?        @map("Combo_Subscription_Ids")
+  minSubscriptionsQty Int?            @map("Min_Subscriptions_Qty")
+  freeShipping        Boolean         @default(false) @map("Free_Shipping")
+  couponCode          String?         @unique @map("Coupon_Code")
+  durationMonths      Int?            @map("Duration_Months")
+  startDate           DateTime?       @map("Start_Date")
+  endDate             DateTime?       @map("End_Date")
+  active              Boolean         @default(true) @map("Active")
+  createdAt           DateTime        @default(now()) @map("Created_At")
+  createdBy           Int?            @map("Created_By")
+
+  @@map("Promotion")
+}
+
 
 model Reviews {
   id           Int       @id @default(autoincrement()) @map("ID")
@@ -377,26 +403,26 @@ model Transaction_History {
 }
 
 model User {
-  id               Int          @id @default(autoincrement()) @map("ID")
-  firstName        String       @map("First_Name")
-  lastName         String       @map("Last_Name")
-  email            String       @unique @map("Email")
-  passwordHash     String       @map("Password_Hash")
-  documentType     DocumentType @map("Document_Type")
-  documentNumber   Int          @unique @map("Document_Number")
-  registrationDate DateTime     @default(now()) @map("Registration_Date")
-  balanceAvailable Decimal?     @map("Balance_Available") @db.Decimal(10, 2)
-  streetAddress    String?      @map("Street_Address")
-  addressNumber    Int?         @map("Address_Number")
-  floorNumber      String?      @map("Floor_Number")
-  addressDetails   String?      @map("Address_Details")
-  city             String?      @map("City")
-  province         String?      @map("Province")
-  postalCode       String?      @map("Postal_Code")
-  active           Boolean      @default(true) @map("Active")
-  birthDate        DateTime?    @map("Birth_Date")
-  phoneNumber      Int?         @map("Phone_Number")
-
+  id                Int          @id @default(autoincrement()) @map("ID")
+  firstName         String       @map("First_Name")
+  lastName          String       @map("Last_Name")
+  email             String       @unique @map("Email")
+  passwordHash      String       @map("Password_Hash")
+  documentType      DocumentType @map("Document_Type")
+  documentNumber    Int          @unique @map("Document_Number")
+  registrationDate  DateTime     @default(now()) @map("Registration_Date")
+  balanceAvailable  Decimal?     @map("Balance_Available") @db.Decimal(10, 2)
+  streetAddress     String?      @map("Street_Address")
+  addressNumber     Int?         @map("Address_Number")
+  floorNumber       String?      @map("Floor_Number")
+  addressDetails    String?      @map("Address_Details")
+  city              String?      @map("City")
+  province          String?      @map("Province")
+  postalCode        String?      @map("Postal_Code")
+  active            Boolean      @default(true) @map("Active")
+  birthDate         DateTime?    @map("Birth_Date")
+  phoneNumber       Int?         @map("Phone_Number")
+  acceptsNewsletter Boolean     @default(false) @map("Accepts_Newsletter")
   @@map("User")
 }
 
@@ -504,4 +530,20 @@ enum VehicleType {
   Auto      @map("Auto")
   Bicicleta @map("Bicicleta")
   A_Pie     @map("A_Pie")
+}
+
+enum ImageSection {
+  Logo         @map("Logo")
+  Banner       @map("Banner")
+  Historia     @map("Historia")
+  Equipo       @map("Equipo")
+}
+
+enum PromotionType {
+  Descuento_Temporal    @map("Descuento_Temporal")
+  Combo_Suscripciones   @map("Combo_Suscripciones")
+  Descuento_Por_Cantidad @map("Descuento_Por_Cantidad")
+  Envio_Gratis          @map("Envio_Gratis")
+  Cupon_Proxima         @map("Cupon_Proxima")
+  Descuento_Primeros_Meses @map("Descuento_Primeros_Meses")
 }

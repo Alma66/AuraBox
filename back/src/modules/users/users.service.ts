@@ -24,6 +24,7 @@ const USER_SELECT = {
   province: true,
   postalCode: true,
   active: true,
+  acceptsNewsletter: true,
 };
 
 function sanitizeUser(user: any) {
@@ -99,6 +100,7 @@ export class UsersService {
     if (dto.city !== undefined)          data.city          = dto.city;
     if (dto.province !== undefined)      data.province      = dto.province;
     if (dto.postalCode !== undefined)    data.postalCode    = dto.postalCode;
+    if (dto.acceptsNewsletter !== undefined) data.acceptsNewsletter = dto.acceptsNewsletter;
 
     try {
       const updated = await this.prisma.user.update({ where: { id }, data, select: USER_SELECT });
@@ -130,4 +132,29 @@ export class UsersService {
       throw err;
     }
   }
+
+async findSubscribersByClub(idClub: number) {
+  const subTypes = await this.prisma.subscription_Types.findMany({
+    where: { idClub },
+    select: { id: true },
+  });
+  const subTypeIds = subTypes.map((s) => s.id);
+  if (subTypeIds.length === 0) return [];
+
+  const activeSubs = await this.prisma.user_Subscriptions.findMany({
+    where: {
+      idSubscriptionTypes: { in: subTypeIds },
+      subscriptionStatus: 'Activa',
+    },
+    select: { idUser: true },
+  });
+  const userIds = Array.from(new Set(activeSubs.map((s) => s.idUser)));
+  if (userIds.length === 0) return [];
+
+  const users = await this.prisma.user.findMany({
+    where: { id: { in: userIds }, acceptsNewsletter: true },
+    select: USER_SELECT,
+  });
+  return users.map(sanitizeUser);
+}
 }

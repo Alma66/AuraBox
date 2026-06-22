@@ -1,4 +1,4 @@
-import { IsEnum, IsInt, IsOptional, IsString, MinLength, IsDateString } from 'class-validator';
+import { IsEnum, IsInt, IsOptional, IsString, MinLength, IsDateString, IsBoolean } from 'class-validator';
 import { Transform } from 'class-transformer';
 import { DocumentType } from '@prisma/client';
 
@@ -64,4 +64,8 @@ export class UpdateUserDto {
   @IsOptional()
   @IsString()
   postalCode?: string;
+
+  @IsOptional()
+  @IsBoolean()
+  acceptsNewsletter?: boolean;
 }
