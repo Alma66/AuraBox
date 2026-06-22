@@ -11,7 +11,7 @@ interface AssignmentSelection {
 
 const AssignDeliveriesPage: React.FC = () => {
   const { clubId } = useParams<{ clubId: string }>();
-  const { user, userRole } = useAuth();
+  const { userRole, loading: authLoading } = useAuth();
   const navigate = useNavigate();
 
   const [club, setClub] = useState<Club | null>(null);
@@ -23,11 +23,12 @@ const AssignDeliveriesPage: React.FC = () => {
   const [assigningId, setAssigningId] = useState<number | null>(null);
 
   useEffect(() => {
+    if (authLoading) return;
+    if (!clubId || userRole !== 'entrepreneur') {
+      navigate('/login');
+      return;
+    }
     const fetchData = async () => {
-      if (!clubId || userRole !== 'entrepreneur' || user?.managedClubId !== clubId) {
-        navigate('/login');
-        return;
-      }
       try {
         const [clubRes, pendingRes, ridersRes] = await Promise.all([
           api.get(`/clubs/${clubId}`),
@@ -45,7 +46,7 @@ const AssignDeliveriesPage: React.FC = () => {
       }
     };
     fetchData();
-  }, [clubId, user, userRole, navigate]);
+  }, [clubId, userRole, authLoading, navigate]);
 
   const updateSelection = (idUserSubscriptions: number, field: 'idCourier' | 'idAssignedRider', value: number | '') => {
     setSelections((prev) => ({
@@ -91,7 +92,7 @@ const AssignDeliveriesPage: React.FC = () => {
     }
   };
 
-  if (loading) return <div className="text-center py-16 text-gray-500">Cargando envíos pendientes...</div>;
+  if (authLoading || loading) return <div className="text-center py-16 text-gray-500">Cargando envíos pendientes...</div>;
   if (error || !club) return <div className="text-center py-16 text-red-500">{error || 'Club no encontrado.'}</div>;
 
   return (

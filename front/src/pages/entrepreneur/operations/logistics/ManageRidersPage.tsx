@@ -9,7 +9,7 @@ const VEHICLE_OPTIONS = ['Moto', 'Auto', 'Bicicleta', 'A_Pie'];
 
 const ManageRidersPage: React.FC = () => {
   const { clubId } = useParams<{ clubId: string }>();
-  const { user, userRole } = useAuth();
+  const { userRole, loading: authLoading } = useAuth();
   const navigate = useNavigate();
 
   const [club, setClub] = useState<Club | null>(null);
@@ -23,11 +23,12 @@ const ManageRidersPage: React.FC = () => {
   const [savingCouriers, setSavingCouriers] = useState(false);
 
   useEffect(() => {
+    if (authLoading) return;
+    if (!clubId || userRole !== 'entrepreneur') {
+      navigate('/login');
+      return;
+    }
     const fetchData = async () => {
-      if (!clubId || userRole !== 'entrepreneur' || user?.managedClubId !== clubId) {
-        navigate('/login');
-        return;
-      }
       try {
         const [clubRes, ridersRes, allCouriersRes, clubCouriersRes] = await Promise.all([
           api.get(`/clubs/${clubId}`),
@@ -47,7 +48,7 @@ const ManageRidersPage: React.FC = () => {
       }
     };
     fetchData();
-  }, [clubId, user, userRole, navigate]);
+  }, [clubId, userRole, authLoading, navigate]);
 
   const toggleCourier = (courierId: number) => {
     setEnabledCourierIds((prev) =>
@@ -97,7 +98,7 @@ const ManageRidersPage: React.FC = () => {
     }
   };
 
-  if (loading) return <div className="text-center py-16 text-gray-500">Cargando...</div>;
+  if (authLoading || loading) return <div className="text-center py-16 text-gray-500">Cargando...</div>;
   if (error || !club) return <div className="text-center py-16 text-red-500">{error || 'Club no encontrado.'}</div>;
 
   return (
@@ -167,7 +168,9 @@ const ManageRidersPage: React.FC = () => {
               </tbody>
             </table>
           </div>
-          {riders.length === 0 && <div className="text-center py-16 text-gray-500">Todavía no asignaste el rol de rider a ningún emprendedor de este club.</div>}
+          {riders.length === 0 && (
+            <div className="text-center py-16 text-gray-500">Todavía no asignaste el rol de rider a ningún emprendedor de este club.</div>
+          )}
         </div>
       )}
 
@@ -211,9 +214,7 @@ const ManageRidersPage: React.FC = () => {
                   onChange={(e) => setEditingRider({ ...editingRider, vehicleType: e.target.value as any })}
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm"
                 >
-                  {VEHICLE_OPTIONS.map((v) => (
-                    <option key={v} value={v}>{v}</option>
-                  ))}
+                  {VEHICLE_OPTIONS.map((v) => <option key={v} value={v}>{v}</option>)}
                 </select>
               </div>
               <div>
