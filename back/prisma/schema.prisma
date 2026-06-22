@@ -295,14 +295,96 @@ model Reviews {
   id           Int       @id @default(autoincrement()) @map("ID")
   idUser       Int       @map("ID_User")
   idClub       Int       @map("ID_Club")
+  idSubscriptionTypes Int? @map("ID_Subscription_Types")
   rating       Int       @map("Rating")
   title        String?   @map("Title")
   comment      String?   @map("Comment")
   reviewDate   DateTime  @default(now()) @map("Review_Date")
   lastEditDate DateTime? @map("Last_Edit_Date")
   active       Boolean   @default(true) @map("Active")
-
+  isHidden     Boolean   @default(false) @map("Is_Hidden")
+  hiddenReason String?   @map("Hidden_Reason")
+  mediaUrl     String?   @map("Media_URL")
+  mediaType    ContentType? @map("Media_Type")
   @@map("Reviews")
+}
+
+model Forbidden_Word {
+  id      Int    @id @default(autoincrement()) @map("ID")
+  idClub  Int    @map("ID_Club")
+  word    String @map("Word")
+  active  Boolean @default(true) @map("Active")
+  createdAt DateTime @default(now()) @map("Created_At")
+  @@unique([idClub, word])
+  @@map("Forbidden_Word")
+}
+
+model Support_Conversation {
+  id                  Int      @id @default(autoincrement()) @map("ID")
+  idClub              Int      @map("ID_Club")
+  idUser              Int      @map("ID_User")
+  idSubscriptionTypes Int      @map("ID_Subscription_Types")
+  subject             String   @map("Subject")
+  status              ConversationStatus @default(Abierta) @map("Status")
+  createdAt           DateTime @default(now()) @map("Created_At")
+  closedAt            DateTime? @map("Closed_At")
+  lastMessageAt       DateTime @default(now()) @map("Last_Message_At")
+  hasUnreadForEntrepreneur Boolean @default(true) @map("Has_Unread_For_Entrepreneur")
+  hasUnreadForUser    Boolean @default(false) @map("Has_Unread_For_User")
+  @@map("Support_Conversation")
+}
+
+model Support_Message {
+  id                Int      @id @default(autoincrement()) @map("ID")
+  idConversation    Int      @map("ID_Conversation")
+  senderType        SenderType @map("Sender_Type")
+  senderId          Int      @map("Sender_Id")
+  content           String?  @map("Content")
+  isAutoReply       Boolean  @default(false) @map("Is_Auto_Reply")
+  createdAt         DateTime @default(now()) @map("Created_At")
+  @@map("Support_Message")
+}
+
+model Support_Message_Attachment {
+  id            Int         @id @default(autoincrement()) @map("ID")
+  idMessage     Int         @map("ID_Message")
+  fileUrl       String      @map("File_URL")
+  fileType      ContentType @map("File_Type")
+  fileName      String?     @map("File_Name")
+  @@map("Support_Message_Attachment")
+}
+
+model Auto_Reply_Rule {
+  id           Int      @id @default(autoincrement()) @map("ID")
+  idClub       Int      @map("ID_Club")
+  name         String   @map("Name")
+  triggerType  AutoReplyTrigger @map("Trigger_Type")
+  triggerValue String?  @map("Trigger_Value")
+  replyMessage String   @map("Reply_Message")
+  active       Boolean  @default(true) @map("Active")
+  createdAt    DateTime @default(now()) @map("Created_At")
+  @@map("Auto_Reply_Rule")
+}
+
+model Sensitive_Data_Verification {
+  id              Int      @id @default(autoincrement()) @map("ID")
+  idConversation  Int      @map("ID_Conversation")
+  code            String   @map("Code")
+  channel         VerificationChannel @map("Channel")
+  used            Boolean  @default(false) @map("Used")
+  expiresAt       DateTime @map("Expires_At")
+  createdAt       DateTime @default(now()) @map("Created_At")
+  createdBy       Int?     @map("Created_By")
+  @@map("Sensitive_Data_Verification")
+}
+
+model Sensitive_Data_Access_Log {
+  id              Int      @id @default(autoincrement()) @map("ID")
+  idConversation  Int      @map("ID_Conversation")
+  idEntrepreneur  Int      @map("ID_Entrepreneur")
+  fieldsViewed    String   @map("Fields_Viewed")
+  viewedAt        DateTime @default(now()) @map("Viewed_At")
+  @@map("Sensitive_Data_Access_Log")
 }
 
 model Role {
@@ -546,4 +628,25 @@ enum PromotionType {
   Envio_Gratis          @map("Envio_Gratis")
   Cupon_Proxima         @map("Cupon_Proxima")
   Descuento_Primeros_Meses @map("Descuento_Primeros_Meses")
+}
+
+enum ConversationStatus {
+  Abierta    @map("Abierta")
+  Cerrada    @map("Cerrada")
+}
+
+enum SenderType {
+  User         @map("User")
+  Entrepreneur @map("Entrepreneur")
+  System       @map("System")
+}
+
+enum AutoReplyTrigger {
+  Primer_Mensaje    @map("Primer_Mensaje")
+  Contiene_Frase    @map("Contiene_Frase")
+}
+
+enum VerificationChannel {
+  Email @map("Email")
+  SMS   @map("SMS")
 }

@@ -40,6 +40,7 @@ import { UserSubscriptionsModule } from './modules/user-subscriptions/user-subsc
 import { UsersModule } from './modules/users/users.module';
 import { CourierModule } from './modules/courier/courier.module';
 import { PromotionModule } from './modules/promotion/promotion.module';
+import { SupportModule } from './modules/support/support.module';
 
 import { JwtAuthGuard } from './common/guards/jwt-auth.guard';
 import { TransformInterceptor } from './common/interceptors/transform.interceptor';
@@ -88,6 +89,7 @@ import { AllExceptionsFilter } from './common/filters/all-exceptions.filter';
     UsersModule,
     CourierModule,
     PromotionModule,
+    SupportModule,
   ],
   controllers: [AppController],
 

@@ -1,12 +1,7 @@
-import { 
-  IsInt, 
-  IsOptional, 
-  IsString, 
-  IsDateString, 
-  IsBoolean, 
-  Min, 
-  Max,
- } from 'class-validator';
+import {
+  IsInt, IsOptional, IsString, IsDateString, IsBoolean, Min, Max, IsEnum, IsUrl,
+} from 'class-validator';
+import { ContentType } from '@prisma/client';
 
 export class CreateReviewDto {
   @IsInt()
@@ -14,6 +9,10 @@ export class CreateReviewDto {
 
   @IsInt()
   idClub!: number;
+
+  @IsOptional()
+  @IsInt()
+  idSubscriptionTypes?: number;
 
   @IsInt()
   @Min(1)
@@ -39,4 +38,12 @@ export class CreateReviewDto {
   @IsOptional()
   @IsBoolean()
   active?: boolean;
+
+  @IsOptional()
+  @IsUrl()
+  mediaUrl?: string;
+
+  @IsOptional()
+  @IsEnum(ContentType)
+  mediaType?: ContentType;
 }
