@@ -1,20 +1,26 @@
+export type ContentType = 'Imagen' | 'Video';
 
 export interface Review {
-  id: string;
-  clubId: string;
-  userId: string;
-  rating: number; 
-  comment: string;
-  date: string; 
-  status: 'pending' | 'approved'; 
-  isBlockedBySystem: boolean; 
+  id: number;
+  idUser: number;
+  idClub: number;
+  idSubscriptionTypes?: number | null;
+  rating: number;
+  title?: string | null;
+  comment?: string | null;
+  reviewDate: string;
+  lastEditDate?: string | null;
+  active: boolean;
+  isHidden: boolean;
+  hiddenReason?: string | null;
+  mediaUrl?: string | null;
+  mediaType?: ContentType | null;
 }
 
-export type ReviewStatus = 'pending' | 'approved';
-
-export interface FeaturedReview {
-  id: string;
-  rating: number;
-  text: string;
-  author: string;
+export interface ForbiddenWord {
+  id: number;
+  idClub: number;
+  word: string;
+  active: boolean;
+  createdAt: string;
 }
