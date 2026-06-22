@@ -7,9 +7,7 @@ import { AssignDeliveryDto, AssignNewShipmentDto } from './dto/assign-delivery.d
 function sanitize(shipment: any) {
   if (!shipment) return shipment;
   if (shipment.shippingCost !== undefined && shipment.shippingCost !== null) {
-    try {
-      shipment.shippingCost = (shipment.shippingCost as any).toString();
-    } catch {}
+    try { shipment.shippingCost = (shipment.shippingCost as any).toString(); } catch {}
   }
   ['estimatedDeliveryStartDate', 'estimatedDeliveryEndDate', 'actualDeliveryDate'].forEach((k) => {
     if (shipment[k] instanceof Date) shipment[k] = shipment[k].toISOString();
@@ -39,12 +37,10 @@ export class ShipmentsService {
   private async validateRiderForClub(idClub: number, idAssignedRider: number) {
     const role = await this.prisma.role.findUnique({ where: { code: 'DELIVERY_RIDER' } });
     if (!role) throw new BadRequestException('No existe el rol DELIVERY_RIDER configurado');
-
     const hasRole = await this.prisma.adminOrEntrepreneurRole.findFirst({
       where: { idRole: role.id, assignedToType: 'Entrepreneur', assignedTo: idAssignedRider },
     });
     if (!hasRole) throw new BadRequestException('El emprendedor seleccionado no tiene el rol de rider');
-
     const belongsToClub = await this.prisma.entrepreneur_Club.findFirst({
       where: { idClub, idEntrepreneurs: idAssignedRider },
     });
@@ -54,16 +50,13 @@ export class ShipmentsService {
   async create(dto: CreateShipmentDto) {
     const user = await this.prisma.user.findUnique({ where: { id: dto.idUser } });
     if (!user) throw new NotFoundException('Usuario no encontrado');
-
     const sub = await this.prisma.user_Subscriptions.findUnique({ where: { id: dto.idUserSubscriptions } });
     if (!sub) throw new NotFoundException('Suscripción no encontrada');
-
     if (dto.idClub) {
       const club = await this.prisma.club.findUnique({ where: { id: dto.idClub } });
       if (!club) throw new NotFoundException('Club no encontrado');
       if (dto.idCourier) await this.validateCourierForClub(dto.idClub, dto.idCourier);
     }
-
     const created = await this.prisma.shipments.create({
       data: {
         idUser: dto.idUser,
@@ -97,29 +90,22 @@ export class ShipmentsService {
   async assignNewShipment(dto: AssignNewShipmentDto) {
     const user = await this.prisma.user.findUnique({ where: { id: dto.idUser } });
     if (!user) throw new NotFoundException('Usuario no encontrado');
-
     const sub = await this.prisma.user_Subscriptions.findUnique({ where: { id: dto.idUserSubscriptions } });
     if (!sub) throw new NotFoundException('Suscripción no encontrada');
-
     const club = await this.prisma.club.findUnique({ where: { id: dto.idClub } });
     if (!club) throw new NotFoundException('Club no encontrado');
-
     const courier = await this.validateCourierForClub(dto.idClub, dto.idCourier);
-
     if (courier.isInternal) {
       if (!dto.idAssignedRider) throw new BadRequestException('Debe seleccionar un rider para este courier interno');
       await this.validateRiderForClub(dto.idClub, dto.idAssignedRider);
     }
-
     const boxMonthYear = dto.boxMonthYear ?? currentBoxMonthYear();
-
     const subType = await this.prisma.subscription_Types.findUnique({ where: { id: sub.idSubscriptionTypes } });
     const boxContentEntry = subType
-      ? await this.prisma.box_Content_History.findFirst({
+      ? await this.prisma.boxContentHistory.findFirst({
           where: { idSubscriptionTypes: subType.id, deliveryMonthYear: boxMonthYear },
         })
       : null;
-
     const created = await this.prisma.shipments.create({
       data: {
         idUser: dto.idUser,
@@ -143,7 +129,6 @@ export class ShipmentsService {
 
   async getPendingForClub(idClub: number) {
     const boxMonthYear = currentBoxMonthYear();
-
     const subscriptionTypes = await this.prisma.subscription_Types.findMany({
       where: { idClub, active: true },
     });
@@ -156,15 +141,10 @@ export class ShipmentsService {
     if (activeSubscriptions.length === 0) return [];
 
     const existingShipments = await this.prisma.shipments.findMany({
-      where: {
-        idClub,
-        boxMonthYear,
-        idUserSubscriptions: { in: activeSubscriptions.map((s) => s.id) },
-      },
+      where: { idClub, boxMonthYear, idUserSubscriptions: { in: activeSubscriptions.map((s) => s.id) } },
       select: { idUserSubscriptions: true },
     });
     const alreadyShipped = new Set(existingShipments.map((s) => s.idUserSubscriptions));
-
     const pendingSubscriptions = activeSubscriptions.filter((s) => !alreadyShipped.has(s.id));
     if (pendingSubscriptions.length === 0) return [];
 
@@ -177,15 +157,15 @@ export class ShipmentsService {
         city: true, postalCode: true, province: true,
       },
     });
-    const usersById = new Map(users.map((u) => [u.id, u]));
-    const subTypesById = new Map(subscriptionTypes.map((s) => [s.id, s]));
+    const usersById = new Map<number, (typeof users)[number]>(users.map((u) => [u.id, u] as [number, (typeof users)[number]]));
+    const subTypesById = new Map<number, (typeof subscriptionTypes)[number]>(subscriptionTypes.map((s) => [s.id, s] as [number, (typeof subscriptionTypes)[number]]));
 
     const clubCouriers = await this.prisma.club_Courier.findMany({ where: { idClub, active: true } });
     const courierIds = clubCouriers.map((c) => c.idCourier);
     const couriers = courierIds.length
       ? await this.prisma.courier.findMany({ where: { id: { in: courierIds }, active: true } })
       : [];
-    const couriersById = new Map(couriers.map((c) => [c.id, c]));
+    const couriersById = new Map<number, (typeof couriers)[number]>(couriers.map((c) => [c.id, c] as [number, (typeof couriers)[number]]));
 
     const userPreferences = await this.prisma.user_Courier_Preference.findMany({
       where: { idClub, idUser: { in: userIds }, active: true },
@@ -204,8 +184,7 @@ export class ShipmentsService {
       const allowedCourierIds = userPrefs && userPrefs.length > 0
         ? courierIds.filter((id) => userPrefs.includes(id))
         : courierIds;
-      const availableCouriers = allowedCourierIds.map((id) => couriersById.get(id)).filter(Boolean);
-
+      const availableCouriers = allowedCourierIds.map((id) => couriersById.get(id)).filter((c): c is NonNullable<typeof c> => !!c);
       return {
         idUserSubscriptions: sub.id,
         idUser: sub.idUser,
@@ -230,7 +209,7 @@ export class ShipmentsService {
               },
             }
           : null,
-        availableCouriers: availableCouriers.map((c: any) => ({
+        availableCouriers: availableCouriers.map((c) => ({
           id: c.id, code: c.code, name: c.name, isInternal: c.isInternal,
         })),
       };
@@ -249,18 +228,12 @@ export class ShipmentsService {
   }
 
   async findByUser(idUser: number) {
-    const shipments = await this.prisma.shipments.findMany({
-      where: { idUser },
-      orderBy: { id: 'desc' },
-    });
+    const shipments = await this.prisma.shipments.findMany({ where: { idUser }, orderBy: { id: 'desc' } });
     return shipments.map(sanitize);
   }
 
   async findByClub(idClub: number) {
-    const shipments = await this.prisma.shipments.findMany({
-      where: { idClub },
-      orderBy: { id: 'desc' },
-    });
+    const shipments = await this.prisma.shipments.findMany({ where: { idClub }, orderBy: { id: 'desc' } });
 
     const userIds = Array.from(new Set(shipments.map((s) => s.idUser)));
     const riderIds = Array.from(new Set(shipments.map((s) => s.idAssignedRider).filter((id): id is number => !!id)));
@@ -278,9 +251,9 @@ export class ShipmentsService {
         : [],
     ]);
 
-    const usersById = new Map(users.map((u) => [u.id, u]));
-    const ridersById = new Map(riders.map((r) => [r.id, r]));
-    const couriersById = new Map(couriers.map((c) => [c.id, c]));
+    const usersById = new Map<number, (typeof users)[number]>(users.map((u) => [u.id, u] as [number, (typeof users)[number]]));
+    const ridersById = new Map<number, (typeof riders)[number]>(riders.map((r) => [r.id, r] as [number, (typeof riders)[number]]));
+    const couriersById = new Map<number, (typeof couriers)[number]>(couriers.map((c) => [c.id, c] as [number, (typeof couriers)[number]]));
 
     return shipments.map((s) => ({
       ...sanitize(s),
@@ -293,7 +266,6 @@ export class ShipmentsService {
   async update(id: number, dto: UpdateShipmentDto) {
     const shipment = await this.prisma.shipments.findUnique({ where: { id } });
     if (!shipment) throw new NotFoundException('Envío no encontrado');
-
     const updated = await this.prisma.shipments.update({
       where: { id },
       data: {
@@ -332,11 +304,7 @@ export class ShipmentsService {
 
     const updated = await this.prisma.shipments.update({
       where: { id },
-      data: {
-        idCourier,
-        idAssignedRider,
-        shipmentStatus: dto.shipmentStatus ?? shipment.shipmentStatus,
-      },
+      data: { idCourier, idAssignedRider, shipmentStatus: dto.shipmentStatus ?? shipment.shipmentStatus },
     });
     return sanitize(updated);
   }
