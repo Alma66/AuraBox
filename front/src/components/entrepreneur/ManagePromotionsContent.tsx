@@ -66,6 +66,7 @@ const ManagePromotionsContent: React.FC<ManagePromotionsContentProps> = ({ activ
 
   useEffect(() => {
     fetchData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [idClub]);
 
   const resetForm = () => {

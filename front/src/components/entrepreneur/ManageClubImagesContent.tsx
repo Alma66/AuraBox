@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import api, { getResponseData } from '../../api/config';
 import { Club } from '../../types/club';
-import { ClubImage, ImageSection } from '../../types/image';
+import { ClubImage } from '../../types/image';
 import { useAuth } from '../../App';
 
 interface ManageClubImagesContentProps {
@@ -54,6 +54,7 @@ const ManageClubImagesContent: React.FC<ManageClubImagesContentProps> = ({ activ
 
   useEffect(() => {
     fetchImages();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeSection, idClub]);
 
   const entrepreneurOptions = club.entrepreneurs ?? [];
