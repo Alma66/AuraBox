@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState, useCallback } from 'react';
 import api, { getResponseData } from '../../api/config';
 import { Review, ForbiddenWord } from '../../types/review';
 import { Club } from '../../types/club';
@@ -36,7 +36,7 @@ const ModerateReviewsContent: React.FC<ModerateReviewsContentProps> = ({ activeS
   const [filterFrom, setFilterFrom] = useState('');
   const [filterTo, setFilterTo] = useState('');
 
-  const fetchAll = async () => {
+  const fetchAll = useCallback(async () => {
     setLoading(true);
     try {
       const [visibleRes, hiddenRes, subsRes, wordsRes] = await Promise.all([
@@ -62,11 +62,11 @@ const ModerateReviewsContent: React.FC<ModerateReviewsContentProps> = ({ activeS
     } finally {
       setLoading(false);
     }
-  };
+  }, [idClub]);
 
   useEffect(() => {
     fetchAll();
-  }, [idClub]);
+  }, [fetchAll]);
 
   const userName = (idUser: number) => {
     const u = users.find((x) => x.id === idUser);
@@ -75,21 +75,24 @@ const ModerateReviewsContent: React.FC<ModerateReviewsContentProps> = ({ activeS
 
   const subName = (id?: number | null) => subscriptionTypes.find((s) => s.id === id)?.name ?? 'Sin especificar';
 
-  const applyFilters = (list: Review[]) => {
-    return list.filter((r) => {
-      if (filterUser !== 'all' && String(r.idUser) !== filterUser) return false;
-      if (filterSub !== 'all' && String(r.idSubscriptionTypes) !== filterSub) return false;
-      if (filterRating !== 'all' && r.rating !== Number(filterRating)) return false;
-      if (filterMedia === 'with' && !r.mediaUrl) return false;
-      if (filterMedia === 'without' && r.mediaUrl) return false;
-      if (filterFrom && new Date(r.reviewDate) < new Date(filterFrom)) return false;
-      if (filterTo && new Date(r.reviewDate) > new Date(filterTo + 'T23:59:59')) return false;
-      return true;
-    });
-  };
+  const applyFilters = useCallback(
+    (list: Review[]) => {
+      return list.filter((r) => {
+        if (filterUser !== 'all' && String(r.idUser) !== filterUser) return false;
+        if (filterSub !== 'all' && String(r.idSubscriptionTypes) !== filterSub) return false;
+        if (filterRating !== 'all' && r.rating !== Number(filterRating)) return false;
+        if (filterMedia === 'with' && !r.mediaUrl) return false;
+        if (filterMedia === 'without' && r.mediaUrl) return false;
+        if (filterFrom && new Date(r.reviewDate) < new Date(filterFrom)) return false;
+        if (filterTo && new Date(r.reviewDate) > new Date(filterTo + 'T23:59:59')) return false;
+        return true;
+      });
+    },
+    [filterUser, filterSub, filterRating, filterMedia, filterFrom, filterTo],
+  );
 
-  const visibleFiltered = useMemo(() => applyFilters(reviews), [reviews, filterUser, filterSub, filterRating, filterMedia, filterFrom, filterTo]);
-  const hiddenFiltered = useMemo(() => applyFilters(hiddenReviews), [hiddenReviews, filterUser, filterSub, filterRating, filterMedia, filterFrom, filterTo]);
+  const visibleFiltered = useMemo(() => applyFilters(reviews), [reviews, applyFilters]);
+  const hiddenFiltered = useMemo(() => applyFilters(hiddenReviews), [hiddenReviews, applyFilters]);
 
   const unhideReview = async (id: number) => {
     try {
