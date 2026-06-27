@@ -6,7 +6,7 @@ import SalesReportsSidebar from '../../../../components/entrepreneur/SalesReport
 import SalesReportsContent from '../../../../components/entrepreneur/SalesReportsContent';
 import { SalesReportData } from '../../../../types/analystics';
 
-type SalesSection = 'resumen' | 'graficos' | 'pagos';
+type SalesSection = 'resumen' | 'graficos' | 'pagos' | 'metodos' | 'proyecciones';
 
 const SalesReportsPage: React.FC = () => {
   const { clubId } = useParams<{ clubId: string }>();
@@ -55,10 +55,12 @@ const SalesReportsPage: React.FC = () => {
       if (filters.to) params.to = filters.to;
       if (filters.paymentStatus) params.paymentStatus = filters.paymentStatus;
       const res = await api.get(`/analytics/sales-report-export/${clubId}`, { params });
-      const rows: any[] = getResponseData(res) || [];
+      const rows: Record<string, unknown>[] = getResponseData(res) || [];
       if (rows.length === 0) return;
       const headers = Object.keys(rows[0]).join(',');
-      const body = rows.map((r) => Object.values(r).map((v) => `"${String(v ?? '').replace(/"/g, '""')}"`).join(',')).join('\n');
+      const body = rows
+        .map((r) => Object.values(r).map((v) => `"${String(v ?? '').replace(/"/g, '""')}"`).join(','))
+        .join('\n');
       const csv = `${headers}\n${body}`;
       const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
       const url = URL.createObjectURL(blob);

@@ -1,6 +1,6 @@
 import React from 'react';
 
-type SalesSection = 'resumen' | 'graficos' | 'pagos';
+type SalesSection = 'resumen' | 'graficos' | 'pagos' | 'metodos' | 'proyecciones';
 
 interface SalesReportsSidebarProps {
   activeSection: SalesSection;
@@ -23,6 +23,16 @@ const SalesReportsSidebar: React.FC<SalesReportsSidebarProps> = ({ activeSection
       id: 'pagos',
       label: 'Detalle de Pagos',
       icon: 'M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z',
+    },
+    {
+      id: 'metodos',
+      label: 'Métodos de Pago',
+      icon: 'M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2',
+    },
+    {
+      id: 'proyecciones',
+      label: 'Proyecciones',
+      icon: 'M13 7h8m0 0v8m0-8l-8 8-4-4-6 6',
     },
   ];
 

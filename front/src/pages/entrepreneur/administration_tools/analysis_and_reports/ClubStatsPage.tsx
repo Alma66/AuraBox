@@ -6,7 +6,7 @@ import ClubStatsSidebar from '../../../../components/entrepreneur/ClubStatsSideb
 import ClubStatsContent from '../../../../components/entrepreneur/ClubStatsContent';
 import { ClubStatsData } from '../../../../types/analystics';
 
-type StatsSection = 'resumen' | 'logistica' | 'reputacion' | 'suscripciones';
+type StatsSection = 'resumen' | 'evolucion' | 'logistica' | 'reputacion' | 'planes';
 
 const ClubStatsPage: React.FC = () => {
   const { clubId } = useParams<{ clubId: string }>();

@@ -6,7 +6,7 @@ import FeedbackTrendsSidebar from '../../../../components/entrepreneur/FeedbackT
 import FeedbackTrendsContent from '../../../../components/entrepreneur/FeedbackTrendsContent';
 import { FeedbackTrendsData } from '../../../../types/analystics';
 
-type FeedbackSection = 'rating' | 'altas-bajas' | 'destacadas' | 'palabras';
+type FeedbackSection = 'rating' | 'altas-bajas' | 'destacadas' | 'palabras' | 'media';
 
 const FeedbackTrendsPage: React.FC = () => {
   const { clubId } = useParams<{ clubId: string }>();
