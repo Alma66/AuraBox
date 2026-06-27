@@ -105,7 +105,7 @@ const SalesReportsContent: React.FC<SalesReportsContentProps> = ({
               <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
               <XAxis dataKey="month" tick={{ fontSize: 11 }} />
               <YAxis tick={{ fontSize: 11 }} />
-              <Tooltip formatter={(v: number | string | undefined) => fmt(v ?? 0)} />
+              <Tooltip formatter={(v) => fmt(Number(v))} />
               <Legend />
               <Bar dataKey="current" name="Este período" fill="#3b82f6" radius={[4, 4, 0, 0]} />
               <Bar dataKey="previous" name="Período anterior" fill="#93c5fd" radius={[4, 4, 0, 0]} />
@@ -120,7 +120,7 @@ const SalesReportsContent: React.FC<SalesReportsContentProps> = ({
                 <Pie data={data.byPaymentMethod} dataKey="amount" nameKey="method" cx="50%" cy="50%" outerRadius={80} label={({ method }) => method}>
                   {data.byPaymentMethod.map((_, i) => <Cell key={i} fill={COLORS[i % COLORS.length]} />)}
                 </Pie>
-                <Tooltip formatter={(v: number | string | undefined) => fmt(v ?? 0)} />
+                <Tooltip formatter={(v) => fmt(Number(v))} />
               </PieChart>
             </ResponsiveContainer>
           </div>
@@ -131,7 +131,7 @@ const SalesReportsContent: React.FC<SalesReportsContentProps> = ({
                 <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
                 <XAxis type="number" tick={{ fontSize: 11 }} />
                 <YAxis dataKey="name" type="category" tick={{ fontSize: 11 }} width={100} />
-                <Tooltip formatter={(v: number | string | undefined) => fmt(v ?? 0)} />
+                <Tooltip formatter={(v) => fmt(Number(v))} />
                 <Bar dataKey="amount" fill="#10b981" radius={[0, 4, 4, 0]} name="Ingresos" />
               </BarChart>
             </ResponsiveContainer>
