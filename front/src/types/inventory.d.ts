@@ -1,47 +1,51 @@
-
-export type UnitType = 'unidad' | 'paquete' | 'gramos' | 'porción' | 'kg' | 'litro' | 'ml' | 'metro' | 'cm'; 
-
-export interface Product {
-  id: string;
+export interface SupplyCategory {
+  id: number;
+  idClub: number;
   name: string;
-  description: string;
-  category: string; 
-  supplierId: string; 
-  unitType: UnitType;
-  currentStock: number;
-  minStock: number;
-  costPerUnit: number;
+  description?: string | null;
+  createdAt: string;
 }
 
-export interface Packaging {
-  id: string;
+export interface SupplierItem {
+  id: number;
+  idClub: number;
   name: string;
-  description: string;
-  type: 'caja' | 'bolsa' | 'etiqueta' | 'relleno' | 'otro'; 
-  supplierId: string; 
-  unitType: UnitType;
-  currentStock: number;
-  minStock: number;
-  costPerUnit: number;
+  contactEmail?: string | null;
+  contactPhone?: string | null;
+  address?: string | null;
+  notes?: string | null;
+  active: boolean;
+  createdAt: string;
+  categoryIds: number[];
 }
 
-export interface Supplier {
-  id: string;
+export interface ProductInventoryItem {
+  id: number;
+  idClub: number;
+  idSupplyCategory: number;
+  idSupplier?: number | null;
   name: string;
-  mail: string; 
-  phone: string; 
-  type: 'product' | 'packaging' | 'general';
+  description?: string | null;
+  unitType: string;
+  currentStock: string;
+  minStock: string;
+  costPerUnit: string;
+  active: boolean;
+  createdAt: string;
 }
 
-export interface ProductCategory {
-  id: string;
-  name: string;
-  description?: string;
-}
+export type SupplyOrderStatus = 'Pendiente' | 'En_Camino' | 'Recibido' | 'Cancelado';
 
-export interface InventoryData {
-  products: Product[];
-  packaging: Packaging[];
-  suppliers: Supplier[];
-  productCategories: ProductCategory[];
+export interface SupplyOrderItem {
+  id: number;
+  idClub: number;
+  idSupplier: number;
+  idProductInventory: number;
+  quantity: string;
+  totalCost: string;
+  status: SupplyOrderStatus;
+  orderDate: string;
+  estimatedArrival?: string | null;
+  receivedDate?: string | null;
+  notes?: string | null;
 }
