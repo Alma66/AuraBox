@@ -433,19 +433,25 @@ model Shipments {
   boxContent                 String?        @map("Box_Content")
   deliveryWindowFrom         String?        @map("Delivery_Window_From")
   deliveryWindowTo           String?        @map("Delivery_Window_To")
-
+  destinationLatitude  Decimal? @map("Destination_Latitude") @db.Decimal(9, 6)
+  destinationLongitude Decimal? @map("Destination_Longitude") @db.Decimal(9, 6)
+  
   @@map("Shipments")
 }
 
 model Rider_Profile {
-  id             Int         @id @default(autoincrement()) @map("ID")
-  idEntrepreneur Int         @unique @map("ID_Entrepreneur")
-  vehicleType    VehicleType @map("Vehicle_Type")
-  licensePlate   String?     @map("License_Plate")
-  availability   Boolean     @default(true) @map("Availability")
-  zonesCovered   String?     @map("Zones_Covered")
-  isActive       Boolean     @default(true) @map("Is_Active")
-  createdAt      DateTime    @default(now()) @map("Created_At")
+  id                Int         @id @default(autoincrement()) @map("ID")
+  idEntrepreneur    Int         @unique @map("ID_Entrepreneur")
+  vehicleType       VehicleType @map("Vehicle_Type")
+  licensePlate      String?     @map("License_Plate")
+  availability      Boolean     @default(true) @map("Availability")
+  zonesCovered      String?     @map("Zones_Covered")
+  isActive          Boolean     @default(true) @map("Is_Active")
+  createdAt         DateTime    @default(now()) @map("Created_At")
+  costPerKm         Decimal?    @map("Cost_Per_Km") @db.Decimal(10, 2)
+  currentLatitude   Decimal?    @map("Current_Latitude") @db.Decimal(9, 6)
+  currentLongitude  Decimal?    @map("Current_Longitude") @db.Decimal(9, 6)
+  lastLocationUpdate DateTime?  @map("Last_Location_Update")
 
   @@map("Rider_Profile")
 }
@@ -535,6 +541,74 @@ model User_Subscriptions {
   cancellationDate    DateTime?          @map("Cancellation_Date")
 
   @@map("User_Subscriptions")
+}
+
+model Supply_Category {
+  id          Int      @id @default(autoincrement()) @map("ID")
+  idClub      Int      @map("ID_Club")
+  name        String   @map("Name")
+  description String?  @map("Description")
+  createdAt   DateTime @default(now()) @map("Created_At")
+  @@map("Supply_Category")
+}
+
+model Supplier {
+  id           Int      @id @default(autoincrement()) @map("ID")
+  idClub       Int      @map("ID_Club")
+  name         String   @map("Name")
+  contactEmail String?  @map("Contact_Email")
+  contactPhone String?  @map("Contact_Phone")
+  address      String?  @map("Address")
+  notes        String?  @map("Notes")
+  active       Boolean  @default(true) @map("Active")
+  createdAt    DateTime @default(now()) @map("Created_At")
+  @@map("Supplier")
+}
+
+model Supplier_Category {
+  id               Int @id @default(autoincrement()) @map("ID")
+  idSupplier       Int @map("ID_Supplier")
+  idSupplyCategory Int @map("ID_Supply_Category")
+  @@unique([idSupplier, idSupplyCategory])
+  @@map("Supplier_Category")
+}
+
+model Product_Inventory {
+  id               Int      @id @default(autoincrement()) @map("ID")
+  idClub           Int      @map("ID_Club")
+  idSupplyCategory Int      @map("ID_Supply_Category")
+  idSupplier       Int?     @map("ID_Supplier")
+  name             String   @map("Name")
+  description      String?  @map("Description")
+  unitType         String   @map("Unit_Type")
+  currentStock     Decimal  @default(0) @map("Current_Stock") @db.Decimal(10, 2)
+  minStock         Decimal  @default(0) @map("Min_Stock") @db.Decimal(10, 2)
+  costPerUnit      Decimal  @default(0) @map("Cost_Per_Unit") @db.Decimal(10, 2)
+  active           Boolean  @default(true) @map("Active")
+  createdAt        DateTime @default(now()) @map("Created_At")
+  @@map("Product_Inventory")
+}
+
+model Supply_Order {
+  id                 Int               @id @default(autoincrement()) @map("ID")
+  idClub             Int               @map("ID_Club")
+  idSupplier         Int               @map("ID_Supplier")
+  idProductInventory Int               @map("ID_Product_Inventory")
+  quantity           Decimal           @map("Quantity") @db.Decimal(10, 2)
+  totalCost          Decimal           @map("Total_Cost") @db.Decimal(10, 2)
+  status             SupplyOrderStatus @default(Pendiente) @map("Status")
+  orderDate          DateTime          @default(now()) @map("Order_Date")
+  estimatedArrival   DateTime?         @map("Estimated_Arrival")
+  receivedDate       DateTime?         @map("Received_Date")
+  notes              String?           @map("Notes")
+  @@map("Supply_Order")
+}
+
+enum SupplyOrderStatus {
+  Pendiente  @map("Pendiente")
+  En_Camino  @map("En_Camino")
+  Recibido   @map("Recibido")
+  Cancelado  @map("Cancelado")
 }
 
 enum AssignedToType {
