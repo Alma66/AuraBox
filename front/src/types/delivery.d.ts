@@ -16,14 +16,6 @@ export interface ShipmentRider {
   email: string;
 }
 
-export interface Courier {
-  id: number;
-  code: string;
-  name: string;
-  isInternal: boolean;
-  active: boolean;
-}
-
 export interface Shipment {
   id: number;
   idUser: number;
@@ -83,6 +75,16 @@ export interface PendingDelivery {
   availableCouriers: Courier[];
 }
 
+
+export interface Courier {
+  id: number;
+  code: string;
+  name: string;
+  isInternal: boolean;
+  active: boolean;
+  baseFee?: string | null;
+}
+
 export interface RiderProfile {
   id: number;
   firstName: string;
@@ -94,6 +96,7 @@ export interface RiderProfile {
   availability: boolean;
   isActive: boolean;
   zonesCovered: string | null;
+  costPerKm: string | null;
   totalDeliveries: number;
   currentAssignments: number;
 }

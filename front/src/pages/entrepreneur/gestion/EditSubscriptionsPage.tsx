@@ -5,6 +5,7 @@ import api, { getResponseData } from '../../../api/config';
 import { Club, SubscriptionPlan } from '../../../types/club';
 import { useAuth } from '../../../App';
 import EntrepreneurSubscriptionSidebar from '../../../components/entrepreneur/EntrepreneurSubscriptionSidebar';
+const AURABOX_COMMISSION = 200;
 
 const FREQUENCY_OPTIONS = [
   { label: 'Única vez', value: 'Unica' },
@@ -18,11 +19,12 @@ const FREQUENCY_OPTIONS = [
 ];
 
 function mapPlanFromApi(raw: any): SubscriptionPlan {
+  const totalPrice = Number(raw.basePrice ?? raw.price ?? 0);
   return {
     planId: String(raw.id),
     name: raw.name ?? '',
     description: raw.description ?? '',
-    price: Number(raw.basePrice ?? raw.price ?? 0),
+    price: totalPrice,
     currency: 'ARS',
     image: raw.imageUrl ?? '',
     deliveryFrequency: raw.frequency ?? raw.deliveryFrequency ?? 'Mensual',
@@ -135,7 +137,7 @@ const EditSubscriptionsPage: React.FC = () => {
     setFormData({
       name: plan.name,
       description: plan.description,
-      price: plan.price,
+      price: Math.max(0, plan.price - AURABOX_COMMISSION),
       frequency: plan.deliveryFrequency,
       descuentoTransferencia: plan.descuentoTransferencia ?? 0,
       descuentoEfectivo: plan.descuentoEfectivo ?? 0,
@@ -160,7 +162,7 @@ const EditSubscriptionsPage: React.FC = () => {
   const buildPayload = () => ({
     name: formData.name,
     description: formData.description,
-    price: Number(formData.price),
+    price: Number(formData.price) + AURABOX_COMMISSION,
     frequency: formData.frequency,
     cashDiscount: Number(formData.descuentoEfectivo) || 0,
     transferDiscount: Number(formData.descuentoTransferencia) || 0,
@@ -255,7 +257,7 @@ const EditSubscriptionsPage: React.FC = () => {
           />
         </div>
         <div>
-          <label className="block text-sm font-semibold text-gray-700 mb-1">Precio (ARS) *</label>
+          <label className="block text-sm font-semibold text-gray-700 mb-1">Tu precio (ARS) *</label>
           <input
             type="number"
             min={0}
@@ -264,6 +266,11 @@ const EditSubscriptionsPage: React.FC = () => {
             className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
             required
           />
+          <div className="mt-2 bg-indigo-50 border border-indigo-100 rounded-lg px-3 py-2 text-xs text-indigo-800 space-y-0.5">
+            <p className="flex justify-between"><span>Tu precio:</span><span>${Number(formData.price || 0).toLocaleString('es-AR')}</span></p>
+            <p className="flex justify-between"><span>Comisión AuraBox:</span><span>${AURABOX_COMMISSION.toLocaleString('es-AR')}</span></p>
+            <p className="flex justify-between font-semibold border-t border-indigo-200 mt-1 pt-1"><span>Precio total que verá el cliente:</span><span>${(Number(formData.price || 0) + AURABOX_COMMISSION).toLocaleString('es-AR')}</span></p>
+          </div>
         </div>
       </div>
 

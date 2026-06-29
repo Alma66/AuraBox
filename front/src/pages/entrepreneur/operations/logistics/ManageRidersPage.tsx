@@ -15,12 +15,41 @@ const ManageRidersPage: React.FC = () => {
   const [club, setClub] = useState<Club | null>(null);
   const [riders, setRiders] = useState<RiderProfile[]>([]);
   const [allCouriers, setAllCouriers] = useState<Courier[]>([]);
+  const [clubCouriers, setClubCouriers] = useState<Courier[]>([]);
   const [enabledCourierIds, setEnabledCourierIds] = useState<number[]>([]);
+  const [feeEdits, setFeeEdits] = useState<Record<number, string>>({});
   const [activeTab, setActiveTab] = useState<'riders' | 'couriers'>('riders');
   const [editingRider, setEditingRider] = useState<RiderProfile | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [savingCouriers, setSavingCouriers] = useState(false);
+
+  const fetchAll = async () => {
+    try {
+      const [clubRes, ridersRes, allCouriersRes, clubCouriersRes] = await Promise.all([
+        api.get(`/clubs/${clubId}`),
+        api.get(`/rider-profile/by-club/${clubId}`),
+        api.get('/courier'),
+        api.get(`/courier/by-club/${clubId}`),
+      ]);
+      setClub(getResponseData(clubRes));
+      setRiders(getResponseData(ridersRes) || []);
+      setAllCouriers(getResponseData(allCouriersRes) || []);
+      const enabled: Courier[] = getResponseData(clubCouriersRes) || [];
+      setClubCouriers(enabled);
+      setEnabledCourierIds(enabled.map((c) => c.id));
+      const fees: Record<number, string> = {};
+      enabled.forEach((c) => {
+        if (c.baseFee) fees[c.id] = c.baseFee;
+      });
+      setFeeEdits(fees);
+    } catch (err) {
+      console.error(err);
+      setError('No se pudo cargar la información de logística.');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
     if (authLoading) return;
@@ -28,26 +57,7 @@ const ManageRidersPage: React.FC = () => {
       navigate('/login');
       return;
     }
-    const fetchData = async () => {
-      try {
-        const [clubRes, ridersRes, allCouriersRes, clubCouriersRes] = await Promise.all([
-          api.get(`/clubs/${clubId}`),
-          api.get(`/rider-profile/by-club/${clubId}`),
-          api.get('/courier'),
-          api.get(`/courier/by-club/${clubId}`),
-        ]);
-        setClub(getResponseData(clubRes));
-        setRiders(getResponseData(ridersRes) || []);
-        setAllCouriers(getResponseData(allCouriersRes) || []);
-        setEnabledCourierIds((getResponseData(clubCouriersRes) || []).map((c: Courier) => c.id));
-      } catch (err) {
-        console.error(err);
-        setError('No se pudo cargar la información de logística.');
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchData();
+    fetchAll();
   }, [clubId, userRole, authLoading, navigate]);
 
   const toggleCourier = (courierId: number) => {
@@ -60,12 +70,29 @@ const ManageRidersPage: React.FC = () => {
     setSavingCouriers(true);
     try {
       await api.put(`/courier/by-club/${clubId}`, { courierIds: enabledCourierIds });
+      await fetchAll();
       alert('Métodos de envío actualizados.');
     } catch (err) {
       console.error(err);
       alert('No se pudieron guardar los métodos de envío.');
     } finally {
       setSavingCouriers(false);
+    }
+  };
+
+  const saveFee = async (courierId: number) => {
+    const value = feeEdits[courierId];
+    if (!value || isNaN(Number(value))) {
+      alert('Ingresá un costo válido');
+      return;
+    }
+    try {
+      await api.put(`/courier/by-club/${clubId}/fee/${courierId}`, { baseFee: Number(value) });
+      await fetchAll();
+      alert('Tarifa actualizada.');
+    } catch (err) {
+      console.error(err);
+      alert('No se pudo actualizar la tarifa.');
     }
   };
 
@@ -78,8 +105,9 @@ const ManageRidersPage: React.FC = () => {
         availability: editingRider.availability,
         zonesCovered: editingRider.zonesCovered,
         isActive: editingRider.isActive,
+        costPerKm: editingRider.costPerKm ? Number(editingRider.costPerKm) : undefined,
       });
-      setRiders((prev) => prev.map((r) => (r.id === editingRider.id ? editingRider : r)));
+      await fetchAll();
       setEditingRider(null);
     } catch (err) {
       console.error(err);
@@ -133,6 +161,7 @@ const ManageRidersPage: React.FC = () => {
                   <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase">Contacto</th>
                   <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase">Vehículo</th>
                   <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase">Zonas</th>
+                  <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase">$/km</th>
                   <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase">Disponible</th>
                   <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase">Entregas</th>
                   <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase">Estado</th>
@@ -146,6 +175,7 @@ const ManageRidersPage: React.FC = () => {
                     <td className="px-6 py-4 text-sm text-gray-600 whitespace-nowrap">{rider.email}{rider.phoneNumber ? ` · ${rider.phoneNumber}` : ''}</td>
                     <td className="px-6 py-4 text-sm text-gray-600 whitespace-nowrap">{rider.vehicleType ?? '—'}</td>
                     <td className="px-6 py-4 text-sm text-gray-600 max-w-xs truncate">{rider.zonesCovered ?? '—'}</td>
+                    <td className="px-6 py-4 text-sm text-gray-600 whitespace-nowrap">{rider.costPerKm ? `$${Number(rider.costPerKm).toLocaleString('es-AR')}` : '—'}</td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <span className={`px-2 py-1 text-xs font-medium rounded-full border ${rider.availability ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : 'bg-gray-100 text-gray-600 border-gray-200'}`}>
                         {rider.availability ? 'Sí' : 'No'}
@@ -177,20 +207,40 @@ const ManageRidersPage: React.FC = () => {
       {activeTab === 'couriers' && (
         <div className="bg-white border border-gray-200 rounded-xl shadow-sm p-6">
           <h2 className="text-base font-semibold text-gray-900 mb-1">Métodos de envío habilitados</h2>
-          <p className="text-sm text-gray-500 mb-5">Elegí con qué empresas u opciones de entrega trabaja este club. Los clientes solo podrán elegir entre las opciones marcadas.</p>
+          <p className="text-sm text-gray-500 mb-5">Elegí con qué empresas u opciones de entrega trabaja este club y configurá el costo fijo de envío para las empresas externas. Para riders propios, el costo se calcula por km configurado en cada perfil de rider en "Mis Riders".</p>
           <div className="space-y-3">
-            {allCouriers.map((courier) => (
-              <label key={courier.id} className="flex items-center gap-3 px-4 py-3 border border-gray-200 rounded-lg cursor-pointer hover:bg-gray-50">
-                <input
-                  type="checkbox"
-                  checked={enabledCourierIds.includes(courier.id)}
-                  onChange={() => toggleCourier(courier.id)}
-                  className="h-4 w-4 text-blue-600 rounded border-gray-300 focus:ring-blue-500"
-                />
-                <span className="text-sm font-medium text-gray-900">{courier.name}</span>
-                {courier.isInternal && <span className="text-xs text-gray-400">(Riders propios)</span>}
-              </label>
-            ))}
+            {allCouriers.map((courier) => {
+              const enabled = enabledCourierIds.includes(courier.id);
+              const linked = clubCouriers.find((c) => c.id === courier.id);
+              return (
+                <div key={courier.id} className="border border-gray-200 rounded-lg px-4 py-3">
+                  <label className="flex items-center gap-3 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={enabled}
+                      onChange={() => toggleCourier(courier.id)}
+                      className="h-4 w-4 text-blue-600 rounded border-gray-300 focus:ring-blue-500"
+                    />
+                    <span className="text-sm font-medium text-gray-900">{courier.name}</span>
+                    {courier.isInternal && <span className="text-xs text-gray-400">(Riders propios)</span>}
+                  </label>
+                  {enabled && !courier.isInternal && linked && (
+                    <div className="flex items-center gap-2 mt-3 pl-7">
+                      <span className="text-xs text-gray-500">Costo fijo de envío ($)</span>
+                      <input
+                        type="number"
+                        value={feeEdits[courier.id] ?? ''}
+                        onChange={(e) => setFeeEdits({ ...feeEdits, [courier.id]: e.target.value })}
+                        className="w-28 px-2 py-1 border border-gray-300 rounded text-sm"
+                      />
+                      <button onClick={() => saveFee(courier.id)} className="text-xs font-medium px-3 py-1 rounded bg-blue-50 text-blue-700 hover:bg-blue-100">
+                        Guardar tarifa
+                      </button>
+                    </div>
+                  )}
+                </div>
+              );
+            })}
           </div>
           <button
             onClick={saveCouriers}
@@ -234,6 +284,16 @@ const ManageRidersPage: React.FC = () => {
                   onChange={(e) => setEditingRider({ ...editingRider, zonesCovered: e.target.value })}
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm"
                   placeholder="CABA, GBA"
+                />
+              </div>
+              <div>
+                <label className="block text-xs font-medium text-gray-500 mb-1">Costo por km ($)</label>
+                <input
+                  type="number"
+                  value={editingRider.costPerKm ?? ''}
+                  onChange={(e) => setEditingRider({ ...editingRider, costPerKm: e.target.value })}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm"
+                  placeholder="Ej: 150"
                 />
               </div>
               <label className="flex items-center gap-2">
