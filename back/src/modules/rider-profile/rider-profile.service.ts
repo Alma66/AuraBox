@@ -6,6 +6,11 @@ import { UpdateRiderProfileDto } from './dto/update-rider-profile.dto';
 function sanitize(profile: any) {
   if (!profile) return profile;
   if (profile.createdAt instanceof Date) profile.createdAt = profile.createdAt.toISOString();
+  if (profile.costPerKm !== undefined && profile.costPerKm !== null) {
+    try {
+      profile.costPerKm = profile.costPerKm.toString();
+    } catch {}
+  }
   return profile;
 }
 
@@ -28,6 +33,7 @@ export class RiderProfileService {
         availability: dto.availability ?? true,
         zonesCovered: dto.zonesCovered,
         isActive: dto.isActive ?? true,
+        costPerKm: dto.costPerKm ?? null,
       },
     });
     return sanitize(created);
@@ -92,6 +98,7 @@ export class RiderProfileService {
         availability: profile?.availability ?? false,
         isActive: profile?.isActive ?? false,
         zonesCovered: profile?.zonesCovered ?? null,
+        costPerKm: profile?.costPerKm ? profile.costPerKm.toString() : null,
         totalDeliveries,
         currentAssignments,
       };

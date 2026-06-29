@@ -132,6 +132,7 @@ model Club_Courier {
   idCourier Int      @map("ID_Courier")
   active    Boolean  @default(true) @map("Active")
   createdAt DateTime @default(now()) @map("Created_At")
+  baseFee   Decimal? @map("Base_Fee") @db.Decimal(10, 2)
 
   @@unique([idClub, idCourier])
   @@map("Club_Courier")

@@ -1,4 +1,4 @@
-import { IsInt, IsEnum, IsOptional, IsString, IsBoolean } from 'class-validator';
+import { IsInt, IsEnum, IsOptional, IsString, IsBoolean, IsNumber, Min } from 'class-validator';
 import { VehicleType } from '@prisma/client';
 
 export class CreateRiderProfileDto {
@@ -23,4 +23,9 @@ export class CreateRiderProfileDto {
   @IsOptional()
   @IsBoolean()
   isActive?: boolean;
+
+  @IsOptional()
+  @IsNumber()
+  @Min(0)
+  costPerKm?: number;
 }

@@ -2,6 +2,17 @@ import { Injectable, NotFoundException, ConflictException } from '@nestjs/common
 import { PrismaService } from '../../prisma/prisma.service';
 import { CreateCourierDto } from './dto/create-courier.dto';
 import { SetClubCouriersDto } from './dto/set-club-couriers.dto';
+import { SetCourierFeeDto } from './dto/set-courier-fee.dto';
+
+function sanitizeFee(item: any) {
+  if (!item) return item;
+  if (item.baseFee !== undefined && item.baseFee !== null) {
+    try {
+      item.baseFee = item.baseFee.toString();
+    } catch {}
+  }
+  return item;
+}
 
 @Injectable()
 export class CourierService {
@@ -30,10 +41,12 @@ export class CourierService {
     });
     const courierIds = clubCouriers.map((c) => c.idCourier);
     if (courierIds.length === 0) return [];
-    return this.prisma.courier.findMany({
+    const couriers = await this.prisma.courier.findMany({
       where: { id: { in: courierIds }, active: true },
       orderBy: { name: 'asc' },
     });
+    const feeByCourierId = new Map(clubCouriers.map((c) => [c.idCourier, c.baseFee]));
+    return couriers.map((c) => sanitizeFee({ ...c, baseFee: feeByCourierId.get(c.id) ?? null }));
   }
 
   async setClubCouriers(idClub: number, dto: SetClubCouriersDto) {
@@ -65,5 +78,17 @@ export class CourierService {
 
     await this.prisma.$transaction([...operations, ...deactivateOperations]);
     return this.findByClub(idClub);
+  }
+
+  async setCourierFee(idClub: number, idCourier: number, dto: SetCourierFeeDto) {
+    const link = await this.prisma.club_Courier.findUnique({
+      where: { idClub_idCourier: { idClub, idCourier } },
+    });
+    if (!link) throw new NotFoundException('Este courier no está habilitado para este club');
+    const updated = await this.prisma.club_Courier.update({
+      where: { id: link.id },
+      data: { baseFee: dto.baseFee },
+    });
+    return sanitizeFee(updated);
   }
 }

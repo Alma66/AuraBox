@@ -2,7 +2,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
 import { CreatePaymentDto } from './dto/create-payment.dto';
 import { UpdatePaymentDto } from './dto/update-payment.dto';
-
+const AURABOX_COMMISSION = 200;
 function sanitize(payment: any) {
   if (!payment) return payment;
   ['totalAmountPaid', 'clubAmount', 'commissionAmount'].forEach((k) => {
@@ -35,12 +35,19 @@ export class PaymentsService {
       if (!pm) throw new NotFoundException('Método de pago no encontrado');
     }
 
+    const totalAmountPaid = dto.totalAmountPaid !== undefined && dto.totalAmountPaid !== null ? Number(dto.totalAmountPaid) : 0;
+    const commissionAmount = AURABOX_COMMISSION;
+    const clubAmount = totalAmountPaid - commissionAmount;
+
     const data: any = {
       idUserSubscription: dto.idUserSubscription,
       idUser: dto.idUser,
       idClub: dto.idClub,
       paymentDate: dto.paymentDate ? new Date(dto.paymentDate) : new Date(),
       paymentStatus: dto.paymentStatus,
+      totalAmountPaid: String(totalAmountPaid),
+      clubAmount: String(clubAmount),
+      commissionAmount: String(commissionAmount),
     };
 
     if (dto.idGatewayTransaction !== undefined && dto.idGatewayTransaction !== null) {
@@ -48,9 +55,6 @@ export class PaymentsService {
     }
 
     if (dto.idPaymentMethods !== undefined) data.idPaymentMethods = dto.idPaymentMethods;
-    if (dto.totalAmountPaid !== undefined && dto.totalAmountPaid !== null) data.totalAmountPaid = String(dto.totalAmountPaid);
-    if (dto.clubAmount !== undefined && dto.clubAmount !== null) data.clubAmount = String(dto.clubAmount);
-    if (dto.commissionAmount !== undefined && dto.commissionAmount !== null) data.commissionAmount = String(dto.commissionAmount);
 
     const created = await this.prisma.payment.create({ data });
     return sanitize(created);
