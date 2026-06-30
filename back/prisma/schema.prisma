@@ -605,6 +605,30 @@ model Supply_Order {
   @@map("Supply_Order")
 }
 
+model Financial_Entry {
+  id          Int                @id @default(autoincrement()) @map("ID")
+  idClub      Int                @map("ID_Club")
+  type        FinancialEntryType @map("Type")
+  category    String             @map("Category")
+  description String             @map("Description")
+  amount      Decimal            @map("Amount") @db.Decimal(10, 2)
+  entryDate   DateTime           @default(now()) @map("Entry_Date")
+  status      FinancialEntryStatus @default(Confirmado) @map("Status")
+  createdAt   DateTime           @default(now()) @map("Created_At")
+  @@map("Financial_Entry")
+}
+
+enum FinancialEntryType {
+  Ingreso @map("Ingreso")
+  Egreso  @map("Egreso")
+}
+
+enum FinancialEntryStatus {
+  Pendiente  @map("Pendiente")
+  Confirmado @map("Confirmado")
+  Pagado     @map("Pagado")
+}
+
 enum SupplyOrderStatus {
   Pendiente  @map("Pendiente")
   En_Camino  @map("En_Camino")
