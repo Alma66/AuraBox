@@ -24,7 +24,7 @@ const ManageRidersPage: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [savingCouriers, setSavingCouriers] = useState(false);
 
-  const fetchAll = async () => {
+  const fetchAll = React.useCallback(async () => {
     try {
       const [clubRes, ridersRes, allCouriersRes, clubCouriersRes] = await Promise.all([
         api.get(`/clubs/${clubId}`),
@@ -49,7 +49,7 @@ const ManageRidersPage: React.FC = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [clubId]);
 
   useEffect(() => {
     if (authLoading) return;
@@ -58,7 +58,7 @@ const ManageRidersPage: React.FC = () => {
       return;
     }
     fetchAll();
-  }, [clubId, userRole, authLoading, navigate]);
+  }, [clubId, userRole, authLoading, navigate, fetchAll]);
 
   const toggleCourier = (courierId: number) => {
     setEnabledCourierIds((prev) =>
