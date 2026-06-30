@@ -26,7 +26,7 @@ import TermsAndConditionsPage from './pages/entrepreneur/club/TermsAndConditions
 import PrivacyAndSecurityPolicyPage from './pages/entrepreneur/club/PrivacyAndSecurityPolicyPage';
 import EntrepreneurProfilePage from './pages/entrepreneur/EntrepreneurProfilePage';
 import EditClubLegalInfoPage from './pages/entrepreneur/gestion/EditClubLegalInfoPage';
-import EditSubscriptionsPage from './pages/entrepreneur/gestion/EditSubscriptionsPage';
+import EditSubscriptionsPage from './pages/entrepreneur/club/EditSubscriptionsPage';
 import InventoryManagementPage from './pages/entrepreneur/gestion/InventoryManagementPage';
 import ActiveSubscriptionsPage from './pages/entrepreneur/operations/clients/ActiveSubscriptionsPage';
 import CustomerHistoryPage from './pages/entrepreneur/operations/clients/CustomerHistoryPage';

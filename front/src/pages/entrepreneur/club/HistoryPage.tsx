@@ -20,6 +20,48 @@ interface CropState {
   croppedAreaPixels: any;
 }
 
+const MAX_IMAGE_SIZE_MB = 8;
+const MAX_IMAGE_SIZE_BYTES = MAX_IMAGE_SIZE_MB * 1024 * 1024;
+const ACCEPTED_IMAGE_TYPES = ['image/png', 'image/jpeg', 'image/jpg', 'image/webp'];
+const MAX_TEAM_MEMBERS = 3;
+const MAX_HISTORY_LENGTH = 4000;
+const MAX_COMMUNITY_LENGTH = 600;
+const MAX_BIO_LENGTH = 400;
+const MAX_MILESTONE_DESCRIPTION_LENGTH = 280;
+const MIN_MILESTONE_YEAR = 1900;
+const CURRENT_YEAR = new Date().getFullYear();
+const MAX_MILESTONE_YEAR = CURRENT_YEAR + 1;
+const MAX_MILESTONES = 12;
+
+function validateImageFile(file: File): string | null {
+  if (!ACCEPTED_IMAGE_TYPES.includes(file.type)) {
+    return 'Formato no permitido. Solo se aceptan imágenes JPG, PNG o WEBP.';
+  }
+  if (file.size > MAX_IMAGE_SIZE_BYTES) {
+    return `La imagen supera el tamaño máximo permitido de ${MAX_IMAGE_SIZE_MB}MB.`;
+  }
+  if (file.size === 0) {
+    return 'El archivo seleccionado está vacío o dañado.';
+  }
+  return null;
+}
+
+function validateMilestone(milestone: Milestone): string | null {
+  if (Number.isNaN(milestone.year) || !Number.isInteger(milestone.year)) {
+    return 'El año debe ser un número entero válido.';
+  }
+  if (milestone.year < MIN_MILESTONE_YEAR || milestone.year > MAX_MILESTONE_YEAR) {
+    return `El año debe estar entre ${MIN_MILESTONE_YEAR} y ${MAX_MILESTONE_YEAR}.`;
+  }
+  if (!milestone.description || !milestone.description.trim()) {
+    return 'Cada hito necesita una descripción.';
+  }
+  if (milestone.description.length > MAX_MILESTONE_DESCRIPTION_LENGTH) {
+    return `La descripción del hito no puede superar los ${MAX_MILESTONE_DESCRIPTION_LENGTH} caracteres.`;
+  }
+  return null;
+}
+
 async function getCroppedBlob(imageSrc: string, croppedAreaPixels: any): Promise<Blob> {
   return new Promise((resolve, reject) => {
     const image = new Image();
@@ -28,11 +70,15 @@ async function getCroppedBlob(imageSrc: string, croppedAreaPixels: any): Promise
       const canvas = document.createElement('canvas');
       canvas.width = croppedAreaPixels.width;
       canvas.height = croppedAreaPixels.height;
-      const ctx = canvas.getContext('2d')!;
+      const ctx = canvas.getContext('2d');
+      if (!ctx) {
+        reject(new Error('No se pudo procesar la imagen'));
+        return;
+      }
       ctx.drawImage(image, croppedAreaPixels.x, croppedAreaPixels.y, croppedAreaPixels.width, croppedAreaPixels.height, 0, 0, croppedAreaPixels.width, croppedAreaPixels.height);
       canvas.toBlob((blob) => { if (blob) resolve(blob); else reject(new Error('Canvas is empty')); }, 'image/jpeg', 0.95);
     };
-    image.onerror = reject;
+    image.onerror = () => reject(new Error('No se pudo cargar la imagen seleccionada'));
   });
 }
 
@@ -46,17 +92,21 @@ const HistoryPage: React.FC = () => {
 
   const [isEditingOrigins, setIsEditingOrigins] = useState(false);
   const [tempHistory, setTempHistory] = useState('');
+  const [originsError, setOriginsError] = useState('');
   const [savingOrigins, setSavingOrigins] = useState(false);
 
   const [isEditingMilestones, setIsEditingMilestones] = useState(false);
   const [tempMilestones, setTempMilestones] = useState<Milestone[]>([]);
+  const [milestonesError, setMilestonesError] = useState('');
   const [savingMilestones, setSavingMilestones] = useState(false);
 
   const [isEditingCommunity, setIsEditingCommunity] = useState(false);
   const [tempCommunityText, setTempCommunityText] = useState('');
+  const [communityError, setCommunityError] = useState('');
   const [savingCommunity, setSavingCommunity] = useState(false);
 
   const [selectedEntrepreneurIds, setSelectedEntrepreneurIds] = useState<number[]>([]);
+  const [teamSelectionNotice, setTeamSelectionNotice] = useState('');
   const [editingBioId, setEditingBioId] = useState<number | null>(null);
   const [tempBio, setTempBio] = useState('');
   const [savingBioId, setSavingBioId] = useState<number | null>(null);
@@ -83,7 +133,7 @@ const HistoryPage: React.FC = () => {
       setTempMilestones(clubData.milestones || []);
       setTempCommunityText(clubData.communityText || '');
       if (clubData.entrepreneurs && clubData.entrepreneurs.length > 0) {
-        setSelectedEntrepreneurIds(clubData.entrepreneurs.slice(0, 3).map((e: any) => e.id));
+        setSelectedEntrepreneurIds(clubData.entrepreneurs.slice(0, MAX_TEAM_MEMBERS).map((e: any) => e.id));
       }
     } catch (error) {
       console.error('Error fetching club:', error);
@@ -100,11 +150,25 @@ const HistoryPage: React.FC = () => {
 
   const handleSaveOrigins = async () => {
     if (!club) return;
+    const trimmed = tempHistory.trim();
+    if (!trimmed) {
+      setOriginsError('La historia no puede quedar vacía.');
+      return;
+    }
+    if (trimmed.length < 30) {
+      setOriginsError('Contanos un poco más: la historia debe tener al menos 30 caracteres.');
+      return;
+    }
+    if (trimmed.length > MAX_HISTORY_LENGTH) {
+      setOriginsError(`La historia no puede superar los ${MAX_HISTORY_LENGTH} caracteres.`);
+      return;
+    }
     setSavingOrigins(true);
     try {
-      await api.put(`/clubs/${club.id}`, { history: tempHistory });
-      setClub({ ...club, history: tempHistory, fullHistory: tempHistory });
+      await api.put(`/clubs/${club.id}`, { history: trimmed });
+      setClub({ ...club, history: trimmed, fullHistory: trimmed });
       setIsEditingOrigins(false);
+      setOriginsError('');
       showToast('Historia guardada');
     } catch {
       showToast('Error al guardar la historia', 'error');
@@ -115,6 +179,14 @@ const HistoryPage: React.FC = () => {
 
   const handleSaveMilestones = async () => {
     if (!club) return;
+    for (let i = 0; i < tempMilestones.length; i += 1) {
+      const validationError = validateMilestone(tempMilestones[i]);
+      if (validationError) {
+        setMilestonesError(`Hito ${i + 1}: ${validationError}`);
+        return;
+      }
+    }
+    setMilestonesError('');
     setSavingMilestones(true);
     try {
       await api.put(`/clubs/${club.id}`, { milestones: JSON.stringify(tempMilestones) });
@@ -129,20 +201,52 @@ const HistoryPage: React.FC = () => {
   };
 
   const handleAddMilestone = () => {
-    setTempMilestones([...tempMilestones, { year: new Date().getFullYear(), description: '' }]);
+    if (tempMilestones.length >= MAX_MILESTONES) {
+      setMilestonesError(`No podés agregar más de ${MAX_MILESTONES} hitos.`);
+      return;
+    }
+    setMilestonesError('');
+    setTempMilestones([...tempMilestones, { year: CURRENT_YEAR, description: '' }]);
   };
 
   const handleRemoveMilestone = (index: number) => {
     setTempMilestones(tempMilestones.filter((_, i) => i !== index));
+    setMilestonesError('');
+  };
+
+  const handleMilestoneYearChange = (index: number, rawValue: string) => {
+    const updated = [...tempMilestones];
+    const parsed = rawValue.trim() === '' ? NaN : Number(rawValue);
+    updated[index] = { ...updated[index], year: parsed };
+    setTempMilestones(updated);
+    if (milestonesError) setMilestonesError('');
+  };
+
+  const handleMilestoneDescriptionChange = (index: number, value: string) => {
+    if (value.length > MAX_MILESTONE_DESCRIPTION_LENGTH) return;
+    const updated = [...tempMilestones];
+    updated[index] = { ...updated[index], description: value };
+    setTempMilestones(updated);
+    if (milestonesError) setMilestonesError('');
   };
 
   const handleSaveCommunity = async () => {
     if (!club) return;
+    const trimmed = tempCommunityText.trim();
+    if (!trimmed) {
+      setCommunityError('El texto de comunidad no puede quedar vacío.');
+      return;
+    }
+    if (trimmed.length > MAX_COMMUNITY_LENGTH) {
+      setCommunityError(`El texto no puede superar los ${MAX_COMMUNITY_LENGTH} caracteres.`);
+      return;
+    }
     setSavingCommunity(true);
     try {
-      await api.put(`/clubs/${club.id}`, { communityText: tempCommunityText });
-      setClub({ ...club, communityText: tempCommunityText });
+      await api.put(`/clubs/${club.id}`, { communityText: trimmed });
+      setClub({ ...club, communityText: trimmed });
       setIsEditingCommunity(false);
+      setCommunityError('');
       showToast('Texto de comunidad guardado');
     } catch {
       showToast('Error al guardar el texto de comunidad', 'error');
@@ -152,14 +256,19 @@ const HistoryPage: React.FC = () => {
   };
 
   const handleSaveBio = async (entrepreneurId: number) => {
+    const trimmed = tempBio.trim();
+    if (trimmed.length > MAX_BIO_LENGTH) {
+      showToast(`La bio no puede superar los ${MAX_BIO_LENGTH} caracteres.`, 'error');
+      return;
+    }
     setSavingBioId(entrepreneurId);
     try {
-      await api.patch('/entrepreneurs/me', { bio: tempBio });
+      await api.patch('/entrepreneurs/me', { bio: trimmed });
       setClub((prev) => {
         if (!prev) return prev;
         return {
           ...prev,
-          entrepreneurs: prev.entrepreneurs?.map((e) => e.id === entrepreneurId ? { ...e, bio: tempBio } : e),
+          entrepreneurs: prev.entrepreneurs?.map((e) => e.id === entrepreneurId ? { ...e, bio: trimmed } : e),
         };
       });
       setEditingBioId(null);
@@ -173,8 +282,15 @@ const HistoryPage: React.FC = () => {
 
   const toggleEntrepreneur = (id: number) => {
     setSelectedEntrepreneurIds((prev) => {
-      if (prev.includes(id)) return prev.filter((x) => x !== id);
-      if (prev.length >= 3) return prev;
+      if (prev.includes(id)) {
+        setTeamSelectionNotice('');
+        return prev.filter((x) => x !== id);
+      }
+      if (prev.length >= MAX_TEAM_MEMBERS) {
+        setTeamSelectionNotice(`Solo podés mostrar hasta ${MAX_TEAM_MEMBERS} personas en esta sección. Quitá a alguien para agregar otra.`);
+        return prev;
+      }
+      setTeamSelectionNotice('');
       return [...prev, id];
     });
   };
@@ -188,6 +304,12 @@ const HistoryPage: React.FC = () => {
     const file = e.target.files?.[0];
     const targetId = photoUploadTargetId.current;
     if (!file || !targetId) return;
+    const validationError = validateImageFile(file);
+    if (validationError) {
+      showToast(validationError, 'error');
+      e.target.value = '';
+      return;
+    }
     const reader = new FileReader();
     reader.onload = () => {
       setCropState({
@@ -198,12 +320,17 @@ const HistoryPage: React.FC = () => {
         croppedAreaPixels: null,
       });
     };
+    reader.onerror = () => showToast('No se pudo leer el archivo seleccionado.', 'error');
     reader.readAsDataURL(file);
     e.target.value = '';
   };
 
   const handleCropConfirm = async () => {
-    if (!cropState || !cropState.croppedAreaPixels || !club) return;
+    if (!cropState || !club) return;
+    if (!cropState.croppedAreaPixels) {
+      showToast('Ajustá el encuadre de la imagen antes de continuar.', 'error');
+      return;
+    }
     setUploading(true);
     try {
       const blob = await getCroppedBlob(cropState.imageSrc, cropState.croppedAreaPixels);
@@ -280,7 +407,9 @@ const HistoryPage: React.FC = () => {
   const communityTextToDisplay = club.communityText || 'Más allá de las cajas, somos una familia de entusiastas. Conéctate con nosotros y otros suscriptores en nuestras redes sociales.';
 
   const allEntrepreneurs = club.entrepreneurs || [];
-  const displayedEntrepreneurs = allEntrepreneurs.filter((e) => selectedEntrepreneurIds.includes(e.id));
+  const displayedEntrepreneurs = isOwner
+    ? allEntrepreneurs.filter((e) => selectedEntrepreneurIds.includes(e.id))
+    : allEntrepreneurs.slice(0, MAX_TEAM_MEMBERS);
 
   const teamGridClass =
     displayedEntrepreneurs.length === 1
@@ -294,7 +423,10 @@ const HistoryPage: React.FC = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-blue-100">
       {toast && (
-        <div className={`fixed top-20 right-4 z-50 px-5 py-3 rounded-lg shadow-lg text-white text-sm font-medium ${toast.type === 'success' ? 'bg-green-500' : 'bg-red-500'}`}>
+        <div
+          role="alert"
+          className={`fixed top-20 right-4 z-50 max-w-sm px-5 py-3 rounded-xl shadow-lg text-white text-sm font-medium flex items-center gap-2 ${toast.type === 'success' ? 'bg-emerald-500' : 'bg-red-500'}`}
+        >
           {toast.msg}
         </div>
       )}
@@ -307,7 +439,7 @@ const HistoryPage: React.FC = () => {
                 <h3 className="text-lg font-semibold text-gray-900">Ajustar foto del equipo</h3>
                 <p className="text-sm text-gray-500 mt-0.5">Mové y hacé zoom para encuadrar la imagen</p>
               </div>
-              <button onClick={() => setCropState(null)} className="text-gray-400 hover:text-gray-600 transition-colors">
+              <button onClick={() => setCropState(null)} className="text-gray-400 hover:text-gray-600 transition-colors" aria-label="Cerrar">
                 <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
                 </svg>
@@ -339,10 +471,15 @@ const HistoryPage: React.FC = () => {
                   value={cropState.zoom}
                   onChange={(e) => setCropState((prev) => prev ? { ...prev, zoom: Number(e.target.value) } : null)}
                   className="flex-1 accent-blue-600"
+                  aria-label="Zoom"
                 />
               </div>
               <div className="flex gap-3">
-                <button onClick={() => setCropState(null)} className="flex-1 px-4 py-2.5 rounded-xl border border-gray-200 text-gray-700 text-sm font-medium hover:bg-gray-100 transition-colors">
+                <button
+                  onClick={() => setCropState(null)}
+                  disabled={uploading}
+                  className="flex-1 px-4 py-2.5 rounded-xl border border-gray-200 text-gray-700 text-sm font-medium hover:bg-gray-100 disabled:opacity-50 transition-colors"
+                >
                   Cancelar
                 </button>
                 <button
@@ -358,7 +495,7 @@ const HistoryPage: React.FC = () => {
         </div>
       )}
 
-      <input type="file" accept="image/*" ref={photoInputRef} className="hidden" onChange={handlePhotoFileSelect} />
+      <input type="file" accept="image/png,image/jpeg,image/jpg,image/webp" ref={photoInputRef} className="hidden" onChange={handlePhotoFileSelect} />
 
       <div className="relative h-80 md:h-96 overflow-hidden shadow-xl">
         <img
@@ -393,7 +530,7 @@ const HistoryPage: React.FC = () => {
               <h3 className="text-3xl font-bold text-purple-800 flex-grow">Nuestros Orígenes y Valores</h3>
               {isOwner && !isEditingOrigins && (
                 <button
-                  onClick={() => { setTempHistory(club.history || ''); setIsEditingOrigins(true); }}
+                  onClick={() => { setTempHistory(club.history || ''); setOriginsError(''); setIsEditingOrigins(true); }}
                   className="ml-4 px-4 py-2 bg-blue-600 text-white rounded-full text-sm font-semibold hover:bg-blue-700 transition-colors duration-200 shadow-md"
                 >
                   Editar
@@ -403,12 +540,18 @@ const HistoryPage: React.FC = () => {
             {isEditingOrigins ? (
               <div>
                 <textarea
-                  className="w-full border border-gray-300 rounded-lg p-3 text-gray-700 text-base leading-relaxed focus:outline-none focus:ring-2 focus:ring-purple-400 h-56 resize-none"
+                  className={`w-full border rounded-lg p-3 text-gray-700 text-base leading-relaxed focus:outline-none focus:ring-2 h-56 resize-none ${originsError ? 'border-red-300 focus:ring-red-400' : 'border-gray-300 focus:ring-purple-400'}`}
                   value={tempHistory}
-                  onChange={(e) => setTempHistory(e.target.value)}
+                  onChange={(e) => { if (e.target.value.length <= MAX_HISTORY_LENGTH) setTempHistory(e.target.value); if (originsError) setOriginsError(''); }}
+                  maxLength={MAX_HISTORY_LENGTH}
                 />
+                <div className="flex items-center justify-between mt-2">
+                  <span className={`text-xs ${originsError ? 'text-red-600' : 'text-gray-400'}`}>
+                    {originsError || `${tempHistory.length} / ${MAX_HISTORY_LENGTH} caracteres`}
+                  </span>
+                </div>
                 <div className="flex justify-end gap-3 mt-3">
-                  <button onClick={() => setIsEditingOrigins(false)} className="px-5 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-100 transition-colors duration-200">
+                  <button onClick={() => { setIsEditingOrigins(false); setOriginsError(''); }} className="px-5 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-100 transition-colors duration-200">
                     Cancelar
                   </button>
                   <button onClick={handleSaveOrigins} disabled={savingOrigins} className="px-5 py-2 bg-green-600 text-white rounded-lg font-semibold hover:bg-green-700 transition-colors duration-200 disabled:opacity-60">
@@ -439,7 +582,7 @@ const HistoryPage: React.FC = () => {
               <h3 className="text-3xl font-bold text-orange-800 flex-grow">Nuestros Hitos</h3>
               {isOwner && !isEditingMilestones && (
                 <button
-                  onClick={() => { setTempMilestones(club.milestones || []); setIsEditingMilestones(true); }}
+                  onClick={() => { setTempMilestones(club.milestones || []); setMilestonesError(''); setIsEditingMilestones(true); }}
                   className="ml-4 px-4 py-2 bg-blue-600 text-white rounded-full text-sm font-semibold hover:bg-blue-700 transition-colors duration-200 shadow-md"
                 >
                   Editar
@@ -448,41 +591,56 @@ const HistoryPage: React.FC = () => {
             </div>
             {isEditingMilestones ? (
               <div>
-                {tempMilestones.map((milestone, index) => (
-                  <div key={index} className="mb-4 p-4 border border-gray-200 rounded-lg bg-gray-50 flex gap-3">
-                    <div className="flex flex-col gap-2 flex-1">
-                      <input
-                        type="number"
-                        className="border border-gray-300 rounded-lg px-3 py-2 w-28 text-gray-700 focus:outline-none focus:ring-2 focus:ring-orange-400"
-                        value={milestone.year}
-                        onChange={(e) => {
-                          const updated = [...tempMilestones];
-                          updated[index] = { ...updated[index], year: parseInt(e.target.value) };
-                          setTempMilestones(updated);
-                        }}
-                        placeholder="Año"
-                      />
-                      <textarea
-                        className="border border-gray-300 rounded-lg px-3 py-2 text-gray-700 focus:outline-none focus:ring-2 focus:ring-orange-400 h-20 resize-none"
-                        value={milestone.description}
-                        onChange={(e) => {
-                          const updated = [...tempMilestones];
-                          updated[index] = { ...updated[index], description: e.target.value };
-                          setTempMilestones(updated);
-                        }}
-                        placeholder="Descripción"
-                      />
+                {milestonesError && (
+                  <p className="mb-4 text-sm text-red-600 bg-red-50 border border-red-200 rounded-lg px-4 py-2.5 flex items-center gap-2">
+                    <svg className="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                    </svg>
+                    {milestonesError}
+                  </p>
+                )}
+                {tempMilestones.map((milestone, index) => {
+                  const fieldError = validateMilestone(milestone);
+                  return (
+                    <div key={index} className="mb-4 p-4 border border-gray-200 rounded-lg bg-gray-50 flex gap-3">
+                      <div className="flex flex-col gap-2 flex-1">
+                        <div>
+                          <input
+                            type="number"
+                            inputMode="numeric"
+                            min={MIN_MILESTONE_YEAR}
+                            max={MAX_MILESTONE_YEAR}
+                            step={1}
+                            className={`border rounded-lg px-3 py-2 w-28 text-gray-700 focus:outline-none focus:ring-2 ${fieldError && !Number.isNaN(milestone.year) ? 'border-red-300 focus:ring-red-400' : 'border-gray-300 focus:ring-orange-400'}`}
+                            value={Number.isNaN(milestone.year) ? '' : milestone.year}
+                            onChange={(e) => handleMilestoneYearChange(index, e.target.value)}
+                            placeholder="Año"
+                          />
+                        </div>
+                        <textarea
+                          className="border border-gray-300 rounded-lg px-3 py-2 text-gray-700 focus:outline-none focus:ring-2 focus:ring-orange-400 h-20 resize-none"
+                          value={milestone.description}
+                          onChange={(e) => handleMilestoneDescriptionChange(index, e.target.value)}
+                          placeholder="Descripción"
+                          maxLength={MAX_MILESTONE_DESCRIPTION_LENGTH}
+                        />
+                        <span className="text-xs text-gray-400 self-end">{milestone.description.length} / {MAX_MILESTONE_DESCRIPTION_LENGTH}</span>
+                      </div>
+                      <button onClick={() => handleRemoveMilestone(index)} className="self-start text-red-500 hover:text-red-700 text-xl font-bold px-2" aria-label="Eliminar hito">
+                        ×
+                      </button>
                     </div>
-                    <button onClick={() => handleRemoveMilestone(index)} className="self-start text-red-500 hover:text-red-700 text-xl font-bold px-2">
-                      ×
-                    </button>
-                  </div>
-                ))}
-                <button onClick={handleAddMilestone} className="mb-4 px-4 py-2 border border-orange-400 text-orange-700 rounded-lg hover:bg-orange-50 transition-colors duration-200 text-sm font-semibold">
-                  + Agregar hito
+                  );
+                })}
+                <button
+                  onClick={handleAddMilestone}
+                  disabled={tempMilestones.length >= MAX_MILESTONES}
+                  className="mb-4 px-4 py-2 border border-orange-400 text-orange-700 rounded-lg hover:bg-orange-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200 text-sm font-semibold"
+                >
+                  + Agregar hito ({tempMilestones.length}/{MAX_MILESTONES})
                 </button>
                 <div className="flex justify-end gap-3 mt-2">
-                  <button onClick={() => setIsEditingMilestones(false)} className="px-5 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-100 transition-colors duration-200">
+                  <button onClick={() => { setIsEditingMilestones(false); setMilestonesError(''); }} className="px-5 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-100 transition-colors duration-200">
                     Cancelar
                   </button>
                   <button onClick={handleSaveMilestones} disabled={savingMilestones} className="px-5 py-2 bg-green-600 text-white rounded-lg font-semibold hover:bg-green-700 transition-colors duration-200 disabled:opacity-60">
@@ -538,21 +696,38 @@ const HistoryPage: React.FC = () => {
 
               {isOwner && allEntrepreneurs.length > 1 && (
                 <div className="mb-8 p-4 bg-red-50 rounded-xl border border-red-100">
-                  <p className="text-sm font-semibold text-red-700 mb-3">Seleccioná quiénes aparecen en esta sección (máximo 3):</p>
+                  <p className="text-sm font-semibold text-red-700 mb-3">
+                    Seleccioná quiénes aparecen en esta sección (máximo {MAX_TEAM_MEMBERS}): {selectedEntrepreneurIds.length}/{MAX_TEAM_MEMBERS}
+                  </p>
+                  {teamSelectionNotice && (
+                    <p className="text-xs text-red-600 mb-3 flex items-center gap-1.5">
+                      <svg className="w-3.5 h-3.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                      </svg>
+                      {teamSelectionNotice}
+                    </p>
+                  )}
                   <div className="flex flex-wrap gap-2">
-                    {allEntrepreneurs.map((e) => (
-                      <button
-                        key={e.id}
-                        onClick={() => toggleEntrepreneur(e.id)}
-                        className={`px-4 py-2 rounded-full text-sm font-semibold border transition-colors duration-200 ${
-                          selectedEntrepreneurIds.includes(e.id)
-                            ? 'bg-red-600 text-white border-red-600'
-                            : 'bg-white text-red-700 border-red-300 hover:bg-red-50'
-                        }`}
-                      >
-                        {e.firstName} {e.lastName}
-                      </button>
-                    ))}
+                    {allEntrepreneurs.map((e) => {
+                      const isSelected = selectedEntrepreneurIds.includes(e.id);
+                      const isDisabled = !isSelected && selectedEntrepreneurIds.length >= MAX_TEAM_MEMBERS;
+                      return (
+                        <button
+                          key={e.id}
+                          onClick={() => toggleEntrepreneur(e.id)}
+                          disabled={isDisabled}
+                          className={`px-4 py-2 rounded-full text-sm font-semibold border transition-colors duration-200 ${
+                            isSelected
+                              ? 'bg-red-600 text-white border-red-600'
+                              : isDisabled
+                                ? 'bg-gray-100 text-gray-400 border-gray-200 cursor-not-allowed'
+                                : 'bg-white text-red-700 border-red-300 hover:bg-red-50'
+                          }`}
+                        >
+                          {e.firstName} {e.lastName}
+                        </button>
+                      );
+                    })}
                   </div>
                 </div>
               )}
@@ -570,6 +745,7 @@ const HistoryPage: React.FC = () => {
                         <button
                           onClick={() => handlePhotoClick(member.id)}
                           className="absolute bottom-0 right-0 bg-blue-600 text-white rounded-full w-8 h-8 flex items-center justify-center shadow-md hover:bg-blue-700 transition-colors duration-200"
+                          title="Cambiar foto (JPG, PNG o WEBP, máx. 8MB)"
                         >
                           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
@@ -585,9 +761,11 @@ const HistoryPage: React.FC = () => {
                         <textarea
                           className="w-full border border-gray-300 rounded-lg px-3 py-2 text-gray-700 text-sm focus:outline-none focus:ring-2 focus:ring-red-400 h-24 resize-none"
                           value={tempBio}
-                          onChange={(e) => setTempBio(e.target.value)}
+                          onChange={(e) => { if (e.target.value.length <= MAX_BIO_LENGTH) setTempBio(e.target.value); }}
                           placeholder="Escribí una bio..."
+                          maxLength={MAX_BIO_LENGTH}
                         />
+                        <p className="text-xs text-gray-400 text-right mt-1">{tempBio.length} / {MAX_BIO_LENGTH}</p>
                         <div className="flex justify-center gap-2 mt-2">
                           <button onClick={() => setEditingBioId(null)} className="px-3 py-1 border border-gray-300 rounded-lg text-gray-600 text-sm hover:bg-gray-100 transition-colors duration-200">
                             Cancelar
@@ -631,7 +809,7 @@ const HistoryPage: React.FC = () => {
               <h3 className="text-3xl font-bold text-green-800 flex-grow">Únete a Nuestra Comunidad</h3>
               {isOwner && !isEditingCommunity && (
                 <button
-                  onClick={() => { setTempCommunityText(club.communityText || ''); setIsEditingCommunity(true); }}
+                  onClick={() => { setTempCommunityText(club.communityText || ''); setCommunityError(''); setIsEditingCommunity(true); }}
                   className="ml-4 px-4 py-2 bg-blue-600 text-white rounded-full text-sm font-semibold hover:bg-blue-700 transition-colors duration-200 shadow-md"
                 >
                   Editar
@@ -641,12 +819,18 @@ const HistoryPage: React.FC = () => {
             {isEditingCommunity ? (
               <div>
                 <textarea
-                  className="w-full border border-gray-300 rounded-lg p-3 text-gray-700 text-base focus:outline-none focus:ring-2 focus:ring-green-400 h-32 resize-none"
+                  className={`w-full border rounded-lg p-3 text-gray-700 text-base focus:outline-none focus:ring-2 h-32 resize-none ${communityError ? 'border-red-300 focus:ring-red-400' : 'border-gray-300 focus:ring-green-400'}`}
                   value={tempCommunityText}
-                  onChange={(e) => setTempCommunityText(e.target.value)}
+                  onChange={(e) => { if (e.target.value.length <= MAX_COMMUNITY_LENGTH) setTempCommunityText(e.target.value); if (communityError) setCommunityError(''); }}
+                  maxLength={MAX_COMMUNITY_LENGTH}
                 />
+                <div className="flex items-center justify-between mt-2">
+                  <span className={`text-xs ${communityError ? 'text-red-600' : 'text-gray-400'}`}>
+                    {communityError || `${tempCommunityText.length} / ${MAX_COMMUNITY_LENGTH} caracteres`}
+                  </span>
+                </div>
                 <div className="flex justify-end gap-3 mt-3">
-                  <button onClick={() => setIsEditingCommunity(false)} className="px-5 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-100 transition-colors duration-200">
+                  <button onClick={() => { setIsEditingCommunity(false); setCommunityError(''); }} className="px-5 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-100 transition-colors duration-200">
                     Cancelar
                   </button>
                   <button onClick={handleSaveCommunity} disabled={savingCommunity} className="px-5 py-2 bg-green-600 text-white rounded-lg font-semibold hover:bg-green-700 transition-colors duration-200 disabled:opacity-60">

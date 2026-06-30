@@ -67,6 +67,41 @@ const ASPECT_RATIOS: Record<CropTarget, number> = {
   history: 4 / 3,
 };
 
+const MAX_IMAGE_SIZE_MB = 8;
+const MAX_IMAGE_SIZE_BYTES = MAX_IMAGE_SIZE_MB * 1024 * 1024;
+const ACCEPTED_IMAGE_TYPES = ['image/png', 'image/jpeg', 'image/jpg', 'image/webp'];
+const MAX_BANNERS = 6;
+const MAX_DESCRIPTION_LENGTH = 1200;
+const URL_REGEX = /^https?:\/\/[^\s/$.?#].[^\s]*$/i;
+
+function validateImageFile(file: File): string | null {
+  if (!ACCEPTED_IMAGE_TYPES.includes(file.type)) {
+    return 'Formato no permitido. Solo se aceptan imágenes JPG, PNG o WEBP.';
+  }
+  if (file.size > MAX_IMAGE_SIZE_BYTES) {
+    return `La imagen supera el tamaño máximo permitido de ${MAX_IMAGE_SIZE_MB}MB.`;
+  }
+  if (file.size === 0) {
+    return 'El archivo seleccionado está vacío o dañado.';
+  }
+  return null;
+}
+
+function validateSocialUrl(url: string): string | null {
+  const trimmed = url.trim();
+  if (!trimmed) return 'Ingresá una URL antes de agregar la red social.';
+  if (trimmed.length > 300) return 'La URL es demasiado larga.';
+  if (!URL_REGEX.test(trimmed)) {
+    return 'La URL no es válida. Debe comenzar con http:// o https:// y tener un formato correcto.';
+  }
+  try {
+    new URL(trimmed);
+  } catch {
+    return 'La URL ingresada no tiene un formato válido.';
+  }
+  return null;
+}
+
 async function getCroppedBlob(imageSrc: string, croppedAreaPixels: any): Promise<Blob> {
   return new Promise((resolve, reject) => {
     const image = new Image();
@@ -75,7 +110,11 @@ async function getCroppedBlob(imageSrc: string, croppedAreaPixels: any): Promise
       const canvas = document.createElement('canvas');
       canvas.width = croppedAreaPixels.width;
       canvas.height = croppedAreaPixels.height;
-      const ctx = canvas.getContext('2d')!;
+      const ctx = canvas.getContext('2d');
+      if (!ctx) {
+        reject(new Error('No se pudo procesar la imagen'));
+        return;
+      }
       ctx.drawImage(
         image,
         croppedAreaPixels.x,
@@ -96,7 +135,7 @@ async function getCroppedBlob(imageSrc: string, croppedAreaPixels: any): Promise
         0.95,
       );
     };
-    image.onerror = reject;
+    image.onerror = () => reject(new Error('No se pudo cargar la imagen seleccionada'));
   });
 }
 
@@ -109,13 +148,18 @@ const ClubDetailPage: React.FC = () => {
   const [error, setError] = useState('');
   const [editingDescription, setEditingDescription] = useState(false);
   const [editDescription, setEditDescription] = useState('');
+  const [descriptionError, setDescriptionError] = useState('');
   const [saving, setSaving] = useState(false);
   const [cropState, setCropState] = useState<CropState | null>(null);
+  const [cropError, setCropError] = useState('');
   const [uploading, setUploading] = useState(false);
   const [socialNetworks, setSocialNetworks] = useState<SocialNetworkRaw[]>([]);
   const [newSocialType, setNewSocialType] = useState('instagram');
   const [newSocialUrl, setNewSocialUrl] = useState('');
+  const [socialUrlError, setSocialUrlError] = useState('');
   const [socialSaving, setSocialSaving] = useState(false);
+  const [confirmDeleteBannerId, setConfirmDeleteBannerId] = useState<number | null>(null);
+  const [confirmDeleteSocialId, setConfirmDeleteSocialId] = useState<number | null>(null);
   const [toast, setToast] = useState<{ msg: string; type: 'success' | 'error' } | null>(null);
   const logoInputRef = useRef<HTMLInputElement>(null);
   const bannerInputRef = useRef<HTMLInputElement>(null);
@@ -147,8 +191,14 @@ const ClubDetailPage: React.FC = () => {
   }, [clubId, fetchClub]);
 
   const openCropper = (target: CropTarget, file: File) => {
+    const validationError = validateImageFile(file);
+    if (validationError) {
+      showToast(validationError, 'error');
+      return;
+    }
     const reader = new FileReader();
     reader.onload = () => {
+      setCropError('');
       setCropState({
         target,
         imageSrc: reader.result as string,
@@ -157,19 +207,30 @@ const ClubDetailPage: React.FC = () => {
         croppedAreaPixels: null,
       });
     };
+    reader.onerror = () => showToast('No se pudo leer el archivo seleccionado.', 'error');
     reader.readAsDataURL(file);
   };
 
   const handleFileSelect = (target: CropTarget) => (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
+    if (target === 'banner' && (club?.bannerImagesRaw?.length ?? 0) >= MAX_BANNERS) {
+      showToast(`Ya alcanzaste el máximo de ${MAX_BANNERS} banners. Eliminá alguno antes de agregar otro.`, 'error');
+      e.target.value = '';
+      return;
+    }
     openCropper(target, file);
     e.target.value = '';
   };
 
   const handleCropConfirm = async () => {
-    if (!cropState || !cropState.croppedAreaPixels || !clubId) return;
+    if (!cropState || !clubId) return;
+    if (!cropState.croppedAreaPixels) {
+      setCropError('Ajustá el encuadre de la imagen antes de continuar.');
+      return;
+    }
     setUploading(true);
+    setCropError('');
     try {
       const blob = await getCroppedBlob(cropState.imageSrc, cropState.croppedAreaPixels);
       const file = new File([blob], 'image.jpg', { type: 'image/jpeg' });
@@ -201,22 +262,45 @@ const ClubDetailPage: React.FC = () => {
       setCropState(null);
       fetchClub();
     } catch {
-      showToast('Error al subir la imagen', 'error');
+      showToast('Error al subir la imagen. Intentá nuevamente.', 'error');
     } finally {
       setUploading(false);
     }
   };
 
+  const handleDescriptionChange = (value: string) => {
+    if (value.length > MAX_DESCRIPTION_LENGTH) {
+      setDescriptionError(`La descripción no puede superar los ${MAX_DESCRIPTION_LENGTH} caracteres.`);
+      return;
+    }
+    setDescriptionError('');
+    setEditDescription(value);
+  };
+
   const handleSaveDescription = async () => {
     if (!clubId) return;
+    const trimmed = editDescription.trim();
+    if (!trimmed) {
+      setDescriptionError('La descripción no puede quedar vacía.');
+      return;
+    }
+    if (trimmed.length < 20) {
+      setDescriptionError('La descripción debe tener al menos 20 caracteres para resultar informativa.');
+      return;
+    }
+    if (trimmed.length > MAX_DESCRIPTION_LENGTH) {
+      setDescriptionError(`La descripción no puede superar los ${MAX_DESCRIPTION_LENGTH} caracteres.`);
+      return;
+    }
     setSaving(true);
     try {
-      await api.put(`/clubs/${clubId}`, { shortDescription: editDescription });
+      await api.put(`/clubs/${clubId}`, { shortDescription: trimmed });
       showToast('Descripción guardada');
       setEditingDescription(false);
+      setDescriptionError('');
       fetchClub();
     } catch {
-      showToast('Error al guardar', 'error');
+      showToast('Error al guardar la descripción.', 'error');
     } finally {
       setSaving(false);
     }
@@ -226,27 +310,47 @@ const ClubDetailPage: React.FC = () => {
     try {
       await api.delete(`/image-club/${imageId}`);
       showToast('Banner eliminado');
+      setConfirmDeleteBannerId(null);
       fetchClub();
     } catch {
       showToast('Error al eliminar el banner', 'error');
     }
   };
 
+  const handleSocialUrlChange = (value: string) => {
+    setNewSocialUrl(value);
+    if (socialUrlError) setSocialUrlError('');
+  };
+
   const handleAddSocial = async () => {
-    if (!newSocialUrl.trim() || !clubId) return;
+    const trimmedUrl = newSocialUrl.trim();
+    const validationError = validateSocialUrl(trimmedUrl);
+    if (validationError) {
+      setSocialUrlError(validationError);
+      return;
+    }
+    const alreadyExists = socialNetworks.some(
+      (sn) => sn.networkType.toLowerCase() === newSocialType.toLowerCase(),
+    );
+    if (alreadyExists) {
+      setSocialUrlError('Ya agregaste una red de este tipo. Eliminala primero si querés reemplazarla.');
+      return;
+    }
+    if (!clubId) return;
     setSocialSaving(true);
     try {
       await api.post(`/club-social-networks`, {
         idClub: Number(clubId),
         networkType: newSocialType,
-        profileUrl: newSocialUrl.trim(),
+        profileUrl: trimmedUrl,
       });
       showToast('Red social agregada');
       setNewSocialUrl('');
+      setSocialUrlError('');
       setNewSocialType('instagram');
       fetchClub();
     } catch {
-      showToast('Error al agregar red social', 'error');
+      showToast('Error al agregar la red social', 'error');
     } finally {
       setSocialSaving(false);
     }
@@ -256,9 +360,10 @@ const ClubDetailPage: React.FC = () => {
     try {
       await api.delete(`/club-social-networks/${id}`);
       showToast('Red social eliminada');
+      setConfirmDeleteSocialId(null);
       fetchClub();
     } catch {
-      showToast('Error al eliminar', 'error');
+      showToast('Error al eliminar la red social', 'error');
     }
   };
 
@@ -266,8 +371,10 @@ const ClubDetailPage: React.FC = () => {
     return (
       <div className="container mx-auto px-4 py-8">
         <div className="animate-pulse">
-          <div className="h-64 bg-gray-200 rounded mb-4" />
-          <div className="h-8 bg-gray-200 rounded w-1/2 mx-auto mb-4" />
+          <div className="h-72 bg-gray-200 rounded-2xl mb-6" />
+          <div className="h-8 bg-gray-200 rounded w-1/3 mb-3" />
+          <div className="h-4 bg-gray-200 rounded w-2/3 mb-2" />
+          <div className="h-4 bg-gray-200 rounded w-1/2" />
         </div>
       </div>
     );
@@ -275,10 +382,10 @@ const ClubDetailPage: React.FC = () => {
 
   if (error || !club) {
     return (
-      <div className="container mx-auto px-4 py-8 text-center">
-        <h1 className="text-4xl font-bold text-red-600 mb-4">Club no encontrado</h1>
-        <p className="text-lg text-gray-700 mb-8">El club que buscás no existe o fue eliminado.</p>
-        <button onClick={() => navigate('/')} className="bg-blue-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-700 transition-all">
+      <div className="container mx-auto px-4 py-16 text-center">
+        <h1 className="text-3xl font-bold text-gray-900 mb-3">Club no encontrado</h1>
+        <p className="text-gray-500 mb-8">El club que buscás no existe o fue eliminado.</p>
+        <button onClick={() => navigate('/')} className="bg-blue-600 text-white px-6 py-3 rounded-xl font-semibold hover:bg-blue-700 transition-colors shadow-sm">
           Volver al inicio
         </button>
       </div>
@@ -294,11 +401,26 @@ const ClubDetailPage: React.FC = () => {
     (acc, sn) => ({ ...acc, [sn.networkType.toLowerCase()]: sn.profileUrl }),
     {} as SocialMediaLinks,
   );
+  const availableNetworkTypes = NETWORK_TYPES.filter(
+    (n) => !socialNetworks.some((sn) => sn.networkType.toLowerCase() === n.key),
+  );
 
   return (
     <div className="bg-gray-50 min-h-screen">
       {toast && (
-        <div className={`fixed top-20 right-4 z-50 px-5 py-3 rounded-lg shadow-lg text-white text-sm font-medium ${toast.type === 'success' ? 'bg-green-500' : 'bg-red-500'}`}>
+        <div
+          role="alert"
+          className={`fixed top-20 right-4 z-50 max-w-sm px-5 py-3 rounded-xl shadow-lg text-white text-sm font-medium flex items-center gap-2 ${toast.type === 'success' ? 'bg-emerald-500' : 'bg-red-500'}`}
+        >
+          {toast.type === 'success' ? (
+            <svg className="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
+            </svg>
+          ) : (
+            <svg className="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+            </svg>
+          )}
           {toast.msg}
         </div>
       )}
@@ -312,7 +434,7 @@ const ClubDetailPage: React.FC = () => {
                 </h3>
                 <p className="text-sm text-gray-500 mt-0.5">Mové y hacé zoom para encuadrar la imagen</p>
               </div>
-              <button onClick={() => setCropState(null)} className="text-gray-400 hover:text-gray-600 transition-colors">
+              <button onClick={() => setCropState(null)} className="text-gray-400 hover:text-gray-600 transition-colors" aria-label="Cerrar">
                 <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
                 </svg>
@@ -332,6 +454,14 @@ const ClubDetailPage: React.FC = () => {
               />
             </div>
             <div className="px-6 py-4 bg-gray-50">
+              {cropError && (
+                <p className="text-xs text-red-600 mb-3 flex items-center gap-1.5">
+                  <svg className="w-3.5 h-3.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                  </svg>
+                  {cropError}
+                </p>
+              )}
               <div className="flex items-center gap-3 mb-4">
                 <svg className="w-4 h-4 text-gray-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7" />
@@ -344,10 +474,15 @@ const ClubDetailPage: React.FC = () => {
                   value={cropState.zoom}
                   onChange={(e) => setCropState((prev) => (prev ? { ...prev, zoom: Number(e.target.value) } : null))}
                   className="flex-1 accent-blue-600"
+                  aria-label="Zoom"
                 />
               </div>
               <div className="flex gap-3">
-                <button onClick={() => setCropState(null)} className="flex-1 px-4 py-2.5 rounded-xl border border-gray-200 text-gray-700 text-sm font-medium hover:bg-gray-100 transition-colors">
+                <button
+                  onClick={() => setCropState(null)}
+                  disabled={uploading}
+                  className="flex-1 px-4 py-2.5 rounded-xl border border-gray-200 text-gray-700 text-sm font-medium hover:bg-gray-100 disabled:opacity-50 transition-colors"
+                >
                   Cancelar
                 </button>
                 <button
@@ -358,6 +493,50 @@ const ClubDetailPage: React.FC = () => {
                   {uploading ? 'Guardando...' : 'Guardar imagen'}
                 </button>
               </div>
+            </div>
+          </div>
+        </div>
+      )}
+      {confirmDeleteBannerId !== null && (
+        <div className="fixed inset-0 z-50 bg-black/60 flex items-center justify-center p-4">
+          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-sm p-6">
+            <h3 className="text-lg font-semibold text-gray-900 mb-2">¿Eliminar este banner?</h3>
+            <p className="text-sm text-gray-500 mb-6">Esta acción no se puede deshacer.</p>
+            <div className="flex gap-3">
+              <button
+                onClick={() => setConfirmDeleteBannerId(null)}
+                className="flex-1 px-4 py-2.5 rounded-xl border border-gray-200 text-gray-700 text-sm font-medium hover:bg-gray-100 transition-colors"
+              >
+                Cancelar
+              </button>
+              <button
+                onClick={() => handleDeleteBanner(confirmDeleteBannerId)}
+                className="flex-1 px-4 py-2.5 rounded-xl bg-red-500 text-white text-sm font-semibold hover:bg-red-600 transition-colors"
+              >
+                Eliminar
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+      {confirmDeleteSocialId !== null && (
+        <div className="fixed inset-0 z-50 bg-black/60 flex items-center justify-center p-4">
+          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-sm p-6">
+            <h3 className="text-lg font-semibold text-gray-900 mb-2">¿Eliminar esta red social?</h3>
+            <p className="text-sm text-gray-500 mb-6">Dejará de mostrarse en el perfil del club.</p>
+            <div className="flex gap-3">
+              <button
+                onClick={() => setConfirmDeleteSocialId(null)}
+                className="flex-1 px-4 py-2.5 rounded-xl border border-gray-200 text-gray-700 text-sm font-medium hover:bg-gray-100 transition-colors"
+              >
+                Cancelar
+              </button>
+              <button
+                onClick={() => handleDeleteSocial(confirmDeleteSocialId)}
+                className="flex-1 px-4 py-2.5 rounded-xl bg-red-500 text-white text-sm font-semibold hover:bg-red-600 transition-colors"
+              >
+                Eliminar
+              </button>
             </div>
           </div>
         </div>
@@ -393,14 +572,20 @@ const ClubDetailPage: React.FC = () => {
                 <button
                   onClick={() => logoInputRef.current?.click()}
                   className="absolute bottom-1 right-1 bg-white text-gray-700 rounded-full p-2 shadow-lg hover:bg-gray-50 border border-gray-200 transition-colors"
-                  title="Cambiar logo"
+                  title="Cambiar logo (JPG, PNG o WEBP, máx. 8MB)"
                 >
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
                   </svg>
                 </button>
-                <input ref={logoInputRef} type="file" accept="image/*" className="hidden" onChange={handleFileSelect('logo')} />
+                <input
+                  ref={logoInputRef}
+                  type="file"
+                  accept="image/png,image/jpeg,image/jpg,image/webp"
+                  className="hidden"
+                  onChange={handleFileSelect('logo')}
+                />
               </>
             )}
           </div>
@@ -417,9 +602,15 @@ const ClubDetailPage: React.FC = () => {
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
                 </svg>
-                Cambiar banner
+                Agregar banner
               </button>
-              <input ref={bannerInputRef} type="file" accept="image/*" className="hidden" onChange={handleFileSelect('banner')} />
+              <input
+                ref={bannerInputRef}
+                type="file"
+                accept="image/png,image/jpeg,image/jpg,image/webp"
+                className="hidden"
+                onChange={handleFileSelect('banner')}
+              />
             </div>
           )}
         </div>
@@ -436,7 +627,9 @@ const ClubDetailPage: React.FC = () => {
             <div className="flex items-center gap-2 mb-4">
               <div className="w-1 h-5 bg-blue-600 rounded-full" />
               <h3 className="text-sm font-semibold text-gray-800">Banners del club</h3>
-              <span className="ml-auto text-xs text-gray-400">{club.bannerImagesRaw.length} imagen{club.bannerImagesRaw.length !== 1 ? 'es' : ''}</span>
+              <span className="ml-auto text-xs text-gray-400">
+                {club.bannerImagesRaw.length} / {MAX_BANNERS} imágenes
+              </span>
             </div>
             <div className="flex flex-wrap gap-3">
               {club.bannerImagesRaw.map((img) => (
@@ -444,7 +637,7 @@ const ClubDetailPage: React.FC = () => {
                   <img src={img.imageUrl} alt="banner" className="w-36 h-24 object-cover rounded-xl border border-gray-100 shadow-sm" />
                   <div className="absolute inset-0 bg-black/40 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
                     <button
-                      onClick={() => handleDeleteBanner(img.id)}
+                      onClick={() => setConfirmDeleteBannerId(img.id)}
                       className="bg-red-500 text-white rounded-lg px-3 py-1.5 text-xs font-medium hover:bg-red-600 transition-colors"
                     >
                       Eliminar
@@ -475,7 +668,7 @@ const ClubDetailPage: React.FC = () => {
                 <h2 className="text-xl font-bold text-gray-900">Sobre Nosotros</h2>
                 {isOwner && !editingDescription && (
                   <button
-                    onClick={() => setEditingDescription(true)}
+                    onClick={() => { setEditDescription(club.shortDescription || ''); setDescriptionError(''); setEditingDescription(true); }}
                     className="inline-flex items-center gap-2 text-sm font-semibold text-white bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded-lg transition-colors shadow-sm"
                   >
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -489,11 +682,17 @@ const ClubDetailPage: React.FC = () => {
                 <div className="bg-gray-50 rounded-xl p-4 border border-gray-200">
                   <textarea
                     value={editDescription}
-                    onChange={(e) => setEditDescription(e.target.value)}
-                    className="w-full border border-gray-200 rounded-xl p-3 h-36 text-sm text-gray-700 focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none resize-none transition-all bg-white"
+                    onChange={(e) => handleDescriptionChange(e.target.value)}
+                    className={`w-full border rounded-xl p-3 h-36 text-sm text-gray-700 focus:ring-2 focus:border-transparent outline-none resize-none transition-all bg-white ${descriptionError ? 'border-red-300 focus:ring-red-400' : 'border-gray-200 focus:ring-blue-500'}`}
                     placeholder="Contá de qué se trata tu club..."
                     autoFocus
+                    maxLength={MAX_DESCRIPTION_LENGTH}
                   />
+                  <div className="flex items-center justify-between mt-1.5">
+                    <span className={`text-xs ${descriptionError ? 'text-red-600' : 'text-gray-400'}`}>
+                      {descriptionError || `${editDescription.length} / ${MAX_DESCRIPTION_LENGTH} caracteres`}
+                    </span>
+                  </div>
                   <div className="flex gap-2 mt-3">
                     <button
                       onClick={handleSaveDescription}
@@ -503,7 +702,7 @@ const ClubDetailPage: React.FC = () => {
                       {saving ? 'Guardando...' : 'Guardar cambios'}
                     </button>
                     <button
-                      onClick={() => { setEditingDescription(false); setEditDescription(club.shortDescription || ''); }}
+                      onClick={() => { setEditingDescription(false); setEditDescription(club.shortDescription || ''); setDescriptionError(''); }}
                       className="text-gray-600 text-sm px-4 py-2.5 rounded-lg hover:bg-gray-200 transition-colors font-medium"
                     >
                       Cancelar
@@ -511,7 +710,7 @@ const ClubDetailPage: React.FC = () => {
                   </div>
                 </div>
               ) : (
-                <p className="text-gray-600 leading-relaxed text-sm">{club.shortDescription}</p>
+                <p className="text-gray-600 leading-relaxed text-sm">{club.shortDescription || 'Este club todavía no cargó una descripción.'}</p>
               )}
             </div>
             <div>
@@ -541,7 +740,14 @@ const ClubDetailPage: React.FC = () => {
                       <span className="text-xs text-gray-300">Hacé click en "Cambiar imagen" para agregar una</span>
                     </div>
                   )}
-                  <input ref={historyInputRef} type="file" accept="image/*" className="hidden" onChange={handleFileSelect('history')} />
+                  <p className="text-xs text-gray-400 mt-2">Formatos aceptados: JPG, PNG o WEBP. Tamaño máximo {MAX_IMAGE_SIZE_MB}MB.</p>
+                  <input
+                    ref={historyInputRef}
+                    type="file"
+                    accept="image/png,image/jpeg,image/jpg,image/webp"
+                    className="hidden"
+                    onChange={handleFileSelect('history')}
+                  />
                 </div>
               ) : (
                 club.fullHistory && (
@@ -576,7 +782,7 @@ const ClubDetailPage: React.FC = () => {
                         <span className="text-xs font-semibold text-gray-700 capitalize">{sn.networkType}</span>
                         <span className="text-xs text-gray-400 max-w-[120px] truncate">{sn.profileUrl}</span>
                         <button
-                          onClick={() => handleDeleteSocial(sn.id)}
+                          onClick={() => setConfirmDeleteSocialId(sn.id)}
                           className="text-gray-300 hover:text-red-500 transition-colors ml-1"
                           title="Eliminar"
                         >
@@ -588,40 +794,52 @@ const ClubDetailPage: React.FC = () => {
                     ))}
                   </div>
                 )}
-                <div className="bg-gray-50 rounded-xl border border-gray-200 p-4">
-                  <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-3">Agregar red social</p>
-                  <div className="flex flex-wrap gap-3 items-end">
-                    <div>
-                      <label className="block text-xs text-gray-500 mb-1.5">Plataforma</label>
-                      <select
-                        value={newSocialType}
-                        onChange={(e) => setNewSocialType(e.target.value)}
-                        className="border border-gray-200 rounded-lg px-3 py-2 text-sm bg-white focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
+                {availableNetworkTypes.length > 0 ? (
+                  <div className="bg-gray-50 rounded-xl border border-gray-200 p-4">
+                    <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-3">Agregar red social</p>
+                    <div className="flex flex-wrap gap-3 items-start">
+                      <div>
+                        <label className="block text-xs text-gray-500 mb-1.5">Plataforma</label>
+                        <select
+                          value={newSocialType}
+                          onChange={(e) => setNewSocialType(e.target.value)}
+                          className="border border-gray-200 rounded-lg px-3 py-2 text-sm bg-white focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
+                        >
+                          {availableNetworkTypes.map((n) => (
+                            <option key={n.key} value={n.key}>{n.label}</option>
+                          ))}
+                        </select>
+                      </div>
+                      <div className="flex-1 min-w-[200px]">
+                        <label className="block text-xs text-gray-500 mb-1.5">URL del perfil</label>
+                        <input
+                          type="url"
+                          value={newSocialUrl}
+                          onChange={(e) => handleSocialUrlChange(e.target.value)}
+                          placeholder="https://instagram.com/tu_club"
+                          className={`border rounded-lg px-3 py-2 text-sm w-full bg-white focus:ring-2 focus:border-transparent outline-none ${socialUrlError ? 'border-red-300 focus:ring-red-400' : 'border-gray-200 focus:ring-blue-500'}`}
+                        />
+                        {socialUrlError && (
+                          <p className="text-xs text-red-600 mt-1.5 flex items-center gap-1">
+                            <svg className="w-3 h-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                            </svg>
+                            {socialUrlError}
+                          </p>
+                        )}
+                      </div>
+                      <button
+                        onClick={handleAddSocial}
+                        disabled={socialSaving || !newSocialUrl.trim()}
+                        className="bg-blue-600 text-white text-sm px-5 py-2.5 rounded-lg font-semibold hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors shadow-sm mt-px"
                       >
-                        {NETWORK_TYPES.map((n) => (
-                          <option key={n.key} value={n.key}>{n.label}</option>
-                        ))}
-                      </select>
+                        {socialSaving ? 'Agregando...' : 'Agregar'}
+                      </button>
                     </div>
-                    <div className="flex-1 min-w-[200px]">
-                      <label className="block text-xs text-gray-500 mb-1.5">URL del perfil</label>
-                      <input
-                        type="url"
-                        value={newSocialUrl}
-                        onChange={(e) => setNewSocialUrl(e.target.value)}
-                        placeholder="https://..."
-                        className="border border-gray-200 rounded-lg px-3 py-2 text-sm w-full bg-white focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
-                      />
-                    </div>
-                    <button
-                      onClick={handleAddSocial}
-                      disabled={socialSaving || !newSocialUrl.trim()}
-                      className="bg-blue-600 text-white text-sm px-5 py-2.5 rounded-lg font-semibold hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors shadow-sm"
-                    >
-                      {socialSaving ? 'Agregando...' : 'Agregar'}
-                    </button>
                   </div>
-                </div>
+                ) : (
+                  <p className="text-xs text-gray-400 italic">Ya agregaste todas las redes sociales disponibles.</p>
+                )}
                 {socialNetworks.length > 0 && (
                   <div className="mt-4">
                     <p className="text-xs text-gray-400 mb-2">Vista previa para el cliente:</p>
