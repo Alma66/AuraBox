@@ -1,9 +1,19 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../../../../App';
 import FinancialSidebar from '../../../../../components/entrepreneur/FinancialSidebar';
 import api, { getResponseData } from '../../../../../api/config';
-import { FinancialMovement, MonthlyTotal, Invoice } from '../../../../../types/financial';
+import { FinancialMovement, MonthlyTotal, FinanceSummary } from '../../../../../types/financial';
+
+const CATEGORY_OPTIONS = ['Sueldos', 'Alquiler', 'Impuestos', 'Marketing', 'Servicios', 'Reembolsos', 'Otros'];
+
+const emptyForm = {
+  type: 'Egreso' as 'Ingreso' | 'Egreso',
+  category: 'Otros',
+  description: '',
+  amount: '',
+  entryDate: '',
+};
 
 const FinancialMovementsPage: React.FC = () => {
   const { user, userRole } = useAuth();
@@ -14,277 +24,237 @@ const FinancialMovementsPage: React.FC = () => {
 
   const [movements, setMovements] = useState<FinancialMovement[]>([]);
   const [monthlyTotals, setMonthlyTotals] = useState<Record<string, MonthlyTotal>>({});
-  const [invoices, setInvoices] = useState<Invoice[]>([]);
-  const [activeTab, setActiveTab] = useState<'movimientos' | 'facturacion'>('movimientos');
+  const [summary, setSummary] = useState<FinanceSummary | null>(null);
   const [activeFilter, setActiveFilter] = useState('all');
-  const [filteredMovements, setFilteredMovements] = useState<FinancialMovement[]>([]);
   const [dateFrom, setDateFrom] = useState('');
   const [dateTo, setDateTo] = useState('');
   const [statusFilter, setStatusFilter] = useState('todos');
   const [loading, setLoading] = useState(true);
+  const [showForm, setShowForm] = useState(false);
+  const [form, setForm] = useState(emptyForm);
+
+  const fetchData = useCallback(async () => {
+    if (!actualClubId) return;
+    setLoading(true);
+    try {
+      const [clubResponse, financeResponse] = await Promise.all([
+        api.get(`/clubs/${actualClubId}`),
+        api.get(`/finance/movements/by-club/${actualClubId}`),
+      ]);
+      setClubName(getResponseData(clubResponse).name || 'Tu Club');
+      const data = getResponseData(financeResponse);
+      setMovements(data.movements || []);
+      setMonthlyTotals(data.monthlyTotals || {});
+      setSummary(data.summary || null);
+    } catch (error) {
+      console.error('Error fetching financial data:', error);
+    } finally {
+      setLoading(false);
+    }
+  }, [actualClubId]);
 
   useEffect(() => {
-    const fetchData = async () => {
-      if (userRole !== 'entrepreneur' || !actualClubId) {
-        navigate('/');
-        return;
-      }
-
-      try {
-        const [clubResponse, movementsResponse, invoicesResponse] = await Promise.all([
-          api.get(`/clubs/${actualClubId}`),
-          api.get(`/clubs/${actualClubId}/financial-movements`),
-          api.get(`/clubs/${actualClubId}/invoices`)
-        ]);
-
-        const clubData = getResponseData(clubResponse);
-        const movementsData = getResponseData(movementsResponse);
-        const invoicesData = getResponseData(invoicesResponse);
-
-        setClubName(clubData.name || 'Tu Club');
-        setMovements(movementsData.movements || []);
-        setMonthlyTotals(movementsData.monthlyTotals || {});
-        setFilteredMovements(movementsData.movements || []);
-        setInvoices(invoicesData || []);
-      } catch (error) {
-        console.error("Error fetching financial data:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
+    if (userRole !== 'entrepreneur' || !actualClubId) {
+      navigate('/');
+      return;
+    }
     fetchData();
-  }, [actualClubId, userRole, navigate]);
+  }, [actualClubId, userRole, navigate, fetchData]);
 
-  useEffect(() => {
+  const categories = useMemo(() => Array.from(new Set(movements.map((m) => m.category))), [movements]);
+
+  const filteredMovements = useMemo(() => {
     let filtered = [...movements];
+    if (activeFilter === 'ingresos') filtered = filtered.filter((m) => m.type === 'Ingreso');
+    else if (activeFilter === 'egresos') filtered = filtered.filter((m) => m.type === 'Egreso');
+    else if (activeFilter !== 'all') filtered = filtered.filter((m) => m.category === activeFilter);
 
-    if (activeFilter !== 'all' && activeFilter !== 'ingresos' && activeFilter !== 'egresos') {
-      filtered = filtered.filter(m => m.category === activeFilter);
-    } else if (activeFilter === 'ingresos') {
-      filtered = filtered.filter(m => m.type === 'ingreso');
-    } else if (activeFilter === 'egresos') {
-      filtered = filtered.filter(m => m.type === 'egreso');
-    }
+    if (dateFrom) filtered = filtered.filter((m) => new Date(m.date) >= new Date(dateFrom));
+    if (dateTo) filtered = filtered.filter((m) => new Date(m.date) <= new Date(dateTo + 'T23:59:59'));
+    if (statusFilter !== 'todos') filtered = filtered.filter((m) => m.status === statusFilter);
 
-    if (dateFrom) {
-      filtered = filtered.filter(m => new Date(m.date) >= new Date(dateFrom));
-    }
-    if (dateTo) {
-      filtered = filtered.filter(m => new Date(m.date) <= new Date(dateTo));
-    }
+    return filtered;
+  }, [movements, activeFilter, dateFrom, dateTo, statusFilter]);
 
-    if (statusFilter !== 'todos') {
-      filtered = filtered.filter(m => m.status === statusFilter);
-    }
-
-    setFilteredMovements(filtered);
-  }, [activeFilter, dateFrom, dateTo, statusFilter, movements]);
-
-  const categories = Array.from(new Set(movements.map(m => m.category)));
-  
   const handleDateFilterChange = (from: string, to: string) => {
     setDateFrom(from);
     setDateTo(to);
   };
 
-  const handleStatusFilterChange = (status: string) => {
-    setStatusFilter(status);
+  const createEntry = async () => {
+    if (!form.description.trim() || !form.amount) {
+      alert('Completá la descripción y el monto');
+      return;
+    }
+    try {
+      await api.post('/finance/entries', {
+        idClub: Number(actualClubId),
+        type: form.type,
+        category: form.category,
+        description: form.description,
+        amount: Number(form.amount),
+        entryDate: form.entryDate || undefined,
+      });
+      setForm(emptyForm);
+      setShowForm(false);
+      await fetchData();
+    } catch (err) {
+      console.error(err);
+      alert('Error al crear el movimiento');
+    }
   };
 
-  const handleEditMovement = (movement: FinancialMovement) => {
-    console.log('Editando movimiento:', movement);
+  const deleteEntry = async (movementId: string) => {
+    if (!movementId.startsWith('manual-')) return;
+    if (!window.confirm('¿Eliminar este movimiento?')) return;
+    try {
+      await api.delete(`/finance/entries/${movementId.replace('manual-', '')}`);
+      await fetchData();
+    } catch (err) {
+      console.error(err);
+      alert('Error al eliminar el movimiento');
+    }
   };
-
-  const handleGenerateInvoice = () => {
-    console.log('Generando nueva factura');
-  };
-
-  const renderMovementRow = (movement: FinancialMovement) => (
-    <tr key={movement.id} className="border-b hover:bg-gray-50">
-      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-        {new Date(movement.date).toLocaleDateString('es-AR')}
-      </td>
-      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{movement.description}</td>
-      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 capitalize">{movement.category.replace(/_/g, ' ')}</td>
-      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 capitalize">{movement.type}</td>
-      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-green-600">
-        {movement.amount > 0 ? `+$${movement.amount.toLocaleString()}` : `-$${Math.abs(movement.amount).toLocaleString()}`}
-      </td>
-      <td className="px-6 py-4 whitespace-nowrap">
-        <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-          movement.status === 'confirmado' ? 'bg-green-100 text-green-800' :
-          movement.status === 'pagado' ? 'bg-blue-100 text-blue-800' :
-          movement.status === 'pendiente' ? 'bg-yellow-100 text-yellow-800' : 'bg-gray-100 text-gray-800'
-        }`}>
-          {movement.status}
-        </span>
-      </td>
-            <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-        <button 
-          onClick={() => handleEditMovement(movement)}
-          className="text-blue-600 hover:text-blue-900 mr-3"
-        >
-          Editar
-        </button>
-        <button className="text-red-600 hover:text-red-900">Eliminar</button>
-      </td>
-    </tr>
-  );
-
-  const renderTotalsTable = () => (
-    <div className="mt-6 overflow-x-auto">
-      <h3 className="text-lg font-semibold text-gray-800 mb-2">Totales Mensuales</h3>
-      <table className="min-w-full divide-y divide-gray-200">
-        <thead className="bg-gray-50">
-          <tr>
-            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Mes</th>
-            <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Ingresos</th>
-            <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Egresos</th>
-            <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Balance</th>
-          </tr>
-        </thead>
-        <tbody className="bg-white divide-y divide-gray-200">
-          {Object.entries(monthlyTotals).map(([month, totals]) => (
-            <tr key={month} className="hover:bg-gray-50">
-              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{month}</td>
-              <td className="px-6 py-4 whitespace-nowrap text-right text-sm text-green-600">
-                ${totals.ingresos.toLocaleString()}
-              </td>
-              <td className="px-6 py-4 whitespace-nowrap text-right text-sm text-red-600">
-                ${totals.egresos.toLocaleString()}
-              </td>
-              <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium text-gray-900">
-                ${totals.balance.toLocaleString()}
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
-  );
-
-  const renderFacturacionSection = () => (
-    <div>
-      <h3 className="text-xl font-bold text-gray-800 mb-4">Facturación y Pagos Pendientes</h3>
-      <p className="text-gray-600 mb-4">Gestiona facturas emitidas, pendientes y pagadas. Total pendiente: ${invoices.filter(i => i.status === 'pendiente').reduce((sum, i) => sum + i.amount, 0).toLocaleString()} ARS.</p>
-      <button 
-        onClick={handleGenerateInvoice}
-        className="mb-4 bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700 transition-colors"
-      >
-        Generar Nueva Factura
-      </button>
-      <div className="overflow-x-auto">
-        <table className="min-w-full divide-y divide-gray-200">
-          <thead className="bg-gray-50">
-            <tr>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Factura ID</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Fecha</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Cliente ID</th>
-              <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Monto</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Estado</th>
-              <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Acciones</th>
-            </tr>
-          </thead>
-          <tbody className="bg-white divide-y divide-gray-200">
-            {invoices.map(invoice => (
-              <tr key={invoice.id} className="hover:bg-gray-50">
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{invoice.id}</td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{new Date(invoice.date).toLocaleDateString('es-AR')}</td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{invoice.clientId}</td>
-                <td className="px-6 py-4 whitespace-nowrap text-right text-sm text-gray-900">${invoice.amount.toLocaleString()}</td>
-                <td className="px-6 py-4 whitespace-nowrap">
-                  <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                    invoice.status === 'pagada' ? 'bg-green-100 text-green-800' :
-                    invoice.status === 'pendiente' ? 'bg-yellow-100 text-yellow-800' : 'bg-red-100 text-red-800'
-                  }`}>
-                    {invoice.status}
-                  </span>
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                  <button className="text-blue-600 hover:text-blue-900 mr-3">Ver PDF</button>
-                  <button className="text-green-600 hover:text-green-900 mr-3">Marcar Pagada</button>
-                  <button className="text-red-600 hover:text-red-900">Eliminar</button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-    </div>
-  );
 
   if (loading) {
-    return <div className="text-center py-20">Cargando movimientos financieros...</div>;
+    return <div className="text-center py-20 text-gray-500">Cargando movimientos financieros...</div>;
   }
 
   return (
-    <div className="container mx-auto px-4 py-8 min-h-screen">
+    <div className="container mx-auto px-4 py-10 max-w-7xl">
+      <h1 className="text-2xl font-bold text-gray-900 mb-8">Gestión Financiera — {clubName}</h1>
+
       <div className="flex flex-col lg:flex-row gap-8">
         <div className="lg:w-1/4">
           <FinancialSidebar
             activeFilter={activeFilter}
             setActiveFilter={setActiveFilter}
             categories={categories}
+            dateFrom={dateFrom}
+            dateTo={dateTo}
             onDateFilterChange={handleDateFilterChange}
-            onStatusFilterChange={handleStatusFilterChange}
+            statusFilter={statusFilter}
+            onStatusFilterChange={setStatusFilter}
           />
         </div>
 
-        <div className="lg:w-3/4 bg-white rounded-xl shadow-lg p-8">
-          <h1 className="text-3xl font-bold text-gray-800 mb-6">Gestión Financiera - {clubName}</h1>
-          
-          <div className="flex border-b border-gray-200 mb-6">
-            <button
-              onClick={() => setActiveTab('movimientos')}
-              className={`px-6 py-2 font-medium border-b-2 ${
-                activeTab === 'movimientos' 
-                  ? 'border-blue-600 text-blue-600' 
-                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-              }`}
-            >
-              Movimientos Financieros
-            </button>
-            <button
-              onClick={() => setActiveTab('facturacion')}
-              className={`ml-8 px-6 py-2 font-medium border-b-2 ${
-                activeTab === 'facturacion' 
-                  ? 'border-blue-600 text-blue-600' 
-                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-              }`}
-            >
-              Facturación y Pagos
+        <div className="lg:w-3/4 bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+          {summary && (
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+              <div className="bg-emerald-50 rounded-xl p-4 text-center">
+                <p className="text-xl font-bold text-emerald-700">${summary.totalIngresos.toLocaleString('es-AR')}</p>
+                <p className="text-xs text-gray-600 mt-1">Ingresos totales</p>
+              </div>
+              <div className="bg-red-50 rounded-xl p-4 text-center">
+                <p className="text-xl font-bold text-red-700">${summary.totalEgresos.toLocaleString('es-AR')}</p>
+                <p className="text-xs text-gray-600 mt-1">Egresos totales</p>
+              </div>
+              <div className="bg-blue-50 rounded-xl p-4 text-center">
+                <p className="text-xl font-bold text-blue-700">${summary.balance.toLocaleString('es-AR')}</p>
+                <p className="text-xs text-gray-600 mt-1">Balance neto</p>
+              </div>
+              <div className="bg-amber-50 rounded-xl p-4 text-center">
+                <p className="text-xl font-bold text-amber-700">${summary.totalAuraboxCommission.toLocaleString('es-AR')}</p>
+                <p className="text-xs text-gray-600 mt-1">Comisión AuraBox pagada</p>
+              </div>
+            </div>
+          )}
+
+          <div className="flex justify-between items-center mb-4">
+            <h2 className="text-lg font-bold text-gray-900">Movimientos ({filteredMovements.length})</h2>
+            <button onClick={() => setShowForm(!showForm)} className="px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700">
+              {showForm ? 'Cancelar' : 'Agregar movimiento manual'}
             </button>
           </div>
 
-          {activeTab === 'movimientos' ? (
-            <div>
-              <h2 className="text-2xl font-semibold text-gray-800 mb-4">Historial de Movimientos</h2>
-              <p className="text-gray-600 mb-6">Total movimientos filtrados: {filteredMovements.length}. Balance general: ${filteredMovements.reduce((sum, m) => sum + m.amount, 0).toLocaleString()} ARS.</p>
-              
-              <div className="overflow-x-auto mb-6">
-                <table className="min-w-full divide-y divide-gray-200">
-                  <thead className="bg-gray-50">
-                    <tr>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Fecha</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Descripción</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Categoría</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tipo</th>
-                      <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Monto</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Estado</th>
-                      <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Acciones</th>
-                    </tr>
-                  </thead>
-                  <tbody className="bg-white divide-y divide-gray-200">
-                    {filteredMovements.map(renderMovementRow)}
-                  </tbody>
-                </table>
+          {showForm && (
+            <div className="border border-gray-200 rounded-xl p-4 mb-6 space-y-3">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                <select value={form.type} onChange={(e) => setForm({ ...form, type: e.target.value as 'Ingreso' | 'Egreso' })} className="px-3 py-2 border border-gray-300 rounded-lg text-sm">
+                  <option value="Egreso">Egreso</option>
+                  <option value="Ingreso">Ingreso</option>
+                </select>
+                <select value={form.category} onChange={(e) => setForm({ ...form, category: e.target.value })} className="px-3 py-2 border border-gray-300 rounded-lg text-sm">
+                  {CATEGORY_OPTIONS.map((c) => <option key={c} value={c}>{c}</option>)}
+                </select>
               </div>
-
-              {renderTotalsTable()}
+              <input type="text" placeholder="Descripción" value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm" />
+              <div className="grid grid-cols-2 gap-3">
+                <input type="number" placeholder="Monto" value={form.amount} onChange={(e) => setForm({ ...form, amount: e.target.value })} className="px-3 py-2 border border-gray-300 rounded-lg text-sm" />
+                <input type="date" value={form.entryDate} onChange={(e) => setForm({ ...form, entryDate: e.target.value })} className="px-3 py-2 border border-gray-300 rounded-lg text-sm" />
+              </div>
+              <button onClick={createEntry} className="px-4 py-2 bg-emerald-600 text-white text-sm font-medium rounded-lg hover:bg-emerald-700">
+                Guardar movimiento
+              </button>
             </div>
-          ) : (
-            renderFacturacionSection()
           )}
+
+          <div className="overflow-x-auto border border-gray-200 rounded-xl mb-8">
+            <table className="min-w-full divide-y divide-gray-100">
+              <thead className="bg-gray-50">
+                <tr>
+                  <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase">Fecha</th>
+                  <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase">Descripción</th>
+                  <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase">Categoría</th>
+                  <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase">Tipo</th>
+                  <th className="px-4 py-3 text-right text-xs font-semibold text-gray-500 uppercase">Monto</th>
+                  <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase">Estado</th>
+                  <th className="px-4 py-3 text-center text-xs font-semibold text-gray-500 uppercase">Acciones</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-100">
+                {filteredMovements.map((m) => (
+                  <tr key={m.id} className="hover:bg-gray-50">
+                    <td className="px-4 py-3 text-sm text-gray-700 whitespace-nowrap">{new Date(m.date).toLocaleDateString('es-AR')}</td>
+                    <td className="px-4 py-3 text-sm text-gray-900">{m.description}</td>
+                    <td className="px-4 py-3 text-sm text-gray-600">{m.category}</td>
+                    <td className="px-4 py-3 text-sm text-gray-600">{m.type}</td>
+                    <td className={`px-4 py-3 text-sm font-medium text-right whitespace-nowrap ${m.type === 'Ingreso' ? 'text-emerald-600' : 'text-red-600'}`}>
+                      {m.type === 'Ingreso' ? '+' : '-'}${m.amount.toLocaleString('es-AR')}
+                    </td>
+                    <td className="px-4 py-3">
+                      <span className="px-2 py-1 text-xs font-semibold rounded-full bg-gray-100 text-gray-700">{m.status}</span>
+                    </td>
+                    <td className="px-4 py-3 text-center">
+                      {m.editable ? (
+                        <button onClick={() => deleteEntry(m.id)} className="text-xs font-medium text-red-600 hover:text-red-800">Eliminar</button>
+                      ) : (
+                        <span className="text-xs text-gray-400">Automático</span>
+                      )}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+            {filteredMovements.length === 0 && <p className="text-center py-12 text-gray-500">No hay movimientos para mostrar.</p>}
+          </div>
+
+          <h3 className="text-lg font-bold text-gray-900 mb-4">Totales Mensuales</h3>
+          <div className="overflow-x-auto border border-gray-200 rounded-xl">
+            <table className="min-w-full divide-y divide-gray-100">
+              <thead className="bg-gray-50">
+                <tr>
+                  <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase">Mes</th>
+                  <th className="px-4 py-3 text-right text-xs font-semibold text-gray-500 uppercase">Ingresos</th>
+                  <th className="px-4 py-3 text-right text-xs font-semibold text-gray-500 uppercase">Egresos</th>
+                  <th className="px-4 py-3 text-right text-xs font-semibold text-gray-500 uppercase">Balance</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-100">
+                {Object.entries(monthlyTotals)
+                  .sort((a, b) => b[0].localeCompare(a[0]))
+                  .map(([month, totals]) => (
+                    <tr key={month}>
+                      <td className="px-4 py-3 text-sm text-gray-900">{month}</td>
+                      <td className="px-4 py-3 text-sm text-emerald-600 text-right">${totals.ingresos.toLocaleString('es-AR')}</td>
+                      <td className="px-4 py-3 text-sm text-red-600 text-right">${totals.egresos.toLocaleString('es-AR')}</td>
+                      <td className="px-4 py-3 text-sm font-medium text-gray-900 text-right">${totals.balance.toLocaleString('es-AR')}</td>
+                    </tr>
+                  ))}
+              </tbody>
+            </table>
+            {Object.keys(monthlyTotals).length === 0 && <p className="text-center py-12 text-gray-500">No hay datos mensuales todavía.</p>}
+          </div>
         </div>
       </div>
     </div>
