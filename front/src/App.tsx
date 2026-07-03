@@ -27,7 +27,10 @@ import PrivacyAndSecurityPolicyPage from './pages/entrepreneur/club/PrivacyAndSe
 import EntrepreneurProfilePage from './pages/entrepreneur/EntrepreneurProfilePage';
 import EditClubLegalInfoPage from './pages/entrepreneur/gestion/EditClubLegalInfoPage';
 import EditSubscriptionsPage from './pages/entrepreneur/club/EditSubscriptionsPage';
-import InventoryManagementPage from './pages/entrepreneur/gestion/InventoryManagementPage';
+import InventoryStockPage from './pages/entrepreneur/gestion/inventory/InventoryStockPage';
+import InventorySuppliersPage from './pages/entrepreneur/gestion/inventory/InventorySuppliersPage';
+import InventoryOrdersPage from './pages/entrepreneur/gestion/inventory/InventoryOrdersPage';
+import InventoryCategoriesPage from './pages/entrepreneur/gestion/inventory/InventoryCategoriesPage';
 import ActiveSubscriptionsPage from './pages/entrepreneur/operations/clients/ActiveSubscriptionsPage';
 import CustomerHistoryPage from './pages/entrepreneur/operations/clients/CustomerHistoryPage';
 import ManageCustomersPage from './pages/entrepreneur/operations/clients/ManageCustomersPage';
@@ -44,6 +47,7 @@ import ClubStatsPage from './pages/entrepreneur/administration_tools/analysis_an
 import SalesReportsPage from './pages/entrepreneur/administration_tools/analysis_and_reports/SalesReportsPage';
 import FeedbackTrendsPage from './pages/entrepreneur/administration_tools/analysis_and_reports/FeedbackTrendsPage';
 import FinancialMovementsPage from './pages/entrepreneur/administration_tools/analysis_and_reports/finance_and_team/FinancialMovementsPage';
+import ProfitabilityPage from './pages/entrepreneur/administration_tools/analysis_and_reports/finance_and_team/ProfitabilityPage';
 import ManageUsersAndRolesPage from './pages/entrepreneur/administration_tools/analysis_and_reports/finance_and_team/ManageUsersAndRolesPage';
 import GeneralSettingsPage from './pages/entrepreneur/administration_tools/analysis_and_reports/finance_and_team/GeneralSettingsPage';
 import api from './api/config';
@@ -185,10 +189,14 @@ const AppContent: React.FC = () => {
           <Route path="/entrepreneur/club/:clubId/edit-terms" element={pr(['entrepreneur'], <EditClubLegalInfoPage />)} />
           <Route path="/entrepreneur/club/:clubId/edit-policies" element={pr(['entrepreneur'], <EditClubLegalInfoPage />)} />
           <Route path="/entrepreneur/club/:clubId/edit-subscriptions" element={pr(['entrepreneur'], <EditSubscriptionsPage />)} />
-          <Route path="/entrepreneur/club/:clubId/financial-management" element={pr(['entrepreneur'], <FinancialMovementsPage />)} />
+          <Route path="/entrepreneur/club/:clubId/finance/movimientos" element={pr(['entrepreneur'], <FinancialMovementsPage />)} />
+          <Route path="/entrepreneur/club/:clubId/finance/rentabilidad" element={pr(['entrepreneur'], <ProfitabilityPage />)} />
           <Route path="/entrepreneur/club/:clubId/manage-users-roles" element={pr(['entrepreneur'], <ManageUsersAndRolesPage />)} />
           <Route path="/entrepreneur/club/:clubId/general-settings" element={pr(['entrepreneur'], <GeneralSettingsPage />)} />
-          <Route path="/entrepreneur/inventory-management" element={pr(['entrepreneur'], <InventoryManagementPage />)} />
+          <Route path="/entrepreneur/inventory/stock" element={pr(['entrepreneur'], <InventoryStockPage />)} />
+          <Route path="/entrepreneur/inventory/proveedores" element={pr(['entrepreneur'], <InventorySuppliersPage />)} />
+          <Route path="/entrepreneur/inventory/pedidos" element={pr(['entrepreneur'], <InventoryOrdersPage />)} />
+          <Route path="/entrepreneur/inventory/categorias" element={pr(['entrepreneur'], <InventoryCategoriesPage />)} />
           <Route path="/entrepreneur/club/:clubId/active-subscriptions" element={pr(['entrepreneur'], <ActiveSubscriptionsPage />)} />
           <Route path="/entrepreneur/club/:clubId/customer-history" element={pr(['entrepreneur'], <CustomerHistoryPage />)} />
           <Route path="/entrepreneur/club/:clubId/customer-history/:customerId" element={pr(['entrepreneur'], <CustomerHistoryPage />)} />

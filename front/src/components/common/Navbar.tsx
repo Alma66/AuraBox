@@ -183,11 +183,22 @@ const Navbar: React.FC<NavbarProps> = ({ userRole, isAuthenticated, onLogout }) 
         </div>
         <div className="relative" ref={gestionMenuRef}>
           <button onClick={toggleGestionMenu} className={btnClass}>
-            Inventario y Proveedores <DropdownArrow isOpen={isGestionMenuOpen} />
+            Operación y Finanzas <DropdownArrow isOpen={isGestionMenuOpen} />
           </button>
           {isGestionMenuOpen && (
-            <div className="absolute left-0 mt-2 w-56 bg-white rounded-md shadow-lg py-2 z-20">
-              <Link to={`/entrepreneur/inventory-management`} className={linkClass} onClick={closeAllDropdowns}>Inventario y Proveedores</Link>
+            <div className="absolute left-0 mt-2 w-96 bg-white rounded-md shadow-lg py-2 z-20 grid grid-cols-2 gap-x-2 px-3">
+              <div>
+                <p className={subTitleClass}>Inventario y Proveedores</p>
+                <Link to={`/entrepreneur/inventory/stock`} className={linkClass} onClick={closeAllDropdowns}>Stock e Insumos</Link>
+                <Link to={`/entrepreneur/inventory/proveedores`} className={linkClass} onClick={closeAllDropdowns}>Proveedores</Link>
+                <Link to={`/entrepreneur/inventory/pedidos`} className={linkClass} onClick={closeAllDropdowns}>Pedidos a Proveedores</Link>
+                <Link to={`/entrepreneur/inventory/categorias`} className={linkClass} onClick={closeAllDropdowns}>Categorías de Insumos</Link>
+              </div>
+              <div>
+                <p className={subTitleClass}>Finanzas</p>
+                <Link to={`/entrepreneur/club/${clubId}/finance/movimientos`} className={linkClass} onClick={closeAllDropdowns}>Caja y Movimientos</Link>
+                <Link to={`/entrepreneur/club/${clubId}/finance/rentabilidad`} className={linkClass} onClick={closeAllDropdowns}>Costos y Rentabilidad</Link>
+              </div>
             </div>
           )}
         </div>
@@ -246,8 +257,7 @@ const Navbar: React.FC<NavbarProps> = ({ userRole, isAuthenticated, onLogout }) 
                 <Link to={`/entrepreneur/club/${clubId}/feedback-trends`} className={linkClass} onClick={closeAllDropdowns}>Feedback y Tendencias</Link>
               </div>
               <div>
-                <p className={subTitleClass}>Finanzas y Equipo</p>
-                <Link to={`/entrepreneur/club/${clubId}/financial-management`} className={linkClass} onClick={closeAllDropdowns}>Gestión Financiera</Link>
+                <p className={subTitleClass}>Equipo</p>
                 <Link to={`/entrepreneur/club/${clubId}/manage-users-roles`} className={linkClass} onClick={closeAllDropdowns}>Usuarios y Roles</Link>
                 <Link to={`/entrepreneur/club/${clubId}/general-settings`} className={linkClass} onClick={closeAllDropdowns}>Ajustes Generales</Link>
               </div>
@@ -275,11 +285,18 @@ const Navbar: React.FC<NavbarProps> = ({ userRole, isAuthenticated, onLogout }) 
           </div>
         )}
         <button onClick={() => toggleMobileSubMenu('gestion')} className="flex items-center justify-between w-full text-gray-700 hover:bg-gray-50 hover:text-blue-600 px-3 py-2 rounded-md text-base font-medium">
-          Inventario y Proveedores <DropdownArrow isOpen={isMobileSubMenuOpen === 'gestion'} />
+          Operación y Finanzas <DropdownArrow isOpen={isMobileSubMenuOpen === 'gestion'} />
         </button>
         {isMobileSubMenuOpen === 'gestion' && (
           <div className="pl-6 pr-3 py-1 space-y-1">
-            <Link to={`/entrepreneur/inventory-management`} className="block text-sm text-gray-700 hover:bg-gray-100 py-1" onClick={closeAllDropdowns}>Inventario y Proveedores</Link>
+            <p className="block text-xs font-semibold text-gray-500 uppercase py-1">Inventario y Proveedores</p>
+            <Link to={`/entrepreneur/inventory/stock`} className="block text-sm text-gray-700 hover:bg-gray-100 py-1" onClick={closeAllDropdowns}>Stock e Insumos</Link>
+            <Link to={`/entrepreneur/inventory/proveedores`} className="block text-sm text-gray-700 hover:bg-gray-100 py-1" onClick={closeAllDropdowns}>Proveedores</Link>
+            <Link to={`/entrepreneur/inventory/pedidos`} className="block text-sm text-gray-700 hover:bg-gray-100 py-1" onClick={closeAllDropdowns}>Pedidos a Proveedores</Link>
+            <Link to={`/entrepreneur/inventory/categorias`} className="block text-sm text-gray-700 hover:bg-gray-100 py-1" onClick={closeAllDropdowns}>Categorías de Insumos</Link>
+            <p className="block text-xs font-semibold text-gray-500 uppercase py-1 mt-2">Finanzas</p>
+            <Link to={`/entrepreneur/club/${clubId}/finance/movimientos`} className="block text-sm text-gray-700 hover:bg-gray-100 py-1" onClick={closeAllDropdowns}>Caja y Movimientos</Link>
+            <Link to={`/entrepreneur/club/${clubId}/finance/rentabilidad`} className="block text-sm text-gray-700 hover:bg-gray-100 py-1" onClick={closeAllDropdowns}>Costos y Rentabilidad</Link>
           </div>
         )}
         <button onClick={() => toggleMobileSubMenu('operations')} className="flex items-center justify-between w-full text-gray-700 hover:bg-gray-50 hover:text-blue-600 px-3 py-2 rounded-md text-base font-medium">
@@ -321,8 +338,7 @@ const Navbar: React.FC<NavbarProps> = ({ userRole, isAuthenticated, onLogout }) 
             <Link to={`/entrepreneur/club/${clubId}/stats`} className="block text-sm text-gray-700 hover:bg-gray-100 py-1" onClick={closeAllDropdowns}>Estadísticas</Link>
             <Link to={`/entrepreneur/club/${clubId}/sales-reports`} className="block text-sm text-gray-700 hover:bg-gray-100 py-1" onClick={closeAllDropdowns}>Reportes de Ventas</Link>
             <Link to={`/entrepreneur/club/${clubId}/feedback-trends`} className="block text-sm text-gray-700 hover:bg-gray-100 py-1" onClick={closeAllDropdowns}>Feedback y Tendencias</Link>
-            <p className="block text-xs font-semibold text-gray-500 uppercase py-1 mt-2">Finanzas y Equipo</p>
-            <Link to={`/entrepreneur/club/${clubId}/financial-management`} className="block text-sm text-gray-700 hover:bg-gray-100 py-1" onClick={closeAllDropdowns}>Gestión Financiera</Link>
+            <p className="block text-xs font-semibold text-gray-500 uppercase py-1 mt-2">Equipo</p>
             <Link to={`/entrepreneur/club/${clubId}/manage-users-roles`} className="block text-sm text-gray-700 hover:bg-gray-100 py-1" onClick={closeAllDropdowns}>Usuarios y Roles</Link>
             <Link to={`/entrepreneur/club/${clubId}/general-settings`} className="block text-sm text-gray-700 hover:bg-gray-100 py-1" onClick={closeAllDropdowns}>Ajustes Generales</Link>
           </div>
