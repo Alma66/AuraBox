@@ -65,8 +65,14 @@ const InventoryOrdersPage: React.FC = () => {
     fetchAll();
   }, [authLoading, userRole, idClub, navigate, fetchAll]);
 
-  const productName = (id: number) => products.find((p) => p.id === id)?.name ?? `Producto #${id}`;
-  const supplierName = (id: number) => suppliers.find((s) => s.id === id)?.name ?? `Proveedor #${id}`;
+  const productName = useCallback(
+    (id: number) => products.find((p) => p.id === id)?.name ?? `Producto #${id}`,
+    [products]
+  );
+  const supplierName = useCallback(
+    (id: number) => suppliers.find((s) => s.id === id)?.name ?? `Proveedor #${id}`,
+    [suppliers]
+  );
 
   const createOrder = async () => {
     if (!form.idSupplier || !form.idProductInventory || !form.quantity || !form.totalCost) {
@@ -142,7 +148,7 @@ const InventoryOrdersPage: React.FC = () => {
     orders.forEach((o) => { counts[o.idProductInventory] = (counts[o.idProductInventory] ?? 0) + Number(o.quantity); });
     const topId = Object.entries(counts).sort((a, b) => b[1] - a[1])[0]?.[0];
     return topId ? productName(Number(topId)) : '—';
-  }, [orders, products]);
+  }, [orders, productName]);
 
   if (authLoading || loading) {
     return <div className="text-center py-20 text-gray-500">Cargando pedidos...</div>;

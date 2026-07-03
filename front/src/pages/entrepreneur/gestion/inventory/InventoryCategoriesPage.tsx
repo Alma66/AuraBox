@@ -90,8 +90,14 @@ const InventoryCategoriesPage: React.FC = () => {
     }
   };
 
-  const productsCount = (catId: number) => products.filter((p) => p.idSupplyCategory === catId).length;
-  const suppliersCount = (catId: number) => suppliers.filter((s) => s.categoryIds.includes(catId)).length;
+  const productsCount = useCallback(
+    (catId: number) => products.filter((p) => p.idSupplyCategory === catId).length,
+    [products]
+  );
+  const suppliersCount = useCallback(
+    (catId: number) => suppliers.filter((s) => s.categoryIds.includes(catId)).length,
+    [suppliers]
+  );
 
   const filtered = useMemo(() => {
     return categories.filter((c) => !search.trim() || c.name.toLowerCase().includes(search.trim().toLowerCase()));
@@ -101,7 +107,7 @@ const InventoryCategoriesPage: React.FC = () => {
     if (categories.length === 0) return '—';
     const sorted = [...categories].sort((a, b) => productsCount(b.id) - productsCount(a.id));
     return sorted[0]?.name ?? '—';
-  }, [categories, products]);
+  }, [categories, productsCount]);
 
   if (authLoading || loading) {
     return <div className="text-center py-20 text-gray-500">Cargando categorías...</div>;
