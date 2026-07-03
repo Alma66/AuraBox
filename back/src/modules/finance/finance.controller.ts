@@ -20,6 +20,11 @@ export class FinanceController {
     return this.svc.getMovements(idClub);
   }
 
+  @Get('profitability/by-club/:idClub')
+  async getProfitability(@Param('idClub', ParseIntPipe) idClub: number) {
+    return this.svc.getProfitability(idClub);
+  }
+
   @Post('entries')
   @UsePipes(new ValidationPipe({ whitelist: true, transform: true }))
   async createEntry(@Body() dto: CreateFinancialEntryDto) {

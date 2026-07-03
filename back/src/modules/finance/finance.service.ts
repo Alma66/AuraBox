@@ -3,7 +3,7 @@ import { PrismaService } from '../../prisma/prisma.service';
 import { CreateFinancialEntryDto } from './dto/create-financial-entry.dto';
 import { UpdateFinancialEntryDto } from './dto/update-financial-entry.dto';
 
-export interface UnifiedMovement {
+interface UnifiedMovement {
   id: string;
   source: 'payment_income' | 'payment_commission' | 'supply_order' | 'manual';
   date: string;
@@ -119,6 +119,81 @@ export class FinanceService {
         balance: totalIngresos - totalEgresos,
         totalAuraboxCommission: movements.filter((m) => m.source === 'payment_commission').reduce((s, m) => s + m.amount, 0),
         totalSupplyExpenses: movements.filter((m) => m.source === 'supply_order').reduce((s, m) => s + m.amount, 0),
+      },
+    };
+  }
+
+  async getProfitability(idClub: number) {
+    const subscriptionTypes = await this.prisma.subscription_Types.findMany({ where: { idClub } });
+    const subTypeIds = subscriptionTypes.map((s) => s.id);
+
+    const userSubs = await this.prisma.user_Subscriptions.findMany({
+      where: { idSubscriptionTypes: { in: subTypeIds } },
+      select: { id: true, idSubscriptionTypes: true, subscriptionStatus: true },
+    });
+    const subTypeByUserSubId = new Map(userSubs.map((us) => [us.id, us.idSubscriptionTypes]));
+
+    const activeCountByType: Record<number, number> = {};
+    for (const us of userSubs) {
+      if (us.subscriptionStatus === 'Activa') {
+        activeCountByType[us.idSubscriptionTypes] = (activeCountByType[us.idSubscriptionTypes] ?? 0) + 1;
+      }
+    }
+
+    const payments = await this.prisma.payment.findMany({ where: { idClub, paymentStatus: 'Exitoso' } });
+    const revenueByType: Record<number, number> = {};
+    const commissionByType: Record<number, number> = {};
+    for (const p of payments) {
+      const typeId = subTypeByUserSubId.get(p.idUserSubscription);
+      if (!typeId) continue;
+      revenueByType[typeId] = (revenueByType[typeId] ?? 0) + Number(p.clubAmount);
+      commissionByType[typeId] = (commissionByType[typeId] ?? 0) + Number(p.commissionAmount);
+    }
+
+    const shipments = await this.prisma.shipments.findMany({
+      where: { idClub },
+      select: { idUserSubscriptions: true, shippingCost: true },
+    });
+    const shippingByType: Record<number, number> = {};
+    for (const s of shipments) {
+      const typeId = subTypeByUserSubId.get(s.idUserSubscriptions);
+      if (!typeId || !s.shippingCost) continue;
+      shippingByType[typeId] = (shippingByType[typeId] ?? 0) + Number(s.shippingCost);
+    }
+
+    const supplyOrders = await this.prisma.supply_Order.findMany({ where: { idClub, status: 'Recibido' } });
+    const totalSupplyCost = supplyOrders.reduce((s, o) => s + Number(o.totalCost), 0);
+    const totalRevenueAllTypes = Object.values(revenueByType).reduce((s, v) => s + v, 0);
+
+    const breakdown = subscriptionTypes.map((st) => {
+      const revenue = revenueByType[st.id] ?? 0;
+      const commission = commissionByType[st.id] ?? 0;
+      const shipping = shippingByType[st.id] ?? 0;
+      const revenueShare = totalRevenueAllTypes > 0 ? revenue / totalRevenueAllTypes : 0;
+      const allocatedInventoryCost = totalSupplyCost * revenueShare;
+      const netMargin = revenue - commission - shipping - allocatedInventoryCost;
+      return {
+        idSubscriptionType: st.id,
+        name: st.name,
+        basePrice: Number(st.basePrice),
+        activeSubscribers: activeCountByType[st.id] ?? 0,
+        revenue,
+        auraboxCommission: commission,
+        shippingCost: shipping,
+        allocatedInventoryCost,
+        netMargin,
+        marginPercent: revenue > 0 ? (netMargin / revenue) * 100 : 0,
+      };
+    });
+
+    return {
+      breakdown,
+      totals: {
+        totalRevenue: totalRevenueAllTypes,
+        totalCommission: Object.values(commissionByType).reduce((s, v) => s + v, 0),
+        totalShipping: Object.values(shippingByType).reduce((s, v) => s + v, 0),
+        totalInventoryCost: totalSupplyCost,
+        totalNetMargin: breakdown.reduce((s, b) => s + b.netMargin, 0),
       },
     };
   }
