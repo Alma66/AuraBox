@@ -3,7 +3,7 @@ import { PrismaService } from '../../prisma/prisma.service';
 import { CreateFinancialEntryDto } from './dto/create-financial-entry.dto';
 import { UpdateFinancialEntryDto } from './dto/update-financial-entry.dto';
 
-interface UnifiedMovement {
+export interface UnifiedMovement {
   id: string;
   source: 'payment_income' | 'payment_commission' | 'supply_order' | 'manual';
   date: string;
