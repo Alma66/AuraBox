@@ -32,3 +32,29 @@ export interface FinancialData {
   monthlyTotals: Record<string, MonthlyTotal>;
   summary: FinanceSummary;
 }
+
+export interface ProfitabilityBreakdownItem {
+  idSubscriptionType: number;
+  name: string;
+  basePrice: number;
+  activeSubscribers: number;
+  revenue: number;
+  auraboxCommission: number;
+  shippingCost: number;
+  allocatedInventoryCost: number;
+  netMargin: number;
+  marginPercent: number;
+}
+
+export interface ProfitabilityTotals {
+  totalRevenue: number;
+  totalCommission: number;
+  totalShipping: number;
+  totalInventoryCost: number;
+  totalNetMargin: number;
+}
+
+export interface ProfitabilityData {
+  breakdown: ProfitabilityBreakdownItem[];
+  totals: ProfitabilityTotals;
+}

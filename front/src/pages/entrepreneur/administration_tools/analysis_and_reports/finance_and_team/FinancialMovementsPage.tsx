@@ -29,6 +29,7 @@ const FinancialMovementsPage: React.FC = () => {
   const [dateFrom, setDateFrom] = useState('');
   const [dateTo, setDateTo] = useState('');
   const [statusFilter, setStatusFilter] = useState('todos');
+  const [search, setSearch] = useState('');
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
   const [form, setForm] = useState(emptyForm);
@@ -72,9 +73,10 @@ const FinancialMovementsPage: React.FC = () => {
     if (dateFrom) filtered = filtered.filter((m) => new Date(m.date) >= new Date(dateFrom));
     if (dateTo) filtered = filtered.filter((m) => new Date(m.date) <= new Date(dateTo + 'T23:59:59'));
     if (statusFilter !== 'todos') filtered = filtered.filter((m) => m.status === statusFilter);
+    if (search.trim()) filtered = filtered.filter((m) => m.description.toLowerCase().includes(search.trim().toLowerCase()));
 
     return filtered;
-  }, [movements, activeFilter, dateFrom, dateTo, statusFilter]);
+  }, [movements, activeFilter, dateFrom, dateTo, statusFilter, search]);
 
   const handleDateFilterChange = (from: string, to: string) => {
     setDateFrom(from);
@@ -116,13 +118,33 @@ const FinancialMovementsPage: React.FC = () => {
     }
   };
 
+  const exportCsv = () => {
+    const header = ['Fecha', 'Descripción', 'Categoría', 'Tipo', 'Monto', 'Estado'];
+    const rows = filteredMovements.map((m) => [
+      new Date(m.date).toLocaleDateString('es-AR'),
+      m.description,
+      m.category,
+      m.type,
+      m.amount,
+      m.status,
+    ]);
+    const csv = [header, ...rows].map((r) => r.map((v) => `"${String(v).replace(/"/g, '""')}"`).join(',')).join('\n');
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = 'caja-y-movimientos.csv';
+    link.click();
+    URL.revokeObjectURL(url);
+  };
+
   if (loading) {
     return <div className="text-center py-20 text-gray-500">Cargando movimientos financieros...</div>;
   }
 
   return (
     <div className="container mx-auto px-4 py-10 max-w-7xl">
-      <h1 className="text-2xl font-bold text-gray-900 mb-8">Gestión Financiera — {clubName}</h1>
+      <h1 className="text-2xl font-bold text-gray-900 mb-8">Caja y Movimientos — {clubName}</h1>
 
       <div className="flex flex-col lg:flex-row gap-8">
         <div className="lg:w-1/4">
@@ -160,11 +182,17 @@ const FinancialMovementsPage: React.FC = () => {
             </div>
           )}
 
-          <div className="flex justify-between items-center mb-4">
+          <div className="flex flex-wrap justify-between items-center gap-3 mb-4">
             <h2 className="text-lg font-bold text-gray-900">Movimientos ({filteredMovements.length})</h2>
-            <button onClick={() => setShowForm(!showForm)} className="px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700">
-              {showForm ? 'Cancelar' : 'Agregar movimiento manual'}
-            </button>
+            <div className="flex gap-2">
+              <input type="text" placeholder="Buscar por descripción..." value={search} onChange={(e) => setSearch(e.target.value)} className="px-3 py-2 border border-gray-300 rounded-lg text-sm" />
+              <button onClick={exportCsv} className="px-4 py-2 bg-gray-100 text-gray-700 text-sm font-medium rounded-lg hover:bg-gray-200">
+                Exportar CSV
+              </button>
+              <button onClick={() => setShowForm(!showForm)} className="px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700">
+                {showForm ? 'Cancelar' : 'Agregar movimiento manual'}
+              </button>
+            </div>
           </div>
 
           {showForm && (
