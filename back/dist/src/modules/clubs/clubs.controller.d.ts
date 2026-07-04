@@ -1,0 +1,73 @@
+import { ClubsService } from './clubs.service';
+import { CreateClubDto } from './dto/create-club.dto';
+import { UpdateClubDto } from './dto/update-club.dto';
+import { ShipmentsService } from '../shipments/shipments.service';
+import { RiderProfileService } from '../rider-profile/rider-profile.service';
+import { AssignDeliveryDto } from '../shipments/dto/assign-delivery.dto';
+export declare class ClubsController {
+    private readonly clubsService;
+    private readonly shipmentsService;
+    private readonly riderProfileService;
+    constructor(clubsService: ClubsService, shipmentsService: ShipmentsService, riderProfileService: RiderProfileService);
+    create(dto: CreateClubDto): Promise<{
+        name: string;
+        id: number;
+        logoUrl: string;
+        slogan: string | null;
+        history: string | null;
+        shortDescription: string;
+        contactEmail: string;
+        whatsappContact: string | null;
+        clubStatus: import("@prisma/client").$Enums.ClubStatus;
+        creationDate: Date;
+        averageRating: import("@prisma/client/runtime/library").Decimal | null;
+        totalReviews: number;
+        communityText: string | null;
+        milestones: string | null;
+        shippingWindowStartDay: number | null;
+        shippingWindowEndDay: number | null;
+    }>;
+    findAll(search?: string, category?: string, minRating?: string, minReviews?: string): Promise<any[]>;
+    findFeatured(): Promise<any[]>;
+    findOne(id: number, req: any): Promise<any>;
+    getClubSubscriptions(id: number, req: any): Promise<any[]>;
+    getClubCustomers(id: number, req: any): Promise<{
+        registrationDate: string;
+        birthDate: string | null;
+        id: number;
+        firstName: string;
+        lastName: string;
+        email: string;
+        active: boolean;
+        phoneNumber: number | null;
+        streetAddress: string | null;
+        addressNumber: number | null;
+        floorNumber: string | null;
+        addressDetails: string | null;
+        city: string | null;
+        province: string | null;
+        postalCode: string | null;
+    }[]>;
+    getClubDeliveries(id: number, req: any): Promise<any[]>;
+    getClubRiders(id: number, req: any): Promise<{
+        id: number;
+        firstName: string;
+        lastName: string;
+        email: string;
+        phoneNumber: number | null;
+        vehicleType: import("@prisma/client").$Enums.VehicleType | null;
+        licensePlate: string | null;
+        availability: boolean;
+        isActive: boolean;
+        zonesCovered: string | null;
+        costPerKm: string | null;
+        totalDeliveries: number;
+        currentAssignments: number;
+    }[]>;
+    assignDelivery(id: number, shipmentId: number, dto: AssignDeliveryDto, req: any): Promise<any>;
+    update(id: number, dto: UpdateClubDto, req: any): Promise<any>;
+    updateLogo(id: number, file: Express.Multer.File, req: any): Promise<any>;
+    remove(id: number): Promise<{
+        ok: boolean;
+    }>;
+}

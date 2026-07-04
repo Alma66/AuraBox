@@ -60,6 +60,16 @@ model Categories {
   @@map("Categories")
 }
 
+model Cart_Item {
+  id                  Int      @id @default(autoincrement()) @map("ID")
+  idUser              Int      @map("ID_User")
+  idSubscriptionTypes Int      @map("ID_Subscription_Types")
+  idPreferredCourier  Int?     @map("ID_Preferred_Courier")
+  addedAt             DateTime @default(now()) @map("Added_At")
+  @@unique([idUser, idSubscriptionTypes])
+  @@map("Cart_Item")
+}
+
 model Club {
   id               Int        @id @default(autoincrement()) @map("ID")
   name             String     @map("Name")
@@ -75,6 +85,8 @@ model Club {
   totalReviews     Int        @default(0) @map("Total_Reviews")
   communityText    String?    @map("Community_Text")
   milestones       String?    @map("Milestones")
+  shippingWindowStartDay Int? @map("Shipping_Window_Start_Day") 
+  shippingWindowEndDay   Int? @map("Shipping_Window_End_Day")   
 
   @@map("Club")
 }
@@ -235,7 +247,9 @@ model Payment {
   commissionAmount     Decimal       @map("Commission_Amount") @db.Decimal(10, 2)
   paymentDate          DateTime      @default(now()) @map("Payment_Date")
   paymentStatus        PaymentStatus @map("Payment_Status")
-
+  cashPaymentCode      String?   @map("Cash_Payment_Code")
+  cashPaymentExpiresAt DateTime? @map("Cash_Payment_Expires_At")
+  
   @@map("Payment")
 }
 

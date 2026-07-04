@@ -24,6 +24,11 @@ export class FavoritesController {
     return this.favoritesService.create(dto);
   }
 
+  @Post('toggle/:idClub')
+  async toggle(@Param('idClub', ParseIntPipe) idClub: number, @Request() req) {
+    return this.favoritesService.toggle(req.user.id, idClub);
+  }
+
   @UseGuards(RolesGuard)
   @Roles('admin')
   @Get()
@@ -36,7 +41,7 @@ export class FavoritesController {
     if (req.user.id !== idUser && req.user.role !== 'admin') {
       throw new ForbiddenException('No autorizado para ver estos favoritos');
     }
-    return this.favoritesService.findByUser(idUser);
+    return this.favoritesService.findByUserEnriched(idUser);
   }
 
   @UseGuards(RolesGuard)
@@ -44,6 +49,11 @@ export class FavoritesController {
   @Get('by-club/:idClub')
   async findByClub(@Param('idClub', ParseIntPipe) idClub: number) {
     return this.favoritesService.findByClub(idClub);
+  }
+
+  @Get('check/:idClub')
+  async check(@Param('idClub', ParseIntPipe) idClub: number, @Request() req) {
+    return this.favoritesService.check(req.user.id, idClub);
   }
 
   @Get(':id')
@@ -61,6 +71,11 @@ export class FavoritesController {
   @UsePipes(new ValidationPipe({ whitelist: true, transform: true }))
   async update(@Param('id', ParseIntPipe) id: number, @Body() dto: UpdateFavoriteDto) {
     return this.favoritesService.update(id, dto);
+  }
+
+  @Delete('by-club/:idClub')
+  async removeByClub(@Param('idClub', ParseIntPipe) idClub: number, @Request() req) {
+    return this.favoritesService.removeByUserAndClub(req.user.id, idClub);
   }
 
   @UseGuards(RolesGuard)
