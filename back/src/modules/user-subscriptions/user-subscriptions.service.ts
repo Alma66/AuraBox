@@ -40,7 +40,7 @@ export class UserSubscriptionsService {
       where: {
         idUser: userId,
         idSubscriptionTypes: dto.idSubscriptionTypes,
-        subscriptionStatus: { not: 'CANCELLED' as any },
+        subscriptionStatus: { not: 'Cancelada' as any },
       },
     });
     if (existing) throw new BadRequestException('Ya tienes una suscripción activa a este tipo');
@@ -51,7 +51,7 @@ export class UserSubscriptionsService {
       idSubscriptionTypes: dto.idSubscriptionTypes,
       startDate: dto.startDate ?? new Date(),
       expectedEndDate: dto.expectedEndDate ?? undefined,
-      subscriptionStatus: 'ACTIVA' as any,
+      subscriptionStatus: 'Activa' as any,
       lastPaymentDate: undefined,
       nextPaymentDate: undefined,
       monthlyAmountPaid: dto.monthlyAmountPaid ?? undefined,
@@ -110,7 +110,7 @@ export class UserSubscriptionsService {
     const updated = await this.prisma.user_Subscriptions.update({
       where: { id },
       data: {
-        subscriptionStatus: 'CANCELADA' as any,
+        subscriptionStatus: 'Cancelada' as any,
         cancellationReason: reason ?? undefined,
         cancellationDate: new Date(),
       },
