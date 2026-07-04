@@ -18,15 +18,16 @@ export class FavoritesController {
   @Post()
   @UsePipes(new ValidationPipe({ whitelist: true, transform: true }))
   async create(@Body() dto: CreateFavoriteDto, @Request() req) {
-    if (req.user.id !== dto.idUser && req.user.role !== 'admin') {
+    const idUser = dto.idUser ?? req.user.id;
+    if (req.user.id !== idUser && req.user.role !== 'admin') {
       throw new ForbiddenException('No autorizado para crear este favorito');
     }
-    return this.favoritesService.create(dto);
+    return this.favoritesService.create({ ...dto, idUser });
   }
 
-  @Post('toggle/:idClub')
-  async toggle(@Param('idClub', ParseIntPipe) idClub: number, @Request() req) {
-    return this.favoritesService.toggle(req.user.id, idClub);
+  @Post('toggle/:idSubscriptionTypes')
+  async toggle(@Param('idSubscriptionTypes', ParseIntPipe) idSubscriptionTypes: number, @Request() req) {
+    return this.favoritesService.toggle(req.user.id, idSubscriptionTypes);
   }
 
   @UseGuards(RolesGuard)
@@ -46,14 +47,14 @@ export class FavoritesController {
 
   @UseGuards(RolesGuard)
   @Roles('entrepreneur', 'admin')
-  @Get('by-club/:idClub')
-  async findByClub(@Param('idClub', ParseIntPipe) idClub: number) {
-    return this.favoritesService.findByClub(idClub);
+  @Get('by-plan/:idSubscriptionTypes')
+  async findByPlan(@Param('idSubscriptionTypes', ParseIntPipe) idSubscriptionTypes: number) {
+    return this.favoritesService.findByPlan(idSubscriptionTypes);
   }
 
-  @Get('check/:idClub')
-  async check(@Param('idClub', ParseIntPipe) idClub: number, @Request() req) {
-    return this.favoritesService.check(req.user.id, idClub);
+  @Get('check/:idSubscriptionTypes')
+  async check(@Param('idSubscriptionTypes', ParseIntPipe) idSubscriptionTypes: number, @Request() req) {
+    return this.favoritesService.check(req.user.id, idSubscriptionTypes);
   }
 
   @Get(':id')
@@ -71,11 +72,6 @@ export class FavoritesController {
   @UsePipes(new ValidationPipe({ whitelist: true, transform: true }))
   async update(@Param('id', ParseIntPipe) id: number, @Body() dto: UpdateFavoriteDto) {
     return this.favoritesService.update(id, dto);
-  }
-
-  @Delete('by-club/:idClub')
-  async removeByClub(@Param('idClub', ParseIntPipe) idClub: number, @Request() req) {
-    return this.favoritesService.removeByUserAndClub(req.user.id, idClub);
   }
 
   @UseGuards(RolesGuard)

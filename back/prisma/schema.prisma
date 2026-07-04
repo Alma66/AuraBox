@@ -205,11 +205,12 @@ model Entrepreneur_Licenses {
 }
 
 model Favorites {
-  id        Int      @id @default(autoincrement()) @map("ID")
-  idUser    Int      @map("ID_User")
-  idClub    Int      @map("ID_Club")
-  dateAdded DateTime @default(now()) @map("Date_Added")
+  id                  Int      @id @default(autoincrement()) @map("ID")
+  idUser              Int      @map("ID_User")
+  idSubscriptionTypes Int      @map("ID_Subscription_Types")
+  dateAdded           DateTime @default(now()) @map("Date_Added")
 
+  @@unique([idUser, idSubscriptionTypes])
   @@map("Favorites")
 }
 

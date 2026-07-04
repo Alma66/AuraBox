@@ -1,5 +1,7 @@
-import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
+import { useAuth } from '../../App';
+import api, { getResponseData } from '../../api/config';
 
 interface Specification {
   type: string;
@@ -36,6 +38,11 @@ const SubscriptionPlanCard: React.FC<SubscriptionPlanCardProps> = ({ plan, clubN
   const [showFullDescription, setShowFullDescription] = useState(false);
   const [showFullIncludes, setShowFullIncludes] = useState(false);
   const [showFullSpecs, setShowFullSpecs] = useState(false);
+  const [isFavorite, setIsFavorite] = useState(false);
+  const [favoriteLoading, setFavoriteLoading] = useState(false);
+  const { isAuthenticated, userRole } = useAuth();
+  const navigate = useNavigate();
+  const location = useLocation();
 
   const includes = plan.includes ?? [];
   const specifications = plan.specifications ?? [];
@@ -47,9 +54,32 @@ const SubscriptionPlanCard: React.FC<SubscriptionPlanCardProps> = ({ plan, clubN
     plan.transferDiscount ?? plan.descuentoTransferencia ?? 0,
   );
   const precioFinal = plan.price * (1 - descuento / 100);
+  const canShowFavorite = userRole !== 'entrepreneur' && userRole !== 'admin';
 
-  const handleAddToWishlist = () => {
-    alert(`"${plan.name}" de ${clubName} añadido a tu lista de deseos.`);
+  useEffect(() => {
+    const checkFavorite = async () => {
+      if (!isAuthenticated || !canShowFavorite) return;
+      try {
+        const res = await api.get(`/favorites/check/${plan.planId}`);
+        setIsFavorite(getResponseData(res)?.isFavorite ?? false);
+      } catch {}
+    };
+    checkFavorite();
+  }, [plan.planId, isAuthenticated, canShowFavorite]);
+
+  const handleAddToWishlist = async () => {
+    if (!isAuthenticated) {
+      navigate(`/login?redirect=${encodeURIComponent(location.pathname)}`);
+      return;
+    }
+    setFavoriteLoading(true);
+    try {
+      const res = await api.post(`/favorites/toggle/${plan.planId}`);
+      setIsFavorite(getResponseData(res)?.isFavorite ?? false);
+    } catch {
+    } finally {
+      setFavoriteLoading(false);
+    }
   };
 
   return (
@@ -66,15 +96,18 @@ const SubscriptionPlanCard: React.FC<SubscriptionPlanCardProps> = ({ plan, clubN
       )}
       <div className="relative">
         <img src={plan.image} alt={plan.name} className="w-full h-48 object-cover" />
-        <button
-          onClick={handleAddToWishlist}
-          className="absolute top-3 right-3 bg-white p-2 rounded-full shadow-md text-gray-500 hover:text-red-500 hover:scale-110 transition-all duration-200"
-          aria-label={`Añadir ${plan.name} a lista de deseos`}
-        >
-          <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-            <path strokeLinecap="round" strokeLinejoin="round" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
-          </svg>
-        </button>
+        {canShowFavorite && (
+          <button
+            onClick={handleAddToWishlist}
+            disabled={favoriteLoading}
+            className={`absolute top-3 right-3 bg-white p-2 rounded-full shadow-md hover:scale-110 transition-all duration-200 disabled:opacity-50 ${isFavorite ? 'text-red-500' : 'text-gray-500 hover:text-red-500'}`}
+            aria-label={`${isFavorite ? 'Quitar' : 'Añadir'} ${plan.name} de lista de deseos`}
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill={isFavorite ? 'currentColor' : 'none'} viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+            </svg>
+          </button>
+        )}
       </div>
       <div className="p-6 flex-grow flex flex-col">
         <h3 className="text-2xl font-bold text-gray-900 mb-2">{plan.name}</h3>

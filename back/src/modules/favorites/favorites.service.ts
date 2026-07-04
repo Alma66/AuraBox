@@ -37,39 +37,39 @@ function mapPlan(p: any) {
 export class FavoritesService {
   constructor(private readonly prisma: PrismaService) {}
 
-  async create(dto: CreateFavoriteDto) {
+  async create(dto: CreateFavoriteDto & { idUser: number }) {
     const user = await this.prisma.user.findUnique({ where: { id: dto.idUser } });
     if (!user) throw new NotFoundException('Usuario no encontrado');
-    const club = await this.prisma.club.findUnique({ where: { id: dto.idClub } });
-    if (!club) throw new NotFoundException('Club no encontrado');
+    const plan = await this.prisma.subscription_Types.findUnique({ where: { id: dto.idSubscriptionTypes } });
+    if (!plan) throw new NotFoundException('Plan de suscripción no encontrado');
     const existing = await this.prisma.favorites.findFirst({
-      where: { idUser: dto.idUser, idClub: dto.idClub },
+      where: { idUser: dto.idUser, idSubscriptionTypes: dto.idSubscriptionTypes },
     });
-    if (existing) throw new BadRequestException('Ya tienes este club en favoritos');
+    if (existing) throw new BadRequestException('Ya tienes este plan en favoritos');
     const created = await this.prisma.favorites.create({
       data: {
         idUser: dto.idUser,
-        idClub: dto.idClub,
+        idSubscriptionTypes: dto.idSubscriptionTypes,
         dateAdded: dto.dateAdded ? new Date(dto.dateAdded) : new Date(),
       },
     });
     return sanitize(created);
   }
 
-  async toggle(idUser: number, idClub: number) {
-    const club = await this.prisma.club.findUnique({ where: { id: idClub } });
-    if (!club) throw new NotFoundException('Club no encontrado');
-    const existing = await this.prisma.favorites.findFirst({ where: { idUser, idClub } });
+  async toggle(idUser: number, idSubscriptionTypes: number) {
+    const plan = await this.prisma.subscription_Types.findUnique({ where: { id: idSubscriptionTypes } });
+    if (!plan) throw new NotFoundException('Plan de suscripción no encontrado');
+    const existing = await this.prisma.favorites.findFirst({ where: { idUser, idSubscriptionTypes } });
     if (existing) {
       await this.prisma.favorites.delete({ where: { id: existing.id } });
       return { isFavorite: false };
     }
-    await this.prisma.favorites.create({ data: { idUser, idClub, dateAdded: new Date() } });
+    await this.prisma.favorites.create({ data: { idUser, idSubscriptionTypes, dateAdded: new Date() } });
     return { isFavorite: true };
   }
 
-  async check(idUser: number, idClub: number) {
-    const existing = await this.prisma.favorites.findFirst({ where: { idUser, idClub } });
+  async check(idUser: number, idSubscriptionTypes: number) {
+    const existing = await this.prisma.favorites.findFirst({ where: { idUser, idSubscriptionTypes } });
     return { isFavorite: !!existing };
   }
 
@@ -84,14 +84,6 @@ export class FavoritesService {
     return sanitize(favorite);
   }
 
-  async findByUser(idUser: number) {
-    const favorites = await this.prisma.favorites.findMany({
-      where: { idUser },
-      orderBy: { dateAdded: 'desc' },
-    });
-    return favorites.map(sanitize);
-  }
-
   async findByUserEnriched(idUser: number) {
     const favorites = await this.prisma.favorites.findMany({
       where: { idUser },
@@ -99,46 +91,39 @@ export class FavoritesService {
     });
     if (favorites.length === 0) return [];
 
-    const clubIds = favorites.map((f) => f.idClub);
+    const planIds = favorites.map((f) => f.idSubscriptionTypes);
+    const plans = await this.prisma.subscription_Types.findMany({ where: { id: { in: planIds } } });
+    const plansById = new Map(plans.map((p) => [p.id, p]));
+
+    const clubIds = [...new Set(plans.map((p) => p.idClub))];
     const clubs = await this.prisma.club.findMany({ where: { id: { in: clubIds } } });
     const clubsById = new Map(clubs.map((c) => [c.id, c]));
 
-    const plans = await this.prisma.subscription_Types.findMany({
-      where: { idClub: { in: clubIds }, active: true },
-    });
-    const plansByClubId = new Map<number, any[]>();
-    plans.forEach((p) => {
-      const list = plansByClubId.get(p.idClub) ?? [];
-      list.push(mapPlan(p));
-      plansByClubId.set(p.idClub, list);
-    });
-
     return favorites
       .map((fav) => {
-        const club = clubsById.get(fav.idClub);
+        const plan = plansById.get(fav.idSubscriptionTypes);
+        if (!plan) return null;
+        const club = clubsById.get(plan.idClub);
         if (!club) return null;
         return {
           favoriteId: fav.id,
-          idClub: fav.idClub,
+          idSubscriptionTypes: fav.idSubscriptionTypes,
           dateAdded: fav.dateAdded.toISOString(),
+          plan: mapPlan(plan),
           club: {
             id: club.id,
             name: club.name,
             logoUrl: club.logoUrl,
             slogan: club.slogan,
-            averageRating: club.averageRating ? club.averageRating.toString() : null,
-            totalReviews: club.totalReviews,
-            clubStatus: club.clubStatus,
           },
-          plans: plansByClubId.get(fav.idClub) ?? [],
         };
       })
       .filter((f): f is NonNullable<typeof f> => f !== null);
   }
 
-  async findByClub(idClub: number) {
+  async findByPlan(idSubscriptionTypes: number) {
     const favorites = await this.prisma.favorites.findMany({
-      where: { idClub },
+      where: { idSubscriptionTypes },
       orderBy: { dateAdded: 'desc' },
     });
     return favorites.map(sanitize);
@@ -155,13 +140,6 @@ export class FavoritesService {
       },
     });
     return sanitize(updated);
-  }
-
-  async removeByUserAndClub(idUser: number, idClub: number) {
-    const favorite = await this.prisma.favorites.findFirst({ where: { idUser, idClub } });
-    if (!favorite) throw new NotFoundException('Favorito no encontrado');
-    await this.prisma.favorites.delete({ where: { id: favorite.id } });
-    return { message: 'Favorito eliminado correctamente' };
   }
 
   async remove(id: number) {

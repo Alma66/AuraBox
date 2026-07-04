@@ -16,20 +16,19 @@ interface WishlistPlan {
   transferDiscount: number;
 }
 
+interface WishlistClub {
+  id: number;
+  name: string;
+  logoUrl: string;
+  slogan: string | null;
+}
+
 interface WishlistEntry {
   favoriteId: number;
-  idClub: number;
+  idSubscriptionTypes: number;
   dateAdded: string;
-  club: {
-    id: number;
-    name: string;
-    logoUrl: string;
-    slogan: string | null;
-    averageRating: string | null;
-    totalReviews: number;
-    clubStatus: string;
-  };
-  plans: WishlistPlan[];
+  plan: WishlistPlan;
+  club: WishlistClub;
 }
 
 const WishlistPage: React.FC = () => {
@@ -61,25 +60,31 @@ const WishlistPage: React.FC = () => {
     fetchWishlist();
   }, [user]);
 
-  const handleRemove = async (idClub: number) => {
-    setRemovingId(idClub);
+  const handleRemove = async (idSubscriptionTypes: number) => {
+    setRemovingId(idSubscriptionTypes);
     try {
-      await api.delete(`/favorites/by-club/${idClub}`);
-      setEntries((prev) => prev.filter((e) => e.idClub !== idClub));
+      await api.post(`/favorites/toggle/${idSubscriptionTypes}`);
+      setEntries((prev) => prev.filter((e) => e.idSubscriptionTypes !== idSubscriptionTypes));
     } catch {
-      setError('No se pudo quitar el club de favoritos.');
+      setError('No se pudo quitar el plan de favoritos.');
     } finally {
       setRemovingId(null);
     }
   };
 
+  const clubOptions = useMemo(() => {
+    const map = new Map<number, string>();
+    entries.forEach((e) => map.set(e.club.id, e.club.name));
+    return Array.from(map.entries()).map(([id, name]) => ({ id, name }));
+  }, [entries]);
+
   const filteredEntries = useMemo(() => {
     return entries.filter((entry) => {
-      if (selectedClubId !== null && entry.idClub !== selectedClubId) return false;
+      if (selectedClubId !== null && entry.club.id !== selectedClubId) return false;
       if (!searchTerm.trim()) return true;
       const term = searchTerm.toLowerCase();
       const clubMatch = entry.club.name.toLowerCase().includes(term) || (entry.club.slogan || '').toLowerCase().includes(term);
-      const planMatch = entry.plans.some((p) => p.name.toLowerCase().includes(term));
+      const planMatch = entry.plan.name.toLowerCase().includes(term);
       return clubMatch || planMatch;
     });
   }, [entries, searchTerm, selectedClubId]);
@@ -101,7 +106,7 @@ const WishlistPage: React.FC = () => {
         <div className="text-center mb-8">
           <h1 className="text-4xl font-bold text-gray-800 mb-2">Mi Lista de Deseos</h1>
           <p className="text-gray-600">
-            {user ? `Hola, ${user.firstName}! ` : ''}Estos son los clubes que marcaste con corazón, junto a sus planes disponibles.
+            {user ? `Hola, ${user.firstName}! ` : ''}Estos son los planes de suscripción que marcaste con corazón.
           </p>
         </div>
 
@@ -126,8 +131,8 @@ const WishlistPage: React.FC = () => {
               className="p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
               <option value="">Todos los clubes</option>
-              {entries.map((entry) => (
-                <option key={entry.idClub} value={entry.idClub}>{entry.club.name}</option>
+              {clubOptions.map((c) => (
+                <option key={c.id} value={c.id}>{c.name}</option>
               ))}
             </select>
           </div>
@@ -138,8 +143,8 @@ const WishlistPage: React.FC = () => {
             <svg className="mx-auto h-20 w-20 text-gray-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
             </svg>
-            <h3 className="text-lg font-medium text-gray-900 mb-2">Todavía no marcaste ningún club</h3>
-            <p className="text-gray-500 mb-4">Explorá clubes y tocá el corazón en los que te gusten.</p>
+            <h3 className="text-lg font-medium text-gray-900 mb-2">Todavía no marcaste ningún plan</h3>
+            <p className="text-gray-500 mb-4">Explorá clubes y tocá el corazón en los planes que te gusten.</p>
             <button
               onClick={() => navigate('/explore')}
               className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors"
@@ -152,76 +157,60 @@ const WishlistPage: React.FC = () => {
             <p className="text-lg text-gray-600 font-medium">No hay resultados para tu búsqueda.</p>
           </div>
         ) : (
-          <div className="space-y-6">
-            {filteredEntries.map((entry) => (
-              <div key={entry.favoriteId} className="bg-white rounded-2xl shadow-md overflow-hidden">
-                <div className="flex items-center justify-between p-5 border-b border-gray-100">
-                  <div
-                    className="flex items-center gap-4 cursor-pointer"
-                    onClick={() => navigate(`/club/${entry.idClub}`)}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+            {filteredEntries.map((entry) => {
+              const descuento = Math.max(entry.plan.cashDiscount ?? 0, entry.plan.transferDiscount ?? 0);
+              return (
+                <div key={entry.favoriteId} className="bg-white rounded-2xl shadow-md overflow-hidden flex flex-col">
+                  <button
+                    onClick={() => navigate(`/club/${entry.club.id}`)}
+                    className="flex items-center gap-3 p-4 border-b border-gray-100 hover:bg-gray-50 transition-colors text-left"
                   >
                     <img
                       src={entry.club.logoUrl || '/assets/default-club.jpg'}
                       alt={entry.club.name}
-                      className="w-14 h-14 rounded-full object-cover border border-gray-100"
+                      className="w-10 h-10 rounded-full object-cover border border-gray-100"
                     />
-                    <div>
-                      <h3 className="font-bold text-gray-900 text-lg hover:text-blue-600 transition-colors">{entry.club.name}</h3>
-                      {entry.club.slogan && <p className="text-sm text-gray-500 italic">{entry.club.slogan}</p>}
-                      <div className="flex items-center gap-1 mt-1">
-                        <span className="text-yellow-400 text-sm">⭐</span>
-                        <span className="text-sm font-semibold text-gray-700">
-                          {entry.club.averageRating ? Number(entry.club.averageRating).toFixed(1) : '—'}
-                        </span>
-                        <span className="text-xs text-gray-400">({entry.club.totalReviews} reseñas)</span>
-                      </div>
+                    <div className="min-w-0">
+                      <p className="text-sm font-bold text-gray-900 truncate">{entry.club.name}</p>
+                      {entry.club.slogan && <p className="text-xs text-gray-500 italic truncate">{entry.club.slogan}</p>}
                     </div>
-                  </div>
-                  <button
-                    onClick={() => handleRemove(entry.idClub)}
-                    disabled={removingId === entry.idClub}
-                    className="text-red-400 hover:text-red-600 transition-colors p-2 disabled:opacity-50"
-                    title="Quitar de favoritos"
-                  >
-                    <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
-                      <path fillRule="evenodd" d="M3.172 5.172a4.5 4.5 0 015.656 0L10 6.343l1.172-1.171a4.5 4.5 0 115.656 5.656L10 17.657l-6.828-6.829a4.5 4.5 0 010-5.656z" clipRule="evenodd" />
-                    </svg>
                   </button>
-                </div>
-                {entry.plans.length > 0 ? (
-                  <div className="p-5 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                    {entry.plans.map((plan) => {
-                      const descuento = Math.max(plan.cashDiscount ?? 0, plan.transferDiscount ?? 0);
-                      return (
-                        <button
-                          key={plan.planId}
-                          onClick={() => navigate(`/club/${entry.idClub}/plan/${plan.planId}`)}
-                          className="text-left border border-gray-100 rounded-xl overflow-hidden hover:shadow-md transition-shadow bg-gray-50"
-                        >
-                          <img
-                            src={plan.image || 'https://placehold.co/400x160/e2e8f0/94a3b8?text=Sin+imagen'}
-                            alt={plan.name}
-                            className="w-full h-28 object-cover"
-                          />
-                          <div className="p-3">
-                            <h4 className="font-semibold text-gray-900 text-sm truncate">{plan.name}</h4>
-                            <p className="text-xs text-gray-500 mb-1">{plan.deliveryFrequency}</p>
-                            <div className="flex items-center justify-between">
-                              <span className="font-bold text-indigo-700 text-sm">ARS {plan.price.toLocaleString('es-AR')}</span>
-                              {descuento > 0 && (
-                                <span className="text-xs bg-red-100 text-red-600 px-2 py-0.5 rounded-full font-semibold">-{descuento}%</span>
-                              )}
-                            </div>
-                          </div>
-                        </button>
-                      );
-                    })}
+                  <button
+                    onClick={() => navigate(`/club/${entry.club.id}/plan/${entry.idSubscriptionTypes}`)}
+                    className="text-left flex-grow"
+                  >
+                    <div className="relative">
+                      <img
+                        src={entry.plan.image || 'https://placehold.co/400x160/e2e8f0/94a3b8?text=Sin+imagen'}
+                        alt={entry.plan.name}
+                        className="w-full h-36 object-cover"
+                      />
+                      {descuento > 0 && (
+                        <span className="absolute top-2 right-2 text-xs bg-red-500 text-white px-2 py-0.5 rounded-full font-bold">-{descuento}%</span>
+                      )}
+                    </div>
+                    <div className="p-4">
+                      <h4 className="font-semibold text-gray-900 truncate">{entry.plan.name}</h4>
+                      <p className="text-xs text-gray-500 mb-2">{entry.plan.deliveryFrequency}</p>
+                      <span className="font-bold text-indigo-700">ARS {entry.plan.price.toLocaleString('es-AR')}</span>
+                    </div>
+                  </button>
+                  <div className="px-4 pb-4">
+                    <button
+                      onClick={() => handleRemove(entry.idSubscriptionTypes)}
+                      disabled={removingId === entry.idSubscriptionTypes}
+                      className="w-full flex items-center justify-center gap-2 text-sm text-red-500 hover:text-red-700 hover:bg-red-50 rounded-lg py-2 transition-colors disabled:opacity-50"
+                    >
+                      <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M3.172 5.172a4.5 4.5 0 015.656 0L10 6.343l1.172-1.171a4.5 4.5 0 115.656 5.656L10 17.657l-6.828-6.829a4.5 4.5 0 010-5.656z" clipRule="evenodd" />
+                      </svg>
+                      Quitar de favoritos
+                    </button>
                   </div>
-                ) : (
-                  <p className="text-sm text-gray-400 italic px-5 py-4">Este club todavía no tiene planes activos.</p>
-                )}
-              </div>
-            ))}
+                </div>
+              );
+            })}
           </div>
         )}
       </div>
