@@ -11,18 +11,21 @@ import { UpdateSubscriptionTypeDto } from './dto/update-subscription-types.dto';
 import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
 import { RolesGuard } from '../auth/roles.guard';
 import { Roles } from '../auth/roles.decorator';
+import { Public } from '../../common/decorators/public.decorator';
 
 @Controller('subscription-types')
 @UseGuards(JwtAuthGuard)
 export class SubscriptionTypesController {
   constructor(private readonly svc: SubscriptionTypesService) {}
 
+  @Public()
   @Get()
   async findAll(@Query('clubId') clubId?: string) {
     if (clubId) return this.svc.findByClub(Number(clubId));
     return this.svc.findAll();
   }
 
+  @Public()
   @Get(':id')
   async findOne(@Param('id', ParseIntPipe) id: number) {
     return this.svc.findById(id);
