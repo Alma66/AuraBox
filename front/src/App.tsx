@@ -20,17 +20,12 @@ import CheckoutPage from './pages/client/CheckoutPage';
 import MisReviewsPage from './pages/client/MisReviewsPage';
 import ClubDetailPage from './pages/entrepreneur/club/ClubDetailPage';
 import HistoryPage from './pages/entrepreneur/club/HistoryPage';
-import SubscriptionPlanDetailPage from './pages/entrepreneur/club/SubscriptionPlanDetailPage';
+import SubscriptionPlanDetailPage from './pages/SubscriptionPlanDetailPage';
 import SubscriptionDetailForEntrepreneurPage from './pages/entrepreneur/club/SubscriptionDetailForEntrepreneurPage';
 import TermsAndConditionsPage from './pages/entrepreneur/club/TermsAndConditionsPage';
 import PrivacyAndSecurityPolicyPage from './pages/entrepreneur/club/PrivacyAndSecurityPolicyPage';
 import EntrepreneurProfilePage from './pages/entrepreneur/EntrepreneurProfilePage';
-import EditClubLegalInfoPage from './pages/entrepreneur/gestion/EditClubLegalInfoPage';
 import EditSubscriptionsPage from './pages/entrepreneur/club/EditSubscriptionsPage';
-import InventoryStockPage from './pages/entrepreneur/gestion/inventory/InventoryStockPage';
-import InventorySuppliersPage from './pages/entrepreneur/gestion/inventory/InventorySuppliersPage';
-import InventoryOrdersPage from './pages/entrepreneur/gestion/inventory/InventoryOrdersPage';
-import InventoryCategoriesPage from './pages/entrepreneur/gestion/inventory/InventoryCategoriesPage';
 import ActiveSubscriptionsPage from './pages/entrepreneur/operations/clients/ActiveSubscriptionsPage';
 import CustomerHistoryPage from './pages/entrepreneur/operations/clients/CustomerHistoryPage';
 import ManageCustomersPage from './pages/entrepreneur/operations/clients/ManageCustomersPage';
@@ -186,17 +181,11 @@ const AppContent: React.FC = () => {
           <Route path="/checkout" element={pr(['customer'], <CheckoutPage />)} />
 
           <Route path="/entrepreneur/profile" element={pr(['entrepreneur'], <EntrepreneurProfilePage />)} />
-          <Route path="/entrepreneur/club/:clubId/edit-terms" element={pr(['entrepreneur'], <EditClubLegalInfoPage />)} />
-          <Route path="/entrepreneur/club/:clubId/edit-policies" element={pr(['entrepreneur'], <EditClubLegalInfoPage />)} />
           <Route path="/entrepreneur/club/:clubId/edit-subscriptions" element={pr(['entrepreneur'], <EditSubscriptionsPage />)} />
           <Route path="/entrepreneur/club/:clubId/finance/movimientos" element={pr(['entrepreneur'], <FinancialMovementsPage />)} />
           <Route path="/entrepreneur/club/:clubId/finance/rentabilidad" element={pr(['entrepreneur'], <ProfitabilityPage />)} />
           <Route path="/entrepreneur/club/:clubId/manage-users-roles" element={pr(['entrepreneur'], <ManageUsersAndRolesPage />)} />
           <Route path="/entrepreneur/club/:clubId/general-settings" element={pr(['entrepreneur'], <GeneralSettingsPage />)} />
-          <Route path="/entrepreneur/inventory/stock" element={pr(['entrepreneur'], <InventoryStockPage />)} />
-          <Route path="/entrepreneur/inventory/proveedores" element={pr(['entrepreneur'], <InventorySuppliersPage />)} />
-          <Route path="/entrepreneur/inventory/pedidos" element={pr(['entrepreneur'], <InventoryOrdersPage />)} />
-          <Route path="/entrepreneur/inventory/categorias" element={pr(['entrepreneur'], <InventoryCategoriesPage />)} />
           <Route path="/entrepreneur/club/:clubId/active-subscriptions" element={pr(['entrepreneur'], <ActiveSubscriptionsPage />)} />
           <Route path="/entrepreneur/club/:clubId/customer-history" element={pr(['entrepreneur'], <CustomerHistoryPage />)} />
           <Route path="/entrepreneur/club/:clubId/customer-history/:customerId" element={pr(['entrepreneur'], <CustomerHistoryPage />)} />

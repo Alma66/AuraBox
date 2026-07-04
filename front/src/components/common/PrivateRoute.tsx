@@ -1,5 +1,5 @@
 import React from 'react';
-import { Navigate } from 'react-router-dom';
+import { Navigate, useLocation } from 'react-router-dom';
 import { UserRole } from '../../types/user';
 
 interface PrivateRouteProps {
@@ -11,6 +11,8 @@ interface PrivateRouteProps {
 }
 
 const PrivateRoute: React.FC<PrivateRouteProps> = ({ isAuthenticated, allowedRoles, userRole, children, loading }) => {
+  const location = useLocation();
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -19,7 +21,7 @@ const PrivateRoute: React.FC<PrivateRouteProps> = ({ isAuthenticated, allowedRol
     );
   }
   if (!isAuthenticated) {
-    return <Navigate to="/login" replace />;
+    return <Navigate to={`/login?redirect=${encodeURIComponent(location.pathname)}`} replace />;
   }
   if (!userRole || !allowedRoles.includes(userRole)) {
     return <Navigate to="/" replace />;

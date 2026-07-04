@@ -1,13 +1,20 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, Link } from 'react-router-dom';
-import api, { getResponseData } from '../../../api/config';
-import { Club, SubscriptionPlan } from '../../../types/club';
+import { useParams, useNavigate, useLocation, Link } from 'react-router-dom';
+import api, { getResponseData } from '../api/config';
+import { useAuth } from '../App';
+import { Club, SubscriptionPlan } from '../types/club';
 
 const SubscriptionPlanDetailPage: React.FC = () => {
   const { clubId, planId } = useParams<{ clubId: string; planId: string }>();
+  const navigate = useNavigate();
+  const location = useLocation();
+  const { isAuthenticated, userRole } = useAuth();
   const [club, setClub] = useState<Club | null>(null);
   const [plan, setPlan] = useState<SubscriptionPlan | null>(null);
   const [loading, setLoading] = useState(true);
+  const [subscribing, setSubscribing] = useState(false);
+  const [subscribeError, setSubscribeError] = useState('');
+  const [subscribeSuccess, setSubscribeSuccess] = useState(false);
 
   useEffect(() => {
     const fetch = async () => {
@@ -45,6 +52,29 @@ const SubscriptionPlanDetailPage: React.FC = () => {
     if (clubId && planId) fetch();
   }, [clubId, planId]);
 
+  const handleSubscribe = async () => {
+    if (!isAuthenticated) {
+      navigate(`/login?redirect=${encodeURIComponent(location.pathname)}`);
+      return;
+    }
+    if (userRole !== 'customer') {
+      setSubscribeError('Solo los clientes pueden suscribirse a un plan.');
+      return;
+    }
+    if (!planId) return;
+    setSubscribing(true);
+    setSubscribeError('');
+    try {
+      await api.post('/user-subscriptions', { idSubscriptionTypes: Number(planId) });
+      setSubscribeSuccess(true);
+    } catch (err: any) {
+      const msg = err?.response?.data?.message;
+      setSubscribeError(Array.isArray(msg) ? msg.join(', ') : (msg ?? 'Error al suscribirte. Intentá nuevamente.'));
+    } finally {
+      setSubscribing(false);
+    }
+  };
+
   if (loading) return (
     <div className="min-h-screen flex items-center justify-center">
       <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-indigo-600" />
@@ -62,6 +92,7 @@ const SubscriptionPlanDetailPage: React.FC = () => {
 
   const descuento = Math.max(plan.descuentoTransferencia ?? 0, plan.descuentoEfectivo ?? 0);
   const precioFinal = plan.price * (1 - descuento / 100);
+  const canSubscribe = plan.activo !== false;
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -78,7 +109,6 @@ const SubscriptionPlanDetailPage: React.FC = () => {
           </div>
         </div>
       </div>
-
       <div className="container mx-auto px-4 py-10 max-w-4xl">
         <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
           <div className="relative">
@@ -94,7 +124,6 @@ const SubscriptionPlanDetailPage: React.FC = () => {
               </div>
             )}
           </div>
-
           <div className="p-8">
             <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4 mb-6">
               <div>
@@ -113,14 +142,12 @@ const SubscriptionPlanDetailPage: React.FC = () => {
                 )}
               </div>
             </div>
-
             {plan.description && (
               <div className="mb-6">
                 <h3 className="text-sm font-bold text-gray-500 uppercase tracking-wide mb-2">Descripción</h3>
                 <p className="text-gray-700 leading-relaxed">{plan.description}</p>
               </div>
             )}
-
             {(plan.includes ?? []).length > 0 && (
               <div className="mb-6">
                 <h3 className="text-sm font-bold text-gray-500 uppercase tracking-wide mb-3">¿Qué incluye?</h3>
@@ -136,7 +163,6 @@ const SubscriptionPlanDetailPage: React.FC = () => {
                 </ul>
               </div>
             )}
-
             {(plan.specifications ?? []).length > 0 && (
               <div className="mb-6">
                 <h3 className="text-sm font-bold text-gray-500 uppercase tracking-wide mb-3">Especificaciones</h3>
@@ -149,14 +175,12 @@ const SubscriptionPlanDetailPage: React.FC = () => {
                 </div>
               </div>
             )}
-
             {plan.shippingAreas && (
               <div className="mb-6">
                 <h3 className="text-sm font-bold text-gray-500 uppercase tracking-wide mb-2">Zonas de envío</h3>
                 <p className="text-gray-700 text-sm">{plan.shippingAreas}</p>
               </div>
             )}
-
             {descuento > 0 && (
               <div className="bg-indigo-50 rounded-xl p-4 mb-6">
                 <p className="text-sm font-semibold text-indigo-800 mb-1">Descuentos disponibles</p>
@@ -168,7 +192,16 @@ const SubscriptionPlanDetailPage: React.FC = () => {
                 )}
               </div>
             )}
-
+            {subscribeError && (
+              <div className="bg-red-50 border border-red-200 text-red-700 text-sm rounded-xl px-4 py-3 mb-6">
+                {subscribeError}
+              </div>
+            )}
+            {subscribeSuccess && (
+              <div className="bg-emerald-50 border border-emerald-200 text-emerald-700 text-sm rounded-xl px-4 py-3 mb-6">
+                ¡Listo! Te suscribiste correctamente a {plan.name}. Podés ver el estado de tu suscripción en tu perfil.
+              </div>
+            )}
             <div className="flex flex-col sm:flex-row gap-3 pt-4 border-t">
               <Link
                 to={`/club/${clubId}`}
@@ -176,9 +209,22 @@ const SubscriptionPlanDetailPage: React.FC = () => {
               >
                 Volver al club
               </Link>
-              <button className="flex-1 px-6 py-3 text-sm font-semibold text-white bg-indigo-600 rounded-xl hover:bg-indigo-700 transition">
-                Suscribirme
-              </button>
+              {subscribeSuccess ? (
+                <Link
+                  to="/customer/profile"
+                  className="flex-1 text-center px-6 py-3 text-sm font-semibold text-white bg-emerald-600 rounded-xl hover:bg-emerald-700 transition"
+                >
+                  Ver mi perfil
+                </Link>
+              ) : (
+                <button
+                  onClick={handleSubscribe}
+                  disabled={subscribing || !canSubscribe}
+                  className="flex-1 px-6 py-3 text-sm font-semibold text-white bg-indigo-600 rounded-xl hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed transition"
+                >
+                  {!canSubscribe ? 'Plan no disponible' : subscribing ? 'Procesando...' : 'Suscribirme'}
+                </button>
+              )}
             </div>
           </div>
         </div>

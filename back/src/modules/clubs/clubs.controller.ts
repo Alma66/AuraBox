@@ -1,7 +1,7 @@
 import {
   Body, Controller, Delete, Get, Param, ParseIntPipe,
   Post, Put, Patch, UseGuards, UsePipes, ValidationPipe,
-  Request, UploadedFile, UseInterceptors,
+  Request, UploadedFile, UseInterceptors, Query,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { ClubsService } from './clubs.service';
@@ -33,8 +33,21 @@ export class ClubsController {
 
   @Public()
   @Get()
-  async findAll() {
-    return this.clubsService.findAll();
+  async findAll(
+    @Query('search') search?: string,
+    @Query('category') category?: string,
+    @Query('minRating') minRating?: string,
+    @Query('minReviews') minReviews?: string,
+  ) {
+    const categoryIds = category
+      ? category.split(',').map((c) => Number(c)).filter((n) => !Number.isNaN(n))
+      : undefined;
+    return this.clubsService.findAll({
+      search,
+      categoryIds,
+      minRating: minRating ? Number(minRating) : undefined,
+      minReviews: minReviews ? Number(minReviews) : undefined,
+    });
   }
 
   @Public()

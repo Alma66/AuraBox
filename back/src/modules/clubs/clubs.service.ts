@@ -5,6 +5,13 @@ import { UpdateClubDto } from './dto/update-club.dto';
 import { CloudinaryService } from '../cloudinary/cloudinary.service';
 import { Prisma } from '@prisma/client';
 
+interface FindAllFilters {
+  search?: string;
+  categoryIds?: number[];
+  minRating?: number;
+  minReviews?: number;
+}
+
 @Injectable()
 export class ClubsService {
   constructor(
@@ -16,7 +23,6 @@ export class ClubsService {
     if (!dto.logoUrl) {
       throw new BadRequestException('logoUrl es requerido');
     }
-
     const data: Prisma.ClubCreateInput = {
       name: dto.name,
       logoUrl: dto.logoUrl,
@@ -34,8 +40,53 @@ export class ClubsService {
     return this.prisma.club.create({ data });
   }
 
-  async findAll() {
-    return this.prisma.club.findMany({ orderBy: { creationDate: 'desc' } });
+  async findAll(filters?: FindAllFilters) {
+    const where: Prisma.ClubWhereInput = { clubStatus: 'APROBADO' };
+
+    if (filters?.minRating) {
+      where.averageRating = { gte: filters.minRating };
+    }
+    if (filters?.minReviews) {
+      where.totalReviews = { gte: filters.minReviews };
+    }
+    if (filters?.search) {
+      where.OR = [
+        { name: { contains: filters.search, mode: 'insensitive' } },
+        { shortDescription: { contains: filters.search, mode: 'insensitive' } },
+        { slogan: { contains: filters.search, mode: 'insensitive' } },
+      ];
+    }
+    if (filters?.categoryIds && filters.categoryIds.length > 0) {
+      const relations = await this.prisma.club_Categories.findMany({
+        where: { idCategories: { in: filters.categoryIds } },
+        select: { idClub: true },
+      });
+      const matchingClubIds = Array.from(new Set(relations.map((r) => r.idClub)));
+      if (matchingClubIds.length === 0) return [];
+      where.id = { in: matchingClubIds };
+    }
+
+    const clubs = await this.prisma.club.findMany({ where, orderBy: { creationDate: 'desc' } });
+    return this.attachCategories(clubs);
+  }
+
+  private async attachCategories(clubs: any[]) {
+    const clubIds = clubs.map((c) => c.id);
+    if (clubIds.length === 0) return [];
+    const links = await this.prisma.club_Categories.findMany({ where: { idClub: { in: clubIds } } });
+    const categoryIds = Array.from(new Set(links.map((l) => l.idCategories)));
+    const categories = categoryIds.length > 0
+      ? await this.prisma.categories.findMany({ where: { id: { in: categoryIds } } })
+      : [];
+    const categoryMap = new Map(categories.map((c) => [c.id, c]));
+    return clubs.map((club) => {
+      const clubLinks = links.filter((l) => l.idClub === club.id);
+      const clubCategories = clubLinks
+        .map((l) => categoryMap.get(l.idCategories))
+        .filter((c) => Boolean(c))
+        .map((c: any) => ({ id: c.id, name: c.name }));
+      return { ...this.sanitizeClub(club), categories: clubCategories };
+    });
   }
 
   async findFeatured() {
@@ -50,34 +101,31 @@ export class ClubsService {
   async findOne(id: number, requestingUserId?: number) {
     const club = await this.prisma.club.findUnique({ where: { id } });
     if (!club) throw new NotFoundException('Club no encontrado');
-
     const entrepreneurClub = await this.prisma.entrepreneur_Club.findMany({
       where: { idClub: id },
     });
     const entrepreneurIds = entrepreneurClub.map((ec) => ec.idEntrepreneurs);
-
     let isOwner = false;
     if (requestingUserId) {
       isOwner = entrepreneurIds.includes(requestingUserId);
     }
-
     const entrepreneurs = await this.prisma.entrepreneurs.findMany({
       where: { id: { in: entrepreneurIds } },
       select: { id: true, firstName: true, lastName: true, bio: true },
     });
-
     const images = await this.prisma.image_Club.findMany({ where: { idClub: id } });
-
     const bannerImagesRaw = images.filter(
       (img) => img.description !== 'historia' && !(img.description ?? '').startsWith('team-'),
     );
     const historyImageRaw = images.filter((img) => img.description === 'historia');
-
     const socialNetworksRaw = await this.prisma.club_Social_Networks.findMany({ where: { idClub: id } });
-
     const plans = await this.prisma.subscription_Types.findMany({ where: { idClub: id } });
     const mappedPlans = plans.map((p) => this.mapPlan(p));
-
+    const categoryLinks = await this.prisma.club_Categories.findMany({ where: { idClub: id } });
+    const categoryIds = categoryLinks.map((l) => l.idCategories);
+    const categories = categoryIds.length > 0
+      ? await this.prisma.categories.findMany({ where: { id: { in: categoryIds } } })
+      : [];
     return {
       ...this.sanitizeClub(club),
       isOwner,
@@ -86,12 +134,12 @@ export class ClubsService {
       historyImageRaw,
       socialNetworksRaw,
       subscriptionPlans: mappedPlans,
+      categories: categories.map((c) => ({ id: c.id, name: c.name })),
     };
   }
 
   async update(id: number, dto: UpdateClubDto, entrepreneurId: number) {
     await this.assertOwnership(id, entrepreneurId);
-
     const data: Prisma.ClubUpdateInput = {};
     if (dto.name !== undefined) data.name = dto.name;
     if (dto.slogan !== undefined) data.slogan = dto.slogan;
@@ -101,7 +149,6 @@ export class ClubsService {
     if (dto.whatsappContact !== undefined) data.whatsappContact = dto.whatsappContact;
     if (dto.communityText !== undefined) data.communityText = dto.communityText;
     if (dto.milestones !== undefined) data.milestones = dto.milestones;
-
     try {
       const updated = await this.prisma.club.update({ where: { id }, data });
       return this.sanitizeClub(updated);
@@ -115,24 +162,19 @@ export class ClubsService {
 
   async updateLogo(id: number, file: Express.Multer.File, entrepreneurId: number) {
     await this.assertOwnership(id, entrepreneurId);
-
     const club = await this.prisma.club.findUnique({ where: { id } });
     if (!club) throw new NotFoundException('Club no encontrado');
-
     if (club.logoUrl) {
       try {
         const publicId = this.cloudinaryService.extractPublicId(club.logoUrl);
         await this.cloudinaryService.deleteImage(publicId);
       } catch {}
     }
-
     const secureUrl = await this.cloudinaryService.uploadImage(file, 'aurabox/clubs/logos');
-
     const updated = await this.prisma.club.update({
       where: { id },
       data: { logoUrl: secureUrl },
     });
-
     return this.sanitizeClub(updated);
   }
 
@@ -150,43 +192,34 @@ export class ClubsService {
 
   async findSubscriptionsByClub(clubId: number, entrepreneurId: number) {
     await this.assertOwnership(clubId, entrepreneurId);
-
     const plans = await this.prisma.subscription_Types.findMany({
       where: { idClub: clubId },
       select: { id: true },
     });
     const planIds = plans.map((p) => p.id);
-
     if (planIds.length === 0) return [];
-
     const subs = await this.prisma.user_Subscriptions.findMany({
       where: { idSubscriptionTypes: { in: planIds } },
       orderBy: { startDate: 'desc' },
     });
-
     return subs.map((s) => this.sanitizeSubscription(s));
   }
 
   async findCustomersByClub(clubId: number, entrepreneurId: number) {
     await this.assertOwnership(clubId, entrepreneurId);
-
     const plans = await this.prisma.subscription_Types.findMany({
       where: { idClub: clubId },
       select: { id: true },
     });
     const planIds = plans.map((p) => p.id);
-
     if (planIds.length === 0) return [];
-
     const subs = await this.prisma.user_Subscriptions.findMany({
       where: { idSubscriptionTypes: { in: planIds } },
       select: { idUser: true },
       distinct: ['idUser'],
     });
-
     const userIds = subs.map((s) => s.idUser);
     if (userIds.length === 0) return [];
-
     const users = await this.prisma.user.findMany({
       where: { id: { in: userIds } },
       select: {
@@ -207,7 +240,6 @@ export class ClubsService {
         birthDate: true,
       },
     });
-
     return users.map((u) => ({
       ...u,
       registrationDate: u.registrationDate.toISOString(),
@@ -221,10 +253,8 @@ export class ClubsService {
       orderBy: { associationDate: 'asc' },
     });
     if (!association) return null;
-
     const club = await this.prisma.club.findUnique({ where: { id: association.idClub } });
     if (!club) return null;
-
     return this.sanitizeClub(club);
   }
 

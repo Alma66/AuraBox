@@ -8,6 +8,7 @@ import { UpdateCategoryDto } from './dto/update-category.dto';
 import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
 import { RolesGuard } from '../auth/roles.guard';
 import { Roles } from '../auth/roles.decorator';
+import { Public } from '../../common/decorators/public.decorator';
 
 @Controller('categories')
 @UseGuards(JwtAuthGuard)
@@ -22,11 +23,13 @@ export class CategoriesController {
     return this.categoriesService.create(dto);
   }
 
+  @Public()
   @Get()
   async findAll() {
     return this.categoriesService.findAll();
   }
 
+  @Public()
   @Get(':id')
   async findOne(@Param('id', ParseIntPipe) id: number) {
     return this.categoriesService.findOne(id);
