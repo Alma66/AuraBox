@@ -100,7 +100,11 @@ const ExploreClubsPage: React.FC = () => {
     } else if (sortBy === 'reviews') {
       list.sort((a, b) => (b.totalReviews || 0) - (a.totalReviews || 0));
     } else {
-      list.sort((a, b) => new Date(b.creationDate).getTime() - new Date(a.creationDate).getTime());
+      list.sort((a, b) => {
+        const dateA = a.creationDate ? new Date(a.creationDate).getTime() : 0;
+        const dateB = b.creationDate ? new Date(b.creationDate).getTime() : 0;
+        return dateB - dateA;
+      });
     }
     return list;
   }, [clubs, sortBy]);

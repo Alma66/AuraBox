@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import api from '../api/config';
 import { User } from '../types/user';
 
@@ -13,6 +13,15 @@ const LoginPage: React.FC<LoginPageProps> = ({ onLogin }) => {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+  const location = useLocation();
+
+  const getRedirectTarget = (): string | null => {
+    const params = new URLSearchParams(location.search);
+    const redirect = params.get('redirect');
+    if (!redirect) return null;
+    if (!redirect.startsWith('/') || redirect.startsWith('//')) return null;
+    return redirect;
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -40,6 +49,12 @@ const LoginPage: React.FC<LoginPageProps> = ({ onLogin }) => {
       };
 
       onLogin(user);
+
+      const redirectTarget = getRedirectTarget();
+      if (redirectTarget) {
+        navigate(redirectTarget);
+        return;
+      }
 
       switch (user.role) {
         case 'customer':
