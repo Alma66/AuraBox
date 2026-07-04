@@ -8,6 +8,7 @@ import { ConfigModule } from '@nestjs/config';
 import { CloudinaryModule } from './modules/cloudinary/cloudinary.module';
 import { PrismaModule } from './prisma/prisma.module';
 
+import { CartItemModule } from './modules/cart-item/cart-item.module';
 import { AnalyticsModule } from './modules/analytics/analytics.module';
 import { AdminOrEntrepreneurRoleModule } from './modules/admin-or-entrepreneur-role/admin-or-entrepreneur-role.module';
 import { AdminsModule } from './modules/admins/admins.module';
@@ -96,6 +97,7 @@ import { AllExceptionsFilter } from './common/filters/all-exceptions.filter';
     SupportModule,
     InventoryModule,
     FinanceModule,
+    CartItemModule,
   ],
   controllers: [AppController],
 

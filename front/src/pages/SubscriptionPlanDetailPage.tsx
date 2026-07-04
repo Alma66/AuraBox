@@ -12,9 +12,14 @@ const SubscriptionPlanDetailPage: React.FC = () => {
   const [club, setClub] = useState<Club | null>(null);
   const [plan, setPlan] = useState<SubscriptionPlan | null>(null);
   const [loading, setLoading] = useState(true);
+
   const [subscribing, setSubscribing] = useState(false);
   const [subscribeError, setSubscribeError] = useState('');
   const [subscribeSuccess, setSubscribeSuccess] = useState(false);
+
+  const [addingToCart, setAddingToCart] = useState(false);
+  const [cartError, setCartError] = useState('');
+  const [addedToCart, setAddedToCart] = useState(false);
 
   useEffect(() => {
     const fetch = async () => {
@@ -52,7 +57,7 @@ const SubscriptionPlanDetailPage: React.FC = () => {
     if (clubId && planId) fetch();
   }, [clubId, planId]);
 
-  const handleSubscribe = async () => {
+  const handleSubscribeNow = async () => {
     if (!isAuthenticated) {
       navigate(`/login?redirect=${encodeURIComponent(location.pathname)}`);
       return;
@@ -72,6 +77,29 @@ const SubscriptionPlanDetailPage: React.FC = () => {
       setSubscribeError(Array.isArray(msg) ? msg.join(', ') : (msg ?? 'Error al suscribirte. Intentá nuevamente.'));
     } finally {
       setSubscribing(false);
+    }
+  };
+
+  const handleAddToCart = async () => {
+    if (!isAuthenticated) {
+      navigate(`/login?redirect=${encodeURIComponent(location.pathname)}`);
+      return;
+    }
+    if (userRole !== 'customer') {
+      setCartError('Solo los clientes pueden agregar planes al carrito.');
+      return;
+    }
+    if (!planId) return;
+    setAddingToCart(true);
+    setCartError('');
+    try {
+      await api.post('/cart-items', { idSubscriptionTypes: Number(planId) });
+      setAddedToCart(true);
+    } catch (err: any) {
+      const msg = err?.response?.data?.message;
+      setCartError(Array.isArray(msg) ? msg.join(', ') : (msg ?? 'Error al agregar al carrito. Intentá nuevamente.'));
+    } finally {
+      setAddingToCart(false);
     }
   };
 
@@ -192,16 +220,29 @@ const SubscriptionPlanDetailPage: React.FC = () => {
                 )}
               </div>
             )}
+
             {subscribeError && (
-              <div className="bg-red-50 border border-red-200 text-red-700 text-sm rounded-xl px-4 py-3 mb-6">
+              <div className="bg-red-50 border border-red-200 text-red-700 text-sm rounded-xl px-4 py-3 mb-4">
                 {subscribeError}
               </div>
             )}
+            {cartError && (
+              <div className="bg-red-50 border border-red-200 text-red-700 text-sm rounded-xl px-4 py-3 mb-4">
+                {cartError}
+              </div>
+            )}
             {subscribeSuccess && (
-              <div className="bg-emerald-50 border border-emerald-200 text-emerald-700 text-sm rounded-xl px-4 py-3 mb-6">
+              <div className="bg-emerald-50 border border-emerald-200 text-emerald-700 text-sm rounded-xl px-4 py-3 mb-4">
                 ¡Listo! Te suscribiste correctamente a {plan.name}. Podés ver el estado de tu suscripción en tu perfil.
               </div>
             )}
+            {addedToCart && !subscribeSuccess && (
+              <div className="bg-blue-50 border border-blue-200 text-blue-700 text-sm rounded-xl px-4 py-3 mb-4">
+                Agregado a tu carrito. Podés seguir explorando o{' '}
+                <Link to="/cart" className="underline font-semibold">ir al carrito</Link>.
+              </div>
+            )}
+
             <div className="flex flex-col sm:flex-row gap-3 pt-4 border-t">
               <Link
                 to={`/club/${clubId}`}
@@ -217,13 +258,22 @@ const SubscriptionPlanDetailPage: React.FC = () => {
                   Ver mi perfil
                 </Link>
               ) : (
-                <button
-                  onClick={handleSubscribe}
-                  disabled={subscribing || !canSubscribe}
-                  className="flex-1 px-6 py-3 text-sm font-semibold text-white bg-indigo-600 rounded-xl hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed transition"
-                >
-                  {!canSubscribe ? 'Plan no disponible' : subscribing ? 'Procesando...' : 'Suscribirme'}
-                </button>
+                <>
+                  <button
+                    onClick={handleAddToCart}
+                    disabled={addingToCart || subscribing || !canSubscribe}
+                    className="flex-1 px-6 py-3 text-sm font-semibold text-indigo-600 border-2 border-indigo-600 rounded-xl hover:bg-indigo-50 disabled:opacity-50 disabled:cursor-not-allowed transition"
+                  >
+                    {addingToCart ? 'Agregando...' : addedToCart ? 'Agregado ✓' : 'Agregar al carrito'}
+                  </button>
+                  <button
+                    onClick={handleSubscribeNow}
+                    disabled={subscribing || addingToCart || !canSubscribe}
+                    className="flex-1 px-6 py-3 text-sm font-semibold text-white bg-indigo-600 rounded-xl hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed transition"
+                  >
+                    {!canSubscribe ? 'Plan no disponible' : subscribing ? 'Procesando...' : 'Suscribirme ahora'}
+                  </button>
+                </>
               )}
             </div>
           </div>

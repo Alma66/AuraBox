@@ -1,66 +1,86 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../App';
 import api, { getResponseData } from '../../api/config';
-import PlanCard from '../../components/client/PlanCard';
-import { SubscriptionPlan } from '../../types/club';
+
+interface CartPlan {
+  planId: number;
+  name: string;
+  description: string;
+  price: number;
+  currency: string;
+  deliveryFrequency: string;
+  image: string;
+  active: boolean;
+  cashDiscount: number;
+  transferDiscount: number;
+}
+
+interface CartClub {
+  id: number;
+  name: string;
+  logoUrl: string;
+  slogan: string | null;
+}
+
+interface CartEntry {
+  cartItemId: number;
+  idSubscriptionTypes: number;
+  addedAt: string;
+  plan: CartPlan;
+  club: CartClub;
+}
 
 const CartPage: React.FC = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
-  const location = useLocation();
-  const [cartItems, setCartItems] = useState<SubscriptionPlan[]>([]);
+  const [items, setItems] = useState<CartEntry[]>([]);
   const [loading, setLoading] = useState(true);
-  const [addedPlanId, setAddedPlanId] = useState<string | null>(null);
+  const [error, setError] = useState('');
+  const [removingId, setRemovingId] = useState<number | null>(null);
+
+  const fetchCart = async () => {
+    try {
+      setLoading(true);
+      const response = await api.get('/cart-items');
+      const data = getResponseData(response);
+      setItems(Array.isArray(data) ? data : []);
+    } catch {
+      setError('Error al cargar tu carrito.');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    const urlParams = new URLSearchParams(location.search);
-    const addedId = urlParams.get('added');
-    setAddedPlanId(addedId || null);
+    if (user) fetchCart();
+    else setLoading(false);
+  }, [user]);
 
-    const fetchPlans = async () => {
-      try {
-        const response = await api.get('/subscription-types');
-        const plansData = getResponseData(response);
-        if (Array.isArray(plansData) && plansData.length > 0) {
-          const mappedPlans: SubscriptionPlan[] = plansData.slice(0, 3).map((plan: any) => ({
-            planId: String(plan.id),
-            name: plan.name,
-            price: plan.price || 0,
-            currency: 'ARS',
-            description: plan.description || '',
-            image: '/assets/default-plan.jpg',
-            deliveryFrequency: '',
-            includes: [],
-            shippingAreas: '',
-            specifications: []
-          }));
-          setCartItems(mappedPlans);
-        }
-      } catch (error) {
-        console.error("Error fetching plans:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchPlans();
-  }, [location.search]);
-
-  const handleRemove = (planId: string) => {
-    setCartItems(prev => prev.filter(item => item.planId !== planId));
+  const handleRemove = async (idSubscriptionTypes: number) => {
+    setRemovingId(idSubscriptionTypes);
+    try {
+      await api.delete(`/cart-items/${idSubscriptionTypes}`);
+      setItems((prev) => prev.filter((i) => i.idSubscriptionTypes !== idSubscriptionTypes));
+    } catch {
+      setError('No se pudo quitar el plan del carrito.');
+    } finally {
+      setRemovingId(null);
+    }
   };
 
   const handleCheckout = () => {
-    if (cartItems.length === 0) {
-      alert('Tu carrito está vacío. Agrega planes primero.');
+    if (items.length === 0) {
+      setError('Tu carrito está vacío. Agregá planes primero.');
       return;
     }
     navigate('/checkout');
   };
 
-  const subtotal = cartItems.reduce((sum, item) => sum + item.price, 0);
-  const shipping = 0;
-  const total = subtotal + shipping;
+  const subtotal = items.reduce((sum, item) => {
+    const descuento = Math.max(item.plan.cashDiscount ?? 0, item.plan.transferDiscount ?? 0);
+    return sum + item.plan.price * (1 - descuento / 100);
+  }, 0);
 
   if (loading) {
     return (
@@ -78,85 +98,97 @@ const CartPage: React.FC = () => {
       <div className="max-w-4xl mx-auto">
         <div className="text-center mb-8">
           <h1 className="text-4xl font-bold text-gray-800 mb-2">Mi Carrito de Compras</h1>
-          <p className="text-gray-600">
-            {user ? `Hola, ${user.firstName}!` : 'Revisa tus planes seleccionados.'}
-            {addedPlanId && <span className="block text-green-600 mt-1">¡Nuevo plan agregado al carrito!</span>}
-          </p>
+          <p className="text-gray-600">{user ? `Hola, ${user.firstName}!` : 'Revisá tus planes seleccionados.'}</p>
         </div>
 
-        {cartItems.length === 0 ? (
+        {error && (
+          <div className="bg-red-50 border border-red-200 text-red-700 text-sm rounded-xl px-4 py-3 mb-6 text-center">
+            {error}
+          </div>
+        )}
+
+        {items.length === 0 ? (
           <div className="text-center py-12">
             <svg className="mx-auto h-24 w-24 text-gray-400 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4m0 0L7 13m0 0l-1.5 7.5M7 13l-1.5 7.5M17 13l1.5 7.5M17 13l4-8m-8 4h8M9 4h6m-6 0h6a2 2 0 002-2V2a2 2 0 00-2-2H9a2 2 0 00-2 2v2a2 2 0 002 2z" />
             </svg>
             <h3 className="text-lg font-medium text-gray-900 mb-2">Tu carrito está vacío</h3>
-            <p className="text-gray-500 mb-4">¡Agrega planes de tu wishlist o explora clubes!</p>
+            <p className="text-gray-500 mb-4">¡Agregá planes desde el perfil de un club!</p>
             <div className="space-x-4">
-              <button
-                onClick={() => navigate('/customer/wishlist')}
-                className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors"
-              >
+              <button onClick={() => navigate('/customer/wishlist')} className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors">
                 Ver Wishlist
               </button>
-              <button
-                onClick={() => navigate('/explore')}
-                className="bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700 transition-colors"
-              >
+              <button onClick={() => navigate('/explore')} className="bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700 transition-colors">
                 Explorar Clubes
               </button>
             </div>
           </div>
         ) : (
-          <>
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-              <div className="lg:col-span-2 space-y-6">
-                {cartItems.map((plan) => (
-                  <PlanCard
-                    key={plan.planId}
-                    plan={plan}
-                    onRemove={() => handleRemove(plan.planId)}
-                    isInCart={true}
-                  />
-                ))}
-              </div>
-
-              <div className="lg:col-span-1">
-                <div className="bg-white rounded-xl shadow-md p-6 sticky top-8">
-                  <h2 className="text-xl font-bold text-gray-800 mb-4">Resumen del Pedido</h2>
-                  <div className="space-y-3 mb-6">
-                    <div className="flex justify-between text-sm">
-                      <span className="text-gray-600">Subtotal ({cartItems.length} items)</span>
-                      <span className="font-semibold">${subtotal.toLocaleString()} ARS</span>
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <div className="lg:col-span-2 space-y-4">
+              {items.map((item) => {
+                const descuento = Math.max(item.plan.cashDiscount ?? 0, item.plan.transferDiscount ?? 0);
+                const precioFinal = item.plan.price * (1 - descuento / 100);
+                return (
+                  <div key={item.cartItemId} className="bg-white rounded-xl shadow-md p-4 flex gap-4 items-center">
+                    <img
+                      src={item.plan.image || 'https://placehold.co/120x120/e2e8f0/94a3b8?text=Sin+imagen'}
+                      alt={item.plan.name}
+                      className="w-20 h-20 rounded-lg object-cover flex-shrink-0"
+                    />
+                    <div className="flex-grow min-w-0">
+                      <p className="text-xs text-gray-400">{item.club.name}</p>
+                      <h3 className="font-bold text-gray-900 truncate">{item.plan.name}</h3>
+                      <p className="text-sm text-gray-500">{item.plan.deliveryFrequency}</p>
+                      <div className="mt-1">
+                        {descuento > 0 && (
+                          <span className="text-xs text-gray-400 line-through mr-2">ARS {item.plan.price.toLocaleString('es-AR')}</span>
+                        )}
+                        <span className="font-bold text-indigo-700">ARS {precioFinal.toLocaleString('es-AR')}</span>
+                      </div>
                     </div>
-                    <div className="flex justify-between text-sm">
-                      <span className="text-gray-600">Envío</span>
-                      <span className="text-green-600 font-semibold">Gratis</span>
-                    </div>
-                    <div className="border-t pt-3 flex justify-between text-lg font-bold text-gray-800">
-                      <span>Total</span>
-                      <span>${total.toLocaleString()} ARS</span>
-                    </div>
+                    <button
+                      onClick={() => handleRemove(item.idSubscriptionTypes)}
+                      disabled={removingId === item.idSubscriptionTypes}
+                      className="text-red-400 hover:text-red-600 p-2 disabled:opacity-50"
+                      title="Quitar del carrito"
+                    >
+                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+                      </svg>
+                    </button>
                   </div>
-                  <button
-                    onClick={handleCheckout}
-                    className="w-full bg-blue-600 text-white py-3 px-6 rounded-lg hover:bg-blue-700 transition-colors font-semibold text-lg"
-                  >
-                    Proceder al Pago
-                  </button>
-                  <div className="mt-4 text-xs text-gray-500 text-center">
-                    Seguro y confidencial
+                );
+              })}
+            </div>
+
+            <div className="lg:col-span-1">
+              <div className="bg-white rounded-xl shadow-md p-6 sticky top-8">
+                <h2 className="text-xl font-bold text-gray-800 mb-4">Resumen del Pedido</h2>
+                <div className="space-y-3 mb-6">
+                  <div className="flex justify-between text-sm">
+                    <span className="text-gray-600">Subtotal ({items.length} planes)</span>
+                    <span className="font-semibold">${subtotal.toLocaleString('es-AR')} ARS</span>
+                  </div>
+                  <div className="border-t pt-3 flex justify-between text-lg font-bold text-gray-800">
+                    <span>Total</span>
+                    <span>${subtotal.toLocaleString('es-AR')} ARS</span>
                   </div>
                 </div>
+                <button
+                  onClick={handleCheckout}
+                  className="w-full bg-blue-600 text-white py-3 px-6 rounded-lg hover:bg-blue-700 transition-colors font-semibold text-lg"
+                >
+                  Proceder al Pago
+                </button>
+                <div className="mt-4 text-xs text-gray-500 text-center">Seguro y confidencial</div>
               </div>
             </div>
-          </>
+          </div>
         )}
 
         <div className="mt-12 text-center">
-          <button
-            onClick={() => navigate('/explore')}
-            className="bg-purple-600 text-white px-8 py-3 rounded-lg hover:bg-purple-700 transition-colors font-semibold"
-          >
+          <button onClick={() => navigate('/explore')} className="bg-purple-600 text-white px-8 py-3 rounded-lg hover:bg-purple-700 transition-colors font-semibold">
             Seguir Comprando
           </button>
         </div>
