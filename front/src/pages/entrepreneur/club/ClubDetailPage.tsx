@@ -161,8 +161,6 @@ const ClubDetailPage: React.FC = () => {
   const [confirmDeleteBannerId, setConfirmDeleteBannerId] = useState<number | null>(null);
   const [confirmDeleteSocialId, setConfirmDeleteSocialId] = useState<number | null>(null);
   const [toast, setToast] = useState<{ msg: string; type: 'success' | 'error' } | null>(null);
-  const [isFavorite, setIsFavorite] = useState(false);
-  const [favoriteLoading, setFavoriteLoading] = useState(false);
   const logoInputRef = useRef<HTMLInputElement>(null);
   const bannerInputRef = useRef<HTMLInputElement>(null);
   const historyInputRef = useRef<HTMLInputElement>(null);
@@ -191,17 +189,6 @@ const ClubDetailPage: React.FC = () => {
   useEffect(() => {
     if (clubId) fetchClub();
   }, [clubId, fetchClub]);
-
-  useEffect(() => {
-    const checkFavorite = async () => {
-      if (userRole !== 'customer' || !clubId) return;
-      try {
-        const res = await api.get(`/favorites/check/${clubId}`);
-        setIsFavorite(getResponseData(res)?.isFavorite ?? false);
-      } catch {}
-    };
-    checkFavorite();
-  }, [clubId, userRole]);
 
   const openCropper = (target: CropTarget, file: File) => {
     const validationError = validateImageFile(file);
@@ -377,19 +364,6 @@ const ClubDetailPage: React.FC = () => {
       fetchClub();
     } catch {
       showToast('Error al eliminar la red social', 'error');
-    }
-  };
-
-  const handleToggleFavorite = async () => {
-    if (!clubId) return;
-    setFavoriteLoading(true);
-    try {
-      const res = await api.post(`/favorites/toggle/${clubId}`);
-      setIsFavorite(getResponseData(res)?.isFavorite ?? false);
-    } catch {
-      showToast('No se pudo actualizar favoritos', 'error');
-    } finally {
-      setFavoriteLoading(false);
     }
   };
 
@@ -679,20 +653,6 @@ const ClubDetailPage: React.FC = () => {
             <span className="inline-flex items-center bg-purple-50 text-purple-700 text-xs font-semibold px-3 py-1.5 rounded-full border border-purple-100">
               {club.category}
             </span>
-            {!isOwner && (
-              <button
-                onClick={handleToggleFavorite}
-                disabled={favoriteLoading}
-                className={`flex items-center gap-2 text-sm font-medium transition-colors px-3 py-1.5 rounded-lg disabled:opacity-50 ${
-                  isFavorite ? 'text-red-500 bg-red-50 hover:bg-red-100' : 'text-gray-500 hover:text-red-500 hover:bg-red-50'
-                }`}
-              >
-                <svg className="h-4 w-4" viewBox="0 0 20 20" fill={isFavorite ? 'currentColor' : 'none'} stroke="currentColor">
-                  <path strokeWidth={isFavorite ? 0 : 1.5} fillRule="evenodd" d="M3.172 5.172a4.5 4.5 0 015.656 0L10 6.343l1.172-1.171a4.5 4.5 0 115.656 5.656L10 17.657l-6.828-6.829a4.5 4.5 0 010-5.656z" clipRule="evenodd" />
-                </svg>
-                {isFavorite ? 'En favoritos' : 'Guardar en favoritos'}
-              </button>
-            )}
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
             <div>
