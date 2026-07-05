@@ -31,6 +31,11 @@ interface WishlistEntry {
   club: WishlistClub;
 }
 
+interface GroupedByClub {
+  club: WishlistClub;
+  entries: WishlistEntry[];
+}
+
 const WishlistPage: React.FC = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
@@ -60,11 +65,13 @@ const WishlistPage: React.FC = () => {
     fetchWishlist();
   }, [user]);
 
-  const handleRemove = async (idSubscriptionTypes: number) => {
-    setRemovingId(idSubscriptionTypes);
+  const handleRemove = async (favoriteId: number) => {
+    const entry = entries.find((e) => e.favoriteId === favoriteId);
+    if (!entry) return;
+    setRemovingId(favoriteId);
     try {
-      await api.post(`/favorites/toggle/${idSubscriptionTypes}`);
-      setEntries((prev) => prev.filter((e) => e.idSubscriptionTypes !== idSubscriptionTypes));
+      await api.post(`/favorites/toggle/${entry.idSubscriptionTypes}`);
+      setEntries((prev) => prev.filter((e) => e.favoriteId !== favoriteId));
     } catch {
       setError('No se pudo quitar el plan de favoritos.');
     } finally {
@@ -73,13 +80,13 @@ const WishlistPage: React.FC = () => {
   };
 
   const clubOptions = useMemo(() => {
-    const map = new Map<number, string>();
-    entries.forEach((e) => map.set(e.club.id, e.club.name));
-    return Array.from(map.entries()).map(([id, name]) => ({ id, name }));
+    const map = new Map<number, WishlistClub>();
+    entries.forEach((e) => map.set(e.club.id, e.club));
+    return Array.from(map.values());
   }, [entries]);
 
-  const filteredEntries = useMemo(() => {
-    return entries.filter((entry) => {
+  const groupedByClub = useMemo<GroupedByClub[]>(() => {
+    const filtered = entries.filter((entry) => {
       if (selectedClubId !== null && entry.club.id !== selectedClubId) return false;
       if (!searchTerm.trim()) return true;
       const term = searchTerm.toLowerCase();
@@ -87,6 +94,17 @@ const WishlistPage: React.FC = () => {
       const planMatch = entry.plan.name.toLowerCase().includes(term);
       return clubMatch || planMatch;
     });
+
+    const groups = new Map<number, GroupedByClub>();
+    filtered.forEach((entry) => {
+      const existing = groups.get(entry.club.id);
+      if (existing) {
+        existing.entries.push(entry);
+      } else {
+        groups.set(entry.club.id, { club: entry.club, entries: [entry] });
+      }
+    });
+    return Array.from(groups.values());
   }, [entries, searchTerm, selectedClubId]);
 
   if (loading) {
@@ -106,7 +124,7 @@ const WishlistPage: React.FC = () => {
         <div className="text-center mb-8">
           <h1 className="text-4xl font-bold text-gray-800 mb-2">Mi Lista de Deseos</h1>
           <p className="text-gray-600">
-            {user ? `Hola, ${user.firstName}! ` : ''}Estos son los planes de suscripción que marcaste con corazón.
+            {user ? `Hola, ${user.firstName}! ` : ''}Estos son los planes que marcaste con corazón, agrupados por club.
           </p>
         </div>
 
@@ -131,8 +149,8 @@ const WishlistPage: React.FC = () => {
               className="p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
               <option value="">Todos los clubes</option>
-              {clubOptions.map((c) => (
-                <option key={c.id} value={c.id}>{c.name}</option>
+              {clubOptions.map((club) => (
+                <option key={club.id} value={club.id}>{club.name}</option>
               ))}
             </select>
           </div>
@@ -152,65 +170,69 @@ const WishlistPage: React.FC = () => {
               Explorar Clubes
             </button>
           </div>
-        ) : filteredEntries.length === 0 ? (
+        ) : groupedByClub.length === 0 ? (
           <div className="text-center py-16 bg-white rounded-xl shadow-inner">
             <p className="text-lg text-gray-600 font-medium">No hay resultados para tu búsqueda.</p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-            {filteredEntries.map((entry) => {
-              const descuento = Math.max(entry.plan.cashDiscount ?? 0, entry.plan.transferDiscount ?? 0);
-              return (
-                <div key={entry.favoriteId} className="bg-white rounded-2xl shadow-md overflow-hidden flex flex-col">
-                  <button
-                    onClick={() => navigate(`/club/${entry.club.id}`)}
-                    className="flex items-center gap-3 p-4 border-b border-gray-100 hover:bg-gray-50 transition-colors text-left"
-                  >
-                    <img
-                      src={entry.club.logoUrl || '/assets/default-club.jpg'}
-                      alt={entry.club.name}
-                      className="w-10 h-10 rounded-full object-cover border border-gray-100"
-                    />
-                    <div className="min-w-0">
-                      <p className="text-sm font-bold text-gray-900 truncate">{entry.club.name}</p>
-                      {entry.club.slogan && <p className="text-xs text-gray-500 italic truncate">{entry.club.slogan}</p>}
-                    </div>
-                  </button>
-                  <button
-                    onClick={() => navigate(`/club/${entry.club.id}/plan/${entry.idSubscriptionTypes}`)}
-                    className="text-left flex-grow"
-                  >
-                    <div className="relative">
-                      <img
-                        src={entry.plan.image || 'https://placehold.co/400x160/e2e8f0/94a3b8?text=Sin+imagen'}
-                        alt={entry.plan.name}
-                        className="w-full h-36 object-cover"
-                      />
-                      {descuento > 0 && (
-                        <span className="absolute top-2 right-2 text-xs bg-red-500 text-white px-2 py-0.5 rounded-full font-bold">-{descuento}%</span>
-                      )}
-                    </div>
-                    <div className="p-4">
-                      <h4 className="font-semibold text-gray-900 truncate">{entry.plan.name}</h4>
-                      <p className="text-xs text-gray-500 mb-2">{entry.plan.deliveryFrequency}</p>
-                      <span className="font-bold text-indigo-700">ARS {entry.plan.price.toLocaleString('es-AR')}</span>
-                    </div>
-                  </button>
-                  <div className="px-4 pb-4">
-                    <button
-                      onClick={() => handleRemove(entry.idSubscriptionTypes)}
-                      disabled={removingId === entry.idSubscriptionTypes}
-                      className="w-full flex items-center justify-center gap-2 text-sm text-red-500 hover:text-red-700 hover:bg-red-50 rounded-lg py-2 transition-colors disabled:opacity-50"
-                    >
-                      <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                        <path fillRule="evenodd" d="M3.172 5.172a4.5 4.5 0 015.656 0L10 6.343l1.172-1.171a4.5 4.5 0 115.656 5.656L10 17.657l-6.828-6.829a4.5 4.5 0 010-5.656z" clipRule="evenodd" />
-                      </svg>
-                      Quitar de favoritos
-                    </button>
+          <div className="space-y-6">
+            {groupedByClub.map((group) => (
+              <div key={group.club.id} className="bg-white rounded-2xl shadow-md overflow-hidden">
+                <div
+                  className="flex items-center gap-4 p-5 border-b border-gray-100 cursor-pointer"
+                  onClick={() => navigate(`/club/${group.club.id}`)}
+                >
+                  <img
+                    src={group.club.logoUrl || '/assets/default-club.jpg'}
+                    alt={group.club.name}
+                    className="w-14 h-14 rounded-full object-cover border border-gray-100"
+                  />
+                  <div>
+                    <h3 className="font-bold text-gray-900 text-lg hover:text-blue-600 transition-colors">{group.club.name}</h3>
+                    {group.club.slogan && <p className="text-sm text-gray-500 italic">{group.club.slogan}</p>}
                   </div>
                 </div>
-              );
-            })}
+                <div className="p-5 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                  {group.entries.map((entry) => {
+                    const descuento = Math.max(entry.plan.cashDiscount ?? 0, entry.plan.transferDiscount ?? 0);
+                    return (
+                      <div key={entry.favoriteId} className="relative border border-gray-100 rounded-xl overflow-hidden bg-gray-50">
+                        <button
+                          onClick={() => handleRemove(entry.favoriteId)}
+                          disabled={removingId === entry.favoriteId}
+                          className="absolute top-2 right-2 z-10 bg-white/90 text-red-500 hover:text-red-700 p-1.5 rounded-full shadow-md transition-colors disabled:opacity-50"
+                          title="Quitar de favoritos"
+                        >
+                          <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                            <path fillRule="evenodd" d="M3.172 5.172a4.5 4.5 0 015.656 0L10 6.343l1.172-1.171a4.5 4.5 0 115.656 5.656L10 17.657l-6.828-6.829a4.5 4.5 0 010-5.656z" clipRule="evenodd" />
+                          </svg>
+                        </button>
+                        <button
+                          onClick={() => navigate(`/club/${group.club.id}/plan/${entry.plan.planId}`)}
+                          className="w-full text-left"
+                        >
+                          <img
+                            src={entry.plan.image || 'https://placehold.co/400x160/e2e8f0/94a3b8?text=Sin+imagen'}
+                            alt={entry.plan.name}
+                            className="w-full h-28 object-cover"
+                          />
+                          <div className="p-3">
+                            <h4 className="font-semibold text-gray-900 text-sm truncate pr-6">{entry.plan.name}</h4>
+                            <p className="text-xs text-gray-500 mb-1">{entry.plan.deliveryFrequency}</p>
+                            <div className="flex items-center justify-between">
+                              <span className="font-bold text-indigo-700 text-sm">ARS {entry.plan.price.toLocaleString('es-AR')}</span>
+                              {descuento > 0 && (
+                                <span className="text-xs bg-red-100 text-red-600 px-2 py-0.5 rounded-full font-semibold">-{descuento}%</span>
+                              )}
+                            </div>
+                          </div>
+                        </button>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            ))}
           </div>
         )}
       </div>

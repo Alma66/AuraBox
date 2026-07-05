@@ -18,7 +18,11 @@ export class FavoritesController {
   @Post()
   @UsePipes(new ValidationPipe({ whitelist: true, transform: true }))
   async create(@Body() dto: CreateFavoriteDto, @Request() req) {
-    return this.favoritesService.create({ ...dto, idUser: req.user.id });
+    const idUser = dto.idUser ?? req.user.id;
+    if (req.user.id !== idUser && req.user.role !== 'admin') {
+      throw new ForbiddenException('No autorizado para crear este favorito');
+    }
+    return this.favoritesService.create({ ...dto, idUser });
   }
 
   @Post('toggle/:idSubscriptionTypes')
