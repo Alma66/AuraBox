@@ -1,17 +1,25 @@
-export type SubscriptionStatus = 'ACTIVA' | 'CANCELADA' | 'PAUSADA' | 'PENDIENTE_PAGO' | 'FINALIZADA';
+export type SubscriptionStatus = 'Activa' | 'Pendiente_Pago' | 'Cancelada' | 'Pausada' | 'Finalizada';
 
-export type NormalizedStatus = 'active' | 'paused' | 'cancelled' | 'pending' | 'finished';
+export type NormalizedStatus = 'active' | 'pending' | 'cancelled' | 'paused' | 'finished';
 
 export function normalizeStatus(status: SubscriptionStatus): NormalizedStatus {
   switch (status) {
-    case 'ACTIVA': return 'active';
-    case 'PAUSADA': return 'paused';
-    case 'CANCELADA': return 'cancelled';
-    case 'PENDIENTE_PAGO': return 'pending';
-    case 'FINALIZADA': return 'finished';
+    case 'Activa': return 'active';
+    case 'Pausada': return 'paused';
+    case 'Cancelada': return 'cancelled';
+    case 'Pendiente_Pago': return 'pending';
+    case 'Finalizada': return 'finished';
     default: return 'active';
   }
 }
+
+export const STATUS_LABELS: Record<SubscriptionStatus, string> = {
+  Activa: 'Activa',
+  Pendiente_Pago: 'Pago Pendiente',
+  Cancelada: 'Cancelada',
+  Pausada: 'Pausada',
+  Finalizada: 'Finalizada',
+};
 
 export interface Subscription {
   id: number;

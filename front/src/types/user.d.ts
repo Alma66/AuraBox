@@ -23,4 +23,11 @@ export interface User {
   managedClubId?: string;
   registeredDate?: string;
   lastLogin?: string;
+  gender?: string;
+  country?: string;
+  locality?: string;
+  street?: string;
+  streetNumber?: string;
+  floor?: string;
+  details?: string;
 }
