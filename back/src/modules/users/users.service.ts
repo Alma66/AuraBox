@@ -25,6 +25,11 @@ const USER_SELECT = {
   postalCode: true,
   active: true,
   acceptsNewsletter: true,
+  gender: true,
+  country: true,
+  showGenderPublicly: true,
+  homeLatitude: true,
+  homeLongitude: true,
 };
 
 function sanitizeUser(user: any) {
@@ -38,6 +43,12 @@ function sanitizeUser(user: any) {
   }
   if (rest.balanceAvailable !== undefined && rest.balanceAvailable !== null) {
     try { rest.balanceAvailable = (rest.balanceAvailable as any).toString(); } catch {}
+  }
+  if (rest.homeLatitude !== undefined && rest.homeLatitude !== null) {
+    try { rest.homeLatitude = (rest.homeLatitude as any).toString(); } catch {}
+  }
+  if (rest.homeLongitude !== undefined && rest.homeLongitude !== null) {
+    try { rest.homeLongitude = (rest.homeLongitude as any).toString(); } catch {}
   }
   return rest;
 }
@@ -101,6 +112,12 @@ export class UsersService {
     if (dto.province !== undefined)      data.province      = dto.province;
     if (dto.postalCode !== undefined)    data.postalCode    = dto.postalCode;
     if (dto.acceptsNewsletter !== undefined) data.acceptsNewsletter = dto.acceptsNewsletter;
+    if (dto.gender !== undefined)        data.gender        = dto.gender;
+    if (dto.country !== undefined)       data.country       = dto.country;
+    if (dto.showGenderPublicly !== undefined) data.showGenderPublicly = dto.showGenderPublicly;
+    if (dto.active !== undefined)        data.active        = dto.active;
+    if (dto.latitude !== undefined)      data.homeLatitude  = dto.latitude;
+    if (dto.longitude !== undefined)     data.homeLongitude = dto.longitude;
 
     try {
       const updated = await this.prisma.user.update({ where: { id }, data, select: USER_SELECT });
@@ -133,28 +150,28 @@ export class UsersService {
     }
   }
 
-async findSubscribersByClub(idClub: number) {
-  const subTypes = await this.prisma.subscription_Types.findMany({
-    where: { idClub },
-    select: { id: true },
-  });
-  const subTypeIds = subTypes.map((s) => s.id);
-  if (subTypeIds.length === 0) return [];
+  async findSubscribersByClub(idClub: number) {
+    const subTypes = await this.prisma.subscription_Types.findMany({
+      where: { idClub },
+      select: { id: true },
+    });
+    const subTypeIds = subTypes.map((s) => s.id);
+    if (subTypeIds.length === 0) return [];
 
-  const activeSubs = await this.prisma.user_Subscriptions.findMany({
-    where: {
-      idSubscriptionTypes: { in: subTypeIds },
-      subscriptionStatus: 'Activa',
-    },
-    select: { idUser: true },
-  });
-  const userIds = Array.from(new Set(activeSubs.map((s) => s.idUser)));
-  if (userIds.length === 0) return [];
+    const activeSubs = await this.prisma.user_Subscriptions.findMany({
+      where: {
+        idSubscriptionTypes: { in: subTypeIds },
+        subscriptionStatus: 'Activa',
+      },
+      select: { idUser: true },
+    });
+    const userIds = Array.from(new Set(activeSubs.map((s) => s.idUser)));
+    if (userIds.length === 0) return [];
 
-  const users = await this.prisma.user.findMany({
-    where: { id: { in: userIds }, acceptsNewsletter: true },
-    select: USER_SELECT,
-  });
-  return users.map(sanitizeUser);
-}
+    const users = await this.prisma.user.findMany({
+      where: { id: { in: userIds }, acceptsNewsletter: true },
+      select: USER_SELECT,
+    });
+    return users.map(sanitizeUser);
+  }
 }

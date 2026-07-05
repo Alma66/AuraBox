@@ -75,9 +75,16 @@ const UserProfileContent: React.FC<UserProfileContentProps> = ({ activeSection, 
     }
   };
 
-  const handleSaveGender = (newGender: string) => {
-    setEditedGender(newGender);
-    setIsEditingGender(false);
+  const handleSaveGender = async (newGender: string) => {
+    try {
+      await api.patch('/users/me', { gender: newGender });
+      setEditedGender(newGender);
+      setIsEditingGender(false);
+      showFeedback('Género guardado correctamente');
+      onUserUpdate();
+    } catch {
+      showFeedback(undefined, 'Error al guardar el género');
+    }
   };
 
   const handleSaveBirthDate = async () => {
@@ -121,12 +128,21 @@ const UserProfileContent: React.FC<UserProfileContentProps> = ({ activeSection, 
         city: locationData.city,
         province: locationData.locality || locationData.city,
         postalCode: locationData.postalCode,
+        country: locationData.country,
       });
       showFeedback('Ubicación guardada correctamente');
       onUserUpdate();
     } catch {
       showFeedback(undefined, 'Error al guardar la ubicación');
     }
+  };
+
+  const handleNewsletterChange = () => {
+    onUserUpdate();
+  };
+
+  const handleGenderVisibilityChange = () => {
+    onUserUpdate();
   };
 
   const Feedback = () => (
@@ -208,12 +224,14 @@ const UserProfileContent: React.FC<UserProfileContentProps> = ({ activeSection, 
             <LocationSection
               country={user.country || ''}
               city={user.city || ''}
-              locality={user.locality || ''}
+              locality={user.province || user.locality || ''}
               postalCode={user.postalCode || ''}
               street={user.streetAddress || user.street || ''}
               streetNumber={user.addressNumber ? String(user.addressNumber) : (user.streetNumber || '')}
               floor={user.floorNumber || user.floor || ''}
               details={user.addressDetails || user.details || ''}
+              homeLatitude={user.homeLatitude}
+              homeLongitude={user.homeLongitude}
               onSave={handleSaveLocation}
               isEntrepreneurProfile={false}
               userRole="customer"
@@ -222,10 +240,20 @@ const UserProfileContent: React.FC<UserProfileContentProps> = ({ activeSection, 
         );
 
       case 'security':
-        return <SecuritySection />;
+        return (
+          <SecuritySection
+            showGenderPublicly={!!user.showGenderPublicly}
+            onGenderVisibilityChange={handleGenderVisibilityChange}
+          />
+        );
 
       case 'settings':
-        return <SettingsSection />;
+        return (
+          <SettingsSection
+            acceptsNewsletter={!!user.acceptsNewsletter}
+            onNewsletterChange={handleNewsletterChange}
+          />
+        );
 
       default:
         return <p className="text-gray-600">Seleccioná una sección del menú.</p>;

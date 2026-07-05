@@ -88,11 +88,14 @@ const FeaturedClubCard: React.FC<FeaturedClubCardProps> = ({ id, name, slogan, l
 
 const HomePage: React.FC = () => {
   const [featuredClubs, setFeaturedClubs] = useState<Club[]>([]);
+  const [recommendedClubs, setRecommendedClubs] = useState<Club[]>([]);
   const [loading, setLoading] = useState(true);
+  const [loadingRecommended, setLoadingRecommended] = useState(false);
   const [showWelcome, setShowWelcome] = useState(false);
   const [welcomeName, setWelcomeName] = useState<string | undefined>(undefined);
   const location = useLocation();
   const navigate = useNavigate();
+  const isLoggedIn = !!localStorage.getItem('access_token');
 
   useEffect(() => {
     const fetchFeatured = async () => {
@@ -108,6 +111,23 @@ const HomePage: React.FC = () => {
     };
     fetchFeatured();
   }, []);
+
+  useEffect(() => {
+    if (!isLoggedIn) return;
+    const fetchRecommended = async () => {
+      setLoadingRecommended(true);
+      try {
+        const response = await api.get('/clubs/recommendations');
+        const data = getResponseData(response);
+        setRecommendedClubs(Array.isArray(data) ? data : []);
+      } catch (error) {
+        console.error("Error fetching recommended clubs:", error);
+      } finally {
+        setLoadingRecommended(false);
+      }
+    };
+    fetchRecommended();
+  }, [isLoggedIn]);
 
   useEffect(() => {
     const state = location.state as { showWelcome?: boolean; welcomeName?: string } | null;
@@ -146,6 +166,33 @@ const HomePage: React.FC = () => {
         backgroundImage="/assets/hero-background.jpg"
       />
       <div className="container mx-auto px-4 py-8 flex-grow">
+        {isLoggedIn && (recommendedClubs.length > 0 || loadingRecommended) && (
+          <section className="mb-16">
+            <h2 className="text-4xl font-bold text-gray-800 mb-2 text-center animate-fadeInUp">
+              Recomendado para vos
+            </h2>
+            <p className="text-center text-gray-500 mb-10">
+              Según tus suscripciones y tus preferencias de contenido
+            </p>
+            {loadingRecommended ? (
+              <div className="text-center py-8">Buscando recomendaciones...</div>
+            ) : (
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-6">
+                {recommendedClubs.map((club) => (
+                  <FeaturedClubCard
+                    key={club.id}
+                    id={club.id}
+                    name={club.name}
+                    slogan={club.slogan}
+                    logoUrl={club.logoUrl}
+                    averageRating={club.averageRating}
+                  />
+                ))}
+              </div>
+            )}
+          </section>
+        )}
+
         <section className="mb-16">
           <h2 className="text-4xl font-bold text-gray-800 mb-2 text-center animate-fadeInUp">
             Clubes Destacados

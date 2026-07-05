@@ -19,6 +19,19 @@ export class ClubsService {
     private readonly cloudinaryService: CloudinaryService,
   ) {}
 
+  private readonly categoryAffinity: Record<string, string[]> = {
+    'café': ['libros', 'té', 'repostería', 'gourmet'],
+    'libros': ['café', 'té', 'arte'],
+    'té': ['libros', 'café', 'bienestar'],
+    'vinos': ['quesos', 'gourmet', 'chocolate'],
+    'quesos': ['vinos', 'gourmet'],
+    'gourmet': ['vinos', 'quesos', 'café'],
+    'belleza': ['bienestar', 'aromaterapia'],
+    'bienestar': ['belleza', 'plantas', 'té'],
+    'plantas': ['bienestar', 'decoración'],
+    'mascotas': ['bienestar'],
+  };
+
   async create(dto: CreateClubDto) {
     if (!dto.logoUrl) {
       throw new BadRequestException('logoUrl es requerido');
@@ -96,6 +109,87 @@ export class ClubsService {
       take: 12,
     });
     return clubs.map((c) => this.sanitizeClub(c));
+  }
+
+  async getRecommendationsForUser(userId: number) {
+    const activeSubs = await this.prisma.user_Subscriptions.findMany({
+      where: { idUser: userId, subscriptionStatus: { in: ['Activa', 'Pausada'] as any } },
+      select: { idSubscriptionTypes: true },
+    });
+    const subTypeIds = activeSubs.map((s) => s.idSubscriptionTypes);
+    const subTypes = subTypeIds.length > 0
+      ? await this.prisma.subscription_Types.findMany({ where: { id: { in: subTypeIds } } })
+      : [];
+    const subscribedClubIds = Array.from(new Set(subTypes.map((s) => s.idClub)));
+
+    const subscribedClubCategoryLinks = subscribedClubIds.length > 0
+      ? await this.prisma.club_Categories.findMany({ where: { idClub: { in: subscribedClubIds } } })
+      : [];
+    const subscribedCategoryIds = Array.from(new Set(subscribedClubCategoryLinks.map((l) => l.idCategories)));
+
+    const preferenceLinks = await this.prisma.user_Category_Preference.findMany({ where: { idUser: userId } });
+    const preferredCategoryIds = preferenceLinks.map((p) => p.idCategory);
+
+    const relevantCategoryIds = Array.from(new Set([...subscribedCategoryIds, ...preferredCategoryIds]));
+    const allRelevantCategories = relevantCategoryIds.length > 0
+      ? await this.prisma.categories.findMany({ where: { id: { in: relevantCategoryIds } } })
+      : [];
+    const categoryNameById = new Map(allRelevantCategories.map((c) => [c.id, c.name.toLowerCase()]));
+
+    const subscribedCategoryNames = new Set(
+      subscribedCategoryIds.map((id) => categoryNameById.get(id)).filter(Boolean) as string[],
+    );
+    const preferredCategoryNames = new Set(
+      preferredCategoryIds.map((id) => categoryNameById.get(id)).filter(Boolean) as string[],
+    );
+
+    const affineNames = new Set<string>();
+    [...subscribedCategoryNames, ...preferredCategoryNames].forEach((name) => {
+      const related = this.categoryAffinity[name];
+      if (related) related.forEach((r) => affineNames.add(r));
+    });
+
+    const candidateClubs = await this.prisma.club.findMany({
+      where: {
+        clubStatus: 'APROBADO',
+        id: subscribedClubIds.length > 0 ? { notIn: subscribedClubIds } : undefined,
+      },
+      orderBy: { averageRating: 'desc' },
+    });
+
+    if (candidateClubs.length === 0) return [];
+
+    const candidateIds = candidateClubs.map((c) => c.id);
+    const candidateLinks = await this.prisma.club_Categories.findMany({ where: { idClub: { in: candidateIds } } });
+    const candidateCategoryIds = Array.from(new Set(candidateLinks.map((l) => l.idCategories)));
+    const candidateCategories = candidateCategoryIds.length > 0
+      ? await this.prisma.categories.findMany({ where: { id: { in: candidateCategoryIds } } })
+      : [];
+    const candidateCategoryNameById = new Map(candidateCategories.map((c) => [c.id, c.name.toLowerCase()]));
+
+    const sameCategoryBucket: any[] = [];
+    const otherBucket: any[] = [];
+
+    for (const club of candidateClubs) {
+      const links = candidateLinks.filter((l) => l.idClub === club.id);
+      const names = links.map((l) => candidateCategoryNameById.get(l.idCategories)).filter(Boolean) as string[];
+      const isSameAsSubscribed = names.some((n) => subscribedCategoryNames.has(n));
+      const matchesPreferred = names.some((n) => preferredCategoryNames.has(n));
+      const matchesAffinity = names.some((n) => affineNames.has(n));
+      const rating = club.averageRating ? Number(club.averageRating) : 0;
+      let score = rating * 0.5;
+      if (matchesPreferred) score += 3;
+      if (matchesAffinity) score += 2;
+
+      const enriched = { ...this.sanitizeClub(club), categories: names, score };
+      if (isSameAsSubscribed) sameCategoryBucket.push(enriched);
+      else otherBucket.push(enriched);
+    }
+
+    sameCategoryBucket.sort((a, b) => b.score - a.score);
+    otherBucket.sort((a, b) => b.score - a.score);
+
+    return [...sameCategoryBucket.slice(0, 2), ...otherBucket].slice(0, 10);
   }
 
   async findOne(id: number, requestingUserId?: number) {

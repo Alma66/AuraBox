@@ -539,7 +539,22 @@ model User {
   birthDate         DateTime?    @map("Birth_Date")
   phoneNumber       Int?         @map("Phone_Number")
   acceptsNewsletter Boolean     @default(false) @map("Accepts_Newsletter")
+  gender             String?      @map("Gender")
+  country            String?      @map("Country")
+  showGenderPublicly Boolean      @default(false) @map("Show_Gender_Publicly")
+  homeLatitude       Decimal?     @map("Home_Latitude") @db.Decimal(9, 6)
+  homeLongitude      Decimal?     @map("Home_Longitude") @db.Decimal(9, 6)
   @@map("User")
+}
+
+model User_Category_Preference {
+  id         Int      @id @default(autoincrement()) @map("ID")
+  idUser     Int      @map("ID_User")
+  idCategory Int      @map("ID_Category")
+  createdAt  DateTime @default(now()) @map("Created_At")
+
+  @@unique([idUser, idCategory])
+  @@map("User_Category_Preference")
 }
 
 model User_Club_Preferences {

@@ -30,4 +30,8 @@ export interface User {
   streetNumber?: string;
   floor?: string;
   details?: string;
+  acceptsNewsletter?: boolean;
+  showGenderPublicly?: boolean;
+  homeLatitude?: string | null;
+  homeLongitude?: string | null;
 }

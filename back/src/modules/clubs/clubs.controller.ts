@@ -56,6 +56,12 @@ export class ClubsController {
     return this.clubsService.findFeatured();
   }
 
+  @UseGuards(JwtAuthGuard)
+  @Get('recommendations')
+  async getRecommendations(@Request() req: any) {
+    return this.clubsService.getRecommendationsForUser(req.user.id);
+  }
+  
   @Public()
   @UseGuards(JwtAuthGuard)
   @Get(':id')

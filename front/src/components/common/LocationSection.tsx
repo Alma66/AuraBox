@@ -1,10 +1,17 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import EditProfileField from './EditProfileField';
 import locationsData from '../../data/locations.json';
-import { MapContainer, TileLayer, Marker, useMapEvents } from 'react-leaflet';
-import { LatLng, LeafletMouseEvent } from 'leaflet';
+import { MapContainer, TileLayer, Marker, useMap, useMapEvents } from 'react-leaflet';
+import L, { LatLng, LeafletMouseEvent } from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import api from '../../api/config';
+
+delete (L.Icon.Default.prototype as any)._getIconUrl;
+L.Icon.Default.mergeOptions({
+  iconRetinaUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png',
+  iconUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png',
+  shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
+});
 
 interface LocationSectionProps {
   country: string;
@@ -15,6 +22,8 @@ interface LocationSectionProps {
   streetNumber: string;
   floor: string;
   details: string;
+  homeLatitude?: string | null;
+  homeLongitude?: string | null;
   onSave: (data: {
     country: string;
     city: string;
@@ -34,9 +43,19 @@ interface LocationData {
   cities: { name: string; localities: string[] }[];
 }
 
+const DEFAULT_CENTER: [number, number] = [-34.6037, -58.3816];
+
+const RecenterMap: React.FC<{ position: LatLng | null }> = ({ position }) => {
+  const map = useMap();
+  useEffect(() => {
+    if (position) map.setView(position, 16);
+  }, [position, map]);
+  return null;
+};
+
 const LocationSection: React.FC<LocationSectionProps> = ({
   country, city, locality, postalCode, street, streetNumber, floor, details,
-  onSave, isEntrepreneurProfile = false, userRole = 'customer',
+  homeLatitude, homeLongitude, onSave, isEntrepreneurProfile = false, userRole = 'customer',
 }) => {
   const [editedCountry, setEditedCountry] = useState(country);
   const [isEditingCountry, setIsEditingCountry] = useState(false);
@@ -59,9 +78,12 @@ const LocationSection: React.FC<LocationSectionProps> = ({
   const [showSensitiveLocationInfo, setShowSensitiveLocationInfo] = useState(false);
   const [locationPassword, setLocationPassword] = useState('');
   const [locationPasswordError, setLocationPasswordError] = useState('');
-  const [coordinates, setCoordinates] = useState<LatLng | null>(null);
+  const [coordinates, setCoordinates] = useState<LatLng | null>(
+    homeLatitude && homeLongitude ? new LatLng(Number(homeLatitude), Number(homeLongitude)) : null,
+  );
   const [saveError, setSaveError] = useState('');
   const [saveSuccess, setSaveSuccess] = useState('');
+  const geocodedOnce = useRef(false);
 
   useEffect(() => {
     setEditedCountry(country); setEditedCity(city); setEditedLocality(locality);
@@ -72,8 +94,14 @@ const LocationSection: React.FC<LocationSectionProps> = ({
     setIsEditingStreetNumber(false); setIsEditingFloor(false); setIsEditingDetails(false);
     setShowSensitiveLocationInfo(false);
     setLocationPassword(''); setLocationPasswordError('');
-    setCoordinates(null); setSaveError(''); setSaveSuccess('');
+    setSaveError(''); setSaveSuccess('');
   }, [country, city, locality, postalCode, street, streetNumber, floor, details, isEntrepreneurProfile]);
+
+  useEffect(() => {
+    if (homeLatitude && homeLongitude) {
+      setCoordinates(new LatLng(Number(homeLatitude), Number(homeLongitude)));
+    }
+  }, [homeLatitude, homeLongitude]);
 
   useEffect(() => {
     const countryData = (locationsData as LocationData[]).find((loc) => loc.country === editedCountry);
@@ -89,18 +117,19 @@ const LocationSection: React.FC<LocationSectionProps> = ({
   }, [editedCountry, editedCity]);
 
   useEffect(() => {
-    if (!coordinates) return;
-    fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${coordinates.lat}&lon=${coordinates.lng}`)
-      .then(res => res.json())
-      .then(data => {
-        setEditedStreet(data.address?.road || '');
-        setEditedStreetNumber(data.address?.house_number || '');
-        setEditedCity(data.address?.city || '');
-        setEditedLocality(data.address?.suburb || '');
-        setEditedPostalCode(data.address?.postcode || '');
+    if (coordinates || geocodedOnce.current || isEntrepreneurProfile) return;
+    if (!street && !city) return;
+    geocodedOnce.current = true;
+    const query = `${street} ${streetNumber}, ${city}, ${locality}, ${country}`;
+    fetch(`https://nominatim.openstreetmap.org/search?format=json&limit=1&q=${encodeURIComponent(query)}`)
+      .then((res) => res.json())
+      .then((data) => {
+        if (Array.isArray(data) && data.length > 0) {
+          setCoordinates(new LatLng(Number(data[0].lat), Number(data[0].lon)));
+        }
       })
-      .catch(err => console.error('Error en reverse geocoding:', err));
-  }, [coordinates]);
+      .catch(() => {});
+  }, [coordinates, street, streetNumber, city, locality, country, isEntrepreneurProfile]);
 
   const endpoint = userRole === 'entrepreneur' ? '/entrepreneurs/me' : '/users/me';
   const verifyEndpoint = userRole === 'entrepreneur' ? '/entrepreneurs/me/verify-password' : '/users/me/verify-password';
@@ -136,8 +165,47 @@ const LocationSection: React.FC<LocationSectionProps> = ({
     }
   };
 
+  const handleMapClick = async (latlng: LatLng) => {
+    setCoordinates(latlng);
+    try {
+      await api.patch(endpoint, { latitude: latlng.lat, longitude: latlng.lng });
+    } catch {
+      showFeedback(undefined, 'Error al guardar la ubicación en el mapa');
+      return;
+    }
+    try {
+      const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${latlng.lat}&lon=${latlng.lng}`);
+      const data = await res.json();
+      const nextStreet = data.address?.road || editedStreet;
+      const nextStreetNumber = data.address?.house_number || editedStreetNumber;
+      const nextCity = data.address?.city || data.address?.town || editedCity;
+      const nextLocality = data.address?.suburb || editedLocality;
+      const nextPostalCode = data.address?.postcode || editedPostalCode;
+      setEditedStreet(nextStreet);
+      setEditedStreetNumber(nextStreetNumber);
+      setEditedCity(nextCity);
+      setEditedLocality(nextLocality);
+      setEditedPostalCode(nextPostalCode);
+      await api.patch(endpoint, {
+        streetAddress: nextStreet,
+        addressNumber: nextStreetNumber ? parseInt(nextStreetNumber) : null,
+        city: nextCity,
+        province: nextLocality,
+        postalCode: nextPostalCode,
+      });
+      onSave({
+        country: editedCountry, city: nextCity, locality: nextLocality,
+        postalCode: nextPostalCode, street: nextStreet, streetNumber: nextStreetNumber,
+        floor: editedFloor, details: editedDetails,
+      });
+      showFeedback('Ubicación actualizada en el mapa');
+    } catch {
+      showFeedback('Pin guardado, pero no se pudo completar la dirección automáticamente');
+    }
+  };
+
   const LocationMarker = () => {
-    useMapEvents({ click(e: LeafletMouseEvent) { setCoordinates(e.latlng); } });
+    useMapEvents({ click(e: LeafletMouseEvent) { handleMapClick(e.latlng); } });
     return coordinates === null ? null : <Marker position={coordinates} />;
   };
 
@@ -156,7 +224,7 @@ const LocationSection: React.FC<LocationSectionProps> = ({
           {(locationsData as LocationData[]).map((loc) => <option key={loc.country} value={loc.country} />)}
         </datalist>
         <button onClick={async () => {
-          await persistLocation(userRole === 'entrepreneur' ? { city: editedCity, province: editedLocality } : { city: editedCity });
+          await persistLocation({ country: editedCountry });
           setIsEditingCountry(false);
         }} className="mt-4 bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors duration-200">
           Guardar País
@@ -190,7 +258,7 @@ const LocationSection: React.FC<LocationSectionProps> = ({
           {availableLocalities.map((c) => <option key={c} value={c} />)}
         </datalist>
         <button onClick={async () => {
-          await persistLocation(userRole === 'entrepreneur' ? { province: editedLocality } : { province: editedLocality });
+          await persistLocation({ province: editedLocality });
           setIsEditingLocality(false);
         }} className="mt-4 bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors duration-200">
           Guardar Localidad
@@ -275,11 +343,12 @@ const LocationSection: React.FC<LocationSectionProps> = ({
             </EditProfileField>
 
             <div className="mt-6 border border-gray-300 rounded p-4 relative bg-gray-50">
-              <p className="mb-2 font-semibold text-gray-700">Mapa de Ubicación (hacé clic para seleccionar)</p>
-              <MapContainer center={[-34.6037, -58.3816]} zoom={13} style={{ height: '400px', width: '100%' }}>
+              <p className="mb-2 font-semibold text-gray-700">Mapa de Ubicación (hacé clic para marcar tu dirección)</p>
+              <MapContainer center={coordinates ?? DEFAULT_CENTER} zoom={coordinates ? 16 : 13} style={{ height: '400px', width: '100%' }}>
                 <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
                   attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors' />
                 <LocationMarker />
+                <RecenterMap position={coordinates} />
               </MapContainer>
               {coordinates && (
                 <p className="mt-2 text-sm text-gray-600">
