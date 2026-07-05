@@ -48,6 +48,17 @@ const ReviewCard: React.FC<ReviewCardProps> = ({ review, club, onDelete, onEdit 
       </div>
       {review.title && <p className="font-semibold text-gray-800 mb-1">{review.title}</p>}
       <p className="text-gray-700 mb-4 leading-relaxed">{review.comment}</p>
+      {review.media && review.media.length > 0 && (
+        <div className="flex flex-wrap gap-2 mb-4">
+          {review.media.map((m) => (
+            m.mediaType === 'Video' ? (
+              <video key={m.id} src={m.mediaUrl} controls className="w-24 h-24 object-cover rounded-lg" />
+            ) : (
+              <img key={m.id} src={m.mediaUrl} alt="Reseña" className="w-24 h-24 object-cover rounded-lg" />
+            )
+          ))}
+        </div>
+      )}
       <div className={`inline-flex px-3 py-1 rounded-full text-sm font-medium ${statusColor} mb-4`}>
         {statusLabel}{hiddenText}
       </div>

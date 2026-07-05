@@ -1,18 +1,21 @@
 import { Injectable } from '@nestjs/common';
 import { v2 as cloudinary } from 'cloudinary';
 
+function ensureConfigured() {
+  const cfg = cloudinary.config();
+  if (!cfg.api_key) {
+    cloudinary.config({
+      cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+      api_key: process.env.CLOUDINARY_API_KEY,
+      api_secret: process.env.CLOUDINARY_API_SECRET,
+    });
+  }
+}
+
 @Injectable()
 export class CloudinaryService {
-
   async uploadImage(file: Express.Multer.File, folder: string = 'aurabox'): Promise<string> {
-    const cfg = cloudinary.config();
-    if (!cfg.api_key) {
-      cloudinary.config({
-        cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
-        api_key: process.env.CLOUDINARY_API_KEY,
-        api_secret: process.env.CLOUDINARY_API_SECRET,
-      });
-    }
+    ensureConfigured();
     return new Promise((resolve, reject) => {
       const uploadStream = cloudinary.uploader.upload_stream(
         {
@@ -33,8 +36,27 @@ export class CloudinaryService {
     });
   }
 
-  async deleteImage(publicId: string): Promise<void> {
-    await cloudinary.uploader.destroy(publicId);
+  async uploadVideo(file: Express.Multer.File, folder: string = 'aurabox'): Promise<string> {
+    ensureConfigured();
+    return new Promise((resolve, reject) => {
+      const uploadStream = cloudinary.uploader.upload_stream(
+        {
+          folder,
+          resource_type: 'video',
+          transformation: [{ quality: 'auto' }],
+        },
+        (error, result) => {
+          if (error) reject(error);
+          else resolve(result!.secure_url);
+        },
+      );
+      uploadStream.end(file.buffer);
+    });
+  }
+
+  async deleteImage(publicId: string, resourceType: 'image' | 'video' | 'raw' = 'image'): Promise<void> {
+    ensureConfigured();
+    await cloudinary.uploader.destroy(publicId, { resource_type: resourceType });
   }
 
   extractPublicId(url: string): string {
@@ -45,6 +67,7 @@ export class CloudinaryService {
   }
 
   async uploadDocument(file: Express.Multer.File, folder: string = 'aurabox'): Promise<string> {
+    ensureConfigured();
     return new Promise((resolve, reject) => {
       const uploadStream = cloudinary.uploader.upload_stream(
         { folder, resource_type: 'raw' },

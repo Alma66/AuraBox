@@ -308,21 +308,33 @@ model Promotion {
 
 
 model Reviews {
-  id           Int       @id @default(autoincrement()) @map("ID")
-  idUser       Int       @map("ID_User")
-  idClub       Int       @map("ID_Club")
-  idSubscriptionTypes Int? @map("ID_Subscription_Types")
-  rating       Int       @map("Rating")
-  title        String?   @map("Title")
-  comment      String?   @map("Comment")
-  reviewDate   DateTime  @default(now()) @map("Review_Date")
-  lastEditDate DateTime? @map("Last_Edit_Date")
-  active       Boolean   @default(true) @map("Active")
-  isHidden     Boolean   @default(false) @map("Is_Hidden")
-  hiddenReason String?   @map("Hidden_Reason")
-  mediaUrl     String?   @map("Media_URL")
-  mediaType    ContentType? @map("Media_Type")
+  id                  Int            @id @default(autoincrement()) @map("ID")
+  idUser              Int            @map("ID_User")
+  idClub              Int            @map("ID_Club")
+  idSubscriptionTypes Int?           @map("ID_Subscription_Types")
+  rating              Int            @map("Rating")
+  title               String?        @map("Title")
+  comment             String?        @map("Comment")
+  reviewDate          DateTime       @default(now()) @map("Review_Date")
+  lastEditDate        DateTime?      @map("Last_Edit_Date")
+  active              Boolean        @default(true) @map("Active")
+  isHidden            Boolean        @default(false) @map("Is_Hidden")
+  hiddenReason        String?        @map("Hidden_Reason")
+  mediaUrl            String?        @map("Media_URL")
+  mediaType           ContentType?   @map("Media_Type")
+  media               Review_Media[]
   @@map("Reviews")
+}
+
+model Review_Media {
+  id        Int         @id @default(autoincrement()) @map("ID")
+  idReview  Int         @map("ID_Review")
+  mediaUrl  String      @map("Media_URL")
+  mediaType ContentType @map("Media_Type")
+  order     Int         @default(0) @map("Order")
+  review    Reviews     @relation(fields: [idReview], references: [id], onDelete: Cascade)
+
+  @@map("Review_Media")
 }
 
 model Forbidden_Word {
