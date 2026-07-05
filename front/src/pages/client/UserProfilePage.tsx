@@ -7,7 +7,7 @@ import { User } from '../../types/user';
 
 function mapApiUserToUser(data: any): User {
   return {
-    id: String(data.id),
+    id: Number(data.id),
     firstName: data.firstName || '',
     lastName: data.lastName || '',
     email: data.email || '',
@@ -16,8 +16,8 @@ function mapApiUserToUser(data: any): User {
     lastLogin: new Date().toISOString(),
     birthDate: data.birthDate ? data.birthDate.split('T')[0] : '',
     documentType: data.documentType || '',
-    documentNumber: data.documentNumber ? String(data.documentNumber) : '',
-    phoneNumber: data.phoneNumber ? String(data.phoneNumber) : '',
+    documentNumber: data.documentNumber ? Number(data.documentNumber) : undefined,
+    phoneNumber: data.phoneNumber ? Number(data.phoneNumber) : null,
     streetAddress: data.streetAddress || '',
     addressNumber: data.addressNumber,
     floorNumber: data.floorNumber || '',

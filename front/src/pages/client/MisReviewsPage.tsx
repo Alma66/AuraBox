@@ -5,17 +5,7 @@ import api, { getResponseData } from '../../api/config';
 import ReviewCard from '../../components/client/ReviewCard';
 import { User } from '../../types/user';
 import { Club } from '../../types/club';
-
-interface Review {
-  id: string;
-  clubId: string;
-  userId: string;
-  rating: number;
-  comment: string;
-  date: string;
-  status: 'pending' | 'approved';
-  isBlockedBySystem: boolean;
-}
+import { Review } from '../../types/review';
 
 const MisReviewsPage: React.FC = () => {
   const { user } = useAuth() as { user: User | null };
@@ -33,27 +23,13 @@ const MisReviewsPage: React.FC = () => {
 
       try {
         const [reviewsResponse, clubsResponse] = await Promise.all([
-          api.get('/reviews'),
+          api.get(`/reviews/by-user/${user.id}`), // antes: '/reviews' (era admin-only)
           api.get('/clubs')
         ]);
-        
-        const allReviews = getResponseData(reviewsResponse);
-        const allClubs = getResponseData(clubsResponse);
-        
-        const userReviews = allReviews.filter((r: any) => r.userId === user.id || r.user?.id === user.id);
-        
-        setReviews(userReviews.map((r: any) => ({
-          id: r.id,
-          clubId: r.clubId,
-          userId: r.userId,
-          rating: r.rating,
-          comment: r.comment,
-          date: r.createdAt,
-          status: r.status || 'approved',
-          isBlockedBySystem: r.isBlockedBySystem || false
-        })));
-        
-        setClubs(allClubs);
+
+        // Ya viene con la forma real de Review, no hace falta remapear
+        setReviews(getResponseData(reviewsResponse));
+        setClubs(getResponseData(clubsResponse));
       } catch (error) {
         console.error("Error fetching reviews:", error);
       } finally {
@@ -63,7 +39,7 @@ const MisReviewsPage: React.FC = () => {
     fetchData();
   }, [user, navigate]);
 
-  const handleDelete = async (reviewId: string) => {
+  const handleDelete = async (reviewId: number) => {
     try {
       await api.delete(`/reviews/${reviewId}`);
       setReviews(prev => prev.filter(r => r.id !== reviewId));
@@ -73,8 +49,8 @@ const MisReviewsPage: React.FC = () => {
     }
   };
 
-  const getClubName = (clubId: string) => {
-    const club = clubs.find(c => c.id === clubId);
+  const getClubName = (idClub: number) => {
+    const club = clubs.find(c => String(c.id) === String(idClub));
     return club ? club.name : 'Club Desconocido';
   };
 
@@ -119,9 +95,9 @@ const MisReviewsPage: React.FC = () => {
               <ReviewCard
                 key={review.id}
                 review={review}
-                club={{ name: getClubName(review.clubId) }}
+                club={{ name: getClubName(review.idClub) }}
                 onDelete={() => handleDelete(review.id)}
-                onEdit={review.status === 'pending' ? () => {} : undefined}
+                onEdit={!review.isHidden ? () => {} : undefined}
               />
             ))}
           </div>
