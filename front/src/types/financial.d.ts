@@ -58,3 +58,24 @@ export interface ProfitabilityData {
   breakdown: ProfitabilityBreakdownItem[];
   totals: ProfitabilityTotals;
 }
+
+export type TeamUserRole = 'administrador_del_club' | 'delivery_rider' | string;
+export type TeamUserStatus = 'activo' | 'inactivo';
+
+export interface TeamUser {
+  id: string;
+  name: string;
+  email: string;
+  role: TeamUserRole;
+  status: TeamUserStatus;
+  assignedDate: string;
+}
+
+export type GeneralSettingCategory = 'finances' | 'team' | 'notifications';
+export type GeneralSettingValue = string | number | boolean | string[];
+
+export interface GeneralSetting {
+  key: string;
+  value: GeneralSettingValue;
+  category: GeneralSettingCategory;
+}
