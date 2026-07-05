@@ -112,6 +112,23 @@ const Navbar: React.FC<NavbarProps> = ({ userRole, isAuthenticated, onLogout }) 
   const btnClass = "flex items-center text-gray-700 hover:text-blue-600 px-2 py-2 rounded-md text-sm font-medium whitespace-nowrap";
   const linkClass = "block px-2 py-1.5 text-sm text-gray-700 hover:bg-gray-100 rounded";
   const subTitleClass = "block px-2 py-1 text-xs font-semibold text-gray-500 uppercase tracking-wide";
+  const renderCustomerQuickIcons = () => {
+    if (!(isAuthenticated && userRole === 'customer')) return null;
+    return (
+      <>
+        <Link to="/customer/wishlist" className="text-gray-700 hover:text-red-500 p-2 rounded-md transition-colors duration-200" onClick={closeAllDropdowns} title="Mi Lista de Deseos">
+          <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+          </svg>
+        </Link>
+        <Link to="/cart" className="text-gray-700 hover:text-blue-600 p-2 rounded-md transition-colors duration-200" onClick={closeAllDropdowns} title="Mi Carrito">
+          <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4m0 0L7 13m0 0l-1.5 7.5M7 13l-1.5 7.5M17 13l1.5 7.5M17 13l4-8m-8 4h8M9 4h6m-6 0h6a2 2 0 002-2V2a2 2 0 00-2-2H9a2 2 0 00-2 2v2a2 2 0 002 2z" />
+          </svg>
+        </Link>
+      </>
+    );
+  };
   const renderAuthButtons = () => {
     if (isAuthenticated) {
       return (
@@ -123,10 +140,12 @@ const Navbar: React.FC<NavbarProps> = ({ userRole, isAuthenticated, onLogout }) 
             <DropdownArrow isOpen={isUserMenuOpen} />
           </button>
           {isUserMenuOpen && (
-            <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-20">
+            <div className="absolute right-0 mt-2 w-52 bg-white rounded-md shadow-lg py-1 z-20">
               {userRole === 'customer' && (
                 <>
                   <Link to="/customer/profile" className={linkClass} onClick={closeAllDropdowns}>Mi Perfil</Link>
+                  <Link to="/customer/subscriptions" className={linkClass} onClick={closeAllDropdowns}>Mis Suscripciones</Link>
+                  <Link to="/customer/orders" className={linkClass} onClick={closeAllDropdowns}>Historial de Compras</Link>
                   <Link to="/customer/reviews" className={linkClass} onClick={closeAllDropdowns}>Mis Reseñas</Link>
                 </>
               )}
@@ -378,24 +397,11 @@ const Navbar: React.FC<NavbarProps> = ({ userRole, isAuthenticated, onLogout }) 
                 Sobre Nosotros
               </Link>
             )}
-            {isAuthenticated && userRole === 'customer' && (
-              <>
-                <Link to="/customer/wishlist" className="text-gray-700 hover:text-red-500 p-2 rounded-md transition-colors duration-200" onClick={closeAllDropdowns} title="Mi Lista de Deseos">
-                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
-                  </svg>
-                </Link>
-                <Link to="/cart" className="text-gray-700 hover:text-blue-600 p-2 rounded-md transition-colors duration-200" onClick={closeAllDropdowns} title="Mi Carrito">
-                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4m0 0L7 13m0 0l-1.5 7.5M7 13l-1.5 7.5M17 13l1.5 7.5M17 13l4-8m-8 4h8M9 4h6m-6 0h6a2 2 0 002-2V2a2 2 0 00-2-2H9a2 2 0 00-2 2v2a2 2 0 002 2z" />
-                  </svg>
-                </Link>
-              </>
-            )}
             {renderEntrepreneurDesktopMenus()}
           </div>
           <div className="flex items-center gap-x-2 pr-2">
-            <div className="hidden md:flex">
+            <div className="hidden md:flex md:items-center md:gap-x-1">
+              {renderCustomerQuickIcons()}
               {renderAuthButtons()}
             </div>
             <div className="flex md:hidden">
@@ -446,6 +452,8 @@ const Navbar: React.FC<NavbarProps> = ({ userRole, isAuthenticated, onLogout }) 
                 {userRole === 'customer' && (
                   <>
                     <Link to="/customer/profile" className="text-gray-700 hover:bg-gray-50 hover:text-blue-600 block px-3 py-2 rounded-md text-base font-medium" onClick={closeAllDropdowns}>Mi Perfil</Link>
+                    <Link to="/customer/subscriptions" className="text-gray-700 hover:bg-gray-50 hover:text-blue-600 block px-3 py-2 rounded-md text-base font-medium" onClick={closeAllDropdowns}>Mis Suscripciones</Link>
+                    <Link to="/customer/orders" className="text-gray-700 hover:bg-gray-50 hover:text-blue-600 block px-3 py-2 rounded-md text-base font-medium" onClick={closeAllDropdowns}>Historial de Compras</Link>
                     <Link to="/customer/reviews" className="text-gray-700 hover:bg-gray-50 hover:text-blue-600 block px-3 py-2 rounded-md text-base font-medium" onClick={closeAllDropdowns}>Mis Reseñas</Link>
                     <Link to="/customer/wishlist" className="text-gray-700 hover:bg-gray-50 hover:text-red-600 block px-3 py-2 rounded-md text-base font-medium" onClick={closeAllDropdowns}>Wishlist</Link>
                     <Link to="/cart" className="text-gray-700 hover:bg-gray-50 hover:text-blue-600 block px-3 py-2 rounded-md text-base font-medium" onClick={closeAllDropdowns}>Carrito</Link>
