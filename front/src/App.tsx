@@ -14,6 +14,8 @@ import FAQPage from './pages/FAQPage';
 import AboutUsPage from './pages/AboutUsPage';
 import ContactPage from './pages/ContactPage';
 import UserProfilePage from './pages/client/UserProfilePage';
+import UserSubscriptionsPage from './pages/client/UserSubscriptionsPage';
+import OrderHistoryPage from './pages/client/OrderHistoryPage';
 import WishlistPage from './pages/client/WishlistPage';
 import CartPage from './pages/client/CartPage';
 import CheckoutPage from './pages/client/CheckoutPage';
@@ -175,6 +177,8 @@ const AppContent: React.FC = () => {
           <Route path="/club/:clubId/plan/:planId" element={<SubscriptionPlanDetailPage />} />
 
           <Route path="/customer/profile" element={pr(['customer'], <UserProfilePage />)} />
+          <Route path="/customer/subscriptions" element={pr(['customer'], <UserSubscriptionsPage />)} />
+          <Route path="/customer/orders" element={pr(['customer'], <OrderHistoryPage />)} />
           <Route path="/customer/reviews" element={pr(['customer'], <MisReviewsPage />)} />
           <Route path="/customer/wishlist" element={pr(['customer'], <WishlistPage />)} />
           <Route path="/cart" element={pr(['customer'], <CartPage />)} />

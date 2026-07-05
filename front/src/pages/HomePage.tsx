@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
 import HeroBanner from '../components/shared/HeroBanner';
 import AlternatingContent from '../components/shared/AlternatingContent';
 import TestimonialCard from '../components/shared/TestimonialCard';
 import HowItWorks from '../components/shared/HowItWorks';
+import WelcomeModal from '../components/common/WelcomeModal';
 import api, { getResponseData } from '../api/config';
 import { Link } from 'react-router-dom';
 import Slider from 'react-slick';
@@ -41,7 +43,6 @@ const testimonialsData = [
   },
 ];
 
-/* ---------- Card de Club Destacado ---------- */
 interface FeaturedClubCardProps {
   id: string | number;
   name: string;
@@ -88,6 +89,10 @@ const FeaturedClubCard: React.FC<FeaturedClubCardProps> = ({ id, name, slogan, l
 const HomePage: React.FC = () => {
   const [featuredClubs, setFeaturedClubs] = useState<Club[]>([]);
   const [loading, setLoading] = useState(true);
+  const [showWelcome, setShowWelcome] = useState(false);
+  const [welcomeName, setWelcomeName] = useState<string | undefined>(undefined);
+  const location = useLocation();
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchFeatured = async () => {
@@ -103,6 +108,15 @@ const HomePage: React.FC = () => {
     };
     fetchFeatured();
   }, []);
+
+  useEffect(() => {
+    const state = location.state as { showWelcome?: boolean; welcomeName?: string } | null;
+    if (state?.showWelcome) {
+      setWelcomeName(state.welcomeName);
+      setShowWelcome(true);
+      navigate(location.pathname, { replace: true, state: {} });
+    }
+  }, [location, navigate]);
 
   const testimonialCarouselSettings = {
     dots: true,
@@ -121,6 +135,9 @@ const HomePage: React.FC = () => {
 
   return (
     <div className="min-h-screen flex flex-col">
+      {showWelcome && (
+        <WelcomeModal name={welcomeName} onClose={() => setShowWelcome(false)} />
+      )}
       <HeroBanner
         title="Descubre la Magia de los Clubes de Suscripción en Argentina"
         subtitle="Experiencias únicas, curadas con pasión, entregadas en tu puerta."
