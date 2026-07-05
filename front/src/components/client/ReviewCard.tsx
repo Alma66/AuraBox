@@ -25,10 +25,15 @@ const ReviewCard: React.FC<ReviewCardProps> = ({ review, club, onDelete, onEdit 
     </div>
   );
 
-  const statusColor = review.status === 'approved' ? 'bg-green-100 text-green-800' : 
-                     review.status === 'pending' ? 'bg-yellow-100 text-yellow-800' : 
-                     'bg-red-100 text-red-800';
-  const blockedText = review.isBlockedBySystem ? ' (Bloqueada por sistema)' : '';
+  const statusLabel = review.isHidden ? 'Oculta' : review.active ? 'Activa' : 'Inactiva';
+  const statusColor = review.isHidden
+    ? 'bg-red-100 text-red-800'
+    : review.active
+    ? 'bg-green-100 text-green-800'
+    : 'bg-yellow-100 text-yellow-800';
+  const hiddenText = review.isHidden
+    ? ` (${review.hiddenReason || 'Oculta por moderación'})`
+    : '';
 
   return (
     <div className="bg-white rounded-xl shadow-md p-6 hover:shadow-lg transition-shadow duration-300 border border-gray-200">
@@ -36,20 +41,18 @@ const ReviewCard: React.FC<ReviewCardProps> = ({ review, club, onDelete, onEdit 
         <div>
           <h4 className="font-bold text-gray-800">{club?.name || 'Club Desconocido'}</h4>
           <p className="text-sm text-gray-500">
-            {new Date(review.date).toLocaleDateString('es-AR', { year: 'numeric', month: 'long', day: 'numeric' })}
+            {new Date(review.reviewDate).toLocaleDateString('es-AR', { year: 'numeric', month: 'long', day: 'numeric' })}
           </p>
         </div>
         <Stars rating={review.rating} />
       </div>
-
+      {review.title && <p className="font-semibold text-gray-800 mb-1">{review.title}</p>}
       <p className="text-gray-700 mb-4 leading-relaxed">{review.comment}</p>
-
       <div className={`inline-flex px-3 py-1 rounded-full text-sm font-medium ${statusColor} mb-4`}>
-        {review.status.charAt(0).toUpperCase() + review.status.slice(1)}{blockedText}
+        {statusLabel}{hiddenText}
       </div>
-
       <div className="flex space-x-2">
-        {review.status === 'pending' && onEdit && (
+        {!review.isHidden && onEdit && (
           <button
             onClick={onEdit}
             className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition-colors text-sm"
