@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 
 interface WelcomeModalProps {
   name?: string;
@@ -8,17 +8,17 @@ interface WelcomeModalProps {
 const WelcomeModal: React.FC<WelcomeModalProps> = ({ name, onClose }) => {
   const [closing, setClosing] = useState(false);
 
+  const handleClose = useCallback(() => {
+    setClosing(true);
+    setTimeout(onClose, 200);
+  }, [onClose]);
+
   useEffect(() => {
     const timer = setTimeout(() => {
       handleClose();
     }, 3000);
     return () => clearTimeout(timer);
-  }, []);
-
-  const handleClose = () => {
-    setClosing(true);
-    setTimeout(onClose, 200);
-  };
+  }, [handleClose]);
 
   return (
     <div
