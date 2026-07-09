@@ -207,11 +207,14 @@ export class ClubsService {
       where: { id: { in: entrepreneurIds } },
       select: { id: true, firstName: true, lastName: true, bio: true },
     });
-    const images = await this.prisma.image_Club.findMany({ where: { idClub: id } });
+    const images = await this.prisma.image_Club.findMany({
+      where: { idClub: id },
+      orderBy: { id: 'desc' },
+    });
     const bannerImagesRaw = images.filter(
-      (img) => img.description !== 'historia' && !(img.description ?? '').startsWith('team-'),
+      (img) => img.section === 'Banner' && img.description !== 'historia' && !(img.description ?? '').startsWith('team-'),
     );
-    const historyImageRaw = images.filter((img) => img.description === 'historia');
+    const historyImageRaw = images.filter((img) => img.section === 'Historia' && img.description === 'historia');
     const socialNetworksRaw = await this.prisma.club_Social_Networks.findMany({ where: { idClub: id } });
     const plans = await this.prisma.subscription_Types.findMany({ where: { idClub: id } });
     const mappedPlans = plans.map((p) => this.mapPlan(p));
@@ -258,17 +261,30 @@ export class ClubsService {
     await this.assertOwnership(id, entrepreneurId);
     const club = await this.prisma.club.findUnique({ where: { id } });
     if (!club) throw new NotFoundException('Club no encontrado');
-    if (club.logoUrl) {
-      try {
-        const publicId = this.cloudinaryService.extractPublicId(club.logoUrl);
-        await this.cloudinaryService.deleteImage(publicId);
-      } catch {}
-    }
+
     const secureUrl = await this.cloudinaryService.uploadImage(file, 'aurabox/clubs/logos');
+
     const updated = await this.prisma.club.update({
       where: { id },
       data: { logoUrl: secureUrl },
     });
+
+    await this.prisma.image_Club.updateMany({
+      where: { idClub: id, section: 'Logo', isActive: true },
+      data: { isActive: false },
+    });
+
+    await this.prisma.image_Club.create({
+      data: {
+        idClub: id,
+        imageUrl: secureUrl,
+        contentType: 'Imagen',
+        section: 'Logo',
+        isActive: true,
+        uploadedBy: entrepreneurId,
+      },
+    });
+
     return this.sanitizeClub(updated);
   }
 

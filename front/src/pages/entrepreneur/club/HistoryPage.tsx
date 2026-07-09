@@ -340,6 +340,8 @@ const HistoryPage: React.FC = () => {
       formData.append('idClub', String(club.id));
       formData.append('contentType', 'Imagen');
       formData.append('description', `team-${cropState.entrepreneurId}`);
+      formData.append('section', 'Equipo');
+      formData.append('uploadedBy', String(cropState.entrepreneurId));
       const existingImage = (club.historyImageRaw as any[])?.find((img) => img.description === `team-${cropState.entrepreneurId}`);
       if (existingImage) {
         await api.delete(`/image-club/${existingImage.id}`);

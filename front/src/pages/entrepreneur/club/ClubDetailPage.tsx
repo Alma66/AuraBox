@@ -265,6 +265,7 @@ const ClubDetailPage: React.FC = () => {
         formData.append('image', file);
         formData.append('idClub', clubId);
         formData.append('contentType', 'Imagen');
+        formData.append('section', 'Banner');
         await api.post(`/image-club`, formData, {
           headers: { 'Content-Type': 'multipart/form-data' },
         });
@@ -274,6 +275,7 @@ const ClubDetailPage: React.FC = () => {
         formData.append('idClub', clubId);
         formData.append('contentType', 'Imagen');
         formData.append('description', 'historia');
+        formData.append('section', 'Historia');
         await api.post(`/image-club`, formData, {
           headers: { 'Content-Type': 'multipart/form-data' },
         });
