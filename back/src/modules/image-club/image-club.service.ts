@@ -58,11 +58,52 @@ export class ImageClubService {
   }
 
   async findByClub(idClub: number, section?: string) {
+    if (section === 'Logo') {
+      await this.ensureLogoImage(idClub);
+    }
+    if (section) {
+      await this.backfillSection(idClub, section);
+    }
+
     const images = await this.prisma.image_Club.findMany({
       where: { idClub, ...(section ? { section: section as any } : {}) },
       orderBy: { id: 'desc' },
     });
     return images.map(sanitize);
+  }
+
+  private async ensureLogoImage(idClub: number) {
+    const existing = await this.prisma.image_Club.findFirst({
+      where: { idClub, section: 'Logo' },
+    });
+    if (existing) return;
+
+    const club = await this.prisma.club.findUnique({ where: { id: idClub } });
+    if (!club?.logoUrl) return;
+
+    await this.prisma.image_Club.create({
+      data: {
+        idClub,
+        imageUrl: club.logoUrl,
+        contentType: 'Imagen',
+        section: 'Logo',
+        isActive: true,
+      },
+    });
+  }
+
+  private async backfillSection(idClub: number, section: string) {
+    if (section === 'Historia') {
+      await this.prisma.image_Club.updateMany({
+        where: { idClub, description: 'historia', NOT: { section: 'Historia' } },
+        data: { section: 'Historia' },
+      });
+    } else if (section === 'Equipo') {
+      await this.prisma.image_Club.updateMany({
+        where: { idClub, description: { startsWith: 'team-' }, NOT: { section: 'Equipo' } },
+        data: { section: 'Equipo' },
+      });
+    }
   }
 
   async findOne(id: number) {
