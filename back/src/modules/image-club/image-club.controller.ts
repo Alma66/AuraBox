@@ -22,7 +22,7 @@ export class ImageClubController {
   @Post()
   @UseInterceptors(FileInterceptor('image', {
     storage: memoryStorage(),
-    limits: { fileSize: 12 * 1024 * 1024 },
+    limits: { fileSize: 5 * 1024 * 1024 },
     fileFilter: (req, file, callback) => {
       if (!file.mimetype.match(/\/(jpg|jpeg|png|gif|webp)$/)) {
         callback(new Error('Solo se permiten imágenes'), false);

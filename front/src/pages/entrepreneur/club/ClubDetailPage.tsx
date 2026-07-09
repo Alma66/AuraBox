@@ -67,23 +67,19 @@ const ASPECT_RATIOS: Record<CropTarget, number> = {
   history: 4 / 3,
 };
 
-const MAX_IMAGE_SIZE_MB: Record<CropTarget, number> = {
-  logo: 8,
-  banner: 12,
-  history: 8,
-};
+const MAX_IMAGE_SIZE_MB = 8;
+const MAX_IMAGE_SIZE_BYTES = MAX_IMAGE_SIZE_MB * 1024 * 1024;
 const ACCEPTED_IMAGE_TYPES = ['image/png', 'image/jpeg', 'image/jpg', 'image/webp'];
 const MAX_BANNERS = 6;
 const MAX_DESCRIPTION_LENGTH = 1200;
 const URL_REGEX = /^https?:\/\/[^\s/$.?#].[^\s]*$/i;
 
-function validateImageFile(file: File, target: CropTarget): string | null {
+function validateImageFile(file: File): string | null {
   if (!ACCEPTED_IMAGE_TYPES.includes(file.type)) {
     return 'Formato no permitido. Solo se aceptan imágenes JPG, PNG o WEBP.';
   }
-  const maxMb = MAX_IMAGE_SIZE_MB[target];
-  if (file.size > maxMb * 1024 * 1024) {
-    return `La imagen supera el tamaño máximo permitido de ${maxMb}MB.`;
+  if (file.size > MAX_IMAGE_SIZE_BYTES) {
+    return `La imagen supera el tamaño máximo permitido de ${MAX_IMAGE_SIZE_MB}MB.`;
   }
   if (file.size === 0) {
     return 'El archivo seleccionado está vacío o dañado.';
@@ -215,7 +211,7 @@ const ClubDetailPage: React.FC = () => {
   }, [club, userRole]);
 
   const openCropper = (target: CropTarget, file: File) => {
-    const validationError = validateImageFile(file, target);
+    const validationError = validateImageFile(file);
     if (validationError) {
       showToast(validationError, 'error');
       return;
@@ -269,7 +265,6 @@ const ClubDetailPage: React.FC = () => {
         formData.append('image', file);
         formData.append('idClub', clubId);
         formData.append('contentType', 'Imagen');
-        formData.append('section', 'Banner');
         await api.post(`/image-club`, formData, {
           headers: { 'Content-Type': 'multipart/form-data' },
         });
@@ -279,7 +274,6 @@ const ClubDetailPage: React.FC = () => {
         formData.append('idClub', clubId);
         formData.append('contentType', 'Imagen');
         formData.append('description', 'historia');
-        formData.append('section', 'Historia');
         await api.post(`/image-club`, formData, {
           headers: { 'Content-Type': 'multipart/form-data' },
         });
@@ -776,7 +770,7 @@ const ClubDetailPage: React.FC = () => {
                       <span className="text-xs text-gray-300">Hacé click en "Cambiar imagen" para agregar una</span>
                     </div>
                   )}
-                  <p className="text-xs text-gray-400 mt-2">Formatos aceptados: JPG, PNG o WEBP. Tamaño máximo {MAX_IMAGE_SIZE_MB.history}MB.</p>
+                  <p className="text-xs text-gray-400 mt-2">Formatos aceptados: JPG, PNG o WEBP. Tamaño máximo {MAX_IMAGE_SIZE_MB}MB.</p>
                   <input
                     ref={historyInputRef}
                     type="file"
