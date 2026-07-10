@@ -75,7 +75,7 @@ const ACCEPTED_IMAGE_TYPES = ['image/png', 'image/jpeg', 'image/jpg', 'image/web
 const MAX_BANNERS = 6;
 const MAX_DESCRIPTION_LENGTH = 1200;
 const URL_REGEX = /^https?:\/\/[^\s/$.?#].[^\s]*$/i;
-const [legalContent, setLegalContent] = useState<{ termsAndConditions: LegalSection[]; privacyAndSecurityPolicy: LegalSection[] }>({ termsAndConditions: [], privacyAndSecurityPolicy: [] });
+
 function validateImageFile(file: File): string | null {
   if (!ACCEPTED_IMAGE_TYPES.includes(file.type)) {
     return 'Formato no permitido. Solo se aceptan imágenes JPG, PNG o WEBP.';
@@ -172,6 +172,7 @@ const ClubDetailPage: React.FC = () => {
   const [toast, setToast] = useState<{ msg: string; type: 'success' | 'error' } | null>(null);
   const [favoritePlanIds, setFavoritePlanIds] = useState<Set<number>>(new Set());
   const [favoriteLoadingId, setFavoriteLoadingId] = useState<number | null>(null);
+  const [legalContent, setLegalContent] = useState<{ termsAndConditions: LegalSection[]; privacyAndSecurityPolicy: LegalSection[] }>({ termsAndConditions: [], privacyAndSecurityPolicy: [] });
   const logoInputRef = useRef<HTMLInputElement>(null);
   const bannerInputRef = useRef<HTMLInputElement>(null);
   const historyInputRef = useRef<HTMLInputElement>(null);
@@ -220,6 +221,7 @@ const ClubDetailPage: React.FC = () => {
     };
     checkFavorites();
   }, [club, userRole]);
+
   useEffect(() => {
     const fetchLegalContent = async () => {
       if (!clubId) return;
@@ -236,6 +238,7 @@ const ClubDetailPage: React.FC = () => {
     };
     fetchLegalContent();
   }, [clubId]);
+
   const openCropper = (target: CropTarget, file: File, aspect: number) => {
     const validationError = validateImageFile(file);
     if (validationError) {
