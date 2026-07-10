@@ -11,6 +11,7 @@ import ClubSocialMedia, { SocialMediaLinks } from '../../../components/club/Club
 import ClubLegalInfo from '../../../components/club/ClubLegalInfo';
 import ClubPaymentShippingInfo from '../../../components/club/ClubPaymentShippingInfo';
 import ClubFeaturedReviews from '../../../components/club/ClubFeaturedReviews';
+import { LegalSection } from '../../../types/legalSection';
 
 const bannerSliderSettings = {
   dots: true,
@@ -74,7 +75,7 @@ const ACCEPTED_IMAGE_TYPES = ['image/png', 'image/jpeg', 'image/jpg', 'image/web
 const MAX_BANNERS = 6;
 const MAX_DESCRIPTION_LENGTH = 1200;
 const URL_REGEX = /^https?:\/\/[^\s/$.?#].[^\s]*$/i;
-
+const [legalContent, setLegalContent] = useState<{ termsAndConditions: LegalSection[]; privacyAndSecurityPolicy: LegalSection[] }>({ termsAndConditions: [], privacyAndSecurityPolicy: [] });
 function validateImageFile(file: File): string | null {
   if (!ACCEPTED_IMAGE_TYPES.includes(file.type)) {
     return 'Formato no permitido. Solo se aceptan imágenes JPG, PNG o WEBP.';
@@ -219,7 +220,22 @@ const ClubDetailPage: React.FC = () => {
     };
     checkFavorites();
   }, [club, userRole]);
-
+  useEffect(() => {
+    const fetchLegalContent = async () => {
+      if (!clubId) return;
+      try {
+        const response = await api.get(`/club-legal-content/by-club/${clubId}`);
+        const data = getResponseData(response);
+        setLegalContent({
+          termsAndConditions: data.termsAndConditions ?? [],
+          privacyAndSecurityPolicy: data.privacyAndSecurityPolicy ?? [],
+        });
+      } catch {
+        setLegalContent({ termsAndConditions: [], privacyAndSecurityPolicy: [] });
+      }
+    };
+    fetchLegalContent();
+  }, [clubId]);
   const openCropper = (target: CropTarget, file: File, aspect: number) => {
     const validationError = validateImageFile(file);
     if (validationError) {
@@ -954,8 +970,12 @@ const ClubDetailPage: React.FC = () => {
             <ClubFeaturedReviews reviews={club.featuredReviews} clubName={club.name} clubId={String(club.id)} />
           </div>
         )}
-        {(club.legalInfo?.termsAndConditionsSections?.length || club.legalInfo?.privacyAndSecurityPolicySections?.length) && (
-          <ClubLegalInfo legalInfo={club.legalInfo} clubId={String(club.id)} />
+        {(legalContent.termsAndConditions.length > 0 || legalContent.privacyAndSecurityPolicy.length > 0) && (
+          <ClubLegalInfo
+            termsAndConditions={legalContent.termsAndConditions}
+            privacyAndSecurityPolicy={legalContent.privacyAndSecurityPolicy}
+            clubName={club.name}
+          />
         )}
       </div>
     </div>

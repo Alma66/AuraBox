@@ -191,18 +191,25 @@ const Navbar: React.FC<NavbarProps> = ({ userRole, isAuthenticated, onLogout }) 
             Club <DropdownArrow isOpen={isClubMenuOpen} />
           </button>
           {isClubMenuOpen && (
-            <div className="absolute left-0 mt-2 w-60 bg-white rounded-md shadow-lg py-2 z-20">
-              <Link to={`/club/${clubId}`} className={linkClass} onClick={closeAllDropdowns}>Perfil del Club</Link>
-              <Link to={`/club/${clubId}/history`} className={linkClass} onClick={closeAllDropdowns}>Historia del Club</Link>
-              <Link to={`/entrepreneur/club/${clubId}/edit-subscriptions`} className={linkClass} onClick={closeAllDropdowns}>Gestionar Suscripciones</Link>
-              <Link to={`/club/${clubId}/terms-and-conditions`} className={linkClass} onClick={closeAllDropdowns}>Términos y Condiciones</Link>
-              <Link to={`/club/${clubId}/privacy-and-security`} className={linkClass} onClick={closeAllDropdowns}>Políticas y Seguridad</Link>
+            <div className="absolute left-0 mt-2 w-96 bg-white rounded-md shadow-lg py-2 z-20 grid grid-cols-2 gap-x-2 px-3">
+              <div>
+                <p className={subTitleClass}>Mi Club</p>
+                <Link to={`/club/${clubId}`} className={linkClass} onClick={closeAllDropdowns}>Perfil del Club</Link>
+                <Link to={`/club/${clubId}/history`} className={linkClass} onClick={closeAllDropdowns}>Historia del Club</Link>
+                <Link to={`/entrepreneur/club/${clubId}/edit-subscriptions`} className={linkClass} onClick={closeAllDropdowns}>Gestionar Suscripciones</Link>
+              </div>
+              <div>
+                <p className={subTitleClass}>Legal</p>
+                <Link to={`/entrepreneur/club/${clubId}/edit-legal-info/terms`} className={linkClass} onClick={closeAllDropdowns}>Términos y Condiciones</Link>
+                <Link to={`/entrepreneur/club/${clubId}/edit-legal-info/privacy`} className={linkClass} onClick={closeAllDropdowns}>Política de Seguridad</Link>
+                <Link to={`/entrepreneur/club/${clubId}/legal-compliance`} className={linkClass} onClick={closeAllDropdowns}>Cumplimiento Legal</Link>
+              </div>
             </div>
           )}
         </div>
         <div className="relative" ref={gestionMenuRef}>
           <button onClick={toggleGestionMenu} className={btnClass}>
-            Operación y Finanzas <DropdownArrow isOpen={isGestionMenuOpen} />
+            Gestión y Finanzas <DropdownArrow isOpen={isGestionMenuOpen} />
           </button>
           {isGestionMenuOpen && (
             <div className="absolute left-0 mt-2 w-96 bg-white rounded-md shadow-lg py-2 z-20 grid grid-cols-2 gap-x-2 px-3">
@@ -296,15 +303,18 @@ const Navbar: React.FC<NavbarProps> = ({ userRole, isAuthenticated, onLogout }) 
         </button>
         {isMobileSubMenuOpen === 'club' && (
           <div className="pl-6 pr-3 py-1 space-y-1">
+            <p className="block text-xs font-semibold text-gray-500 uppercase py-1">Mi Club</p>
             <Link to={`/club/${clubId}`} className="block text-sm text-gray-700 hover:bg-gray-100 py-1" onClick={closeAllDropdowns}>Perfil del Club</Link>
             <Link to={`/club/${clubId}/history`} className="block text-sm text-gray-700 hover:bg-gray-100 py-1" onClick={closeAllDropdowns}>Historia del Club</Link>
             <Link to={`/entrepreneur/club/${clubId}/edit-subscriptions`} className="block text-sm text-gray-700 hover:bg-gray-100 py-1" onClick={closeAllDropdowns}>Gestionar Suscripciones</Link>
-            <Link to={`/club/${clubId}/terms-and-conditions`} className="block text-sm text-gray-700 hover:bg-gray-100 py-1" onClick={closeAllDropdowns}>Términos y Condiciones</Link>
-            <Link to={`/club/${clubId}/privacy-and-security`} className="block text-sm text-gray-700 hover:bg-gray-100 py-1" onClick={closeAllDropdowns}>Políticas y Seguridad</Link>
+            <p className="block text-xs font-semibold text-gray-500 uppercase py-1 mt-2">Legal</p>
+            <Link to={`/entrepreneur/club/${clubId}/edit-legal-info/terms`} className="block text-sm text-gray-700 hover:bg-gray-100 py-1" onClick={closeAllDropdowns}>Términos y Condiciones</Link>
+            <Link to={`/entrepreneur/club/${clubId}/edit-legal-info/privacy`} className="block text-sm text-gray-700 hover:bg-gray-100 py-1" onClick={closeAllDropdowns}>Política de Seguridad</Link>
+            <Link to={`/entrepreneur/club/${clubId}/legal-compliance`} className="block text-sm text-gray-700 hover:bg-gray-100 py-1" onClick={closeAllDropdowns}>Cumplimiento Legal</Link>
           </div>
         )}
         <button onClick={() => toggleMobileSubMenu('gestion')} className="flex items-center justify-between w-full text-gray-700 hover:bg-gray-50 hover:text-blue-600 px-3 py-2 rounded-md text-base font-medium">
-          Operación y Finanzas <DropdownArrow isOpen={isMobileSubMenuOpen === 'gestion'} />
+          Gestión y Finanzas <DropdownArrow isOpen={isMobileSubMenuOpen === 'gestion'} />
         </button>
         {isMobileSubMenuOpen === 'gestion' && (
           <div className="pl-6 pr-3 py-1 space-y-1">

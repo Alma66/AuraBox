@@ -1,61 +1,41 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import api, { getResponseData } from '../../../api/config';
-import { Club, LegalSection } from '../../../types/club';
 import LegalContentRenderer from '../../../components/club/LegalContentRenderer';
+import { LegalSection } from '../../../types/legalSection';
 
 const TermsAndConditionsPage: React.FC = () => {
   const { clubId } = useParams<{ clubId: string }>();
   const navigate = useNavigate();
-  const [club, setClub] = useState<Club | null>(null);
+  const [sections, setSections] = useState<LegalSection[]>([]);
+  const [clubName, setClubName] = useState('');
   const [loading, setLoading] = useState(true);
+  const [notFound, setNotFound] = useState(false);
 
   useEffect(() => {
-    const fetchClub = async () => {
+    const fetchContent = async () => {
       try {
-        const response = await api.get(`/clubs/${clubId}`);
-        const clubData = getResponseData(response);
-        
-        const legalInfo = clubData.legalInfo || {};
-        const allowedTypes = ['title', 'paragraph', 'list', 'image'];
-
-        const sanitizeSections = (sections: any[]): LegalSection[] =>
-          sections.map((section: any) => ({
-            id: section.id,
-            type: allowedTypes.includes(section.type) ? section.type : 'paragraph',
-            content: section.content,
-            layout: section.layout,
-          }));
-
-        const sanitizedClub: Club = {
-          ...clubData,
-          legalInfo: {
-            ...legalInfo,
-            termsAndConditionsSections: legalInfo.termsAndConditionsSections
-              ? sanitizeSections(legalInfo.termsAndConditionsSections)
-              : [],
-            privacyAndSecurityPolicySections: legalInfo.privacyAndSecurityPolicySections
-              ? sanitizeSections(legalInfo.privacyAndSecurityPolicySections)
-              : [],
-          },
-        };
-
-        setClub(sanitizedClub);
+        const [legalResponse, clubResponse] = await Promise.all([
+          api.get(`/club-legal-content/by-club/${clubId}`),
+          api.get(`/clubs/${clubId}`),
+        ]);
+        setSections(getResponseData(legalResponse).termsAndConditions ?? []);
+        setClubName(getResponseData(clubResponse).name ?? '');
       } catch (error) {
-        console.error("Error fetching club:", error);
-        setClub(null);
+        console.error('Error fetching terms:', error);
+        setNotFound(true);
       } finally {
         setLoading(false);
       }
     };
-    if (clubId) fetchClub();
+    if (clubId) fetchContent();
   }, [clubId]);
 
   if (loading) {
     return <div className="text-center py-20">Cargando términos...</div>;
   }
 
-  if (!club) {
+  if (notFound) {
     return (
       <div className="container mx-auto px-4 py-8 text-center">
         <h1 className="text-4xl font-bold text-red-600 mb-4">Club no encontrado</h1>
@@ -72,9 +52,9 @@ const TermsAndConditionsPage: React.FC = () => {
       <button onClick={() => navigate(-1)} className="mb-6 flex items-center text-blue-600 hover:text-blue-800">
         &larr; Volver al Club
       </button>
-
-      {club.legalInfo?.termsAndConditionsSections && club.legalInfo.termsAndConditionsSections.length > 0 ? (
-        <LegalContentRenderer sections={club.legalInfo.termsAndConditionsSections} />
+      <h1 className="text-2xl font-bold text-gray-900 mb-6 text-center">Términos y Condiciones de {clubName}</h1>
+      {sections.length > 0 ? (
+        <LegalContentRenderer sections={sections} />
       ) : (
         <p className="text-gray-600 text-center">Este club aún no ha proporcionado sus términos y condiciones.</p>
       )}

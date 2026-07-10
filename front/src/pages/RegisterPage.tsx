@@ -3,7 +3,6 @@ import { Link, useNavigate } from 'react-router-dom';
 import api from '../api/config';
 
 const RegisterPage: React.FC = () => {
-  const [userType, setUserType] = useState<'customer' | 'entrepreneur'>('customer');
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
   const [email, setEmail] = useState('');
@@ -20,12 +19,10 @@ const RegisterPage: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
-
     if (password !== confirmPassword) {
       setError('Las contraseñas no coinciden.');
       return;
     }
-
     const birth = new Date(birthDate);
     const today = new Date();
     let age = today.getFullYear() - birth.getFullYear();
@@ -33,18 +30,11 @@ const RegisterPage: React.FC = () => {
     if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birth.getDate())) {
       age--;
     }
-
-    if (userType === 'customer' && age < 16) {
-      setError('Debés tener al menos 16 años para registrarte como cliente.');
+    if (age < 16) {
+      setError('Debés tener al menos 16 años para registrarte.');
       return;
     }
-    if (userType === 'entrepreneur' && age < 18) {
-      setError('Debés tener al menos 18 años para registrarte como emprendedor.');
-      return;
-    }
-
     setLoading(true);
-
     try {
       const dto = {
         firstName,
@@ -56,19 +46,10 @@ const RegisterPage: React.FC = () => {
         phoneNumber: phoneNumber || null,
         birthDate,
       };
-
-      const endpoint = userType === 'customer' ? '/auth/register/customer' : '/auth/register/entrepreneur';
-      const response = await api.post(endpoint, dto);
+      const response = await api.post('/auth/register/customer', dto);
       const data = response.data?.data ?? response.data;
-
       localStorage.setItem('pending_user_id', data.id.toString());
-      localStorage.setItem('pending_user_type', userType);
-
-      if (userType === 'customer') {
-        navigate('/register/complete-profile');
-      } else {
-        navigate('/register/complete-club');
-      }
+      navigate('/register/complete-profile');
     } catch (err: any) {
       setError(err.response?.data?.message || 'Error al registrarse. Intentá de nuevo.');
     } finally {
@@ -90,32 +71,6 @@ const RegisterPage: React.FC = () => {
             </Link>
           </p>
         </div>
-
-        <div className="flex items-center justify-center space-x-6">
-          <label className="inline-flex items-center cursor-pointer">
-            <input
-              type="radio"
-              name="userType"
-              value="customer"
-              checked={userType === 'customer'}
-              onChange={() => setUserType('customer')}
-              className="form-radio h-4 w-4 text-blue-600"
-            />
-            <span className="ml-2 text-gray-900 font-medium">Soy cliente</span>
-          </label>
-          <label className="inline-flex items-center cursor-pointer">
-            <input
-              type="radio"
-              name="userType"
-              value="entrepreneur"
-              checked={userType === 'entrepreneur'}
-              onChange={() => setUserType('entrepreneur')}
-              className="form-radio h-4 w-4 text-blue-600"
-            />
-            <span className="ml-2 text-gray-900 font-medium">Soy emprendedor</span>
-          </label>
-        </div>
-
         <form className="mt-4 space-y-4" onSubmit={handleSubmit}>
           <div className="rounded-md shadow-sm -space-y-px">
             <div>
@@ -231,9 +186,7 @@ const RegisterPage: React.FC = () => {
               />
             </div>
           </div>
-
           {error && <p className="text-red-500 text-sm text-center">{error}</p>}
-
           <div>
             <button
               type="submit"

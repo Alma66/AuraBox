@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
+import { Injectable, NotFoundException, BadRequestException, ForbiddenException } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
 import { CreateEntrepreneurLicenseDto } from './dto/create-entrepreneur-licenses.dto';
 import { UpdateEntrepreneurLicenseDto } from './dto/update-entrepreneur-licenses.dto';
@@ -118,6 +118,46 @@ export class EntrepreneurLicensesService {
     return sanitize(updated);
   }
 
+  async findRequiredForClub(idClub: number, requesterId: number, requesterRole: string) {
+    const club = await this.prisma.club.findUnique({ where: { id: idClub } });
+    if (!club) throw new NotFoundException('Club no encontrado');
+    if (requesterRole !== 'admin') {
+      const association = await this.prisma.entrepreneur_Club.findFirst({
+        where: { idClub, idEntrepreneurs: requesterId },
+      });
+      if (!association) throw new ForbiddenException('No autorizado para ver estos requisitos');
+    }
+    const clubCategories = await this.prisma.club_Categories.findMany({ where: { idClub } });
+    const categoryIds = clubCategories.map((c) => c.idCategories);
+    const requiredLinks = categoryIds.length > 0
+      ? await this.prisma.category_License_Type.findMany({ where: { idCategories: { in: categoryIds } } })
+      : [];
+    const requiredLicenseTypeIds = Array.from(new Set(requiredLinks.map((l) => l.idLicenseTypes)));
+    const licenseTypes = requiredLicenseTypeIds.length > 0
+      ? await this.prisma.license_Types.findMany({ where: { id: { in: requiredLicenseTypeIds } } })
+      : [];
+    const entrepreneurClub = await this.prisma.entrepreneur_Club.findFirst({ where: { idClub } });
+    const idEntrepreneurs = entrepreneurClub?.idEntrepreneurs ?? null;
+    const uploadedLicenses = idEntrepreneurs
+      ? await this.prisma.entrepreneur_Licenses.findMany({
+          where: { idEntrepreneurs, idLicenseTypes: { in: requiredLicenseTypeIds } },
+        })
+      : [];
+    return licenseTypes.map((licenseType) => {
+      const uploaded = uploadedLicenses.find((u) => u.idLicenseTypes === licenseType.id);
+      return {
+        idLicenseTypes: licenseType.id,
+        name: licenseType.name,
+        description: licenseType.description,
+        entrepreneurLicenseId: uploaded?.id ?? null,
+        verificationStatus: uploaded?.verificationStatus ?? null,
+        documentUrl: uploaded?.documentUrl ?? null,
+        issueDate: uploaded?.issueDate ? uploaded.issueDate.toISOString() : null,
+        expirationDate: uploaded?.expirationDate ? uploaded.expirationDate.toISOString() : null,
+        verificationNotes: uploaded?.verificationNotes ?? null,
+      };
+    });
+  }
   async remove(id: number) {
     const existing = await this.prisma.entrepreneur_Licenses.findUnique({ where: { id } });
     if (!existing) throw new NotFoundException('Licencia no encontrada');

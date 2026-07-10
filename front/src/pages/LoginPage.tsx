@@ -58,10 +58,8 @@ const LoginPage: React.FC<LoginPageProps> = ({ onLogin }) => {
 
       switch (user.role) {
         case 'customer':
-          navigate('/', { state: { showWelcome: true, welcomeName: user.firstName } });
-          break;
         case 'entrepreneur':
-          navigate('/entrepreneur/profile');
+          navigate('/', { state: { showWelcome: true, welcomeName: user.firstName } });
           break;
         case 'admin':
           navigate('/admin/dashboard');

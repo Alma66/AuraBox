@@ -51,6 +51,11 @@ export class EntrepreneurLicensesController {
     }
     return this.service.findByEntrepreneur(idEntrepreneur);
   }
+  
+  @Get('required-for-club/:idClub')
+  async findRequiredForClub(@Param('idClub', ParseIntPipe) idClub: number, @Request() req) {
+    return this.service.findRequiredForClub(idClub, req.user.id, req.user.role);
+  }
 
   @Get(':id')
   async findOne(@Param('id', ParseIntPipe) id: number, @Request() req) {

@@ -8,7 +8,6 @@ import HomePage from './pages/HomePage';
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
 import CompleteProfilePage from './pages/CompleteProfilePage';
-import CompleteClubPage from './pages/CompleteClubPage';
 import ExploreClubsPage from './pages/ExploreClubsPage';
 import FAQPage from './pages/FAQPage';
 import AboutUsPage from './pages/AboutUsPage';
@@ -47,6 +46,8 @@ import FinancialMovementsPage from './pages/entrepreneur/administration_tools/an
 import ProfitabilityPage from './pages/entrepreneur/administration_tools/analysis_and_reports/finance_and_team/ProfitabilityPage';
 import ManageUsersAndRolesPage from './pages/entrepreneur/administration_tools/analysis_and_reports/finance_and_team/ManageUsersAndRolesPage';
 import GeneralSettingsPage from './pages/entrepreneur/administration_tools/analysis_and_reports/finance_and_team/GeneralSettingsPage';
+import LegalCompliancePage from './pages/entrepreneur/operations_and_finance/EditClubLegalInfoPage';
+import EditClubLegalInfoPage from './pages/entrepreneur/operations_and_finance/EditClubLegalInfoPage';
 import api from './api/config';
 import { User, UserRole } from './types/user';
 
@@ -166,7 +167,6 @@ const AppContent: React.FC = () => {
           <Route path="/login" element={<LoginPage onLogin={login} />} />
           <Route path="/register" element={<RegisterPage />} />
           <Route path="/register/complete-profile" element={<CompleteProfilePage />} />
-          <Route path="/register/complete-club" element={<CompleteClubPage />} />
           <Route path="/about-us" element={<AboutUsPage />} />
           <Route path="/contact" element={<ContactPage />} />
           <Route path="/logout" element={<Logout />} />
@@ -175,7 +175,9 @@ const AppContent: React.FC = () => {
           <Route path="/club/:clubId/terms-and-conditions" element={<TermsAndConditionsPage />} />
           <Route path="/club/:clubId/privacy-and-security" element={<PrivacyAndSecurityPolicyPage />} />
           <Route path="/club/:clubId/plan/:planId" element={<SubscriptionPlanDetailPage />} />
-
+          <Route path="/entrepreneur/club/:clubId/edit-legal-info/:section" element={pr(['entrepreneur'], <EditClubLegalInfoPage />)} />
+          <Route path="/entrepreneur/club/:clubId/edit-legal-info" element={pr(['entrepreneur'], <EditClubLegalInfoPage />)} />
+          <Route path="/entrepreneur/club/:clubId/legal-compliance" element={pr(['entrepreneur'], <LegalCompliancePage />)} />
           <Route path="/customer/profile" element={pr(['customer'], <UserProfilePage />)} />
           <Route path="/customer/subscriptions" element={pr(['customer'], <UserSubscriptionsPage />)} />
           <Route path="/customer/orders" element={pr(['customer'], <OrderHistoryPage />)} />

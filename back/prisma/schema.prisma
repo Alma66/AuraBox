@@ -546,7 +546,24 @@ model User {
   homeLongitude      Decimal?     @map("Home_Longitude") @db.Decimal(9, 6)
   @@map("User")
 }
+model Club_Legal_Content {
+  id                       Int      @id @default(autoincrement()) @map("ID")
+  idClub                   Int      @unique @map("ID_Club")
+  termsAndConditions       Json?    @map("Terms_And_Conditions")
+  privacyAndSecurityPolicy Json?    @map("Privacy_And_Security_Policy")
+  updatedAt                DateTime @updatedAt @map("Updated_At")
 
+  @@map("Club_Legal_Content")
+}
+
+model Category_License_Type {
+  id             Int @id @default(autoincrement()) @map("ID")
+  idCategories   Int @map("ID_Categories")
+  idLicenseTypes Int @map("ID_License_Types")
+
+  @@unique([idCategories, idLicenseTypes])
+  @@map("Category_License_Type")
+}
 model User_Category_Preference {
   id         Int      @id @default(autoincrement()) @map("ID")
   idUser     Int      @map("ID_User")
