@@ -34,4 +34,5 @@ export interface User {
   showGenderPublicly?: boolean;
   homeLatitude?: string | null;
   homeLongitude?: string | null;
+  cuitCuil?: string;
 }

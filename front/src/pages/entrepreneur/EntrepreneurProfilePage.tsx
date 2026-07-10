@@ -5,36 +5,34 @@ import EntrepreneurProfileContent from '../../components/entrepreneur/Entreprene
 import api, { getResponseData } from '../../api/config';
 import { User } from '../../types/user';
 import { useAuth } from '../../App';
-
 function mapApiEntrepreneurToUser(data: any): User {
   return {
-    id: String(data.id),
+    id: data.id,
     firstName: data.firstName || '',
     lastName: data.lastName || '',
     email: data.email || '',
     role: 'entrepreneur',
+    documentType: data.documentType || '',
+    documentNumber: data.documentNumber,
     registeredDate: data.registrationDate || new Date().toISOString(),
     lastLogin: new Date().toISOString(),
     birthDate: data.birthDate ? data.birthDate.split('T')[0] : '',
-    documentType: data.documentType || '',
-    documentNumber: data.documentNumber ? String(data.documentNumber) : '',
-    phoneNumber: data.phoneNumber ? String(data.phoneNumber) : '',
+    phoneNumber: data.phoneNumber,
     cuitCuil: data.cuitCuil ? String(data.cuitCuil) : '',
     city: data.city || '',
     province: data.province || '',
-    locality: '',
-    country: 'Argentina',
-    street: '',
-    streetNumber: '',
-    floor: '',
-    details: '',
-    postalCode: '',
-    taxId: data.cuitCuil ? String(data.cuitCuil) : '',
-    legalName: `${data.firstName} ${data.lastName}`,
+    locality: data.province || '',
+    country: data.country || 'Argentina',
+    street: data.streetAddress || '',
+    streetNumber: data.addressNumber ? String(data.addressNumber) : '',
+    floor: data.floorNumber || '',
+    details: data.addressDetails || '',
+    postalCode: data.postalCode || '',
+    gender: data.gender || '',
+    showGenderPublicly: data.showGenderPublicly || false,
     managedClubId: data.managedClubId ? String(data.managedClubId) : undefined,
   };
 }
-
 const EntrepreneurProfilePage: React.FC = () => {
   const [activeSection, setActiveSection] = useState<string>('profile');
   const [loggedInUser, setLoggedInUser] = useState<User | null>(null);
@@ -42,7 +40,6 @@ const EntrepreneurProfilePage: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
   const { userRole } = useAuth();
-
   const fetchEntrepreneur = useCallback(async () => {
     try {
       const response = await api.get('/entrepreneurs/me');
@@ -59,7 +56,6 @@ const EntrepreneurProfilePage: React.FC = () => {
       setLoading(false);
     }
   }, [navigate]);
-
   useEffect(() => {
     if (userRole && userRole !== 'entrepreneur') {
       navigate(userRole === 'customer' ? '/customer/profile' : '/login');
@@ -67,15 +63,11 @@ const EntrepreneurProfilePage: React.FC = () => {
     }
     fetchEntrepreneur();
   }, [userRole, navigate, fetchEntrepreneur]);
-
   if (loading) return <div className="text-center py-20">Cargando perfil...</div>;
   if (!loggedInUser) return <div className="text-center py-20">Redirigiendo...</div>;
-
   return (
     <div className="container mx-auto px-4 py-8 min-h-screen">
       <h1 className="text-4xl font-bold text-gray-800 mb-2 text-center">Mi Perfil de Emprendedor</h1>
-
-      {/* Acceso rápido al club */}
       {managedClub && (
         <div className="mb-8 flex justify-center">
           <Link
@@ -102,7 +94,6 @@ const EntrepreneurProfilePage: React.FC = () => {
           </Link>
         </div>
       )}
-
       <div className="flex flex-col lg:flex-row gap-8">
         <div className="lg:w-1/4">
           <EntrepreneurProfileSidebar activeSection={activeSection} setActiveSection={setActiveSection} />
@@ -111,6 +102,7 @@ const EntrepreneurProfilePage: React.FC = () => {
           <EntrepreneurProfileContent
             activeSection={activeSection}
             user={loggedInUser}
+            managedClub={managedClub}
             onUserUpdate={fetchEntrepreneur}
           />
         </div>
@@ -118,5 +110,4 @@ const EntrepreneurProfilePage: React.FC = () => {
     </div>
   );
 };
-
 export default EntrepreneurProfilePage;

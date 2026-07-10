@@ -177,7 +177,14 @@ model Entrepreneurs {
   province         String?  @map("Province")
   active           Boolean  @default(true) @map("Active")
   bio              String?  @map("Bio")
-
+  gender           String?  @map("Gender")
+  country          String?  @map("Country")
+  streetAddress    String?  @map("Street_Address")
+  addressNumber    Int?     @map("Address_Number")
+  floorNumber      String?  @map("Floor_Number")
+  addressDetails   String?  @map("Address_Details")
+  postalCode       String?  @map("Postal_Code")
+  showGenderPublicly Boolean  @default(false) @map("Show_Gender_Publicly")
   @@map("Entrepreneurs")
 }
 

@@ -1,10 +1,8 @@
 import React from 'react';
-
 interface EntrepreneurProfileSidebarProps {
   activeSection: string;
   setActiveSection: (section: string) => void;
 }
-
 const EntrepreneurProfileSidebar: React.FC<EntrepreneurProfileSidebarProps> = ({
   activeSection,
   setActiveSection,
@@ -26,11 +24,6 @@ const EntrepreneurProfileSidebar: React.FC<EntrepreneurProfileSidebarProps> = ({
       icon: 'M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z M15 11a3 3 0 11-6 0 3 3 0 016 0z',
     },
     {
-      id: 'legal-compliance',
-      label: 'Cumplimiento Legal',
-      icon: 'M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z',
-    },
-    {
       id: 'security',
       label: 'Seguridad y Privacidad',
       icon: 'M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z',
@@ -41,7 +34,6 @@ const EntrepreneurProfileSidebar: React.FC<EntrepreneurProfileSidebarProps> = ({
       icon: 'M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.827 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.827 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.827-2.37-2.37.996.608 2.296.07 2.572-1.065z',
     },
   ];
-
   return (
     <nav className="bg-white rounded-xl shadow-lg p-6">
       <ul className="space-y-2">
@@ -71,5 +63,4 @@ const EntrepreneurProfileSidebar: React.FC<EntrepreneurProfileSidebarProps> = ({
     </nav>
   );
 };
-
 export default EntrepreneurProfileSidebar;
