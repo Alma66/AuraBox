@@ -36,7 +36,7 @@ function mapApiEntrepreneurToUser(data: any): User {
 const EntrepreneurProfilePage: React.FC = () => {
   const [activeSection, setActiveSection] = useState<string>('profile');
   const [loggedInUser, setLoggedInUser] = useState<User | null>(null);
-  const [managedClub, setManagedClub] = useState<{ id: number; name: string; logoUrl: string } | null>(null);
+  const [managedClub, setManagedClub] = useState<{ id: number; name: string; logoUrl: string; clubStatus?: string; creationDate?: string } | null>(null);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
   const { userRole } = useAuth();

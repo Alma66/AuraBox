@@ -31,7 +31,13 @@ export class EntrepreneursController {
     const club = await this.clubsService.findClubByEntrepreneur(req.user.id);
     return {
       ...entrepreneur,
-      managedClub: club ? { id: club.id, name: club.name, logoUrl: club.logoUrl } : null,
+      managedClub: club ? {
+        id: club.id,
+        name: club.name,
+        logoUrl: club.logoUrl,
+        clubStatus: club.clubStatus,
+        creationDate: club.creationDate,
+      } : null,
       managedClubId: club ? club.id : null,
     };
   }

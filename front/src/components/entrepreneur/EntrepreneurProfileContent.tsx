@@ -22,6 +22,8 @@ interface ManagedClub {
   id: number;
   name: string;
   logoUrl: string;
+  clubStatus?: string;
+  creationDate?: string;
 }
 interface EntrepreneurProfileContentProps {
   activeSection: string;
@@ -39,6 +41,8 @@ const EntrepreneurProfileContent: React.FC<EntrepreneurProfileContentProps> = ({
   const [editedBirthDate, setEditedBirthDate] = useState(user.birthDate || '');
   const [isEditingTaxId, setIsEditingTaxId] = useState(false);
   const [editedTaxId, setEditedTaxId] = useState(user.cuitCuil || '');
+  const [isEditingBio, setIsEditingBio] = useState(false);
+  const [editedBio, setEditedBio] = useState(user.bio || '');
   const [showSensitiveProfileInfo, setShowSensitiveProfileInfo] = useState(false);
   const [profilePassword, setProfilePassword] = useState('');
   const [profilePasswordError, setProfilePasswordError] = useState('');
@@ -50,6 +54,7 @@ const EntrepreneurProfileContent: React.FC<EntrepreneurProfileContentProps> = ({
     setEditedGender(user.gender || '');
     setEditedBirthDate(user.birthDate || '');
     setEditedTaxId(user.cuitCuil || '');
+    setEditedBio(user.bio || '');
     setShowSensitiveProfileInfo(false);
     setProfilePassword('');
     setProfilePasswordError('');
@@ -112,6 +117,16 @@ const EntrepreneurProfileContent: React.FC<EntrepreneurProfileContentProps> = ({
       onUserUpdate();
     } catch {
       showFeedback(undefined, 'Error al guardar el CUIT/CUIL');
+    }
+  };
+  const handleSaveBio = async () => {
+    try {
+      await api.patch('/entrepreneurs/me', { bio: editedBio.trim() });
+      setIsEditingBio(false);
+      showFeedback('Descripción guardada correctamente');
+      onUserUpdate();
+    } catch {
+      showFeedback(undefined, 'Error al guardar la descripción');
     }
   };
   const handleProfilePasswordCheck = async () => {
@@ -222,9 +237,34 @@ const EntrepreneurProfileContent: React.FC<EntrepreneurProfileContentProps> = ({
                 <input type="text" value={editedTaxId} onChange={(e) => setEditedTaxId(e.target.value)} className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm" placeholder="Ej: 20123456789" />
                 <button onClick={handleSaveTaxId} className="mt-4 bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors duration-200">Guardar CUIT/CUIL</button>
               </EditProfileField>
+              <EditProfileField
+                label="Descripción del Negocio"
+                value={editedBio || 'Sin descripción todavía'}
+                isEditing={isEditingBio}
+                onEdit={() => setIsEditingBio(true)}
+                onCancel={() => { setEditedBio(user.bio || ''); setIsEditingBio(false); }}
+              >
+                <textarea value={editedBio} onChange={(e) => setEditedBio(e.target.value)} rows={4} maxLength={500} className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm" placeholder="Contanos de qué se trata tu emprendimiento, hace cuánto existe, qué lo hace especial..." />
+                <p className="text-xs text-gray-500 mt-1">{editedBio.length}/500</p>
+                <button onClick={handleSaveBio} className="mt-2 bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors duration-200">Guardar Descripción</button>
+              </EditProfileField>
               {managedClub ? (
                 <div className="bg-gray-100 p-6 rounded-lg shadow-md mt-8">
-                  <h3 className="text-xl font-bold text-gray-800 mb-4">Gestión de {managedClub.name}</h3>
+                  <div className="flex items-center justify-between mb-4">
+                    <h3 className="text-xl font-bold text-gray-800">Gestión de {managedClub.name}</h3>
+                    {managedClub.clubStatus && (
+                      <span className={`text-xs font-semibold px-3 py-1 rounded-full ${
+                        managedClub.clubStatus === 'APROBADO' ? 'bg-green-100 text-green-700' :
+                        managedClub.clubStatus === 'PENDIENTE_APROBACION' ? 'bg-yellow-100 text-yellow-700' :
+                        'bg-red-100 text-red-700'
+                      }`}>
+                        {managedClub.clubStatus === 'APROBADO' ? 'Aprobado' : managedClub.clubStatus === 'PENDIENTE_APROBACION' ? 'Pendiente de Aprobación' : managedClub.clubStatus}
+                      </span>
+                    )}
+                  </div>
+                  {managedClub.creationDate && (
+                    <p className="text-sm text-gray-500 mb-4">Club creado el {new Date(managedClub.creationDate).toLocaleDateString('es-AR')}</p>
+                  )}
                   <p className="text-gray-600 mb-4">La razón social, dirección legal y demás datos del negocio se gestionan desde el perfil de tu club.</p>
                   <div className="flex flex-wrap gap-3">
                     <Link to={`/club/${managedClub.id}`} className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors duration-200 text-sm font-medium">Perfil del Club</Link>

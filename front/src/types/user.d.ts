@@ -35,4 +35,5 @@ export interface User {
   homeLatitude?: string | null;
   homeLongitude?: string | null;
   cuitCuil?: string;
+  bio?: string;
 }
