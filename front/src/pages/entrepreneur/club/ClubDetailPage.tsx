@@ -48,6 +48,7 @@ interface CropState {
   crop: { x: number; y: number };
   zoom: number;
   croppedAreaPixels: any;
+  aspect: number;
 }
 
 const NETWORK_TYPES = [
@@ -61,7 +62,7 @@ const NETWORK_TYPES = [
   { key: 'website', label: 'Sitio Web' },
 ];
 
-const ASPECT_RATIOS: Record<CropTarget, number> = {
+const FALLBACK_ASPECT_RATIOS: Record<CropTarget, number> = {
   logo: 1,
   banner: 16 / 5,
   history: 4 / 3,
@@ -100,6 +101,13 @@ function validateSocialUrl(url: string): string | null {
     return 'La URL ingresada no tiene un formato válido.';
   }
   return null;
+}
+
+function getElementAspect(el: HTMLElement | null, fallback: number): number {
+  if (!el) return fallback;
+  const { width, height } = el.getBoundingClientRect();
+  if (!width || !height) return fallback;
+  return width / height;
 }
 
 async function getCroppedBlob(imageSrc: string, croppedAreaPixels: any): Promise<Blob> {
@@ -166,6 +174,8 @@ const ClubDetailPage: React.FC = () => {
   const logoInputRef = useRef<HTMLInputElement>(null);
   const bannerInputRef = useRef<HTMLInputElement>(null);
   const historyInputRef = useRef<HTMLInputElement>(null);
+  const bannerDisplayRef = useRef<HTMLDivElement>(null);
+  const historyDisplayRef = useRef<HTMLDivElement | HTMLImageElement>(null);
   const isOwner = userRole === 'entrepreneur' && !!club?.isOwner;
 
   const showToast = (msg: string, type: 'success' | 'error' = 'success') => {
@@ -210,7 +220,7 @@ const ClubDetailPage: React.FC = () => {
     checkFavorites();
   }, [club, userRole]);
 
-  const openCropper = (target: CropTarget, file: File) => {
+  const openCropper = (target: CropTarget, file: File, aspect: number) => {
     const validationError = validateImageFile(file);
     if (validationError) {
       showToast(validationError, 'error');
@@ -225,6 +235,7 @@ const ClubDetailPage: React.FC = () => {
         crop: { x: 0, y: 0 },
         zoom: 1,
         croppedAreaPixels: null,
+        aspect,
       });
     };
     reader.onerror = () => showToast('No se pudo leer el archivo seleccionado.', 'error');
@@ -239,7 +250,13 @@ const ClubDetailPage: React.FC = () => {
       e.target.value = '';
       return;
     }
-    openCropper(target, file);
+    let aspect = FALLBACK_ASPECT_RATIOS[target];
+    if (target === 'banner') {
+      aspect = getElementAspect(bannerDisplayRef.current, aspect);
+    } else if (target === 'history') {
+      aspect = getElementAspect(historyDisplayRef.current, aspect);
+    }
+    openCropper(target, file, aspect);
     e.target.value = '';
   };
 
@@ -485,7 +502,7 @@ const ClubDetailPage: React.FC = () => {
                 image={cropState.imageSrc}
                 crop={cropState.crop}
                 zoom={cropState.zoom}
-                aspect={ASPECT_RATIOS[cropState.target]}
+                aspect={cropState.aspect}
                 cropShape={cropState.target === 'logo' ? 'round' : 'rect'}
                 showGrid={cropState.target !== 'logo'}
                 onCropChange={(crop) => setCropState((prev) => (prev ? { ...prev, crop } : null))}
@@ -582,7 +599,7 @@ const ClubDetailPage: React.FC = () => {
         </div>
       )}
       <div className="relative shadow-lg">
-        <div className="h-72 md:h-96">
+        <div className="h-72 md:h-96" ref={bannerDisplayRef}>
           {bannerList.length > 0 ? (
             <Slider {...bannerSliderSettings}>
               {bannerList.map((imgSrc, index) => (
@@ -762,9 +779,9 @@ const ClubDetailPage: React.FC = () => {
                     </button>
                   </div>
                   {historyImage ? (
-                    <img src={historyImage} alt="Historia" className="w-full h-56 object-cover rounded-xl border border-gray-100 shadow-sm" />
+                    <img ref={historyDisplayRef as React.RefObject<HTMLImageElement>} src={historyImage} alt="Historia" className="w-full h-56 object-cover rounded-xl border border-gray-100 shadow-sm" />
                   ) : (
-                    <div className="w-full h-56 rounded-xl border-2 border-dashed border-gray-200 bg-gray-50 flex flex-col items-center justify-center gap-2">
+                    <div ref={historyDisplayRef as React.RefObject<HTMLDivElement>} className="w-full h-56 rounded-xl border-2 border-dashed border-gray-200 bg-gray-50 flex flex-col items-center justify-center gap-2">
                       <svg className="w-8 h-8 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
                       </svg>
