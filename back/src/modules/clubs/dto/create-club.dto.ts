@@ -1,9 +1,12 @@
-import { 
-  IsEmail, 
-  IsOptional, 
-  IsString, 
-  MinLength, 
+import {
+  IsEmail,
+  IsOptional,
+  IsString,
+  MinLength,
   IsEnum,
+  IsInt,
+  Min,
+  Max,
 } from 'class-validator';
 import { ClubStatus } from '@prisma/client';
 
@@ -45,4 +48,16 @@ export class CreateClubDto {
   @IsOptional()
   @IsString()
   communityText?: string;
+
+  @IsOptional()
+  @IsInt()
+  @Min(1)
+  @Max(31)
+  shippingWindowStartDay?: number;
+
+  @IsOptional()
+  @IsInt()
+  @Min(1)
+  @Max(31)
+  shippingWindowEndDay?: number;
 }

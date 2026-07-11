@@ -117,7 +117,7 @@ const LocationSection: React.FC<LocationSectionProps> = ({
   }, [editedCountry, editedCity]);
 
   useEffect(() => {
-    if (coordinates || geocodedOnce.current || isEntrepreneurProfile) return;
+    if (coordinates || geocodedOnce.current) return;
     if (!street && !city) return;
     geocodedOnce.current = true;
     const query = `${street} ${streetNumber}, ${city}, ${locality}, ${country}`;
@@ -265,8 +265,7 @@ const LocationSection: React.FC<LocationSectionProps> = ({
         </button>
       </EditProfileField>
 
-      {!isEntrepreneurProfile && (
-        <div className="relative bg-gray-100 p-6 rounded-lg shadow-md mt-8">
+      <div className="relative bg-gray-100 p-6 rounded-lg shadow-md mt-8">
           <h3 className="text-xl font-bold text-gray-800 mb-4">Detalles de Dirección y Mapa</h3>
           {!showSensitiveLocationInfo && (
             <div className="absolute inset-0 bg-gray-200 bg-opacity-90 flex flex-col items-center justify-center rounded-lg z-10">
@@ -357,8 +356,7 @@ const LocationSection: React.FC<LocationSectionProps> = ({
               )}
             </div>
           </div>
-        </div>
-      )}
+      </div>
     </div>
   );
 };

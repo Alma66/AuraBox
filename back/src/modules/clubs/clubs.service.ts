@@ -246,6 +246,8 @@ export class ClubsService {
     if (dto.whatsappContact !== undefined) data.whatsappContact = dto.whatsappContact;
     if (dto.communityText !== undefined) data.communityText = dto.communityText;
     if (dto.milestones !== undefined) data.milestones = dto.milestones;
+    if (dto.shippingWindowStartDay !== undefined) data.shippingWindowStartDay = dto.shippingWindowStartDay;
+    if (dto.shippingWindowEndDay !== undefined) data.shippingWindowEndDay = dto.shippingWindowEndDay;
     try {
       const updated = await this.prisma.club.update({ where: { id }, data });
       return this.sanitizeClub(updated);

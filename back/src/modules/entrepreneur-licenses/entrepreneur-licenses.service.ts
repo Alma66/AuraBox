@@ -71,7 +71,7 @@ export class EntrepreneurLicensesService {
     return sanitize(item);
   }
 
-  async update(id: number, dto: UpdateEntrepreneurLicenseDto) {
+  async update(id: number, dto: UpdateEntrepreneurLicenseDto, documentFile?: Express.Multer.File) {
     const existing = await this.prisma.entrepreneur_Licenses.findUnique({ where: { id } });
     if (!existing) throw new NotFoundException('Licencia no encontrada');
 
@@ -84,6 +84,18 @@ export class EntrepreneurLicensesService {
       if (!lt) throw new NotFoundException('Tipo de licencia (nuevo) no encontrado');
     }
 
+    let documentUrl = (dto as any).documentUrl ?? existing.documentUrl;
+    let verificationStatus = existing.verificationStatus;
+    let verificationDate = existing.verificationDate;
+    let verificationNotes = (dto as any).verificationNotes ?? existing.verificationNotes;
+
+    if (documentFile) {
+      documentUrl = await this.cloudinary.uploadDocument(documentFile, 'aurabox/licenses');
+      verificationStatus = VerificationStatus.PENDIENTE;
+      verificationDate = null;
+      verificationNotes = null;
+    }
+
     const updated = await this.prisma.entrepreneur_Licenses.update({
       where: { id },
       data: {
@@ -91,8 +103,10 @@ export class EntrepreneurLicensesService {
         idLicenseTypes: (dto as any).idLicenseTypes ?? existing.idLicenseTypes,
         issueDate: (dto as any).issueDate ? new Date((dto as any).issueDate) : existing.issueDate,
         expirationDate: (dto as any).expirationDate ? new Date((dto as any).expirationDate) : existing.expirationDate,
-        documentUrl: (dto as any).documentUrl ?? existing.documentUrl,
-        verificationNotes: (dto as any).verificationNotes ?? existing.verificationNotes,
+        documentUrl,
+        verificationStatus,
+        verificationDate,
+        verificationNotes,
       },
     });
     return sanitize(updated);
@@ -158,6 +172,7 @@ export class EntrepreneurLicensesService {
       };
     });
   }
+
   async remove(id: number) {
     const existing = await this.prisma.entrepreneur_Licenses.findUnique({ where: { id } });
     if (!existing) throw new NotFoundException('Licencia no encontrada');

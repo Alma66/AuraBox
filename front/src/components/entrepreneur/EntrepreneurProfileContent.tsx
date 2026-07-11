@@ -309,7 +309,11 @@ const EntrepreneurProfileContent: React.FC<EntrepreneurProfileContentProps> = ({
           />
         );
       case 'settings':
-        return <EntrepreneurSettingsSection />;
+        return managedClub ? (
+          <EntrepreneurSettingsSection clubId={String(managedClub.id)} />
+        ) : (
+          <p className="text-gray-600">Necesitás tener un club asociado para acceder a la configuración.</p>
+        );
       default:
         return <p className="text-gray-600">Seleccioná una sección del menú.</p>;
     }

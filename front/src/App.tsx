@@ -46,8 +46,8 @@ import FinancialMovementsPage from './pages/entrepreneur/administration_tools/an
 import ProfitabilityPage from './pages/entrepreneur/administration_tools/analysis_and_reports/finance_and_team/ProfitabilityPage';
 import ManageUsersAndRolesPage from './pages/entrepreneur/administration_tools/analysis_and_reports/finance_and_team/ManageUsersAndRolesPage';
 import GeneralSettingsPage from './pages/entrepreneur/administration_tools/analysis_and_reports/finance_and_team/GeneralSettingsPage';
-import LegalCompliancePage from './pages/entrepreneur/operations_and_finance/EditClubLegalInfoPage';
 import EditClubLegalInfoPage from './pages/entrepreneur/operations_and_finance/EditClubLegalInfoPage';
+import LegalCompliancePage from './pages/entrepreneur/operations_and_finance/LegalCompliancePage';
 import api from './api/config';
 import { User, UserRole } from './types/user';
 

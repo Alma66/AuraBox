@@ -12,23 +12,25 @@ import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
 import { RolesGuard } from '../auth/roles.guard';
 import { Roles } from '../auth/roles.decorator';
 
+const licenseFileOptions = {
+  storage: memoryStorage(),
+  limits: { fileSize: 10 * 1024 * 1024 },
+  fileFilter: (req, file, callback) => {
+    if (!file.mimetype.match(/\/(pdf|jpg|jpeg|png)$/)) {
+      callback(new Error('Solo se permiten PDF o imágenes'), false);
+    } else {
+      callback(null, true);
+    }
+  },
+};
+
 @Controller('entrepreneur-licenses')
 @UseGuards(JwtAuthGuard)
 export class EntrepreneurLicensesController {
   constructor(private readonly service: EntrepreneurLicensesService) {}
 
   @Post()
-  @UseInterceptors(FileInterceptor('document', {
-    storage: memoryStorage(),
-    limits: { fileSize: 10 * 1024 * 1024 },
-    fileFilter: (req, file, callback) => {
-      if (!file.mimetype.match(/\/(pdf|jpg|jpeg|png)$/)) {
-        callback(new Error('Solo se permiten PDF o imágenes'), false);
-      } else {
-        callback(null, true);
-      }
-    },
-  }))
+  @UseInterceptors(FileInterceptor('document', licenseFileOptions))
   @UsePipes(new ValidationPipe({ whitelist: true, transform: true }))
   async create(@Body() dto: CreateEntrepreneurLicenseDto, @Request() req, @UploadedFile() document?: Express.Multer.File) {
     if (req.user.role !== 'admin' && req.user.id !== dto.idEntrepreneurs) {
@@ -51,7 +53,7 @@ export class EntrepreneurLicensesController {
     }
     return this.service.findByEntrepreneur(idEntrepreneur);
   }
-  
+
   @Get('required-for-club/:idClub')
   async findRequiredForClub(@Param('idClub', ParseIntPipe) idClub: number, @Request() req) {
     return this.service.findRequiredForClub(idClub, req.user.id, req.user.role);
@@ -67,13 +69,19 @@ export class EntrepreneurLicensesController {
   }
 
   @Patch(':id')
+  @UseInterceptors(FileInterceptor('document', licenseFileOptions))
   @UsePipes(new ValidationPipe({ whitelist: true, transform: true }))
-  async update(@Param('id', ParseIntPipe) id: number, @Body() dto: UpdateEntrepreneurLicenseDto, @Request() req) {
+  async update(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() dto: UpdateEntrepreneurLicenseDto,
+    @Request() req,
+    @UploadedFile() document?: Express.Multer.File,
+  ) {
     const existing = await this.service.findOne(id);
     if (req.user.id !== existing.idEntrepreneurs && req.user.role !== 'admin') {
       throw new ForbiddenException('No autorizado para actualizar esta licencia');
     }
-    return this.service.update(id, dto);
+    return this.service.update(id, dto, document);
   }
 
   @UseGuards(RolesGuard)

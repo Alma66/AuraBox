@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import api, { getResponseData } from '../../../api/config';
 import { useAuth } from '../../../App';
@@ -8,23 +8,25 @@ interface RequiredLicense {
   name: string;
   description: string | null;
   entrepreneurLicenseId: number | null;
-  verificationStatus: string | null;
+  verificationStatus: 'PENDIENTE' | 'APROBADO' | 'RECHAZADO' | null;
   documentUrl: string | null;
   issueDate: string | null;
   expirationDate: string | null;
   verificationNotes: string | null;
 }
 
-const statusLabel: Record<string, string> = {
-  PENDIENTE: 'Pendiente de revisión',
-  APROBADO: 'Aprobado',
-  RECHAZADO: 'Rechazado',
+const statusLabel = (status: string | null) => {
+  if (status === 'APROBADO') return 'Aprobado';
+  if (status === 'PENDIENTE') return 'Pendiente de revisión';
+  if (status === 'RECHAZADO') return 'Rechazado';
+  return 'Sin subir';
 };
 
-const statusColor: Record<string, string> = {
-  PENDIENTE: 'bg-yellow-100 text-yellow-700',
-  APROBADO: 'bg-green-100 text-green-700',
-  RECHAZADO: 'bg-red-100 text-red-700',
+const statusColor = (status: string | null) => {
+  if (status === 'APROBADO') return 'bg-green-100 text-green-700';
+  if (status === 'PENDIENTE') return 'bg-yellow-100 text-yellow-700';
+  if (status === 'RECHAZADO') return 'bg-red-100 text-red-700';
+  return 'bg-gray-100 text-gray-600';
 };
 
 const LegalCompliancePage: React.FC = () => {
@@ -33,91 +35,63 @@ const LegalCompliancePage: React.FC = () => {
   const { user, userRole } = useAuth();
   const [licenses, setLicenses] = useState<RequiredLicense[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
   const [uploadingId, setUploadingId] = useState<number | null>(null);
-  const [toast, setToast] = useState<{ msg: string; type: 'success' | 'error' } | null>(null);
-  const [pendingFiles, setPendingFiles] = useState<Record<number, File | null>>({});
-  const [pendingDates, setPendingDates] = useState<Record<number, { issueDate: string; expirationDate: string }>>({});
+  const [selectedFiles, setSelectedFiles] = useState<Record<number, File | null>>({});
 
-  const showToast = (msg: string, type: 'success' | 'error' = 'success') => {
-    setToast({ msg, type });
-    setTimeout(() => setToast(null), 3500);
-  };
-
-  const fetchLicenses = useCallback(async () => {
-    if (!clubId) return;
+  const fetchLicenses = async () => {
     try {
       const response = await api.get(`/entrepreneur-licenses/required-for-club/${clubId}`);
-      setLicenses(getResponseData(response));
-    } catch (error) {
-      console.error('Error fetching required licenses:', error);
-      showToast('No se pudieron cargar los requisitos legales', 'error');
+      setLicenses(getResponseData(response) || []);
+    } catch {
+      setError('No se pudieron cargar los requisitos legales de este club.');
     } finally {
       setLoading(false);
     }
-  }, [clubId]);
+  };
 
   useEffect(() => {
     if (userRole !== 'entrepreneur' || !user?.managedClubId || user.managedClubId !== clubId) {
       navigate('/login');
       return;
     }
-    fetchLicenses();
-  }, [clubId, user, userRole, navigate, fetchLicenses]);
+    if (clubId) fetchLicenses();
+  }, [clubId, user, userRole, navigate]);
 
   const handleFileChange = (idLicenseTypes: number, file: File | null) => {
-    setPendingFiles((prev) => ({ ...prev, [idLicenseTypes]: file }));
-  };
-
-  const handleDateChange = (idLicenseTypes: number, field: 'issueDate' | 'expirationDate', value: string) => {
-    setPendingDates((prev) => ({
-      ...prev,
-      [idLicenseTypes]: { ...prev[idLicenseTypes], [field]: value },
-    }));
+    setSelectedFiles((prev) => ({ ...prev, [idLicenseTypes]: file }));
   };
 
   const handleUpload = async (license: RequiredLicense) => {
-    if (!user?.id) return;
-    const file = pendingFiles[license.idLicenseTypes];
-    if (!file) {
-      showToast('Seleccioná un archivo antes de subir', 'error');
-      return;
-    }
+    const file = selectedFiles[license.idLicenseTypes];
+    if (!file || !user) return;
     setUploadingId(license.idLicenseTypes);
+    setError('');
     try {
       const formData = new FormData();
-      formData.append('idEntrepreneurs', String(user.id));
-      formData.append('idLicenseTypes', String(license.idLicenseTypes));
-      const dates = pendingDates[license.idLicenseTypes];
-      if (dates?.issueDate) formData.append('issueDate', dates.issueDate);
-      if (dates?.expirationDate) formData.append('expirationDate', dates.expirationDate);
       formData.append('document', file);
-      await api.post('/entrepreneur-licenses', formData, {
-        headers: { 'Content-Type': 'multipart/form-data' },
-      });
-      showToast('Documento subido correctamente. Queda pendiente de revisión.');
-      setPendingFiles((prev) => ({ ...prev, [license.idLicenseTypes]: null }));
-      fetchLicenses();
-    } catch (error) {
-      console.error('Error uploading license:', error);
-      showToast('Error al subir el documento', 'error');
+      if (license.entrepreneurLicenseId) {
+        await api.patch(`/entrepreneur-licenses/${license.entrepreneurLicenseId}`, formData);
+      } else {
+        formData.append('idEntrepreneurs', String(user.id));
+        formData.append('idLicenseTypes', String(license.idLicenseTypes));
+        await api.post('/entrepreneur-licenses', formData);
+      }
+      setSelectedFiles((prev) => ({ ...prev, [license.idLicenseTypes]: null }));
+      await fetchLicenses();
+    } catch {
+      setError('Error al subir el archivo. Intentá de nuevo.');
     } finally {
       setUploadingId(null);
     }
   };
 
   if (loading) {
-    return <div className="container mx-auto px-4 py-8 text-center">Cargando cumplimiento legal...</div>;
+    return <div className="container mx-auto px-4 py-8 text-center">Cargando requisitos legales...</div>;
   }
 
   return (
     <div className="container mx-auto px-4 py-8 min-h-screen">
-      {toast && (
-        <div
-          className={`fixed top-20 right-4 z-50 max-w-sm px-5 py-3 rounded-xl shadow-lg text-white text-sm font-medium ${toast.type === 'success' ? 'bg-emerald-500' : 'bg-red-500'}`}
-        >
-          {toast.msg}
-        </div>
-      )}
       <button
         onClick={() => navigate(`/club/${clubId}`)}
         className="mb-6 flex items-center text-blue-600 hover:text-blue-800 transition-colors duration-200"
@@ -126,83 +100,63 @@ const LegalCompliancePage: React.FC = () => {
       </button>
       <div className="bg-white rounded-xl shadow-lg p-8">
         <h1 className="text-3xl font-bold text-gray-800 mb-2 text-center">Cumplimiento Legal</h1>
-        <p className="text-gray-500 text-center mb-8">
-          Subí las habilitaciones, permisos y licencias correspondientes al rubro de tu club. El equipo de AuraBox las va a revisar próximamente.
+        <p className="text-gray-600 text-center mb-8">
+          Subí las habilitaciones, licencias y permisos que tu club necesita según su rubro para operar de forma vigente en Argentina.
         </p>
+        {error && <p className="text-red-600 text-sm bg-red-50 p-3 rounded mb-6">{error}</p>}
         {licenses.length === 0 ? (
-          <p className="text-gray-600 text-center">
-            Tu club todavía no tiene categorías asignadas, por lo que no hay requisitos legales para mostrar.
-          </p>
+          <p className="text-gray-600 text-center">No hay requisitos legales configurados para las categorías de tu club.</p>
         ) : (
-          <div className="space-y-5">
+          <div className="space-y-6">
             {licenses.map((license) => (
-              <div key={license.idLicenseTypes} className="border border-gray-200 rounded-xl p-5">
-                <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-3 mb-3">
-                  <div>
-                    <h3 className="font-bold text-gray-900">{license.name}</h3>
+              <div key={license.idLicenseTypes} className="border border-gray-200 rounded-xl p-6 bg-gray-50">
+                <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-4">
+                  <div className="flex-1">
+                    <div className="flex items-center gap-3 flex-wrap">
+                      <h3 className="text-lg font-semibold text-gray-800">{license.name}</h3>
+                      <span className={`text-xs font-semibold px-3 py-1 rounded-full ${statusColor(license.verificationStatus)}`}>
+                        {statusLabel(license.verificationStatus)}
+                      </span>
+                    </div>
                     {license.description && (
-                      <p className="text-sm text-gray-500 mt-1">{license.description}</p>
+                      <p className="text-gray-600 text-sm mt-2">{license.description}</p>
                     )}
-                  </div>
-                  {license.verificationStatus && (
-                    <span className={`text-xs font-semibold px-3 py-1.5 rounded-full whitespace-nowrap ${statusColor[license.verificationStatus] ?? 'bg-gray-100 text-gray-600'}`}>
-                      {statusLabel[license.verificationStatus] ?? license.verificationStatus}
-                    </span>
-                  )}
-                </div>
-                {license.entrepreneurLicenseId ? (
-                  <div className="text-sm text-gray-600 space-y-1">
+                    {license.verificationNotes && license.verificationStatus === 'RECHAZADO' && (
+                      <p className="text-red-600 text-sm mt-2">Motivo del rechazo: {license.verificationNotes}</p>
+                    )}
                     {license.documentUrl && (
-                      <p>
-                        Documento:{' '}
-                        <a href={license.documentUrl} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">
-                          Ver archivo subido
-                        </a>
-                      </p>
-                    )}
-                    {license.issueDate && <p>Fecha de emisión: {license.issueDate.split('T')[0]}</p>}
-                    {license.expirationDate && <p>Fecha de vencimiento: {license.expirationDate.split('T')[0]}</p>}
-                    {license.verificationNotes && <p>Notas del revisor: {license.verificationNotes}</p>}
-                  </div>
-                ) : (
-                  <div className="bg-gray-50 rounded-lg p-4 space-y-3">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                      <div>
-                        <label className="block text-xs text-gray-500 mb-1">Fecha de emisión (opcional)</label>
-                        <input
-                          type="date"
-                          className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm"
-                          value={pendingDates[license.idLicenseTypes]?.issueDate ?? ''}
-                          onChange={(e) => handleDateChange(license.idLicenseTypes, 'issueDate', e.target.value)}
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-xs text-gray-500 mb-1">Fecha de vencimiento (opcional)</label>
-                        <input
-                          type="date"
-                          className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm"
-                          value={pendingDates[license.idLicenseTypes]?.expirationDate ?? ''}
-                          onChange={(e) => handleDateChange(license.idLicenseTypes, 'expirationDate', e.target.value)}
-                        />
-                      </div>
-                    </div>
-                    <div className="flex flex-col md:flex-row gap-3 md:items-center">
-                      <input
-                        type="file"
-                        accept="application/pdf,image/png,image/jpeg,image/jpg"
-                        onChange={(e) => handleFileChange(license.idLicenseTypes, e.target.files?.[0] ?? null)}
-                        className="text-sm"
-                      />
-                      <button
-                        onClick={() => handleUpload(license)}
-                        disabled={uploadingId === license.idLicenseTypes}
-                        className="bg-blue-600 text-white text-sm px-4 py-2 rounded-lg font-semibold hover:bg-blue-700 disabled:opacity-50 transition-colors"
+                     <a
+                        href={license.documentUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-blue-600 hover:text-blue-800 text-sm mt-2 inline-block"
                       >
-                        {uploadingId === license.idLicenseTypes ? 'Subiendo...' : 'Subir documento'}
-                      </button>
-                    </div>
+                        Ver archivo subido
+                      </a>
+                    )}
                   </div>
-                )}
+                  <div className="flex flex-col gap-2 w-full md:w-64">
+                    <input
+                      type="file"
+                      accept=".pdf,.jpg,.jpeg,.png"
+                      onChange={(e) => handleFileChange(license.idLicenseTypes, e.target.files ? e.target.files[0] : null)}
+                      className="text-sm"
+                    />
+                    <button
+                      onClick={() => handleUpload(license)}
+                      disabled={!selectedFiles[license.idLicenseTypes] || uploadingId === license.idLicenseTypes}
+                      className={`bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors duration-200 text-sm font-semibold ${
+                        !selectedFiles[license.idLicenseTypes] || uploadingId === license.idLicenseTypes ? 'opacity-50 cursor-not-allowed' : ''
+                      }`}
+                    >
+                      {uploadingId === license.idLicenseTypes
+                        ? 'Subiendo...'
+                        : license.entrepreneurLicenseId
+                        ? 'Reemplazar Archivo'
+                        : 'Subir Archivo'}
+                    </button>
+                  </div>
+                </div>
               </div>
             ))}
           </div>
