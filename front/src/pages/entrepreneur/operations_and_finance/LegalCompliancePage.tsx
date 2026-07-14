@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import api, { getResponseData } from '../../../api/config';
 import { useAuth } from '../../../App';
@@ -39,7 +39,8 @@ const LegalCompliancePage: React.FC = () => {
   const [uploadingId, setUploadingId] = useState<number | null>(null);
   const [selectedFiles, setSelectedFiles] = useState<Record<number, File | null>>({});
 
-  const fetchLicenses = async () => {
+  const fetchLicenses = useCallback(async () => {
+    if (!clubId) return;
     try {
       const response = await api.get(`/entrepreneur-licenses/required-for-club/${clubId}`);
       setLicenses(getResponseData(response) || []);
@@ -48,15 +49,15 @@ const LegalCompliancePage: React.FC = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [clubId]);
 
   useEffect(() => {
     if (userRole !== 'entrepreneur' || !user?.managedClubId || user.managedClubId !== clubId) {
       navigate('/login');
       return;
     }
-    if (clubId) fetchLicenses();
-  }, [clubId, user, userRole, navigate]);
+    fetchLicenses();
+  }, [clubId, user, userRole, navigate, fetchLicenses]);
 
   const handleFileChange = (idLicenseTypes: number, file: File | null) => {
     setSelectedFiles((prev) => ({ ...prev, [idLicenseTypes]: file }));
@@ -125,7 +126,7 @@ const LegalCompliancePage: React.FC = () => {
                       <p className="text-red-600 text-sm mt-2">Motivo del rechazo: {license.verificationNotes}</p>
                     )}
                     {license.documentUrl && (
-                     <a
+                   <a   
                         href={license.documentUrl}
                         target="_blank"
                         rel="noopener noreferrer"
