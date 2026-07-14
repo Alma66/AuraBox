@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
 import { User } from '../../types/user';
 import EditProfileField from '../common/EditProfileField';
 import EditGenderField from '../common/EditGenderField';
@@ -7,6 +6,7 @@ import SecuritySection from '../common/SecuritySection';
 import LocationSection from '../common/LocationSection';
 import EditPhoneField from '../common/EditPhoneField';
 import EntrepreneurSettingsSection from './EntrepreneurSettingsSection';
+import ClubBusinessInfoSection from './ClubBusinessInfoSection';
 import api from '../../api/config';
 interface LocationData {
   country: string;
@@ -249,30 +249,26 @@ const EntrepreneurProfileContent: React.FC<EntrepreneurProfileContentProps> = ({
                 <button onClick={handleSaveBio} className="mt-2 bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors duration-200">Guardar Descripción</button>
               </EditProfileField>
               {managedClub ? (
-                <div className="bg-gray-100 p-6 rounded-lg shadow-md mt-8">
-                  <div className="flex items-center justify-between mb-4">
-                    <h3 className="text-xl font-bold text-gray-800">Gestión de {managedClub.name}</h3>
-                    {managedClub.clubStatus && (
-                      <span className={`text-xs font-semibold px-3 py-1 rounded-full ${
-                        managedClub.clubStatus === 'APROBADO' ? 'bg-green-100 text-green-700' :
-                        managedClub.clubStatus === 'PENDIENTE_APROBACION' ? 'bg-yellow-100 text-yellow-700' :
-                        'bg-red-100 text-red-700'
-                      }`}>
-                        {managedClub.clubStatus === 'APROBADO' ? 'Aprobado' : managedClub.clubStatus === 'PENDIENTE_APROBACION' ? 'Pendiente de Aprobación' : managedClub.clubStatus}
-                      </span>
+                <>
+                  <div className="bg-gray-100 p-6 rounded-lg shadow-md mt-8">
+                    <div className="flex items-center justify-between mb-2">
+                      <h3 className="text-xl font-bold text-gray-800">{managedClub.name}</h3>
+                      {managedClub.clubStatus && (
+                        <span className={`text-xs font-semibold px-3 py-1 rounded-full ${
+                          managedClub.clubStatus === 'APROBADO' ? 'bg-green-100 text-green-700' :
+                          managedClub.clubStatus === 'PENDIENTE_APROBACION' ? 'bg-yellow-100 text-yellow-700' :
+                          'bg-red-100 text-red-700'
+                        }`}>
+                          {managedClub.clubStatus === 'APROBADO' ? 'Aprobado' : managedClub.clubStatus === 'PENDIENTE_APROBACION' ? 'Pendiente de Aprobación' : managedClub.clubStatus}
+                        </span>
+                      )}
+                    </div>
+                    {managedClub.creationDate && (
+                      <p className="text-sm text-gray-500">Club creado el {new Date(managedClub.creationDate).toLocaleDateString('es-AR')}</p>
                     )}
                   </div>
-                  {managedClub.creationDate && (
-                    <p className="text-sm text-gray-500 mb-4">Club creado el {new Date(managedClub.creationDate).toLocaleDateString('es-AR')}</p>
-                  )}
-                  <p className="text-gray-600 mb-4">La razón social, dirección legal y demás datos del negocio se gestionan desde el perfil de tu club.</p>
-                  <div className="flex flex-wrap gap-3">
-                    <Link to={`/club/${managedClub.id}`} className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors duration-200 text-sm font-medium">Perfil del Club</Link>
-                    <Link to={`/entrepreneur/club/${managedClub.id}/legal-compliance`} className="bg-blue-100 text-blue-700 px-4 py-2 rounded-md hover:bg-blue-200 transition-colors duration-200 text-sm font-medium">Cumplimiento Legal</Link>
-                    <Link to={`/entrepreneur/club/${managedClub.id}/edit-legal-info/terms`} className="bg-blue-100 text-blue-700 px-4 py-2 rounded-md hover:bg-blue-200 transition-colors duration-200 text-sm font-medium">Términos y Condiciones</Link>
-                    <Link to={`/entrepreneur/club/${managedClub.id}/edit-legal-info/privacy`} className="bg-blue-100 text-blue-700 px-4 py-2 rounded-md hover:bg-blue-200 transition-colors duration-200 text-sm font-medium">Política de Seguridad</Link>
-                  </div>
-                </div>
+                  <ClubBusinessInfoSection clubId={String(managedClub.id)} />
+                </>
               ) : (
                 <div className="bg-yellow-50 border-l-4 border-yellow-400 text-yellow-800 p-4 mt-4">
                   <p className="font-bold">Todavía no tenés un club asociado a tu cuenta.</p>
@@ -306,6 +302,7 @@ const EntrepreneurProfileContent: React.FC<EntrepreneurProfileContentProps> = ({
           <SecuritySection
             showGenderPublicly={!!user.showGenderPublicly}
             onGenderVisibilityChange={() => onUserUpdate()}
+            registeredDate={user.registeredDate}
           />
         );
       case 'settings':

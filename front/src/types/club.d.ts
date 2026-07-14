@@ -24,8 +24,8 @@ export interface SubscriptionPlan {
   specifications: { type: string; value: string }[];
   descuentoTransferencia?: number;
   descuentoEfectivo?: number;
-  activo?: boolean;    
-  active?: boolean;    
+  activo?: boolean;
+  active?: boolean;
   cashDiscount?: number;
   transferDiscount?: number;
 }
@@ -112,7 +112,7 @@ export interface Club {
   totalSubscribers?: number;
   monthlyBoxesSent?: number;
   historyMoments?: HistoryMoment[];
-  milestones?: Milestone[];
+  milestones?: string;
   keyFigures?: KeyFigure[];
   teamMembers?: TeamMember[];
   communityText?: string;

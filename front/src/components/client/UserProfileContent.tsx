@@ -244,6 +244,7 @@ const UserProfileContent: React.FC<UserProfileContentProps> = ({ activeSection, 
           <SecuritySection
             showGenderPublicly={!!user.showGenderPublicly}
             onGenderVisibilityChange={handleGenderVisibilityChange}
+            registeredDate={user.registeredDate}
           />
         );
 
