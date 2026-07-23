@@ -112,7 +112,7 @@ export interface Club {
   totalSubscribers?: number;
   monthlyBoxesSent?: number;
   historyMoments?: HistoryMoment[];
-  milestones?: string;
+  milestones?: Milestone[];
   keyFigures?: KeyFigure[];
   teamMembers?: TeamMember[];
   communityText?: string;

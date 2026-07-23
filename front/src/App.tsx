@@ -27,6 +27,8 @@ import TermsAndConditionsPage from './pages/entrepreneur/club/TermsAndConditions
 import PrivacyAndSecurityPolicyPage from './pages/entrepreneur/club/PrivacyAndSecurityPolicyPage';
 import EntrepreneurProfilePage from './pages/entrepreneur/EntrepreneurProfilePage';
 import EditSubscriptionsPage from './pages/entrepreneur/club/EditSubscriptionsPage';
+import ClubSubscriptionsOverviewPage from './pages/entrepreneur/club/ClubSubscriptionsOverviewPage';
+import SubscriptionBoxHistoryPage from './pages/entrepreneur/club/SubscriptionBoxHistoryPage';
 import ActiveSubscriptionsPage from './pages/entrepreneur/operations/clients/ActiveSubscriptionsPage';
 import CustomerHistoryPage from './pages/entrepreneur/operations/clients/CustomerHistoryPage';
 import ManageCustomersPage from './pages/entrepreneur/operations/clients/ManageCustomersPage';
@@ -188,6 +190,8 @@ const AppContent: React.FC = () => {
 
           <Route path="/entrepreneur/profile" element={pr(['entrepreneur'], <EntrepreneurProfilePage />)} />
           <Route path="/entrepreneur/club/:clubId/edit-subscriptions" element={pr(['entrepreneur'], <EditSubscriptionsPage />)} />
+          <Route path="/entrepreneur/club/:clubId/subscription-boxes" element={pr(['entrepreneur'], <ClubSubscriptionsOverviewPage />)} />
+          <Route path="/entrepreneur/club/:clubId/subscription-boxes/:subscriptionTypeId" element={pr(['entrepreneur'], <SubscriptionBoxHistoryPage />)} />
           <Route path="/entrepreneur/club/:clubId/finance/movimientos" element={pr(['entrepreneur'], <FinancialMovementsPage />)} />
           <Route path="/entrepreneur/club/:clubId/finance/rentabilidad" element={pr(['entrepreneur'], <ProfitabilityPage />)} />
           <Route path="/entrepreneur/club/:clubId/manage-users-roles" element={pr(['entrepreneur'], <ManageUsersAndRolesPage />)} />

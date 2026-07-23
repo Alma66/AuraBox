@@ -48,6 +48,15 @@ model BoxContentHistory {
   productVideoUrl       String?   @map("Product_Video_URL")
   additionalNotes       String?   @map("Additional_Notes")
   publicationDate       DateTime? @map("Publication_Date")
+  ageRestriction        Boolean   @default(false) @map("Age_Restriction")
+  originLocation        String?   @map("Origin_Location")
+  containsAllergens     Boolean   @default(false) @map("Contains_Allergens")
+  allergensDetail       String?   @map("Allergens_Detail")
+  isDangerousItem       Boolean   @default(false) @map("Is_Dangerous_Item")
+  dangerDetail          String?   @map("Danger_Detail")
+  requiresCleaning      Boolean   @default(false) @map("Requires_Cleaning")
+  cleaningInstructions  String?   @map("Cleaning_Instructions")
+  updatedAt             DateTime? @updatedAt @map("Updated_At")
 
   @@map("Box_Content_History")
 }
@@ -504,6 +513,7 @@ model Subscription_Types {
   shippingAreas    String?   @map("Shipping_Areas")
   includes         String?   @map("Includes")
   imageUrl         String?   @map("Image_URL")
+  createdAt        DateTime  @default(now()) @map("Created_At")
 
   @@map("Subscription_Types")
 }

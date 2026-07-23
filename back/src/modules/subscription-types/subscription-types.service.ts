@@ -12,6 +12,9 @@ function sanitize(nt: any) {
       try { nt[field] = nt[field].toString(); } catch {}
     }
   }
+  if (nt.createdAt instanceof Date) {
+    nt.createdAt = nt.createdAt.toISOString();
+  }
   if (nt.includes && typeof nt.includes === 'string') {
     try { nt.includes = JSON.parse(nt.includes); } catch { nt.includes = []; }
   }
@@ -93,8 +96,8 @@ export class SubscriptionTypesService {
     if (dto.name !== undefined) data.name = dto.name;
     if (dto.description !== undefined) data.description = dto.description;
     if (dto.basePrice !== undefined || (dto as any).price !== undefined) {
-  data.basePrice = (dto.basePrice ?? (dto as any).price) as any;
-}
+      data.basePrice = (dto.basePrice ?? (dto as any).price) as any;
+    }
     if (dto.frequency !== undefined) data.frequency = dto.frequency as any;
     if (dto.cashDiscount !== undefined) data.cashDiscount = dto.cashDiscount as any;
     if (dto.transferDiscount !== undefined) data.transferDiscount = dto.transferDiscount as any;

@@ -37,7 +37,7 @@ export class BoxContentHistoryController {
     @Request() req,
     @UploadedFile() image?: Express.Multer.File,
   ) {
-    return this.svc.create(dto, image);
+    return this.svc.create(dto, image, req.user.id, req.user.role);
   }
 
   @UseGuards(RolesGuard)
@@ -66,14 +66,14 @@ export class BoxContentHistoryController {
   @Roles('entrepreneur', 'admin')
   @Put(':id')
   @UsePipes(new ValidationPipe({ whitelist: true, transform: true }))
-  async update(@Param('id', ParseIntPipe) id: number, @Body() dto: UpdateBoxContentHistoryDto) {
-    return this.svc.update(id, dto);
+  async update(@Param('id', ParseIntPipe) id: number, @Body() dto: UpdateBoxContentHistoryDto, @Request() req) {
+    return this.svc.update(id, dto, req.user.id, req.user.role);
   }
 
   @UseGuards(RolesGuard)
   @Roles('entrepreneur', 'admin')
   @Delete(':id')
-  async remove(@Param('id', ParseIntPipe) id: number) {
-    return this.svc.remove(id);
+  async remove(@Param('id', ParseIntPipe) id: number, @Request() req) {
+    return this.svc.remove(id, req.user.id, req.user.role);
   }
 }

@@ -45,15 +45,8 @@ const ClubBusinessInfoSection: React.FC<ClubBusinessInfoSectionProps> = ({ clubI
       setRelations(getResponseData(relationsRes) || []);
       const clubData = getResponseData(clubRes);
       setCommunityText(clubData.communityText || '');
-      if (clubData.milestones) {
-        try {
-          const parsed = JSON.parse(clubData.milestones);
-          if (Array.isArray(parsed)) {
-            setMilestones(parsed.map((m: any) => ({ year: String(m.year ?? ''), description: m.description ?? '' })));
-          }
-        } catch {
-          setMilestones([]);
-        }
+      if (Array.isArray(clubData.milestones)) {
+        setMilestones(clubData.milestones.map((m: any) => ({ year: String(m.year ?? ''), description: m.description ?? '' })));
       }
     } catch {
       setError('No se pudo cargar la información del club');

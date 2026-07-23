@@ -197,6 +197,7 @@ const Navbar: React.FC<NavbarProps> = ({ userRole, isAuthenticated, onLogout }) 
                 <Link to={`/club/${clubId}`} className={linkClass} onClick={closeAllDropdowns}>Perfil del Club</Link>
                 <Link to={`/club/${clubId}/history`} className={linkClass} onClick={closeAllDropdowns}>Historia del Club</Link>
                 <Link to={`/entrepreneur/club/${clubId}/edit-subscriptions`} className={linkClass} onClick={closeAllDropdowns}>Gestionar Suscripciones</Link>
+                <Link to={`/entrepreneur/club/${clubId}/subscription-boxes`} className={linkClass} onClick={closeAllDropdowns}>Contenido de Cajas</Link>
               </div>
               <div>
                 <p className={subTitleClass}>Legal</p>
@@ -307,6 +308,7 @@ const Navbar: React.FC<NavbarProps> = ({ userRole, isAuthenticated, onLogout }) 
             <Link to={`/club/${clubId}`} className="block text-sm text-gray-700 hover:bg-gray-100 py-1" onClick={closeAllDropdowns}>Perfil del Club</Link>
             <Link to={`/club/${clubId}/history`} className="block text-sm text-gray-700 hover:bg-gray-100 py-1" onClick={closeAllDropdowns}>Historia del Club</Link>
             <Link to={`/entrepreneur/club/${clubId}/edit-subscriptions`} className="block text-sm text-gray-700 hover:bg-gray-100 py-1" onClick={closeAllDropdowns}>Gestionar Suscripciones</Link>
+            <Link to={`/entrepreneur/club/${clubId}/subscription-boxes`} className="block text-sm text-gray-700 hover:bg-gray-100 py-1" onClick={closeAllDropdowns}>Contenido de Cajas</Link>
             <p className="block text-xs font-semibold text-gray-500 uppercase py-1 mt-2">Legal</p>
             <Link to={`/entrepreneur/club/${clubId}/edit-legal-info/terms`} className="block text-sm text-gray-700 hover:bg-gray-100 py-1" onClick={closeAllDropdowns}>Términos y Condiciones</Link>
             <Link to={`/entrepreneur/club/${clubId}/edit-legal-info/privacy`} className="block text-sm text-gray-700 hover:bg-gray-100 py-1" onClick={closeAllDropdowns}>Política de Seguridad</Link>

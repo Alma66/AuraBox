@@ -414,6 +414,15 @@ export class ClubsService {
         sanitized.averageRating = sanitized.averageRating.toString();
       } catch {}
     }
+    if (typeof sanitized.milestones === 'string') {
+      try {
+        sanitized.milestones = JSON.parse(sanitized.milestones);
+      } catch {
+        sanitized.milestones = [];
+      }
+    } else if (!sanitized.milestones) {
+      sanitized.milestones = [];
+    }
     return sanitized;
   }
 
