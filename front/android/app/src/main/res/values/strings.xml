@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">AuraBox</string>
+    <string name="title_activity_main">AuraBox</string>
+    <string name="package_name">com.almalacarra.aurabox</string>
+    <string name="custom_url_scheme">com.almalacarra.aurabox</string>
+</resources>
