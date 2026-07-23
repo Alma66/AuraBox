@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import api, { getResponseData } from '../../../api/config';
-import { useAuth } from '../../../App';
-import { LegalSection } from '../../../types/legalSection';
-import LegalContentRenderer from '../../../components/club/LegalContentRenderer';
+import api, { getResponseData } from '../../../../api/config';
+import { useAuth } from '../../../../App';
+import { LegalSection } from '../../../../types/legalSection';
+import LegalContentRenderer from '../../../../components/club/LegalContentRenderer';
 
 type SectionType = 'title' | 'paragraph' | 'list' | 'image';
 

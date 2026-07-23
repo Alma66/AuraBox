@@ -1,10 +1,10 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import Cropper from 'react-easy-crop';
-import api, { getResponseData } from '../../../api/config';
-import { Club, SubscriptionPlan } from '../../../types/club';
-import { useAuth } from '../../../App';
-import EntrepreneurSubscriptionSidebar from '../../../components/entrepreneur/EntrepreneurSubscriptionSidebar';
+import api, { getResponseData } from '../../../../api/config';
+import { Club, SubscriptionPlan } from '../../../../types/club';
+import { useAuth } from '../../../../App';
+import EntrepreneurSubscriptionSidebar from '../../../../components/entrepreneur/EntrepreneurSubscriptionSidebar';
 const AURABOX_COMMISSION = 200;
 
 const FREQUENCY_OPTIONS = [

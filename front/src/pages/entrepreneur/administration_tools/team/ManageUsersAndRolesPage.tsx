@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { useAuth } from '../../../../../App';
-import UsersSidebar from '../../../../../components/entrepreneur/UsersSidebar';
-import api, { getResponseData } from '../../../../../api/config';
-import { TeamUser } from '../../../../../types/financial';
+import { useAuth } from '../../../../App';
+import UsersSidebar from '../../../../components/entrepreneur/UsersSidebar';
+import api, { getResponseData } from '../../../../api/config';
+import { TeamUser } from '../../../../types/financial';
 
 const ManageUsersAndRolesPage: React.FC = () => {
   const { user, userRole } = useAuth();

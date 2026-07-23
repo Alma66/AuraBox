@@ -2,16 +2,16 @@ import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import Slider from 'react-slick';
 import Cropper from 'react-easy-crop';
-import api, { getResponseData } from '../../../api/config';
-import { useAuth } from '../../../App';
-import { Club } from '../../../types/club';
-import { SubscriptionPlan as SubscriptionPlanCardType } from '../../../components/club/SubscriptionPlanCard';
-import SubscriptionPlanCard from '../../../components/club/SubscriptionPlanCard';
-import ClubSocialMedia, { SocialMediaLinks } from '../../../components/club/ClubSocialMedia';
-import ClubLegalInfo from '../../../components/club/ClubLegalInfo';
-import ClubPaymentShippingInfo from '../../../components/club/ClubPaymentShippingInfo';
-import ClubFeaturedReviews from '../../../components/club/ClubFeaturedReviews';
-import { LegalSection } from '../../../types/legalSection';
+import api, { getResponseData } from '../../../../api/config';
+import { useAuth } from '../../../../App';
+import { Club } from '../../../../types/club';
+import { SubscriptionPlan as SubscriptionPlanCardType } from '../../../../components/club/SubscriptionPlanCard';
+import SubscriptionPlanCard from '../../../../components/club/SubscriptionPlanCard';
+import ClubSocialMedia, { SocialMediaLinks } from '../../../../components/club/ClubSocialMedia';
+import ClubLegalInfo from '../../../../components/club/ClubLegalInfo';
+import ClubPaymentShippingInfo from '../../../../components/club/ClubPaymentShippingInfo';
+import ClubFeaturedReviews from '../../../../components/club/ClubFeaturedReviews';
+import { LegalSection } from '../../../../types/legalSection';
 
 const bannerSliderSettings = {
   dots: true,

@@ -1,9 +1,9 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { useAuth } from '../../../../../App';
-import FinancialSidebar from '../../../../../components/entrepreneur/FinancialSidebar';
-import api, { getResponseData } from '../../../../../api/config';
-import { FinancialMovement, MonthlyTotal, FinanceSummary } from '../../../../../types/financial';
+import { useAuth } from '../../../../App';
+import FinancialSidebar from '../../../../components/entrepreneur/FinancialSidebar';
+import api, { getResponseData } from '../../../../api/config';
+import { FinancialMovement, MonthlyTotal, FinanceSummary } from '../../../../types/financial';
 
 const CATEGORY_OPTIONS = ['Sueldos', 'Alquiler', 'Impuestos', 'Marketing', 'Servicios', 'Reembolsos', 'Otros'];
 

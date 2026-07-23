@@ -1,8 +1,8 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { useAuth } from '../../../../../App';
-import api, { getResponseData } from '../../../../../api/config';
-import { ProfitabilityBreakdownItem, ProfitabilityTotals } from '../../../../../types/financial';
+import { useAuth } from '../../../../App';
+import api, { getResponseData } from '../../../../api/config';
+import { ProfitabilityBreakdownItem, ProfitabilityTotals } from '../../../../types/financial';
 
 type SortKey = 'name' | 'revenue' | 'margin' | 'marginPercent';
 

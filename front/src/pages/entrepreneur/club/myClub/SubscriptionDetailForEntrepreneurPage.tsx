@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { useAuth } from '../../../App';
-import { Club } from '../../../types/club';
-import { Subscription, normalizeStatus, NormalizedStatus } from '../../../types/subscription';
-import { User } from '../../../types/user';
-import api, { getResponseData } from '../../../api/config';
+import { useAuth } from '../../../../App';
+import { Club } from '../../../../types/club';
+import { Subscription, normalizeStatus, NormalizedStatus } from '../../../../types/subscription';
+import { User } from '../../../../types/user';
+import api, { getResponseData } from '../../../../api/config';
 
 const statusColorClass: Record<NormalizedStatus, string> = {
   active: 'bg-green-500',

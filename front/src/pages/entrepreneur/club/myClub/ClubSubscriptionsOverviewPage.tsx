@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import api, { getResponseData } from '../../../api/config';
-import { useAuth } from '../../../App';
+import api, { getResponseData } from '../../../../api/config';
+import { useAuth } from '../../../../App';
 
 interface SubscriptionTypeSummary {
   id: number;

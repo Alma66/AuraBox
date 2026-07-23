@@ -1,10 +1,10 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import Cropper from 'react-easy-crop';
-import api, { getResponseData } from '../../../api/config';
-import { Club, Milestone } from '../../../types/club';
-import { useAuth } from '../../../App';
-import ClubSocialMedia from '../../../components/club/ClubSocialMedia';
+import api, { getResponseData } from '../../../../api/config';
+import { Club, Milestone } from '../../../../types/club';
+import { useAuth } from '../../../../App';
+import ClubSocialMedia from '../../../../components/club/ClubSocialMedia';
 
 const AnimatedSection: React.FC<{ children: React.ReactNode; delay?: string }> = ({ children, delay = '0s' }) => (
   <div className="opacity-0 animate-fadeInUp" style={{ animationDelay: delay }}>

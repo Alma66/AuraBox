@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import api, { getResponseData } from '../../../api/config';
-import { useAuth } from '../../../App';
-import { BoxContentItem } from '../../../types/boxContent';
+import api, { getResponseData } from '../../../../api/config';
+import { useAuth } from '../../../../App';
+import { BoxContentItem } from '../../../../types/boxContent';
 
 interface SubscriptionTypeDetail {
   id: number;

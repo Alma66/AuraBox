@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { useAuth } from '../../../../../App';
-import SettingsSidebar from '../../../../../components/entrepreneur/SettingsSidebar';
-import api, { getResponseData } from '../../../../../api/config';
-import { GeneralSetting } from '../../../../../types/financial';
+import { useAuth } from '../../../../App';
+import SettingsSidebar from '../../../../components/entrepreneur/SettingsSidebar';
+import api, { getResponseData } from '../../../../api/config';
+import { GeneralSetting } from '../../../../types/financial';
 
 const GeneralSettingsPage: React.FC = () => {
   const { user, userRole } = useAuth();
