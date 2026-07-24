@@ -16,6 +16,8 @@ export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
   @Post('register')
+  @UseGuards(RolesGuard)
+  @Roles('admin')
   @UsePipes(new ValidationPipe({ whitelist: true, transform: true }))
   async register(@Body() dto: CreateUserDto) {
     return this.usersService.create(dto);

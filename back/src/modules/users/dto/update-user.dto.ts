@@ -1,4 +1,15 @@
-import { IsEnum, IsInt, IsOptional, IsString, MinLength, IsDateString, IsBoolean, IsNumber } from 'class-validator';
+import {
+  IsEnum,
+  IsInt,
+  IsOptional,
+  IsString,
+  MinLength,
+  MaxLength,
+  Matches,
+  IsDateString,
+  IsBoolean,
+  IsNumber,
+} from 'class-validator';
 import { Transform } from 'class-transformer';
 import { DocumentType } from '@prisma/client';
 
@@ -15,7 +26,11 @@ export class UpdateUserDto {
 
   @IsOptional()
   @IsString()
-  @MinLength(6)
+  @MinLength(8)
+  @MaxLength(64)
+  @Matches(/(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/, {
+    message: 'La contraseña debe tener al menos una mayúscula, una minúscula y un número',
+  })
   password?: string;
 
   @IsOptional()

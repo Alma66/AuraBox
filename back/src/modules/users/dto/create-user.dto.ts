@@ -1,12 +1,14 @@
-import { 
-  IsEmail, 
-  IsEnum, 
-  IsInt, 
-  IsString, 
-  MinLength, 
-  IsDateString, 
+import {
+  IsEmail,
+  IsEnum,
+  IsInt,
+  IsString,
+  MinLength,
+  MaxLength,
+  Matches,
+  IsDateString,
   IsOptional,
- } from 'class-validator';
+} from 'class-validator';
 import { Transform } from 'class-transformer';
 import { DocumentType } from '@prisma/client';
 
@@ -23,7 +25,11 @@ export class CreateUserDto {
   email!: string;
 
   @IsString()
-  @MinLength(6)
+  @MinLength(8)
+  @MaxLength(64)
+  @Matches(/(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/, {
+    message: 'La contraseña debe tener al menos una mayúscula, una minúscula y un número',
+  })
   password!: string;
 
   @IsEnum(DocumentType)
@@ -39,7 +45,7 @@ export class CreateUserDto {
   phoneNumber?: number;
 
   @IsDateString()
-  birthDate!: string; 
+  birthDate!: string;
 
   userType!: 'customer' | 'entrepreneur';
 }

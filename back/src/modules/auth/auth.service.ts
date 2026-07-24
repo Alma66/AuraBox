@@ -43,6 +43,10 @@ export class AuthService {
     const ok = await bcrypt.compare(pass, user.passwordHash);
     if (!ok) return null;
 
+    if (role === 'customer' && user.active === false) {
+      throw new UnauthorizedException('Cuenta deshabilitada');
+    }
+
     const { passwordHash, ...safe } = user as any;
     return { ...safe, role };
   }
@@ -78,6 +82,23 @@ export class AuthService {
     return { access_token: token };
   }
 
+  private signRegistrationToken(id: number, purpose: string, expiresInSeconds: number) {
+    return this.jwtService.sign({ sub: id, purpose }, { expiresIn: expiresInSeconds });
+  }
+
+  private verifyRegistrationToken(token: string, expectedPurpose: string): number {
+    let payload: any;
+    try {
+      payload = this.jwtService.verify(token);
+    } catch {
+      throw new UnauthorizedException('Token de registro inválido o expirado');
+    }
+    if (payload.purpose !== expectedPurpose) {
+      throw new UnauthorizedException('Token de registro inválido');
+    }
+    return payload.sub;
+  }
+
   async registerCustomer(dto: any) {
     const exists = await this.prisma.user.findFirst({
       where: { OR: [{ email: dto.email }, { documentNumber: parseInt(dto.documentNumber) }] },
@@ -104,16 +125,19 @@ export class AuthService {
     });
 
     const { passwordHash, ...safe } = user as any;
-    return { ...safe, role: 'customer' };
+    const profileToken = this.signRegistrationToken(user.id, 'complete-profile', 15 * 60);
+    return { ...safe, role: 'customer', profileToken };
   }
 
   async completeCustomerProfile(dto: any) {
-    const { userId, streetAddress, addressNumber, floorNumber, addressDetails, city, province, postalCode } = dto;
+    const { profileToken, streetAddress, addressNumber, floorNumber, addressDetails, city, province, postalCode } = dto;
 
-    if (!userId) throw new BadRequestException('userId es requerido');
+    if (!profileToken) throw new BadRequestException('profileToken es requerido');
+
+    const userId = this.verifyRegistrationToken(profileToken, 'complete-profile');
 
     const updated = await this.prisma.user.update({
-      where: { id: parseInt(userId) },
+      where: { id: userId },
       data: {
         streetAddress: streetAddress ?? null,
         addressNumber: addressNumber ? parseInt(addressNumber) : null,
@@ -157,16 +181,19 @@ export class AuthService {
     });
 
     const { passwordHash, ...safe } = entrepreneur as any;
-    return { ...safe, role: 'entrepreneur' };
+    const entrepreneurToken = this.signRegistrationToken(entrepreneur.id, 'entrepreneur-club', 30 * 60);
+    return { ...safe, role: 'entrepreneur', entrepreneurToken };
   }
 
   async registerEntrepreneurClub(dto: any) {
-    const { entrepreneurId, name, logoUrl, shortDescription, contactEmail, slogan, history, whatsappContact } = dto;
+    const { entrepreneurToken, name, logoUrl, shortDescription, contactEmail, slogan, history, whatsappContact } = dto;
 
-    if (!entrepreneurId) throw new BadRequestException('entrepreneurId es requerido');
+    if (!entrepreneurToken) throw new BadRequestException('entrepreneurToken es requerido');
+
+    const entrepreneurId = this.verifyRegistrationToken(entrepreneurToken, 'entrepreneur-club');
 
     const entrepreneur = await this.prisma.entrepreneurs.findUnique({
-      where: { id: parseInt(entrepreneurId) },
+      where: { id: entrepreneurId },
     });
     if (!entrepreneur) throw new BadRequestException('Emprendedor no encontrado');
 
@@ -185,7 +212,7 @@ export class AuthService {
 
     await this.prisma.entrepreneur_Club.create({
       data: {
-        idEntrepreneurs: parseInt(entrepreneurId),
+        idEntrepreneurs: entrepreneurId,
         idClub: club.id,
       },
     });
