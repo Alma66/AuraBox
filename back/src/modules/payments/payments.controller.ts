@@ -1,6 +1,6 @@
 import {
   Body, Controller, Get, Post, Put, Delete,
-  Param, ParseIntPipe, Query, UseGuards, Request,
+  Param, ParseIntPipe, UseGuards, Request,
   UsePipes, ValidationPipe, ForbiddenException,
 } from '@nestjs/common';
 import { PaymentsService } from './payments.service';
@@ -15,12 +15,11 @@ import { Roles } from '../auth/roles.decorator';
 export class PaymentsController {
   constructor(private readonly paymentsService: PaymentsService) {}
 
+  @UseGuards(RolesGuard)
+  @Roles('admin')
   @Post()
   @UsePipes(new ValidationPipe({ whitelist: true, transform: true }))
-  async create(@Body() dto: CreatePaymentDto, @Request() req) {
-    if (req.user.id !== dto.idUser && req.user.role !== 'admin') {
-      throw new ForbiddenException('No autorizado para registrar este pago');
-    }
+  async create(@Body() dto: CreatePaymentDto) {
     return this.paymentsService.create(dto);
   }
 
@@ -42,13 +41,13 @@ export class PaymentsController {
   @UseGuards(RolesGuard)
   @Roles('entrepreneur', 'admin')
   @Get('by-club/:idClub')
-  async findByClub(@Param('idClub', ParseIntPipe) idClub: number) {
-    return this.paymentsService.findByClub(idClub);
+  async findByClub(@Param('idClub', ParseIntPipe) idClub: number, @Request() req) {
+    return this.paymentsService.findByClub(idClub, req.user);
   }
 
   @Get(':id')
-  async findOne(@Param('id', ParseIntPipe) id: number) {
-    return this.paymentsService.findOne(id);
+  async findOne(@Param('id', ParseIntPipe) id: number, @Request() req) {
+    return this.paymentsService.findOneForUser(id, req.user);
   }
 
   @UseGuards(RolesGuard)

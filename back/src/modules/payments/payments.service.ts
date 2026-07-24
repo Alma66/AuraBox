@@ -1,8 +1,10 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, ForbiddenException, BadRequestException } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
 import { CreatePaymentDto } from './dto/create-payment.dto';
 import { UpdatePaymentDto } from './dto/update-payment.dto';
+
 const AURABOX_COMMISSION = 200;
+
 function sanitize(payment: any) {
   if (!payment) return payment;
   ['totalAmountPaid', 'clubAmount', 'commissionAmount'].forEach((k) => {
@@ -20,9 +22,21 @@ function sanitize(payment: any) {
 export class PaymentsService {
   constructor(private readonly prisma: PrismaService) {}
 
+  private async assertClubAccess(idClub: number, user: { id: number; role: string }) {
+    if (user.role === 'admin') return;
+    const assoc = await this.prisma.entrepreneur_Club.findFirst({
+      where: { idClub, idEntrepreneurs: user.id },
+    });
+    if (!assoc) throw new ForbiddenException('No tenés acceso a este club');
+  }
+
   async create(dto: CreatePaymentDto) {
     const sub = await this.prisma.user_Subscriptions.findUnique({ where: { id: dto.idUserSubscription } });
     if (!sub) throw new NotFoundException('Suscripción no encontrada');
+
+    if (sub.idUser !== dto.idUser) {
+      throw new BadRequestException('La suscripción no pertenece al usuario indicado');
+    }
 
     const user = await this.prisma.user.findUnique({ where: { id: dto.idUser } });
     if (!user) throw new NotFoundException('Usuario no encontrado');
@@ -67,10 +81,17 @@ export class PaymentsService {
     return payments.map(sanitize);
   }
 
-  async findOne(id: number) {
+  async findOneForUser(id: number, user: { id: number; role: string }) {
     const payment = await this.prisma.payment.findUnique({ where: { id } });
     if (!payment) throw new NotFoundException('Pago no encontrado');
-    return sanitize(payment);
+
+    if (user.role === 'admin') return sanitize(payment);
+    if (user.role === 'customer' && payment.idUser === user.id) return sanitize(payment);
+    if (user.role === 'entrepreneur') {
+      await this.assertClubAccess(payment.idClub, user);
+      return sanitize(payment);
+    }
+    throw new ForbiddenException('No autorizado para ver este pago');
   }
 
   async findByUser(idUser: number) {
@@ -81,7 +102,8 @@ export class PaymentsService {
     return payments.map(sanitize);
   }
 
-  async findByClub(idClub: number) {
+  async findByClub(idClub: number, user: { id: number; role: string }) {
+    await this.assertClubAccess(idClub, user);
     const payments = await this.prisma.payment.findMany({
       where: { idClub },
       orderBy: { paymentDate: 'desc' },

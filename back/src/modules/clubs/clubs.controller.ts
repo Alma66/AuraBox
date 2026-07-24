@@ -24,7 +24,7 @@ export class ClubsController {
   ) {}
 
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles('entrepreneur', 'admin')
+  @Roles('admin')
   @Post()
   @UsePipes(new ValidationPipe({ whitelist: true, transform: true }))
   async create(@Body() dto: CreateClubDto) {
@@ -113,12 +113,12 @@ export class ClubsController {
     return this.shipmentsService.assignRiderForClub(shipmentId, id, dto);
   }
 
-  @UseGuards(JwtAuthGuard, RolesGuard)
+@UseGuards(JwtAuthGuard, RolesGuard)
   @Roles('entrepreneur', 'admin')
   @Put(':id')
   @UsePipes(new ValidationPipe({ whitelist: true, transform: true }))
   async update(@Param('id', ParseIntPipe) id: number, @Body() dto: UpdateClubDto, @Request() req) {
-    return this.clubsService.update(id, dto, req.user.id);
+    return this.clubsService.update(id, dto, req.user);
   }
 
   @UseGuards(JwtAuthGuard, RolesGuard)

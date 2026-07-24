@@ -235,8 +235,10 @@ export class ClubsService {
     };
   }
 
-  async update(id: number, dto: UpdateClubDto, entrepreneurId: number) {
-    await this.assertOwnership(id, entrepreneurId);
+  async update(id: number, dto: UpdateClubDto, user: { id: number; role: string }) {
+    if (user.role !== 'admin') {
+      await this.assertOwnership(id, user.id);
+    }
     const data: Prisma.ClubUpdateInput = {};
     if (dto.name !== undefined) data.name = dto.name;
     if (dto.slogan !== undefined) data.slogan = dto.slogan;

@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, ForbiddenException } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
 import { CreateFinancialEntryDto } from './dto/create-financial-entry.dto';
 import { UpdateFinancialEntryDto } from './dto/update-financial-entry.dto';
@@ -23,6 +23,20 @@ function monthKey(date: Date) {
 export class FinanceService {
   constructor(private readonly prisma: PrismaService) {}
 
+  async assertClubAccess(idClub: number, user: { id: number; role: string }) {
+    if (user.role === 'admin') return;
+    const assoc = await this.prisma.entrepreneur_Club.findFirst({
+      where: { idClub, idEntrepreneurs: user.id },
+    });
+    if (!assoc) throw new ForbiddenException('No tenés acceso a este club');
+  }
+
+  async assertEntryAccess(entryId: number, user: { id: number; role: string }) {
+    const entry = await this.prisma.financial_Entry.findUnique({ where: { id: entryId } });
+    if (!entry) throw new NotFoundException('Movimiento no encontrado');
+    await this.assertClubAccess(entry.idClub, user);
+  }
+  
   async getMovements(idClub: number) {
     const movements: UnifiedMovement[] = [];
 
