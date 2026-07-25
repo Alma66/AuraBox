@@ -1,4 +1,4 @@
-import { IsInt, IsString, IsOptional, IsBoolean, IsEnum } from 'class-validator';
+import { IsInt, IsString, IsOptional, IsBoolean, IsEnum, IsNotEmpty, MaxLength } from 'class-validator';
 import { AutoReplyTrigger } from '@prisma/client';
 
 export class CreateAutoReplyDto {
@@ -6,6 +6,8 @@ export class CreateAutoReplyDto {
   idClub!: number;
 
   @IsString()
+  @IsNotEmpty()
+  @MaxLength(100)
   name!: string;
 
   @IsEnum(AutoReplyTrigger)
@@ -13,9 +15,12 @@ export class CreateAutoReplyDto {
 
   @IsOptional()
   @IsString()
+  @MaxLength(200)
   triggerValue?: string;
 
   @IsString()
+  @IsNotEmpty()
+  @MaxLength(1000)
   replyMessage!: string;
 
   @IsOptional()

@@ -1,10 +1,14 @@
 import { Injectable, NotFoundException, ForbiddenException, BadRequestException } from '@nestjs/common';
+import { randomInt } from 'crypto';
 import { PrismaService } from '../../prisma/prisma.service';
 import { CreateConversationDto } from './dto/create-conversation.dto';
 import { CreateMessageDto } from './dto/create-message.dto';
 import { CreateAutoReplyDto } from './dto/create-auto-reply.dto';
+import { UpdateAutoReplyDto } from './dto/update-auto-reply.dto';
 import { RequestVerificationDto } from './dto/request-verification.dto';
 import { ConfirmVerificationDto } from './dto/confirm-verification.dto';
+
+type RequestUser = { id: number; role: string };
 
 function sanitize(item: any) {
   if (!item) return item;
@@ -18,9 +22,30 @@ function sanitize(item: any) {
 export class SupportService {
   constructor(private readonly prisma: PrismaService) {}
 
-  async createConversation(dto: CreateConversationDto) {
+  private async assertClubAccess(idClub: number, user: RequestUser) {
+    if (user.role === 'admin') return;
+    const assoc = await this.prisma.entrepreneur_Club.findFirst({
+      where: { idClub, idEntrepreneurs: user.id },
+    });
+    if (!assoc) throw new ForbiddenException('No tenés acceso a este club');
+  }
+
+  private async assertConversationAccess(conversation: { idClub: number; idUser: number }, user: RequestUser) {
+    if (user.role === 'admin') return;
+    if (user.role === 'customer') {
+      if (conversation.idUser !== user.id) throw new ForbiddenException('No tenés acceso a esta conversación');
+      return;
+    }
+    if (user.role === 'entrepreneur') {
+      await this.assertClubAccess(conversation.idClub, user);
+      return;
+    }
+    throw new ForbiddenException('No tenés acceso a esta conversación');
+  }
+
+  async createConversation(dto: CreateConversationDto, idUser: number) {
     const sub = await this.prisma.user_Subscriptions.findFirst({
-      where: { idUser: dto.idUser, idSubscriptionTypes: dto.idSubscriptionTypes },
+      where: { idUser, idSubscriptionTypes: dto.idSubscriptionTypes },
     });
     if (!sub) throw new ForbiddenException('Solo podés contactar clubes a los que estás suscripto');
 
@@ -32,15 +57,15 @@ export class SupportService {
     const conversation = await this.prisma.support_Conversation.create({
       data: {
         idClub: dto.idClub,
-        idUser: dto.idUser,
+        idUser,
         idSubscriptionTypes: dto.idSubscriptionTypes,
-        subject: dto.subject,
+        subject: dto.subject.trim(),
         status: 'Abierta',
       },
     });
 
     await this.prisma.support_Message.create({
-      data: { idConversation: conversation.id, senderType: 'User', senderId: dto.idUser, content: dto.content },
+      data: { idConversation: conversation.id, senderType: 'User', senderId: idUser, content: dto.content.trim() },
     });
 
     await this.handleAutoReply(conversation.id, dto.idClub, dto.content, true);
@@ -67,7 +92,8 @@ export class SupportService {
     }
   }
 
-  async findByClub(idClub: number, status?: 'Abierta' | 'Cerrada') {
+  async findByClub(idClub: number, user: RequestUser, status?: 'Abierta' | 'Cerrada') {
+    await this.assertClubAccess(idClub, user);
     const conversations = await this.prisma.support_Conversation.findMany({
       where: { idClub, ...(status ? { status } : {}) },
       orderBy: { lastMessageAt: 'desc' },
@@ -75,13 +101,18 @@ export class SupportService {
     return conversations.map(sanitize);
   }
 
-  async findOne(id: number) {
+  async findOne(id: number, user: RequestUser) {
     const conversation = await this.prisma.support_Conversation.findUnique({ where: { id } });
     if (!conversation) throw new NotFoundException('Conversación no encontrada');
+    await this.assertConversationAccess(conversation, user);
     return sanitize(conversation);
   }
 
-  async getMessages(idConversation: number) {
+  async getMessages(idConversation: number, user: RequestUser) {
+    const conversation = await this.prisma.support_Conversation.findUnique({ where: { id: idConversation } });
+    if (!conversation) throw new NotFoundException('Conversación no encontrada');
+    await this.assertConversationAccess(conversation, user);
+
     const messages = await this.prisma.support_Message.findMany({
       where: { idConversation },
       orderBy: { createdAt: 'asc' },
@@ -95,12 +126,23 @@ export class SupportService {
     }));
   }
 
-  async sendEntrepreneurMessage(dto: CreateMessageDto, attachmentUrls: { url: string; type: 'Imagen' | 'Video'; name?: string }[] = []) {
+  async sendEntrepreneurMessage(
+    dto: CreateMessageDto,
+    user: RequestUser,
+    attachmentUrls: { url: string; type: 'Imagen' | 'Video'; name?: string }[] = [],
+  ) {
     const conversation = await this.prisma.support_Conversation.findUnique({ where: { id: dto.idConversation } });
     if (!conversation) throw new NotFoundException('Conversación no encontrada');
+    await this.assertClubAccess(conversation.idClub, user);
+    if (conversation.status === 'Cerrada') throw new BadRequestException('La conversación está cerrada');
+
+    const content = dto.content?.trim() || null;
+    if (!content && attachmentUrls.length === 0) {
+      throw new BadRequestException('El mensaje debe tener contenido o un archivo adjunto');
+    }
 
     const message = await this.prisma.support_Message.create({
-      data: { idConversation: dto.idConversation, senderType: 'Entrepreneur', senderId: 0, content: dto.content ?? null },
+      data: { idConversation: dto.idConversation, senderType: 'Entrepreneur', senderId: user.id, content },
     });
 
     for (const att of attachmentUrls) {
@@ -117,13 +159,23 @@ export class SupportService {
     return sanitize(message);
   }
 
-  async sendUserMessage(dto: CreateMessageDto, attachmentUrls: { url: string; type: 'Imagen' | 'Video'; name?: string }[] = []) {
+  async sendUserMessage(
+    dto: CreateMessageDto,
+    user: RequestUser,
+    attachmentUrls: { url: string; type: 'Imagen' | 'Video'; name?: string }[] = [],
+  ) {
     const conversation = await this.prisma.support_Conversation.findUnique({ where: { id: dto.idConversation } });
     if (!conversation) throw new NotFoundException('Conversación no encontrada');
+    await this.assertConversationAccess(conversation, user);
     if (conversation.status === 'Cerrada') throw new BadRequestException('La conversación está cerrada');
 
+    const content = dto.content?.trim() || null;
+    if (!content && attachmentUrls.length === 0) {
+      throw new BadRequestException('El mensaje debe tener contenido o un archivo adjunto');
+    }
+
     const message = await this.prisma.support_Message.create({
-      data: { idConversation: dto.idConversation, senderType: 'User', senderId: conversation.idUser, content: dto.content ?? null },
+      data: { idConversation: dto.idConversation, senderType: 'User', senderId: conversation.idUser, content },
     });
 
     for (const att of attachmentUrls) {
@@ -137,33 +189,50 @@ export class SupportService {
       data: { lastMessageAt: new Date(), hasUnreadForEntrepreneur: true },
     });
 
-    await this.handleAutoReply(dto.idConversation, conversation.idClub, dto.content ?? '', false);
+    await this.handleAutoReply(dto.idConversation, conversation.idClub, content ?? '', false);
 
     return sanitize(message);
   }
 
-  async markRead(idConversation: number, by: 'entrepreneur' | 'user') {
-    const data = by === 'entrepreneur' ? { hasUnreadForEntrepreneur: false } : { hasUnreadForUser: false };
-    return this.prisma.support_Conversation.update({ where: { id: idConversation }, data });
-  }
-
-  async closeConversation(idConversation: number) {
-    return this.prisma.support_Conversation.update({
-      where: { id: idConversation },
-      data: { status: 'Cerrada', closedAt: new Date() },
-    });
-  }
-
-  async reopenConversation(idConversation: number) {
-    return this.prisma.support_Conversation.update({
-      where: { id: idConversation },
-      data: { status: 'Abierta', closedAt: null },
-    });
-  }
-
-  async getBasicCustomerInfo(idConversation: number) {
+  async markRead(idConversation: number, user: RequestUser) {
     const conversation = await this.prisma.support_Conversation.findUnique({ where: { id: idConversation } });
     if (!conversation) throw new NotFoundException('Conversación no encontrada');
+    await this.assertConversationAccess(conversation, user);
+
+    const data = user.role === 'customer' ? { hasUnreadForUser: false } : { hasUnreadForEntrepreneur: false };
+    return sanitize(await this.prisma.support_Conversation.update({ where: { id: idConversation }, data }));
+  }
+
+  async closeConversation(idConversation: number, user: RequestUser) {
+    const conversation = await this.prisma.support_Conversation.findUnique({ where: { id: idConversation } });
+    if (!conversation) throw new NotFoundException('Conversación no encontrada');
+    await this.assertClubAccess(conversation.idClub, user);
+
+    return sanitize(
+      await this.prisma.support_Conversation.update({
+        where: { id: idConversation },
+        data: { status: 'Cerrada', closedAt: new Date() },
+      }),
+    );
+  }
+
+  async reopenConversation(idConversation: number, user: RequestUser) {
+    const conversation = await this.prisma.support_Conversation.findUnique({ where: { id: idConversation } });
+    if (!conversation) throw new NotFoundException('Conversación no encontrada');
+    await this.assertClubAccess(conversation.idClub, user);
+
+    return sanitize(
+      await this.prisma.support_Conversation.update({
+        where: { id: idConversation },
+        data: { status: 'Abierta', closedAt: null },
+      }),
+    );
+  }
+
+  async getBasicCustomerInfo(idConversation: number, user: RequestUser) {
+    const conversation = await this.prisma.support_Conversation.findUnique({ where: { id: idConversation } });
+    if (!conversation) throw new NotFoundException('Conversación no encontrada');
+    await this.assertClubAccess(conversation.idClub, user);
 
     const subTypes = await this.prisma.subscription_Types.findMany({ where: { idClub: conversation.idClub } });
     const subTypeIds = subTypes.map((s) => s.id);
@@ -205,27 +274,31 @@ export class SupportService {
     return enriched;
   }
 
-  async requestVerification(dto: RequestVerificationDto, createdBy?: number) {
+  async requestVerification(dto: RequestVerificationDto, user: RequestUser) {
     const conversation = await this.prisma.support_Conversation.findUnique({ where: { id: dto.idConversation } });
     if (!conversation) throw new NotFoundException('Conversación no encontrada');
+    await this.assertClubAccess(conversation.idClub, user);
 
-    const code = Math.floor(100000 + Math.random() * 900000).toString();
+    const code = randomInt(100000, 1000000).toString();
     const expiresAt = new Date(Date.now() + 10 * 60 * 1000);
 
     await this.prisma.sensitive_Data_Verification.create({
-      data: { idConversation: dto.idConversation, code, channel: dto.channel, expiresAt, createdBy: createdBy ?? null },
+      data: { idConversation: dto.idConversation, code, channel: dto.channel, expiresAt, createdBy: user.id },
     });
 
-    return { code, channel: dto.channel, expiresAt: expiresAt.toISOString() };
+    return { channel: dto.channel, expiresAt: expiresAt.toISOString() };
   }
 
-  async confirmVerification(dto: ConfirmVerificationDto, entrepreneurId?: number) {
+  async confirmVerification(dto: ConfirmVerificationDto, user: RequestUser) {
     const conversation = await this.prisma.support_Conversation.findUnique({ where: { id: dto.idConversation } });
     if (!conversation) throw new NotFoundException('Conversación no encontrada');
+    await this.assertClubAccess(conversation.idClub, user);
 
-    const user = await this.prisma.user.findUnique({ where: { id: conversation.idUser } });
-    if (!user) throw new NotFoundException('Usuario no encontrado');
-    if (String(user.documentNumber) !== dto.dni.trim()) {
+    const customer = await this.prisma.user.findUnique({ where: { id: conversation.idUser } });
+    if (!customer) throw new NotFoundException('Usuario no encontrado');
+
+    const normalizedDni = dto.dni.replace(/\D/g, '');
+    if (String(customer.documentNumber) !== normalizedDni) {
       throw new BadRequestException('El DNI no coincide');
     }
 
@@ -251,31 +324,33 @@ export class SupportService {
     );
 
     const sensitiveData = {
-      dni: user.documentNumber,
-      phoneNumber: user.phoneNumber,
-      streetAddress: user.streetAddress,
-      addressNumber: user.addressNumber,
-      floorNumber: user.floorNumber,
-      addressDetails: user.addressDetails,
-      postalCode: user.postalCode,
-      city: user.city,
+      dni: customer.documentNumber,
+      phoneNumber: customer.phoneNumber,
+      streetAddress: customer.streetAddress,
+      addressNumber: customer.addressNumber,
+      floorNumber: customer.floorNumber,
+      addressDetails: customer.addressDetails,
+      postalCode: customer.postalCode,
+      city: customer.city,
       lastCardDigits: lastShipments.map((s) => s?.trackingNumber ?? null),
     };
 
-    if (entrepreneurId) {
-      await this.prisma.sensitive_Data_Access_Log.create({
-        data: {
-          idConversation: dto.idConversation,
-          idEntrepreneur: entrepreneurId,
-          fieldsViewed: Object.keys(sensitiveData).join(','),
-        },
-      });
-    }
+    await this.prisma.sensitive_Data_Access_Log.create({
+      data: {
+        idConversation: dto.idConversation,
+        idEntrepreneur: user.id,
+        fieldsViewed: Object.keys(sensitiveData).join(','),
+      },
+    });
 
     return sensitiveData;
   }
 
-  async getAccessLogs(idConversation: number) {
+  async getAccessLogs(idConversation: number, user: RequestUser) {
+    const conversation = await this.prisma.support_Conversation.findUnique({ where: { id: idConversation } });
+    if (!conversation) throw new NotFoundException('Conversación no encontrada');
+    await this.assertClubAccess(conversation.idClub, user);
+
     const logs = await this.prisma.sensitive_Data_Access_Log.findMany({
       where: { idConversation },
       orderBy: { viewedAt: 'desc' },
@@ -283,34 +358,48 @@ export class SupportService {
     return logs.map(sanitize);
   }
 
-  async createAutoReply(dto: CreateAutoReplyDto) {
+  async createAutoReply(dto: CreateAutoReplyDto, user: RequestUser) {
     const club = await this.prisma.club.findUnique({ where: { id: dto.idClub } });
     if (!club) throw new NotFoundException('Club no encontrado');
+    await this.assertClubAccess(dto.idClub, user);
+
     return this.prisma.auto_Reply_Rule.create({
       data: {
         idClub: dto.idClub,
-        name: dto.name,
+        name: dto.name.trim(),
         triggerType: dto.triggerType,
-        triggerValue: dto.triggerValue ?? null,
-        replyMessage: dto.replyMessage,
+        triggerValue: dto.triggerValue?.trim() ?? null,
+        replyMessage: dto.replyMessage.trim(),
         active: dto.active ?? true,
       },
     });
   }
 
-  async findAutoRepliesByClub(idClub: number) {
+  async findAutoRepliesByClub(idClub: number, user: RequestUser) {
+    await this.assertClubAccess(idClub, user);
     return this.prisma.auto_Reply_Rule.findMany({ where: { idClub }, orderBy: { createdAt: 'desc' } });
   }
 
-  async updateAutoReply(id: number, dto: Partial<CreateAutoReplyDto>) {
+  async updateAutoReply(id: number, dto: UpdateAutoReplyDto, user: RequestUser) {
     const rule = await this.prisma.auto_Reply_Rule.findUnique({ where: { id } });
     if (!rule) throw new NotFoundException('Regla no encontrada');
-    return this.prisma.auto_Reply_Rule.update({ where: { id }, data: dto as any });
+    await this.assertClubAccess(rule.idClub, user);
+
+    const data: any = {};
+    if (dto.name !== undefined) data.name = dto.name.trim();
+    if (dto.triggerType !== undefined) data.triggerType = dto.triggerType;
+    if (dto.triggerValue !== undefined) data.triggerValue = dto.triggerValue?.trim() ?? null;
+    if (dto.replyMessage !== undefined) data.replyMessage = dto.replyMessage.trim();
+    if (dto.active !== undefined) data.active = dto.active;
+
+    return this.prisma.auto_Reply_Rule.update({ where: { id }, data });
   }
 
-  async removeAutoReply(id: number) {
+  async removeAutoReply(id: number, user: RequestUser) {
     const rule = await this.prisma.auto_Reply_Rule.findUnique({ where: { id } });
     if (!rule) throw new NotFoundException('Regla no encontrada');
+    await this.assertClubAccess(rule.idClub, user);
+
     await this.prisma.auto_Reply_Rule.delete({ where: { id } });
     return { message: 'Regla eliminada correctamente' };
   }
