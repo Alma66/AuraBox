@@ -1,8 +1,10 @@
-import { Injectable, NotFoundException, ConflictException } from '@nestjs/common';
+import { Injectable, NotFoundException, ConflictException, ForbiddenException } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
 import { CreateCourierDto } from './dto/create-courier.dto';
 import { SetClubCouriersDto } from './dto/set-club-couriers.dto';
 import { SetCourierFeeDto } from './dto/set-courier-fee.dto';
+
+type RequestUser = { id: number; role: string };
 
 function sanitizeFee(item: any) {
   if (!item) return item;
@@ -17,6 +19,14 @@ function sanitizeFee(item: any) {
 @Injectable()
 export class CourierService {
   constructor(private readonly prisma: PrismaService) {}
+
+  async assertClubAccess(idClub: number, user: RequestUser) {
+    if (user.role === 'admin') return;
+    const assoc = await this.prisma.entrepreneur_Club.findFirst({
+      where: { idClub, idEntrepreneurs: user.id },
+    });
+    if (!assoc) throw new ForbiddenException('No tenés acceso a este club');
+  }
 
   async create(dto: CreateCourierDto) {
     const exists = await this.prisma.courier.findUnique({ where: { code: dto.code } });

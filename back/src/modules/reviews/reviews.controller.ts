@@ -117,21 +117,24 @@ export class ReviewsController {
   @UseGuards(RolesGuard)
   @Roles('entrepreneur', 'admin')
   @Get('by-club/:idClub')
-  async findByClub(@Param('idClub', ParseIntPipe) idClub: number, @Query('includeHidden') includeHidden?: string) {
+  async findByClub(@Param('idClub', ParseIntPipe) idClub: number, @Query('includeHidden') includeHidden: string | undefined, @Request() req) {
+    await this.reviewsService.assertClubAccess(idClub, req.user);
     return this.reviewsService.findByClub(idClub, includeHidden === 'true');
   }
 
   @UseGuards(RolesGuard)
   @Roles('entrepreneur', 'admin')
   @Get('hidden-by-club/:idClub')
-  async findHiddenByClub(@Param('idClub', ParseIntPipe) idClub: number) {
+  async findHiddenByClub(@Param('idClub', ParseIntPipe) idClub: number, @Request() req) {
+    await this.reviewsService.assertClubAccess(idClub, req.user);
     return this.reviewsService.findHiddenByClub(idClub);
   }
 
   @UseGuards(RolesGuard)
   @Roles('entrepreneur', 'admin')
   @Get('forbidden-words/by-club/:idClub')
-  async findForbiddenWords(@Param('idClub', ParseIntPipe) idClub: number) {
+  async findForbiddenWords(@Param('idClub', ParseIntPipe) idClub: number, @Request() req) {
+    await this.reviewsService.assertClubAccess(idClub, req.user);
     return this.reviewsService.findForbiddenWordsByClub(idClub);
   }
 
@@ -139,38 +142,34 @@ export class ReviewsController {
   @Roles('entrepreneur', 'admin')
   @Post('forbidden-words')
   @UsePipes(new ValidationPipe({ whitelist: true, transform: true }))
-  async createForbiddenWord(@Body() dto: CreateForbiddenWordDto) {
+  async createForbiddenWord(@Body() dto: CreateForbiddenWordDto, @Request() req) {
+    await this.reviewsService.assertClubAccess(dto.idClub, req.user);
     return this.reviewsService.createForbiddenWord(dto);
   }
 
   @UseGuards(RolesGuard)
   @Roles('entrepreneur', 'admin')
   @Patch('forbidden-words/:id/toggle')
-  async toggleForbiddenWord(@Param('id', ParseIntPipe) id: number, @Body() body: { active: boolean }) {
-    return this.reviewsService.toggleForbiddenWord(id, body.active);
+  async toggleForbiddenWord(@Param('id', ParseIntPipe) id: number, @Body() body: { active: boolean }, @Request() req) {
+    return this.reviewsService.toggleForbiddenWord(id, body.active, req.user);
   }
 
   @UseGuards(RolesGuard)
   @Roles('entrepreneur', 'admin')
   @Delete('forbidden-words/:id')
-  async removeForbiddenWord(@Param('id', ParseIntPipe) id: number) {
-    return this.reviewsService.removeForbiddenWord(id);
+  async removeForbiddenWord(@Param('id', ParseIntPipe) id: number, @Request() req) {
+    return this.reviewsService.removeForbiddenWord(id, req.user);
   }
 
   @Get(':id')
-  async findOne(@Param('id', ParseIntPipe) id: number) {
-    return this.reviewsService.findOne(id);
+  async findOne(@Param('id', ParseIntPipe) id: number, @Request() req) {
+    return this.reviewsService.findOneForRequester(id, req.user);
   }
 
   @Put(':id')
   @UsePipes(new ValidationPipe({ whitelist: true, transform: true }))
   async update(@Param('id', ParseIntPipe) id: number, @Body() dto: UpdateReviewDto, @Request() req) {
-    const review = await this.reviewsService.findOne(id);
-    const isOwner = req.user.id === review.idUser;
-    if (!isOwner && req.user.role !== 'admin' && req.user.role !== 'entrepreneur') {
-      throw new ForbiddenException('No autorizado para editar esta reseña');
-    }
-    return this.reviewsService.update(id, dto);
+    return this.reviewsService.updateForRequester(id, dto, req.user);
   }
 
   @Delete(':id')

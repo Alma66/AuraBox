@@ -35,7 +35,8 @@ export class RiderProfileController {
   @UseGuards(RolesGuard)
   @Roles('entrepreneur', 'admin')
   @Get('by-club/:idClub')
-  async findByClub(@Param('idClub', ParseIntPipe) idClub: number) {
+  async findByClub(@Param('idClub', ParseIntPipe) idClub: number, @Request() req) {
+    await this.svc.assertClubAccess(idClub, req.user);
     return this.svc.findByClub(idClub);
   }
 
@@ -48,16 +49,16 @@ export class RiderProfileController {
   }
 
   @Get(':id')
-  async findOne(@Param('id', ParseIntPipe) id: number) {
-    return this.svc.findOne(id);
+  async findOne(@Param('id', ParseIntPipe) id: number, @Request() req) {
+    return this.svc.findOneForRequester(id, req.user);
   }
 
   @UseGuards(RolesGuard)
   @Roles('entrepreneur', 'admin')
   @Put(':id')
   @UsePipes(new ValidationPipe({ whitelist: true, transform: true }))
-  async update(@Param('id', ParseIntPipe) id: number, @Body() dto: UpdateRiderProfileDto) {
-    return this.svc.update(id, dto);
+  async update(@Param('id', ParseIntPipe) id: number, @Body() dto: UpdateRiderProfileDto, @Request() req) {
+    return this.svc.updateForRequester(id, dto, req.user);
   }
 
   @UseGuards(RolesGuard)

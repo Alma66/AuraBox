@@ -1,8 +1,10 @@
-import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
+import { Injectable, NotFoundException, BadRequestException, ForbiddenException } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
 import { CreateShipmentDto } from './dto/create-shipment.dto';
 import { UpdateShipmentDto } from './dto/update-shipment.dto';
 import { AssignDeliveryDto, AssignNewShipmentDto } from './dto/assign-delivery.dto';
+
+type RequestUser = { id: number; role: string };
 
 function sanitize(shipment: any) {
   if (!shipment) return shipment;
@@ -23,6 +25,14 @@ function currentBoxMonthYear() {
 @Injectable()
 export class ShipmentsService {
   constructor(private readonly prisma: PrismaService) {}
+
+  async assertClubAccess(idClub: number, user: RequestUser) {
+    if (user.role === 'admin') return;
+    const assoc = await this.prisma.entrepreneur_Club.findFirst({
+      where: { idClub, idEntrepreneurs: user.id },
+    });
+    if (!assoc) throw new ForbiddenException('No tenés acceso a este club');
+  }
 
   private async validateCourierForClub(idClub: number, idCourier: number) {
     const clubCourier = await this.prisma.club_Courier.findFirst({
@@ -52,6 +62,9 @@ export class ShipmentsService {
     if (!user) throw new NotFoundException('Usuario no encontrado');
     const sub = await this.prisma.user_Subscriptions.findUnique({ where: { id: dto.idUserSubscriptions } });
     if (!sub) throw new NotFoundException('Suscripción no encontrada');
+    if (sub.idUser !== dto.idUser) {
+      throw new BadRequestException('La suscripción no pertenece al usuario indicado');
+    }
     if (dto.idClub) {
       const club = await this.prisma.club.findUnique({ where: { id: dto.idClub } });
       if (!club) throw new NotFoundException('Club no encontrado');
@@ -92,6 +105,9 @@ export class ShipmentsService {
     if (!user) throw new NotFoundException('Usuario no encontrado');
     const sub = await this.prisma.user_Subscriptions.findUnique({ where: { id: dto.idUserSubscriptions } });
     if (!sub) throw new NotFoundException('Suscripción no encontrada');
+    if (sub.idUser !== dto.idUser) {
+      throw new BadRequestException('La suscripción no pertenece al usuario indicado');
+    }
     const club = await this.prisma.club.findUnique({ where: { id: dto.idClub } });
     if (!club) throw new NotFoundException('Club no encontrado');
     const courier = await this.validateCourierForClub(dto.idClub, dto.idCourier);

@@ -29,7 +29,8 @@ export class ShipmentsController {
   @Roles('entrepreneur', 'admin')
   @Post('assign')
   @UsePipes(new ValidationPipe({ whitelist: true, transform: true }))
-  async assignNew(@Body() dto: AssignNewShipmentDto) {
+  async assignNew(@Body() dto: AssignNewShipmentDto, @Request() req) {
+    await this.shipmentsService.assertClubAccess(dto.idClub, req.user);
     return this.shipmentsService.assignNewShipment(dto);
   }
 
@@ -51,24 +52,29 @@ export class ShipmentsController {
   @UseGuards(RolesGuard)
   @Roles('entrepreneur', 'admin')
   @Get('by-club/:idClub')
-  async findByClub(@Param('idClub', ParseIntPipe) idClub: number) {
+  async findByClub(@Param('idClub', ParseIntPipe) idClub: number, @Request() req) {
+    await this.shipmentsService.assertClubAccess(idClub, req.user);
     return this.shipmentsService.findByClub(idClub);
   }
 
   @UseGuards(RolesGuard)
   @Roles('entrepreneur', 'admin')
   @Get('pending-by-club/:idClub')
-  async findPendingByClub(@Param('idClub', ParseIntPipe) idClub: number) {
+  async findPendingByClub(@Param('idClub', ParseIntPipe) idClub: number, @Request() req) {
+    await this.shipmentsService.assertClubAccess(idClub, req.user);
     return this.shipmentsService.getPendingForClub(idClub);
   }
 
   @Get(':id')
   async findOne(@Param('id', ParseIntPipe) id: number, @Request() req) {
     const shipment = await this.shipmentsService.findOne(id);
-    if (req.user.role !== 'admin' && req.user.id !== shipment.idUser) {
-      throw new ForbiddenException('No autorizado para ver este envío');
+    if (req.user.role === 'admin') return shipment;
+    if (req.user.role === 'customer' && req.user.id === shipment.idUser) return shipment;
+    if (req.user.role === 'entrepreneur' && shipment.idClub) {
+      await this.shipmentsService.assertClubAccess(shipment.idClub, req.user);
+      return shipment;
     }
-    return shipment;
+    throw new ForbiddenException('No autorizado para ver este envío');
   }
 
   @UseGuards(RolesGuard)
@@ -79,7 +85,9 @@ export class ShipmentsController {
     @Param('id', ParseIntPipe) id: number,
     @Param('idClub', ParseIntPipe) idClub: number,
     @Body() dto: AssignDeliveryDto,
+    @Request() req,
   ) {
+    await this.shipmentsService.assertClubAccess(idClub, req.user);
     return this.shipmentsService.assignRiderForClub(id, idClub, dto);
   }
 

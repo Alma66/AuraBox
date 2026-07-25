@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
+import { Injectable, NotFoundException, BadRequestException, ForbiddenException } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
 import { CreateSupplyCategoryDto } from './dto/create-supply-category.dto';
 import { UpdateSupplyCategoryDto } from './dto/update-supply-category.dto';
@@ -9,13 +9,13 @@ import { UpdateProductInventoryDto } from './dto/update-product-inventory.dto';
 import { CreateSupplyOrderDto } from './dto/create-supply-order.dto';
 import { UpdateSupplyOrderDto } from './dto/update-supply-order.dto';
 
+type RequestUser = { id: number; role: string };
+
 function sanitizeDecimal(obj: any, fields: string[]) {
   if (!obj) return obj;
   fields.forEach((f) => {
     if (obj[f] !== undefined && obj[f] !== null) {
-      try {
-        obj[f] = obj[f].toString();
-      } catch {}
+      try { obj[f] = obj[f].toString(); } catch {}
     }
   });
   return obj;
@@ -33,34 +33,48 @@ function sanitizeDates(obj: any, fields: string[]) {
 export class InventoryService {
   constructor(private readonly prisma: PrismaService) {}
 
-  async createCategory(dto: CreateSupplyCategoryDto) {
+  private async assertClubAccess(idClub: number, user: RequestUser) {
+    if (user.role === 'admin') return;
+    const assoc = await this.prisma.entrepreneur_Club.findFirst({
+      where: { idClub, idEntrepreneurs: user.id },
+    });
+    if (!assoc) throw new ForbiddenException('No tenés acceso a este club');
+  }
+
+  async createCategory(dto: CreateSupplyCategoryDto, user: RequestUser) {
     const club = await this.prisma.club.findUnique({ where: { id: dto.idClub } });
     if (!club) throw new NotFoundException('Club no encontrado');
+    await this.assertClubAccess(dto.idClub, user);
     return this.prisma.supply_Category.create({ data: dto });
   }
 
-  async findCategoriesByClub(idClub: number) {
+  async findCategoriesByClub(idClub: number, user: RequestUser) {
+    await this.assertClubAccess(idClub, user);
     return this.prisma.supply_Category.findMany({ where: { idClub }, orderBy: { name: 'asc' } });
   }
 
-  async updateCategory(id: number, dto: UpdateSupplyCategoryDto) {
+  async updateCategory(id: number, dto: UpdateSupplyCategoryDto, user: RequestUser) {
     const cat = await this.prisma.supply_Category.findUnique({ where: { id } });
     if (!cat) throw new NotFoundException('Categoría no encontrada');
-    return this.prisma.supply_Category.update({ where: { id }, data: dto });
+    await this.assertClubAccess(cat.idClub, user);
+    const { idClub, ...rest } = dto as any;
+    return this.prisma.supply_Category.update({ where: { id }, data: rest });
   }
 
-  async removeCategory(id: number) {
+  async removeCategory(id: number, user: RequestUser) {
     const cat = await this.prisma.supply_Category.findUnique({ where: { id } });
     if (!cat) throw new NotFoundException('Categoría no encontrada');
+    await this.assertClubAccess(cat.idClub, user);
     const inUse = await this.prisma.product_Inventory.findFirst({ where: { idSupplyCategory: id } });
     if (inUse) throw new BadRequestException('No se puede eliminar: hay productos usando esta categoría');
     await this.prisma.supply_Category.delete({ where: { id } });
     return { message: 'Categoría eliminada correctamente' };
   }
 
-  async createSupplier(dto: CreateSupplierDto) {
+  async createSupplier(dto: CreateSupplierDto, user: RequestUser) {
     const club = await this.prisma.club.findUnique({ where: { id: dto.idClub } });
     if (!club) throw new NotFoundException('Club no encontrado');
+    await this.assertClubAccess(dto.idClub, user);
 
     const created = await this.prisma.supplier.create({
       data: {
@@ -84,7 +98,8 @@ export class InventoryService {
     return this.findSupplierById(created.id);
   }
 
-  async findSuppliersByClub(idClub: number) {
+  async findSuppliersByClub(idClub: number, user: RequestUser) {
+    await this.assertClubAccess(idClub, user);
     const suppliers = await this.prisma.supplier.findMany({ where: { idClub }, orderBy: { name: 'asc' } });
     const links = await this.prisma.supplier_Category.findMany({
       where: { idSupplier: { in: suppliers.map((s) => s.id) } },
@@ -102,18 +117,19 @@ export class InventoryService {
     return { ...supplier, categoryIds: links.map((l) => l.idSupplyCategory) };
   }
 
-  async updateSupplier(id: number, dto: UpdateSupplierDto) {
+  async updateSupplier(id: number, dto: UpdateSupplierDto, user: RequestUser) {
     const supplier = await this.prisma.supplier.findUnique({ where: { id } });
     if (!supplier) throw new NotFoundException('Proveedor no encontrado');
+    await this.assertClubAccess(supplier.idClub, user);
 
-    const { categoryIds, ...rest } = dto;
+    const { categoryIds, idClub, ...rest } = dto as any;
     await this.prisma.supplier.update({ where: { id }, data: rest });
 
     if (categoryIds !== undefined) {
       await this.prisma.supplier_Category.deleteMany({ where: { idSupplier: id } });
       if (categoryIds.length > 0) {
         await this.prisma.supplier_Category.createMany({
-          data: categoryIds.map((idSupplyCategory) => ({ idSupplier: id, idSupplyCategory })),
+          data: categoryIds.map((idSupplyCategory: number) => ({ idSupplier: id, idSupplyCategory })),
           skipDuplicates: true,
         });
       }
@@ -122,24 +138,28 @@ export class InventoryService {
     return this.findSupplierById(id);
   }
 
-  async removeSupplier(id: number) {
+  async removeSupplier(id: number, user: RequestUser) {
     const supplier = await this.prisma.supplier.findUnique({ where: { id } });
     if (!supplier) throw new NotFoundException('Proveedor no encontrado');
+    await this.assertClubAccess(supplier.idClub, user);
     await this.prisma.supplier_Category.deleteMany({ where: { idSupplier: id } });
     await this.prisma.supplier.delete({ where: { id } });
     return { message: 'Proveedor eliminado correctamente' };
   }
 
-  async createProduct(dto: CreateProductInventoryDto) {
+  async createProduct(dto: CreateProductInventoryDto, user: RequestUser) {
     const club = await this.prisma.club.findUnique({ where: { id: dto.idClub } });
     if (!club) throw new NotFoundException('Club no encontrado');
+    await this.assertClubAccess(dto.idClub, user);
 
     const category = await this.prisma.supply_Category.findUnique({ where: { id: dto.idSupplyCategory } });
     if (!category) throw new NotFoundException('Categoría no encontrada');
+    if (category.idClub !== dto.idClub) throw new BadRequestException('La categoría no pertenece a este club');
 
     if (dto.idSupplier) {
       const supplier = await this.prisma.supplier.findUnique({ where: { id: dto.idSupplier } });
       if (!supplier) throw new NotFoundException('Proveedor no encontrado');
+      if (supplier.idClub !== dto.idClub) throw new BadRequestException('El proveedor no pertenece a este club');
     }
 
     const created = await this.prisma.product_Inventory.create({
@@ -159,36 +179,43 @@ export class InventoryService {
     return sanitizeDecimal(sanitizeDates(created, ['createdAt']), ['currentStock', 'minStock', 'costPerUnit']);
   }
 
-  async findProductsByClub(idClub: number) {
+  async findProductsByClub(idClub: number, user: RequestUser) {
+    await this.assertClubAccess(idClub, user);
     const products = await this.prisma.product_Inventory.findMany({ where: { idClub }, orderBy: { name: 'asc' } });
     return products.map((p) => sanitizeDecimal(sanitizeDates(p, ['createdAt']), ['currentStock', 'minStock', 'costPerUnit']));
   }
 
-  async updateProduct(id: number, dto: UpdateProductInventoryDto) {
+  async updateProduct(id: number, dto: UpdateProductInventoryDto, user: RequestUser) {
     const product = await this.prisma.product_Inventory.findUnique({ where: { id } });
     if (!product) throw new NotFoundException('Producto no encontrado');
-    const updated = await this.prisma.product_Inventory.update({ where: { id }, data: dto as any });
+    await this.assertClubAccess(product.idClub, user);
+    const { idClub, ...rest } = dto as any;
+    const updated = await this.prisma.product_Inventory.update({ where: { id }, data: rest });
     return sanitizeDecimal(sanitizeDates(updated, ['createdAt']), ['currentStock', 'minStock', 'costPerUnit']);
   }
 
-  async removeProduct(id: number) {
+  async removeProduct(id: number, user: RequestUser) {
     const product = await this.prisma.product_Inventory.findUnique({ where: { id } });
     if (!product) throw new NotFoundException('Producto no encontrado');
+    await this.assertClubAccess(product.idClub, user);
     const inUse = await this.prisma.supply_Order.findFirst({ where: { idProductInventory: id } });
     if (inUse) throw new BadRequestException('No se puede eliminar: hay pedidos asociados a este producto');
     await this.prisma.product_Inventory.delete({ where: { id } });
     return { message: 'Producto eliminado correctamente' };
   }
 
-  async createOrder(dto: CreateSupplyOrderDto) {
+  async createOrder(dto: CreateSupplyOrderDto, user: RequestUser) {
     const club = await this.prisma.club.findUnique({ where: { id: dto.idClub } });
     if (!club) throw new NotFoundException('Club no encontrado');
+    await this.assertClubAccess(dto.idClub, user);
 
     const supplier = await this.prisma.supplier.findUnique({ where: { id: dto.idSupplier } });
     if (!supplier) throw new NotFoundException('Proveedor no encontrado');
+    if (supplier.idClub !== dto.idClub) throw new BadRequestException('El proveedor no pertenece a este club');
 
     const product = await this.prisma.product_Inventory.findUnique({ where: { id: dto.idProductInventory } });
     if (!product) throw new NotFoundException('Producto no encontrado');
+    if (product.idClub !== dto.idClub) throw new BadRequestException('El producto no pertenece a este club');
 
     const created = await this.prisma.supply_Order.create({
       data: {
@@ -205,16 +232,19 @@ export class InventoryService {
     return sanitizeDecimal(sanitizeDates(created, ['orderDate', 'estimatedArrival', 'receivedDate']), ['quantity', 'totalCost']);
   }
 
-  async findOrdersByClub(idClub: number) {
+  async findOrdersByClub(idClub: number, user: RequestUser) {
+    await this.assertClubAccess(idClub, user);
     const orders = await this.prisma.supply_Order.findMany({ where: { idClub }, orderBy: { orderDate: 'desc' } });
     return orders.map((o) => sanitizeDecimal(sanitizeDates(o, ['orderDate', 'estimatedArrival', 'receivedDate']), ['quantity', 'totalCost']));
   }
 
-  async updateOrder(id: number, dto: UpdateSupplyOrderDto) {
+  async updateOrder(id: number, dto: UpdateSupplyOrderDto, user: RequestUser) {
     const order = await this.prisma.supply_Order.findUnique({ where: { id } });
     if (!order) throw new NotFoundException('Pedido no encontrado');
+    await this.assertClubAccess(order.idClub, user);
 
-    const data: any = { ...dto };
+    const { idClub, ...rest } = dto as any;
+    const data: any = { ...rest };
     if (dto.estimatedArrival !== undefined) data.estimatedArrival = dto.estimatedArrival ? new Date(dto.estimatedArrival) : null;
     if (dto.receivedDate !== undefined) data.receivedDate = dto.receivedDate ? new Date(dto.receivedDate) : null;
 
@@ -230,9 +260,10 @@ export class InventoryService {
     return sanitizeDecimal(sanitizeDates(updated, ['orderDate', 'estimatedArrival', 'receivedDate']), ['quantity', 'totalCost']);
   }
 
-  async removeOrder(id: number) {
+  async removeOrder(id: number, user: RequestUser) {
     const order = await this.prisma.supply_Order.findUnique({ where: { id } });
     if (!order) throw new NotFoundException('Pedido no encontrado');
+    await this.assertClubAccess(order.idClub, user);
     await this.prisma.supply_Order.delete({ where: { id } });
     return { message: 'Pedido eliminado correctamente' };
   }

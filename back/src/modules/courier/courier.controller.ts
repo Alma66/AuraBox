@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, ParseIntPipe, Put, UseGuards, UsePipes, ValidationPipe } from '@nestjs/common';
+import { Body, Controller, Get, Param, ParseIntPipe, Put, Request, UseGuards, UsePipes, ValidationPipe } from '@nestjs/common';
 import { CourierService } from './courier.service';
 import { SetClubCouriersDto } from './dto/set-club-couriers.dto';
 import { SetCourierFeeDto } from './dto/set-courier-fee.dto';
@@ -19,7 +19,8 @@ export class CourierController {
   @UseGuards(RolesGuard)
   @Roles('entrepreneur', 'admin')
   @Get('by-club/:idClub')
-  async findByClub(@Param('idClub', ParseIntPipe) idClub: number) {
+  async findByClub(@Param('idClub', ParseIntPipe) idClub: number, @Request() req) {
+    await this.svc.assertClubAccess(idClub, req.user);
     return this.svc.findByClub(idClub);
   }
 
@@ -27,7 +28,8 @@ export class CourierController {
   @Roles('entrepreneur', 'admin')
   @Put('by-club/:idClub')
   @UsePipes(new ValidationPipe({ whitelist: true, transform: true }))
-  async setClubCouriers(@Param('idClub', ParseIntPipe) idClub: number, @Body() dto: SetClubCouriersDto) {
+  async setClubCouriers(@Param('idClub', ParseIntPipe) idClub: number, @Body() dto: SetClubCouriersDto, @Request() req) {
+    await this.svc.assertClubAccess(idClub, req.user);
     return this.svc.setClubCouriers(idClub, dto);
   }
 
@@ -39,7 +41,9 @@ export class CourierController {
     @Param('idClub', ParseIntPipe) idClub: number,
     @Param('idCourier', ParseIntPipe) idCourier: number,
     @Body() dto: SetCourierFeeDto,
+    @Request() req,
   ) {
+    await this.svc.assertClubAccess(idClub, req.user);
     return this.svc.setCourierFee(idClub, idCourier, dto);
   }
 }

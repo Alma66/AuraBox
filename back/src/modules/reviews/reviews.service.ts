@@ -9,6 +9,8 @@ import { ContentType } from '@prisma/client';
 const MAX_MEDIA_PER_REVIEW = 5;
 const REVIEW_WINDOW_AFTER_CANCEL_DAYS = 30;
 
+type RequestUser = { id: number; role: string };
+
 function sanitize(review: any) {
   if (!review) return review;
   if (review.reviewDate instanceof Date) review.reviewDate = review.reviewDate.toISOString();
@@ -27,6 +29,14 @@ export class ReviewsService {
     private readonly prisma: PrismaService,
     private readonly cloudinary: CloudinaryService,
   ) {}
+
+  async assertClubAccess(idClub: number, user: RequestUser) {
+    if (user.role === 'admin') return;
+    const assoc = await this.prisma.entrepreneur_Club.findFirst({
+      where: { idClub, idEntrepreneurs: user.id },
+    });
+    if (!assoc) throw new ForbiddenException('No tenés acceso a este club');
+  }
 
   private async matchesForbiddenWord(idClub: number, text: string) {
     const words = await this.prisma.forbidden_Word.findMany({ where: { idClub, active: true } });
@@ -164,6 +174,18 @@ export class ReviewsService {
     return sanitize(review);
   }
 
+  async findOneForRequester(id: number, user: RequestUser) {
+    const review = await this.findOne(id);
+    if (!review.isHidden) return review;
+    if (user.role === 'admin') return review;
+    if (user.role === 'customer' && review.idUser === user.id) return review;
+    if (user.role === 'entrepreneur') {
+      await this.assertClubAccess(review.idClub, user);
+      return review;
+    }
+    throw new ForbiddenException('No autorizado para ver esta reseña');
+  }
+
   async findByUser(idUser: number) {
     const reviews = await this.prisma.reviews.findMany({
       where: { idUser },
@@ -223,7 +245,37 @@ export class ReviewsService {
     return { average: agg._avg.rating ?? 0, count: agg._count.rating };
   }
 
-  async update(id: number, dto: UpdateReviewDto) {
+  async updateForRequester(id: number, dto: UpdateReviewDto, user: RequestUser) {
+    const review = await this.findOne(id);
+    const isOwner = user.id === review.idUser;
+
+    if (isOwner) {
+      const { isHidden, hiddenReason, ...ownerFields } = dto;
+      const data: Partial<UpdateReviewDto> = { ...ownerFields };
+      if (ownerFields.title !== undefined || ownerFields.comment !== undefined) {
+        const newTitle = ownerFields.title ?? review.title;
+        const newComment = ownerFields.comment ?? review.comment;
+        const forbidden = await this.matchesForbiddenWord(review.idClub, `${newTitle ?? ''} ${newComment ?? ''}`);
+        if (forbidden) {
+          (data as any).isHidden = true;
+          (data as any).hiddenReason = 'Contiene palabra filtrada automáticamente';
+        }
+      }
+      return this.update(id, data);
+    }
+
+    if (user.role === 'admin') return this.update(id, dto);
+
+    if (user.role === 'entrepreneur') {
+      await this.assertClubAccess(review.idClub, user);
+      const { rating, title, comment, ...moderationFields } = dto;
+      return this.update(id, moderationFields);
+    }
+
+    throw new ForbiddenException('No autorizado para editar esta reseña');
+  }
+
+  async update(id: number, dto: Partial<UpdateReviewDto>) {
     const review = await this.prisma.reviews.findUnique({ where: { id } });
     if (!review) throw new NotFoundException('Reseña no encontrada');
 
@@ -278,16 +330,18 @@ export class ReviewsService {
     return this.prisma.forbidden_Word.findMany({ where: { idClub }, orderBy: { createdAt: 'desc' } });
   }
 
-  async removeForbiddenWord(id: number) {
+  async removeForbiddenWord(id: number, user: RequestUser) {
     const word = await this.prisma.forbidden_Word.findUnique({ where: { id } });
     if (!word) throw new NotFoundException('Palabra no encontrada');
+    await this.assertClubAccess(word.idClub, user);
     await this.prisma.forbidden_Word.delete({ where: { id } });
     return { message: 'Palabra eliminada correctamente' };
   }
 
-  async toggleForbiddenWord(id: number, active: boolean) {
+  async toggleForbiddenWord(id: number, active: boolean, user: RequestUser) {
     const word = await this.prisma.forbidden_Word.findUnique({ where: { id } });
     if (!word) throw new NotFoundException('Palabra no encontrada');
+    await this.assertClubAccess(word.idClub, user);
     return this.prisma.forbidden_Word.update({ where: { id }, data: { active } });
   }
 }

@@ -4,6 +4,8 @@ import { CreateUserSubscriptionDto } from './dto/create-user-subscription.dto';
 import { UpdateUserSubscriptionDto } from './dto/update-user-subscription.dto';
 import { Prisma } from '@prisma/client';
 
+type RequestUser = { id: number; role: string };
+
 function sanitize(sub: any) {
   if (!sub) return sub;
   if (sub.monthlyAmountPaid !== undefined && sub.monthlyAmountPaid !== null) {
@@ -21,9 +23,17 @@ function sanitize(sub: any) {
 export class UserSubscriptionsService {
   constructor(private readonly prisma: PrismaService) {}
 
-  async create(dto: CreateUserSubscriptionDto, actingUserId?: number) {
-    const userId = dto.idUser ?? actingUserId;
-    if (!userId) throw new BadRequestException('idUser no especificado');
+  private async assertEntrepreneurOwnsSubscription(idSubscriptionTypes: number, entrepreneurId: number) {
+    const subType = await this.prisma.subscription_Types.findUnique({ where: { id: idSubscriptionTypes } });
+    if (!subType) throw new NotFoundException('Tipo de suscripción no encontrado');
+    const assoc = await this.prisma.entrepreneur_Club.findFirst({
+      where: { idClub: subType.idClub, idEntrepreneurs: entrepreneurId },
+    });
+    if (!assoc) throw new ForbiddenException('No tenés acceso a esta suscripción');
+  }
+
+  async create(dto: CreateUserSubscriptionDto, actingUser: RequestUser) {
+    const userId = actingUser.role === 'admin' && dto.idUser ? dto.idUser : actingUser.id;
 
     const user = await this.prisma.user.findUnique({ where: { id: userId } });
     if (!user) throw new NotFoundException('Usuario no encontrado');
@@ -76,6 +86,17 @@ export class UserSubscriptionsService {
     return sanitize(row);
   }
 
+  async findOneForRequester(id: number, user: RequestUser) {
+    const sub = await this.findById(id);
+    if (user.role === 'admin') return sub;
+    if (user.role === 'customer' && sub.idUser === user.id) return sub;
+    if (user.role === 'entrepreneur') {
+      await this.assertEntrepreneurOwnsSubscription(sub.idSubscriptionTypes, user.id);
+      return sub;
+    }
+    throw new ForbiddenException('No autorizado para ver esta suscripción');
+  }
+
   async findByUser(userId: number) {
     const rows = await this.prisma.user_Subscriptions.findMany({
       where: { idUser: userId },
@@ -84,7 +105,18 @@ export class UserSubscriptionsService {
     return rows.map((r) => sanitize(r));
   }
 
-  async update(id: number, dto: UpdateUserSubscriptionDto, actingUserRole?: string) {
+  async updateForRequester(id: number, dto: UpdateUserSubscriptionDto, user: RequestUser) {
+    const existing = await this.prisma.user_Subscriptions.findUnique({ where: { id } });
+    if (!existing) throw new NotFoundException('Suscripción no encontrada');
+
+    if (user.role === 'entrepreneur') {
+      await this.assertEntrepreneurOwnsSubscription(existing.idSubscriptionTypes, user.id);
+    }
+
+    return this.update(id, dto);
+  }
+
+  async update(id: number, dto: UpdateUserSubscriptionDto) {
     const existing = await this.prisma.user_Subscriptions.findUnique({ where: { id } });
     if (!existing) throw new NotFoundException('Suscripción no encontrada');
 

@@ -18,18 +18,27 @@ export class UserSubscriptionsController {
   @Post()
   @UsePipes(new ValidationPipe({ whitelist: true, transform: true }))
   async create(@Body() dto: CreateUserSubscriptionDto, @Request() req) {
-    return this.svc.create(dto, req.user?.id);
+    return this.svc.create(dto, req.user);
   }
 
   @Get()
-  async findAll(@Query('userId') userId?: string) {
-    if (userId) return this.svc.findByUser(Number(userId));
+  async findAll(@Query('userId') userId: string | undefined, @Request() req) {
+    if (userId) {
+      const targetId = Number(userId);
+      if (req.user.id !== targetId && req.user.role !== 'admin') {
+        throw new ForbiddenException('No autorizado para ver estas suscripciones');
+      }
+      return this.svc.findByUser(targetId);
+    }
+    if (req.user.role !== 'admin') {
+      throw new ForbiddenException('No autorizado para ver todas las suscripciones');
+    }
     return this.svc.findAll();
   }
 
   @Get(':id')
-  async findOne(@Param('id', ParseIntPipe) id: number) {
-    return this.svc.findById(id);
+  async findOne(@Param('id', ParseIntPipe) id: number, @Request() req) {
+    return this.svc.findOneForRequester(id, req.user);
   }
 
   @UseGuards(RolesGuard)
@@ -37,7 +46,7 @@ export class UserSubscriptionsController {
   @Put(':id')
   @UsePipes(new ValidationPipe({ whitelist: true, transform: true }))
   async update(@Param('id', ParseIntPipe) id: number, @Body() dto: UpdateUserSubscriptionDto, @Request() req) {
-    return this.svc.update(id, dto, req.user?.role);
+    return this.svc.updateForRequester(id, dto, req.user);
   }
 
   @Post(':id/cancel')

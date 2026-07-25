@@ -1,8 +1,10 @@
-import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
+import { Injectable, NotFoundException, BadRequestException, ForbiddenException } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
 import { CreateImageClubDto } from './dto/create-image-club.dto';
 import { UpdateImageClubDto } from './dto/update-image-club.dto';
 import { CloudinaryService } from '../cloudinary/cloudinary.service';
+
+type RequestUser = { id: number; role: string };
 
 function sanitize(image: any) {
   if (!image) return image;
@@ -17,9 +19,18 @@ export class ImageClubService {
     private readonly cloudinary: CloudinaryService,
   ) {}
 
-  async create(dto: CreateImageClubDto, imageFile?: Express.Multer.File) {
+  private async assertClubAccess(idClub: number, user: RequestUser) {
+    if (user.role === 'admin') return;
+    const assoc = await this.prisma.entrepreneur_Club.findFirst({
+      where: { idClub, idEntrepreneurs: user.id },
+    });
+    if (!assoc) throw new ForbiddenException('No tenés acceso a este club');
+  }
+
+  async create(dto: CreateImageClubDto, imageFile: Express.Multer.File | undefined, user: RequestUser) {
     const club = await this.prisma.club.findUnique({ where: { id: dto.idClub } });
     if (!club) throw new NotFoundException('Club no encontrado');
+    await this.assertClubAccess(dto.idClub, user);
 
     let imageUrl = dto.imageUrl ?? '';
     if (imageFile) {
@@ -112,12 +123,14 @@ export class ImageClubService {
     return sanitize(item);
   }
 
-  async update(id: number, dto: UpdateImageClubDto) {
+  async update(id: number, dto: UpdateImageClubDto, user: RequestUser) {
     const item = await this.prisma.image_Club.findUnique({ where: { id } });
     if (!item) throw new NotFoundException('Imagen no encontrada');
+    await this.assertClubAccess(item.idClub, user);
 
-    const targetSection = dto.section ?? item.section;
-    const targetActive = dto.isActive ?? item.isActive;
+    const { idClub, ...rest } = dto as any;
+    const targetSection = rest.section ?? item.section;
+    const targetActive = rest.isActive ?? item.isActive;
 
     if (targetActive && targetSection === 'Logo') {
       await this.prisma.image_Club.updateMany({
@@ -129,16 +142,17 @@ export class ImageClubService {
     const updated = await this.prisma.image_Club.update({
       where: { id },
       data: {
-        ...dto,
-        uploadDate: dto.uploadDate ? new Date(dto.uploadDate) : item.uploadDate,
+        ...rest,
+        uploadDate: rest.uploadDate ? new Date(rest.uploadDate) : item.uploadDate,
       },
     });
     return sanitize(updated);
   }
 
-  async remove(id: number) {
+  async remove(id: number, user: RequestUser) {
     const item = await this.prisma.image_Club.findUnique({ where: { id } });
     if (!item) throw new NotFoundException('Imagen no encontrada');
+    await this.assertClubAccess(item.idClub, user);
 
     if (item.imageUrl) {
       const publicId = this.cloudinary.extractPublicId(item.imageUrl);
@@ -149,8 +163,14 @@ export class ImageClubService {
     return { message: 'Imagen eliminada correctamente' };
   }
 
-  async removeMany(ids: number[]) {
+  async removeMany(ids: number[], user: RequestUser) {
     const items = await this.prisma.image_Club.findMany({ where: { id: { in: ids } } });
+
+    const clubIds = Array.from(new Set(items.map((i) => i.idClub)));
+    for (const idClub of clubIds) {
+      await this.assertClubAccess(idClub, user);
+    }
+
     for (const item of items) {
       if (item.imageUrl) {
         try {
