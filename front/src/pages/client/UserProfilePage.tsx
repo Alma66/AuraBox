@@ -57,18 +57,32 @@ const UserProfilePage: React.FC = () => {
     fetchUser();
   }, [fetchUser]);
 
-  if (loading) return <div className="text-center py-20">Cargando perfil...</div>;
-  if (!user) return <div className="text-center py-20">Redirigiendo...</div>;
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-aurora-cream flex items-center justify-center">
+        <div className="flex flex-col items-center gap-4">
+          <div className="w-12 h-12 border-4 border-aurora-terracotta/20 border-t-aurora-terracotta rounded-full animate-spin" />
+          <p className="font-display text-aurora-navy/70">Cargando tu perfil...</p>
+        </div>
+      </div>
+    );
+  }
+  if (!user) return <div className="min-h-screen bg-aurora-cream flex items-center justify-center text-aurora-navy/70">Redirigiendo...</div>;
 
   return (
-    <div className="container mx-auto px-4 py-8 min-h-screen">
-      <h1 className="text-4xl font-bold text-gray-800 mb-8 text-center">Mi Cuenta AuraBox</h1>
-      <div className="flex flex-col lg:flex-row gap-8">
-        <div className="lg:w-1/4">
-          <ProfileSidebar activeSection={activeSection} setActiveSection={setActiveSection} />
+    <div className="min-h-screen bg-aurora-cream">
+      <div className="container mx-auto px-4 py-10 md:py-14">
+        <div className="mb-8 text-center">
+          <span className="section-eyebrow block">Tu espacio</span>
+          <h1 className="font-display text-4xl md:text-5xl font-bold text-aurora-navy">Mi Cuenta AuraBox</h1>
         </div>
-        <div className="lg:w-3/4 bg-white rounded-xl shadow-lg p-8">
-          <UserProfileContent activeSection={activeSection} user={user} onUserUpdate={fetchUser} />
+        <div className="flex flex-col lg:flex-row gap-6 lg:gap-8">
+          <div className="lg:w-1/4">
+            <ProfileSidebar activeSection={activeSection} setActiveSection={setActiveSection} />
+          </div>
+          <div className="lg:w-3/4 bg-white rounded-2xl shadow-aurora-sm border border-aurora-navy/5 p-6 md:p-10">
+            <UserProfileContent activeSection={activeSection} user={user} onUserUpdate={fetchUser} />
+          </div>
         </div>
       </div>
     </div>

@@ -20,28 +20,28 @@ const EditProfileField: React.FC<EditProfileFieldProps> = ({
   children,
 }) => {
   return (
-    <div className="border border-gray-300 rounded-md p-4 bg-white shadow-sm">
+    <div className="border border-aurora-navy/10 rounded-xl p-5 bg-white shadow-aurora-sm">
       <div className="flex justify-between items-center">
-        <label className="font-semibold text-gray-700">{label}</label>
+        <label className="font-semibold text-aurora-navy text-sm">{label}</label>
         {!isEditing && !isLocked && (
           <button
             onClick={onEdit}
-            className="text-blue-600 hover:text-blue-800 text-sm font-medium"
+            className="text-aurora-terracotta hover:text-aurora-terracottaDark text-sm font-semibold transition-colors duration-200"
           >
             Editar
           </button>
         )}
       </div>
       {!isEditing ? (
-        <p className={`mt-2 text-gray-800 ${isLocked ? 'italic text-gray-500' : ''}`}>{value}</p>
+        <p className={`mt-2 ${isLocked ? 'italic text-aurora-navy/50' : 'text-aurora-navy/90'}`}>{value}</p>
       ) : (
-        <div className="mt-2">{children}</div>
+        <div className="mt-3">{children}</div>
       )}
       {isEditing && (
         <div className="mt-4 flex space-x-2">
           <button
             onClick={onCancel}
-            className="px-4 py-2 bg-gray-300 rounded-md hover:bg-gray-400 text-gray-700"
+            className="px-4 py-2 bg-aurora-cream border border-aurora-navy/15 rounded-lg hover:bg-aurora-creamDark text-aurora-navy text-sm font-semibold transition-colors duration-200"
           >
             Cancelar
           </button>

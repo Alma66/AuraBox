@@ -8,6 +8,7 @@ import EditPhoneField from '../common/EditPhoneField';
 import EntrepreneurSettingsSection from './EntrepreneurSettingsSection';
 import ClubBusinessInfoSection from './ClubBusinessInfoSection';
 import api from '../../api/config';
+
 interface LocationData {
   country: string;
   city: string;
@@ -18,6 +19,7 @@ interface LocationData {
   floor: string;
   details: string;
 }
+
 interface ManagedClub {
   id: number;
   name: string;
@@ -25,12 +27,17 @@ interface ManagedClub {
   clubStatus?: string;
   creationDate?: string;
 }
+
 interface EntrepreneurProfileContentProps {
   activeSection: string;
   user: User;
   managedClub: ManagedClub | null;
   onUserUpdate: () => void;
 }
+
+const inputClass = "mt-1 block w-full rounded-lg border border-aurora-navy/15 bg-white px-3 py-2 text-sm text-aurora-navy focus:outline-none focus:ring-2 focus:ring-aurora-navy/30 focus:border-aurora-navy transition-all duration-200";
+const primaryBtnClass = "mt-4 bg-aurora-navy hover:bg-aurora-navyDark text-white px-5 py-2.5 rounded-lg font-semibold text-sm shadow-aurora-sm transition-all duration-200";
+
 const EntrepreneurProfileContent: React.FC<EntrepreneurProfileContentProps> = ({ activeSection, user, managedClub, onUserUpdate }) => {
   const [isEditingName, setIsEditingName] = useState(false);
   const [editedFirstName, setEditedFirstName] = useState(user.firstName || '');
@@ -48,6 +55,7 @@ const EntrepreneurProfileContent: React.FC<EntrepreneurProfileContentProps> = ({
   const [profilePasswordError, setProfilePasswordError] = useState('');
   const [saveError, setSaveError] = useState('');
   const [saveSuccess, setSaveSuccess] = useState('');
+
   useEffect(() => {
     setEditedFirstName(user.firstName || '');
     setEditedLastName(user.lastName || '');
@@ -61,11 +69,13 @@ const EntrepreneurProfileContent: React.FC<EntrepreneurProfileContentProps> = ({
     setSaveError('');
     setSaveSuccess('');
   }, [user, activeSection]);
+
   const showFeedback = (success?: string, error?: string) => {
     setSaveSuccess(success || '');
     setSaveError(error || '');
     if (success) setTimeout(() => setSaveSuccess(''), 3000);
   };
+
   const handleSaveName = async () => {
     try {
       await api.patch('/entrepreneurs/me', {
@@ -79,6 +89,7 @@ const EntrepreneurProfileContent: React.FC<EntrepreneurProfileContentProps> = ({
       showFeedback(undefined, 'Error al guardar el nombre');
     }
   };
+
   const handleSaveGender = async (newGender: string) => {
     try {
       await api.patch('/entrepreneurs/me', { gender: newGender });
@@ -90,6 +101,7 @@ const EntrepreneurProfileContent: React.FC<EntrepreneurProfileContentProps> = ({
       showFeedback(undefined, 'Error al guardar el género');
     }
   };
+
   const handleSaveBirthDate = async () => {
     try {
       await api.patch('/entrepreneurs/me', { birthDate: editedBirthDate });
@@ -100,6 +112,7 @@ const EntrepreneurProfileContent: React.FC<EntrepreneurProfileContentProps> = ({
       showFeedback(undefined, 'Error al guardar la fecha');
     }
   };
+
   const handleSavePhoneNumber = async (newNumber: string) => {
     try {
       await api.patch('/entrepreneurs/me', { phoneNumber: newNumber ? parseInt(newNumber) : null });
@@ -109,6 +122,7 @@ const EntrepreneurProfileContent: React.FC<EntrepreneurProfileContentProps> = ({
       showFeedback(undefined, 'Error al guardar el teléfono');
     }
   };
+
   const handleSaveTaxId = async () => {
     try {
       await api.patch('/entrepreneurs/me', { cuitCuil: editedTaxId ? parseInt(editedTaxId) : null });
@@ -119,6 +133,7 @@ const EntrepreneurProfileContent: React.FC<EntrepreneurProfileContentProps> = ({
       showFeedback(undefined, 'Error al guardar el CUIT/CUIL');
     }
   };
+
   const handleSaveBio = async () => {
     try {
       await api.patch('/entrepreneurs/me', { bio: editedBio.trim() });
@@ -129,6 +144,7 @@ const EntrepreneurProfileContent: React.FC<EntrepreneurProfileContentProps> = ({
       showFeedback(undefined, 'Error al guardar la descripción');
     }
   };
+
   const handleProfilePasswordCheck = async () => {
     try {
       await api.post('/entrepreneurs/me/verify-password', { password: profilePassword });
@@ -138,6 +154,7 @@ const EntrepreneurProfileContent: React.FC<EntrepreneurProfileContentProps> = ({
       setProfilePasswordError('Contraseña incorrecta. Intenta de nuevo.');
     }
   };
+
   const handleSaveLocation = async (locationData: LocationData) => {
     try {
       await api.patch('/entrepreneurs/me', {
@@ -156,19 +173,25 @@ const EntrepreneurProfileContent: React.FC<EntrepreneurProfileContentProps> = ({
       showFeedback(undefined, 'Error al guardar la ubicación');
     }
   };
+
   const Feedback = () => (
     <>
-      {saveSuccess && <p className="text-green-600 text-sm mb-4 bg-green-50 p-2 rounded">{saveSuccess}</p>}
-      {saveError && <p className="text-red-600 text-sm mb-4 bg-red-50 p-2 rounded">{saveError}</p>}
+      {saveSuccess && (
+        <p className="text-green-700 text-sm mb-4 bg-green-50 border border-green-200 px-4 py-2.5 rounded-lg">{saveSuccess}</p>
+      )}
+      {saveError && (
+        <p className="text-red-700 text-sm mb-4 bg-red-50 border border-red-200 px-4 py-2.5 rounded-lg">{saveError}</p>
+      )}
     </>
   );
+
   const renderContent = () => {
-    if (!user) return <p className="text-gray-600">Cargando información del perfil...</p>;
+    if (!user) return <p className="text-aurora-navy/60">Cargando información del perfil...</p>;
     switch (activeSection) {
       case 'profile':
         return (
           <div>
-            <h2 className="text-2xl font-bold text-gray-800 mb-4">Mi Perfil Personal</h2>
+            <h2 className="font-display text-2xl font-bold text-aurora-navy mb-6">Mi Perfil Personal</h2>
             <Feedback />
             <div className="space-y-4">
               <EditProfileField
@@ -178,17 +201,17 @@ const EntrepreneurProfileContent: React.FC<EntrepreneurProfileContentProps> = ({
                 onEdit={() => setIsEditingName(true)}
                 onCancel={() => { setEditedFirstName(user.firstName || ''); setEditedLastName(user.lastName || ''); setIsEditingName(false); }}
               >
-                <div className="flex space-x-4">
+                <div className="flex flex-col sm:flex-row gap-4">
                   <div className="flex-1">
-                    <label className="block text-sm font-medium text-gray-700">Nombre:</label>
-                    <input type="text" value={editedFirstName} onChange={(e) => setEditedFirstName(e.target.value)} className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm" />
+                    <label className="block text-sm font-medium text-aurora-navy/80">Nombre:</label>
+                    <input type="text" value={editedFirstName} onChange={(e) => setEditedFirstName(e.target.value)} className={inputClass} />
                   </div>
                   <div className="flex-1">
-                    <label className="block text-sm font-medium text-gray-700">Apellido:</label>
-                    <input type="text" value={editedLastName} onChange={(e) => setEditedLastName(e.target.value)} className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm" />
+                    <label className="block text-sm font-medium text-aurora-navy/80">Apellido:</label>
+                    <input type="text" value={editedLastName} onChange={(e) => setEditedLastName(e.target.value)} className={inputClass} />
                   </div>
                 </div>
-                <button onClick={handleSaveName} className="mt-4 bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors duration-200">Guardar Nombre</button>
+                <button onClick={handleSaveName} className={primaryBtnClass}>Guardar Nombre</button>
               </EditProfileField>
               <EditGenderField label="Género" value={editedGender} isEditing={isEditingGender} onEdit={() => setIsEditingGender(true)} onCancel={() => { setEditedGender(user.gender || ''); setIsEditingGender(false); }} onSave={handleSaveGender} />
               <EditProfileField
@@ -198,18 +221,23 @@ const EntrepreneurProfileContent: React.FC<EntrepreneurProfileContentProps> = ({
                 onEdit={() => setIsEditingBirthDate(true)}
                 onCancel={() => { setEditedBirthDate(user.birthDate || ''); setIsEditingBirthDate(false); }}
               >
-                <input type="date" value={editedBirthDate} onChange={(e) => setEditedBirthDate(e.target.value)} className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm" max={new Date(new Date().setFullYear(new Date().getFullYear() - 18)).toISOString().split('T')[0]} />
-                <button onClick={handleSaveBirthDate} className="mt-4 bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors duration-200">Guardar Fecha de Nacimiento</button>
+                <input type="date" value={editedBirthDate} onChange={(e) => setEditedBirthDate(e.target.value)} className={inputClass} max={new Date(new Date().setFullYear(new Date().getFullYear() - 18)).toISOString().split('T')[0]} />
+                <button onClick={handleSaveBirthDate} className={primaryBtnClass}>Guardar Fecha de Nacimiento</button>
               </EditProfileField>
-              <div className="relative bg-gray-100 p-6 rounded-lg shadow-md mt-8">
-                <h3 className="text-xl font-bold text-gray-800 mb-4">Información de Contacto y Documento</h3>
+              <div className="relative bg-aurora-cream/60 p-6 rounded-2xl border border-aurora-navy/5 mt-8">
+                <h3 className="font-display text-lg font-bold text-aurora-navy mb-4">Información de Contacto y Documento</h3>
                 {!showSensitiveProfileInfo && (
-                  <div className="absolute inset-0 bg-gray-200 bg-opacity-90 flex flex-col items-center justify-center rounded-lg z-10">
-                    <p className="text-lg font-semibold text-gray-700 mb-4">Contenido sensible oculto</p>
-                    <p className="text-gray-800 mb-2 text-center">Para ver o editar esta información, ingresá tu contraseña:</p>
-                    <input type="password" className="mt-1 block mx-auto w-full max-w-xs rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm text-center" value={profilePassword} onChange={(e) => setProfilePassword(e.target.value)} placeholder="Contraseña" onKeyDown={(e) => e.key === 'Enter' && handleProfilePasswordCheck()} />
-                    {profilePasswordError && <p className="text-red-500 text-sm mt-2">{profilePasswordError}</p>}
-                    <button onClick={handleProfilePasswordCheck} className="mt-4 bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors duration-200">Verificar</button>
+                  <div className="absolute inset-0 bg-aurora-cream/95 backdrop-blur-sm flex flex-col items-center justify-center rounded-2xl z-10 px-6">
+                    <div className="w-12 h-12 rounded-full bg-aurora-navy/10 flex items-center justify-center mb-3">
+                      <svg className="w-6 h-6 text-aurora-navy" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                      </svg>
+                    </div>
+                    <p className="font-display text-lg font-semibold text-aurora-navy mb-1">Contenido sensible protegido</p>
+                    <p className="text-aurora-navy/70 mb-4 text-center text-sm">Ingresá tu contraseña para ver o editar esta información</p>
+                    <input type="password" className={`${inputClass} max-w-xs text-center`} value={profilePassword} onChange={(e) => setProfilePassword(e.target.value)} placeholder="Contraseña" onKeyDown={(e) => e.key === 'Enter' && handleProfilePasswordCheck()} />
+                    {profilePasswordError && <p className="text-red-600 text-sm mt-2">{profilePasswordError}</p>}
+                    <button onClick={handleProfilePasswordCheck} className={primaryBtnClass}>Verificar</button>
                   </div>
                 )}
                 <div className={`space-y-6 ${!showSensitiveProfileInfo ? 'blur-sm pointer-events-none' : ''}`}>
@@ -224,7 +252,7 @@ const EntrepreneurProfileContent: React.FC<EntrepreneurProfileContentProps> = ({
       case 'business-info':
         return (
           <div>
-            <h2 className="text-2xl font-bold text-gray-800 mb-4">Información del Negocio</h2>
+            <h2 className="font-display text-2xl font-bold text-aurora-navy mb-6">Información del Negocio</h2>
             <Feedback />
             <div className="space-y-4">
               <EditProfileField
@@ -234,8 +262,8 @@ const EntrepreneurProfileContent: React.FC<EntrepreneurProfileContentProps> = ({
                 onEdit={() => setIsEditingTaxId(true)}
                 onCancel={() => { setEditedTaxId(user.cuitCuil || ''); setIsEditingTaxId(false); }}
               >
-                <input type="text" value={editedTaxId} onChange={(e) => setEditedTaxId(e.target.value)} className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm" placeholder="Ej: 20123456789" />
-                <button onClick={handleSaveTaxId} className="mt-4 bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors duration-200">Guardar CUIT/CUIL</button>
+                <input type="text" value={editedTaxId} onChange={(e) => setEditedTaxId(e.target.value)} className={inputClass} placeholder="Ej: 20123456789" />
+                <button onClick={handleSaveTaxId} className={primaryBtnClass}>Guardar CUIT/CUIL</button>
               </EditProfileField>
               <EditProfileField
                 label="Descripción del Negocio"
@@ -244,19 +272,19 @@ const EntrepreneurProfileContent: React.FC<EntrepreneurProfileContentProps> = ({
                 onEdit={() => setIsEditingBio(true)}
                 onCancel={() => { setEditedBio(user.bio || ''); setIsEditingBio(false); }}
               >
-                <textarea value={editedBio} onChange={(e) => setEditedBio(e.target.value)} rows={4} maxLength={500} className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm" placeholder="Contanos de qué se trata tu emprendimiento, hace cuánto existe, qué lo hace especial..." />
-                <p className="text-xs text-gray-500 mt-1">{editedBio.length}/500</p>
-                <button onClick={handleSaveBio} className="mt-2 bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors duration-200">Guardar Descripción</button>
+                <textarea value={editedBio} onChange={(e) => setEditedBio(e.target.value)} rows={4} maxLength={500} className={inputClass} placeholder="Contanos de qué se trata tu emprendimiento, hace cuánto existe, qué lo hace especial..." />
+                <p className="text-xs text-aurora-navy/50 mt-1">{editedBio.length}/500</p>
+                <button onClick={handleSaveBio} className="mt-2 bg-aurora-navy hover:bg-aurora-navyDark text-white px-5 py-2.5 rounded-lg font-semibold text-sm shadow-aurora-sm transition-all duration-200">Guardar Descripción</button>
               </EditProfileField>
               {managedClub ? (
                 <>
-                  <div className="bg-gray-100 p-6 rounded-lg shadow-md mt-8">
-                    <div className="flex items-center justify-between mb-2">
-                      <h3 className="text-xl font-bold text-gray-800">{managedClub.name}</h3>
+                  <div className="bg-aurora-cream/60 p-6 rounded-2xl border border-aurora-navy/5 mt-8">
+                    <div className="flex items-center justify-between mb-2 flex-wrap gap-2">
+                      <h3 className="font-display text-xl font-bold text-aurora-navy">{managedClub.name}</h3>
                       {managedClub.clubStatus && (
                         <span className={`text-xs font-semibold px-3 py-1 rounded-full ${
                           managedClub.clubStatus === 'APROBADO' ? 'bg-green-100 text-green-700' :
-                          managedClub.clubStatus === 'PENDIENTE_APROBACION' ? 'bg-yellow-100 text-yellow-700' :
+                          managedClub.clubStatus === 'PENDIENTE_APROBACION' ? 'bg-aurora-gold/20 text-aurora-terracottaDark' :
                           'bg-red-100 text-red-700'
                         }`}>
                           {managedClub.clubStatus === 'APROBADO' ? 'Aprobado' : managedClub.clubStatus === 'PENDIENTE_APROBACION' ? 'Pendiente de Aprobación' : managedClub.clubStatus}
@@ -264,14 +292,14 @@ const EntrepreneurProfileContent: React.FC<EntrepreneurProfileContentProps> = ({
                       )}
                     </div>
                     {managedClub.creationDate && (
-                      <p className="text-sm text-gray-500">Club creado el {new Date(managedClub.creationDate).toLocaleDateString('es-AR')}</p>
+                      <p className="text-sm text-aurora-navy/60">Club creado el {new Date(managedClub.creationDate).toLocaleDateString('es-AR')}</p>
                     )}
                   </div>
                   <ClubBusinessInfoSection clubId={String(managedClub.id)} />
                 </>
               ) : (
-                <div className="bg-yellow-50 border-l-4 border-yellow-400 text-yellow-800 p-4 mt-4">
-                  <p className="font-bold">Todavía no tenés un club asociado a tu cuenta.</p>
+                <div className="bg-aurora-gold/10 border-l-4 border-aurora-gold text-aurora-terracottaDark p-4 rounded-r-lg mt-4">
+                  <p className="font-semibold">Todavía no tenés un club asociado a tu cuenta.</p>
                 </div>
               )}
             </div>
@@ -280,7 +308,7 @@ const EntrepreneurProfileContent: React.FC<EntrepreneurProfileContentProps> = ({
       case 'location':
         return (
           <div>
-            <h2 className="text-2xl font-bold text-gray-800 mb-4">Ubicación</h2>
+            <h2 className="font-display text-2xl font-bold text-aurora-navy mb-6">Ubicación</h2>
             <Feedback />
             <LocationSection
               country={user.country || 'Argentina'}
@@ -309,10 +337,10 @@ const EntrepreneurProfileContent: React.FC<EntrepreneurProfileContentProps> = ({
         return managedClub ? (
           <EntrepreneurSettingsSection clubId={String(managedClub.id)} />
         ) : (
-          <p className="text-gray-600">Necesitás tener un club asociado para acceder a la configuración.</p>
+          <p className="text-aurora-navy/60">Necesitás tener un club asociado para acceder a la configuración.</p>
         );
       default:
-        return <p className="text-gray-600">Seleccioná una sección del menú.</p>;
+        return <p className="text-aurora-navy/60">Seleccioná una sección del menú.</p>;
     }
   };
   return <div>{renderContent()}</div>;

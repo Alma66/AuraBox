@@ -9,6 +9,16 @@ interface SecuritySectionProps {
   registeredDate?: string;
 }
 
+const inputClass = "mt-1 block w-full rounded-lg border border-aurora-navy/15 bg-white px-3 py-2 text-sm text-aurora-navy focus:outline-none focus:ring-2 focus:ring-aurora-terracotta/50 focus:border-aurora-terracotta transition-all duration-200";
+const primaryBtnClass = "mt-2 bg-aurora-terracotta hover:bg-aurora-terracottaDark text-white px-5 py-2.5 rounded-lg font-semibold text-sm shadow-aurora-sm transition-all duration-200";
+
+const ToggleSwitch: React.FC<{ checked: boolean; onChange: (v: boolean) => void }> = ({ checked, onChange }) => (
+  <label className="relative inline-flex items-center cursor-pointer flex-shrink-0">
+    <input type="checkbox" checked={checked} onChange={(e) => onChange(e.target.checked)} className="sr-only peer" />
+    <div className="w-11 h-6 bg-aurora-navy/15 rounded-full peer peer-checked:bg-aurora-terracotta transition-colors duration-300 after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:shadow-sm after:transition-all after:duration-300 peer-checked:after:translate-x-5" />
+  </label>
+);
+
 const SecuritySection: React.FC<SecuritySectionProps> = ({ showGenderPublicly, onGenderVisibilityChange, registeredDate }) => {
   const { userRole } = useAuth();
 
@@ -99,83 +109,78 @@ const SecuritySection: React.FC<SecuritySectionProps> = ({ showGenderPublicly, o
 
   return (
     <div className="space-y-6">
+      <h2 className="font-display text-2xl font-bold text-aurora-navy mb-2">Seguridad y Privacidad</h2>
+
       {registeredDate && (
-        <div className="bg-gray-100 p-6 rounded-lg shadow-md">
-          <h3 className="text-xl font-bold text-gray-800 mb-2">Información de la Cuenta</h3>
-          <p className="text-gray-700 text-sm">
-            Cuenta creada el {new Date(registeredDate).toLocaleDateString('es-AR', { year: 'numeric', month: 'long', day: 'numeric' })}
+        <div className="bg-aurora-cream/60 p-5 rounded-2xl border border-aurora-navy/5">
+          <p className="text-aurora-navy/80 text-sm">
+            Cuenta creada el{' '}
+            <span className="font-semibold text-aurora-navy">
+              {new Date(registeredDate).toLocaleDateString('es-AR', { year: 'numeric', month: 'long', day: 'numeric' })}
+            </span>
           </p>
         </div>
       )}
 
-      <div className="relative bg-gray-100 p-6 rounded-lg shadow-md">
-        <h3 className="text-xl font-bold text-gray-800 mb-4">Seguridad y Privacidad</h3>
+      <div className="relative bg-aurora-cream/60 p-6 rounded-2xl border border-aurora-navy/5">
         {!showSensitiveInfo && (
-          <div className="absolute inset-0 bg-gray-200 bg-opacity-90 flex flex-col items-center justify-center rounded-lg z-10">
-            <p className="text-lg font-semibold text-gray-700 mb-4">Contenido sensible oculto</p>
-            <p className="text-gray-800 mb-2 text-center">Para ver o editar, ingresá tu contraseña:</p>
+          <div className="absolute inset-0 bg-aurora-cream/95 backdrop-blur-sm flex flex-col items-center justify-center rounded-2xl z-10 px-6">
+            <div className="w-12 h-12 rounded-full bg-aurora-navy/10 flex items-center justify-center mb-3">
+              <svg className="w-6 h-6 text-aurora-navy" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+              </svg>
+            </div>
+            <p className="font-display text-lg font-semibold text-aurora-navy mb-1">Zona protegida</p>
+            <p className="text-aurora-navy/70 mb-4 text-center text-sm">Ingresá tu contraseña para gestionar tu seguridad</p>
             <input type="password"
-              className="mt-1 block mx-auto w-full max-w-xs rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm text-center"
+              className={`${inputClass} max-w-xs text-center`}
               value={securityPassword} onChange={(e) => setSecurityPassword(e.target.value)}
               placeholder="Contraseña" onKeyDown={(e) => e.key === 'Enter' && handleSecurityCheck()} />
-            {authError && <p className="text-red-500 text-sm mt-2">{authError}</p>}
-            <button onClick={handleSecurityCheck}
-              className="mt-4 bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors duration-200">
-              Verificar
-            </button>
+            {authError && <p className="text-red-600 text-sm mt-2">{authError}</p>}
+            <button onClick={handleSecurityCheck} className={primaryBtnClass}>Verificar</button>
           </div>
         )}
 
         <div className={`space-y-6 ${!showSensitiveInfo ? 'blur-sm pointer-events-none' : ''}`}>
 
-          <EditProfileField label="Contraseña" value="********" isEditing={isEditingPassword}
+          <EditProfileField label="Contraseña" value="········" isEditing={isEditingPassword}
             onEdit={() => { setIsEditingPassword(true); setPasswordError(''); setPasswordSuccess(''); }}
             onCancel={() => { setIsEditingPassword(false); setOldPassword(''); setNewPassword(''); setConfirmNewPassword(''); setPasswordError(''); }}>
             <div className="space-y-3">
               <div>
-                <label className="block text-sm font-medium text-gray-700">Contraseña actual:</label>
-                <input type="password" value={oldPassword} onChange={(e) => setOldPassword(e.target.value)}
-                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm" />
+                <label className="block text-sm font-medium text-aurora-navy/80">Contraseña actual:</label>
+                <input type="password" value={oldPassword} onChange={(e) => setOldPassword(e.target.value)} className={inputClass} />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700">Nueva contraseña:</label>
-                <input type="password" value={newPassword} onChange={(e) => setNewPassword(e.target.value)}
-                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm" />
+                <label className="block text-sm font-medium text-aurora-navy/80">Nueva contraseña:</label>
+                <input type="password" value={newPassword} onChange={(e) => setNewPassword(e.target.value)} className={inputClass} />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700">Confirmar nueva contraseña:</label>
-                <input type="password" value={confirmNewPassword} onChange={(e) => setConfirmNewPassword(e.target.value)}
-                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm" />
+                <label className="block text-sm font-medium text-aurora-navy/80">Confirmar nueva contraseña:</label>
+                <input type="password" value={confirmNewPassword} onChange={(e) => setConfirmNewPassword(e.target.value)} className={inputClass} />
               </div>
-              {passwordError && <p className="text-red-500 text-sm">{passwordError}</p>}
-              {passwordSuccess && <p className="text-green-600 text-sm">{passwordSuccess}</p>}
-              <button onClick={handleSavePassword}
-                className="mt-2 bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors duration-200">
-                Guardar Contraseña
-              </button>
+              {passwordError && <p className="text-red-600 text-sm">{passwordError}</p>}
+              {passwordSuccess && <p className="text-green-700 text-sm">{passwordSuccess}</p>}
+              <button onClick={handleSavePassword} className={primaryBtnClass}>Guardar Contraseña</button>
             </div>
           </EditProfileField>
 
-          <div className="bg-gray-50 p-4 rounded-lg shadow-sm">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="font-medium text-gray-700">Mostrar mi género públicamente</p>
-                <p className="text-sm text-gray-500">Otros usuarios podrán ver tu género en tu perfil público.</p>
-              </div>
-              <input type="checkbox" checked={localShowGenderPublicly}
-                onChange={(e) => handleTogglePrivacy(e.target.checked)}
-                className="h-5 w-5 text-blue-600 rounded focus:ring-blue-500" />
+          <div className="bg-white p-5 rounded-xl border border-aurora-navy/10 flex items-center justify-between gap-4">
+            <div>
+              <p className="font-semibold text-aurora-navy text-sm">Mostrar mi género públicamente</p>
+              <p className="text-sm text-aurora-navy/60 mt-0.5">Otros usuarios podrán ver tu género en tu perfil público.</p>
+              {privacySuccess && <p className="text-green-700 text-xs mt-2">{privacySuccess}</p>}
             </div>
-            {privacySuccess && <p className="text-green-600 text-sm mt-2">{privacySuccess}</p>}
+            <ToggleSwitch checked={localShowGenderPublicly} onChange={handleTogglePrivacy} />
           </div>
 
-          <div className="bg-gray-50 p-4 rounded-lg shadow-sm text-center">
-            <h4 className="text-lg font-semibold text-gray-800 mb-3">Desactivar Cuenta</h4>
-            <p className="text-gray-600 mb-4">Vas a perder el acceso a tu cuenta hasta que te contactes con soporte para reactivarla.</p>
-            {deletionError && <p className="text-red-500 text-sm mb-2">{deletionError}</p>}
-            {deletionSuccess && <p className="text-green-600 text-sm mb-2">{deletionSuccess}</p>}
+          <div className="bg-white p-6 rounded-xl border border-red-200 text-center">
+            <h4 className="font-display text-lg font-semibold text-aurora-navy mb-2">Desactivar Cuenta</h4>
+            <p className="text-aurora-navy/60 text-sm mb-4">Vas a perder el acceso a tu cuenta hasta que te contactes con soporte para reactivarla.</p>
+            {deletionError && <p className="text-red-600 text-sm mb-2">{deletionError}</p>}
+            {deletionSuccess && <p className="text-green-700 text-sm mb-2">{deletionSuccess}</p>}
             <button onClick={handleRequestAccountDeletion}
-              className="bg-red-600 text-white px-6 py-3 rounded-md hover:bg-red-700 transition-colors duration-200 font-semibold">
+              className="bg-red-600 text-white px-6 py-2.5 rounded-lg hover:bg-red-700 transition-colors duration-200 font-semibold text-sm">
               Desactivar Cuenta
             </button>
           </div>

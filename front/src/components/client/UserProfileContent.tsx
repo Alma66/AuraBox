@@ -25,6 +25,9 @@ interface UserProfileContentProps {
   onUserUpdate: () => void;
 }
 
+const inputClass = "mt-1 block w-full rounded-lg border border-aurora-navy/15 bg-white px-3 py-2 text-sm text-aurora-navy focus:outline-none focus:ring-2 focus:ring-aurora-terracotta/50 focus:border-aurora-terracotta transition-all duration-200";
+const primaryBtnClass = "mt-4 bg-aurora-terracotta hover:bg-aurora-terracottaDark text-white px-5 py-2.5 rounded-lg font-semibold text-sm shadow-aurora-sm transition-all duration-200";
+
 const UserProfileContent: React.FC<UserProfileContentProps> = ({ activeSection, user, onUserUpdate }) => {
   const [isEditingName, setIsEditingName] = useState(false);
   const [editedFirstName, setEditedFirstName] = useState(user.firstName || '');
@@ -147,19 +150,23 @@ const UserProfileContent: React.FC<UserProfileContentProps> = ({ activeSection, 
 
   const Feedback = () => (
     <>
-      {saveSuccess && <p className="text-green-600 text-sm mb-4 bg-green-50 p-2 rounded">{saveSuccess}</p>}
-      {saveError && <p className="text-red-600 text-sm mb-4 bg-red-50 p-2 rounded">{saveError}</p>}
+      {saveSuccess && (
+        <p className="text-green-700 text-sm mb-4 bg-green-50 border border-green-200 px-4 py-2.5 rounded-lg">{saveSuccess}</p>
+      )}
+      {saveError && (
+        <p className="text-red-700 text-sm mb-4 bg-red-50 border border-red-200 px-4 py-2.5 rounded-lg">{saveError}</p>
+      )}
     </>
   );
 
   const renderContent = () => {
-    if (!user) return <p className="text-gray-600">Cargando información del perfil...</p>;
+    if (!user) return <p className="text-aurora-navy/60">Cargando información del perfil...</p>;
 
     switch (activeSection) {
       case 'profile':
         return (
           <div>
-            <h2 className="text-2xl font-bold text-gray-800 mb-4">Mi Perfil</h2>
+            <h2 className="font-display text-2xl font-bold text-aurora-navy mb-6">Mi Perfil</h2>
             <Feedback />
             <div className="space-y-4">
               <EditProfileField
@@ -169,17 +176,17 @@ const UserProfileContent: React.FC<UserProfileContentProps> = ({ activeSection, 
                 onEdit={() => setIsEditingName(true)}
                 onCancel={() => { setEditedFirstName(user.firstName || ''); setEditedLastName(user.lastName || ''); setIsEditingName(false); }}
               >
-                <div className="flex space-x-4">
+                <div className="flex flex-col sm:flex-row gap-4">
                   <div className="flex-1">
-                    <label className="block text-sm font-medium text-gray-700">Nombre:</label>
-                    <input type="text" value={editedFirstName} onChange={(e) => setEditedFirstName(e.target.value)} className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm" />
+                    <label className="block text-sm font-medium text-aurora-navy/80">Nombre:</label>
+                    <input type="text" value={editedFirstName} onChange={(e) => setEditedFirstName(e.target.value)} className={inputClass} />
                   </div>
                   <div className="flex-1">
-                    <label className="block text-sm font-medium text-gray-700">Apellido:</label>
-                    <input type="text" value={editedLastName} onChange={(e) => setEditedLastName(e.target.value)} className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm" />
+                    <label className="block text-sm font-medium text-aurora-navy/80">Apellido:</label>
+                    <input type="text" value={editedLastName} onChange={(e) => setEditedLastName(e.target.value)} className={inputClass} />
                   </div>
                 </div>
-                <button onClick={handleSaveName} className="mt-4 bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors duration-200">Guardar Nombre</button>
+                <button onClick={handleSaveName} className={primaryBtnClass}>Guardar Nombre</button>
               </EditProfileField>
 
               <EditGenderField label="Género" value={editedGender} isEditing={isEditingGender} onEdit={() => setIsEditingGender(true)} onCancel={() => { setEditedGender(user.gender || ''); setIsEditingGender(false); }} onSave={handleSaveGender} />
@@ -191,19 +198,24 @@ const UserProfileContent: React.FC<UserProfileContentProps> = ({ activeSection, 
                 onEdit={() => setIsEditingBirthDate(true)}
                 onCancel={() => { setEditedBirthDate(user.birthDate || ''); setIsEditingBirthDate(false); }}
               >
-                <input type="date" value={editedBirthDate} onChange={(e) => setEditedBirthDate(e.target.value)} className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm" max={new Date(new Date().setFullYear(new Date().getFullYear() - 18)).toISOString().split('T')[0]} />
-                <button onClick={handleSaveBirthDate} className="mt-4 bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors duration-200">Guardar Fecha de Nacimiento</button>
+                <input type="date" value={editedBirthDate} onChange={(e) => setEditedBirthDate(e.target.value)} className={inputClass} max={new Date(new Date().setFullYear(new Date().getFullYear() - 18)).toISOString().split('T')[0]} />
+                <button onClick={handleSaveBirthDate} className={primaryBtnClass}>Guardar Fecha de Nacimiento</button>
               </EditProfileField>
 
-              <div className="relative bg-gray-100 p-6 rounded-lg shadow-md mt-8">
-                <h3 className="text-xl font-bold text-gray-800 mb-4">Información de Contacto y Documento</h3>
+              <div className="relative bg-aurora-cream/60 p-6 rounded-2xl border border-aurora-navy/5 mt-8">
+                <h3 className="font-display text-lg font-bold text-aurora-navy mb-4">Información de Contacto y Documento</h3>
                 {!showSensitiveProfileInfo && (
-                  <div className="absolute inset-0 bg-gray-200 bg-opacity-90 flex flex-col items-center justify-center rounded-lg z-10">
-                    <p className="text-lg font-semibold text-gray-700 mb-4">Contenido sensible oculto</p>
-                    <p className="text-gray-800 mb-2 text-center">Para ver o editar esta información, ingresá tu contraseña:</p>
-                    <input type="password" className="mt-1 block mx-auto w-full max-w-xs rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm text-center" value={profilePassword} onChange={(e) => setProfilePassword(e.target.value)} placeholder="Contraseña" onKeyDown={(e) => e.key === 'Enter' && handleProfilePasswordCheck()} />
-                    {profilePasswordError && <p className="text-red-500 text-sm mt-2">{profilePasswordError}</p>}
-                    <button onClick={handleProfilePasswordCheck} className="mt-4 bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors duration-200">Verificar</button>
+                  <div className="absolute inset-0 bg-aurora-cream/95 backdrop-blur-sm flex flex-col items-center justify-center rounded-2xl z-10 px-6">
+                    <div className="w-12 h-12 rounded-full bg-aurora-navy/10 flex items-center justify-center mb-3">
+                      <svg className="w-6 h-6 text-aurora-navy" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                      </svg>
+                    </div>
+                    <p className="font-display text-lg font-semibold text-aurora-navy mb-1">Contenido sensible protegido</p>
+                    <p className="text-aurora-navy/70 mb-4 text-center text-sm">Ingresá tu contraseña para ver o editar esta información</p>
+                    <input type="password" className={`${inputClass} max-w-xs text-center`} value={profilePassword} onChange={(e) => setProfilePassword(e.target.value)} placeholder="Contraseña" onKeyDown={(e) => e.key === 'Enter' && handleProfilePasswordCheck()} />
+                    {profilePasswordError && <p className="text-red-600 text-sm mt-2">{profilePasswordError}</p>}
+                    <button onClick={handleProfilePasswordCheck} className={primaryBtnClass}>Verificar</button>
                   </div>
                 )}
                 <div className={`space-y-6 ${!showSensitiveProfileInfo ? 'blur-sm pointer-events-none' : ''}`}>
@@ -219,7 +231,7 @@ const UserProfileContent: React.FC<UserProfileContentProps> = ({ activeSection, 
       case 'location':
         return (
           <div>
-            <h2 className="text-2xl font-bold text-gray-800 mb-4">Ubicación</h2>
+            <h2 className="font-display text-2xl font-bold text-aurora-navy mb-6">Ubicación</h2>
             <Feedback />
             <LocationSection
               country={user.country || ''}
@@ -257,7 +269,7 @@ const UserProfileContent: React.FC<UserProfileContentProps> = ({ activeSection, 
         );
 
       default:
-        return <p className="text-gray-600">Seleccioná una sección del menú.</p>;
+        return <p className="text-aurora-navy/60">Seleccioná una sección del menú.</p>;
     }
   };
 
