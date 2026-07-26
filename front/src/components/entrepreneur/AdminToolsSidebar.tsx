@@ -32,16 +32,16 @@ const AdminToolsSidebar: React.FC<AdminToolsSidebarProps> = ({ activeSection, se
   ];
 
   return (
-    <nav className="bg-white rounded-xl shadow-lg p-6 sticky top-8">
-      <h3 className="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-4">Análisis y Reportes</h3>
+    <nav className="bg-white rounded-xl shadow-aurora-sm border border-aurora-navy/10 p-6 sticky top-8">
+      <h3 className="text-sm font-semibold text-aurora-navy/50 uppercase tracking-wide mb-4">Análisis y Reportes</h3>
       <ul className="space-y-2">
         {menuItems.map((item) => (
           <li key={item.id}>
             <Link
               to={item.path}
               onClick={() => setActiveSection(item.id)}
-              className={`w-full flex items-center p-3 rounded-lg text-left font-medium transition-colors duration-200 
-                ${activeSection === item.id ? 'bg-blue-600 text-white shadow-md' : 'text-gray-700 hover:bg-gray-100 hover:text-blue-600'}`}
+              className={`w-full flex items-center p-3 rounded-lg text-left font-medium transition-colors duration-200
+                ${activeSection === item.id ? 'bg-aurora-navy text-white shadow-sm' : 'text-aurora-navy/80 hover:bg-aurora-cream hover:text-aurora-navy'}`}
             >
               <svg className="w-6 h-6 mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d={item.icon}></path>
