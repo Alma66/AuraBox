@@ -5,6 +5,29 @@ module.exports = {
   ],
   theme: {
     extend: {
+      colors: {
+        aurora: {
+          navy: '#1F3350',
+          navyDark: '#152438',
+          navyLight: '#2D4A73',
+          terracotta: '#C1622B',
+          terracottaLight: '#D97D45',
+          terracottaDark: '#9E4D20',
+          gold: '#E3A73C',
+          goldLight: '#F0C878',
+          cream: '#FBF4E9',
+          creamDark: '#F3E7D5',
+          ink: '#221D17',
+        },
+      },
+      fontFamily: {
+        display: ['"Fraunces"', 'serif'],
+        sans: ['"Plus Jakarta Sans"', 'system-ui', 'sans-serif'],
+      },
+      boxShadow: {
+        aurora: '0 20px 40px -12px rgba(31, 51, 80, 0.25)',
+        'aurora-sm': '0 8px 20px -6px rgba(31, 51, 80, 0.15)',
+      },
       keyframes: {
         fadeInUp: {
           '0%': {
@@ -55,6 +78,18 @@ module.exports = {
             animationTimingFunction: 'cubic-bezier(0, 0, 0.2, 1)',
           },
         },
+        float: {
+          '0%, 100%': { transform: 'translateY(0)' },
+          '50%': { transform: 'translateY(-8px)' },
+        },
+        shimmer: {
+          '0%': { backgroundPosition: '-200% 0' },
+          '100%': { backgroundPosition: '200% 0' },
+        },
+        glowPulse: {
+          '0%, 100%': { opacity: '0.5', transform: 'scale(1)' },
+          '50%': { opacity: '0.8', transform: 'scale(1.05)' },
+        },
       },
       animation: {
         fadeInUp: 'fadeInUp 0.6s ease-out forwards',
@@ -62,11 +97,13 @@ module.exports = {
         gradientShift: 'gradientShift 10s ease infinite',
         pulseSubtle: 'pulseSubtle 2s infinite ease-in-out',
         bounceOnce: 'bounceOnce 1s ease-in-out',
+        float: 'float 4s ease-in-out infinite',
+        shimmer: 'shimmer 2.5s linear infinite',
+        glowPulse: 'glowPulse 4s ease-in-out infinite',
       },
-        
     },
   },
   plugins: [
-     require('@tailwindcss/typography'),
+    require('@tailwindcss/typography'),
   ],
 };

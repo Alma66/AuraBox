@@ -3,41 +3,45 @@ import React from 'react';
 const HowItWorks: React.FC = () => {
   const steps = [
     {
-      icon: '🔍', 
-      title: 'Explora y Descubre',
-      description: 'Navega por nuestro catálogo de clubes, filtrando por categoría, precio o intereses. Encuentra la experiencia perfecta para ti.'
+      icon: '🔍',
+      title: 'Explorá y Descubrí',
+      description: 'Navegá por nuestro catálogo de clubes, filtrando por categoría, precio o intereses. Encontrá la experiencia perfecta para vos.'
     },
     {
       icon: '📦',
-      title: 'Suscríbete Fácilmente',
-      description: 'Elige tu club favorito y suscríbete en pocos pasos. Pagos seguros y gestión transparente desde tu panel de usuario.'
+      title: 'Suscribite Fácilmente',
+      description: 'Elegí tu club favorito y suscribite en pocos pasos. Pagos seguros y gestión transparente desde tu panel de usuario.'
     },
     {
       icon: '🎁',
-      title: 'Recibe tu Sorpresa',
-      description: 'Espera tu caja en la puerta de tu casa. Cada mes, una nueva experiencia curada con amor y dedicación.'
+      title: 'Recibí tu Sorpresa',
+      description: 'Esperá tu caja en la puerta de tu casa. Cada mes, una nueva experiencia curada con amor y dedicación.'
     },
     {
       icon: '💬',
-      title: 'Comparte y Conecta',
-      description: 'Deja reseñas, interactúa con otros suscriptores y forma parte de una comunidad apasionada por las experiencias únicas.'
+      title: 'Compartí y Conectá',
+      description: 'Dejá reseñas, interactuá con otros suscriptores y formá parte de una comunidad apasionada por las experiencias únicas.'
     }
   ];
 
   return (
-    <div className="py-16 bg-gray-50 rounded-xl shadow-inner">
-      <h2 className="text-4xl font-bold text-gray-800 mb-12 text-center animate-fadeInUp">¿Cómo funciona AuraBox?</h2>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 px-8">
+    <div className="py-16 bg-white rounded-2xl shadow-aurora-sm border border-aurora-navy/5">
+      <span className="section-eyebrow block text-center">El camino</span>
+      <h2 className="font-display text-4xl font-bold text-aurora-navy mb-12 text-center animate-fadeInUp">¿Cómo funciona AuraBox?</h2>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 px-8">
         {steps.map((step, index) => (
-          <div 
-            key={index} 
-            className="bg-white rounded-lg shadow-md p-6 text-center flex flex-col items-center 
-                       transform transition-all duration-300 hover:scale-[1.03] hover:shadow-xl animate-slideInUp"
-            style={{ animationDelay: `${index * 100}ms` }} 
+          <div
+            key={index}
+            className="relative bg-aurora-cream rounded-xl p-6 text-center flex flex-col items-center
+                       transform transition-all duration-300 hover:scale-[1.03] hover:shadow-aurora-sm animate-slideInUp"
+            style={{ animationDelay: `${index * 100}ms` }}
           >
-            <div className="text-5xl mb-4 p-4 bg-blue-100 rounded-full inline-block shadow-inner">{step.icon}</div>
-            <h3 className="text-xl font-semibold text-gray-800 mb-3">{step.title}</h3>
-            <p className="text-gray-600 text-base">{step.description}</p>
+            <span className="absolute top-3 right-4 font-display text-3xl font-bold text-aurora-navy/10">
+              {String(index + 1).padStart(2, '0')}
+            </span>
+            <div className="text-5xl mb-4 p-4 bg-aurora-gold/15 rounded-full inline-block">{step.icon}</div>
+            <h3 className="font-display text-xl font-semibold text-aurora-navy mb-3">{step.title}</h3>
+            <p className="text-aurora-navy/65 text-base">{step.description}</p>
           </div>
         ))}
       </div>

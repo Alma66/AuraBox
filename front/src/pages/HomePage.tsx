@@ -57,12 +57,12 @@ const FeaturedClubCard: React.FC<FeaturedClubCardProps> = ({ id, name, slogan, l
   return (
     <Link
       to={`/club/${id}`}
-      className="group block bg-white rounded-2xl shadow-md hover:shadow-2xl border border-gray-100
+      className="group block bg-white rounded-2xl shadow-aurora-sm hover:shadow-aurora border border-aurora-navy/5
                  transition-all duration-300 hover:-translate-y-2 p-6 text-center h-full"
     >
       <div className="flex justify-center mb-4">
-        <div className="w-24 h-24 rounded-full overflow-hidden border-4 border-purple-100
-                        group-hover:border-purple-300 transition-colors duration-300 shadow-sm">
+        <div className="w-24 h-24 rounded-full overflow-hidden border-4 border-aurora-gold/30
+                        group-hover:border-aurora-gold transition-colors duration-300 shadow-sm">
           <img
             src={logoUrl || '/assets/default-club.jpg'}
             alt={name}
@@ -71,14 +71,13 @@ const FeaturedClubCard: React.FC<FeaturedClubCardProps> = ({ id, name, slogan, l
         </div>
       </div>
 
-      <h3 className="text-xl font-bold text-gray-900 mb-1 truncate">{name}</h3>
+      <h3 className="font-display text-xl font-bold text-aurora-navy mb-1 truncate">{name}</h3>
 
-      <p className="text-gray-500 text-sm mb-4 italic min-h-[2.5rem] line-clamp-2">
+      <p className="text-aurora-navy/50 text-sm mb-4 italic min-h-[2.5rem] line-clamp-2">
         {slogan ? `"${slogan}"` : ''}
       </p>
 
-      <div className="inline-flex items-center gap-1 bg-yellow-50 text-yellow-600 font-semibold
-                      px-3 py-1 rounded-full text-sm">
+      <div className="badge-gold">
         <span>⭐</span>
         <span>{rating}</span>
       </div>
@@ -93,9 +92,17 @@ const HomePage: React.FC = () => {
   const [loadingRecommended, setLoadingRecommended] = useState(false);
   const [showWelcome, setShowWelcome] = useState(false);
   const [welcomeName, setWelcomeName] = useState<string | undefined>(undefined);
+  const [quizAnswer, setQuizAnswer] = useState<string | null>(null);
   const location = useLocation();
   const navigate = useNavigate();
   const isLoggedIn = !!localStorage.getItem('access_token');
+
+  const quizOptions = [
+    { key: 'gourmet', label: '🍫 Gourmet & Bebidas', category: 'gourmet' },
+    { key: 'lectura', label: '📚 Lectura & Cultura', category: 'lectura' },
+    { key: 'belleza', label: '💅 Belleza & Cuidado', category: 'belleza' },
+    { key: 'hogar', label: '🌿 Hogar & Plantas', category: 'hogar' },
+  ];
 
   useEffect(() => {
     const fetchFeatured = async () => {
@@ -138,6 +145,11 @@ const HomePage: React.FC = () => {
     }
   }, [location, navigate]);
 
+  const handleQuizSelect = (key: string, category: string) => {
+    setQuizAnswer(key);
+    navigate(`/explore?category=${category}`);
+  };
+
   const testimonialCarouselSettings = {
     dots: true,
     infinite: true,
@@ -154,28 +166,53 @@ const HomePage: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="min-h-screen flex flex-col bg-aurora-cream">
       {showWelcome && (
         <WelcomeModal name={welcomeName} onClose={() => setShowWelcome(false)} />
       )}
       <HeroBanner
-        title="Descubre la Magia de los Clubes de Suscripción en Argentina"
+        title="Descubrí la Magia de los Clubes de Suscripción en Argentina"
         subtitle="Experiencias únicas, curadas con pasión, entregadas en tu puerta."
         ctaText="Explorar Clubes Ahora"
         ctaLink="/explore"
         backgroundImage="/assets/hero-background.jpg"
       />
-      <div className="container mx-auto px-4 py-8 flex-grow">
+
+      <section className="bg-white border-b border-aurora-navy/5">
+        <div className="container mx-auto px-4 py-10">
+          <div className="text-center mb-6">
+            <span className="section-eyebrow">Empezá por acá</span>
+            <h2 className="font-display text-2xl md:text-3xl font-bold text-aurora-navy">¿Qué tipo de sorpresa te tienta hoy?</h2>
+          </div>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-3xl mx-auto">
+            {quizOptions.map((opt) => (
+              <button
+                key={opt.key}
+                onClick={() => handleQuizSelect(opt.key, opt.category)}
+                className={`p-5 rounded-2xl border-2 text-center font-semibold transition-all duration-200 hover:-translate-y-1 hover:shadow-aurora-sm ${
+                  quizAnswer === opt.key ? 'border-aurora-terracotta bg-aurora-terracotta/5' : 'border-aurora-navy/10 bg-aurora-cream'
+                }`}
+              >
+                <span className="block text-2xl mb-2">{opt.label.split(' ')[0]}</span>
+                <span className="text-sm text-aurora-navy">{opt.label.substring(opt.label.indexOf(' ') + 1)}</span>
+              </button>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <div className="container mx-auto px-4 py-14 flex-grow">
         {isLoggedIn && (recommendedClubs.length > 0 || loadingRecommended) && (
-          <section className="mb-16">
-            <h2 className="text-4xl font-bold text-gray-800 mb-2 text-center animate-fadeInUp">
+          <section className="mb-20">
+            <span className="section-eyebrow block text-center">Para vos</span>
+            <h2 className="font-display text-4xl font-bold text-aurora-navy mb-2 text-center animate-fadeInUp">
               Recomendado para vos
             </h2>
-            <p className="text-center text-gray-500 mb-10">
+            <p className="text-center text-aurora-navy/50 mb-10">
               Según tus suscripciones y tus preferencias de contenido
             </p>
             {loadingRecommended ? (
-              <div className="text-center py-8">Buscando recomendaciones...</div>
+              <div className="text-center py-8 text-aurora-navy/50">Buscando recomendaciones...</div>
             ) : (
               <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-6">
                 {recommendedClubs.map((club) => (
@@ -193,18 +230,23 @@ const HomePage: React.FC = () => {
           </section>
         )}
 
-        <section className="mb-16">
-          <h2 className="text-4xl font-bold text-gray-800 mb-2 text-center animate-fadeInUp">
+        <section className="mb-20">
+          <span className="section-eyebrow block text-center">La comunidad elige</span>
+          <h2 className="font-display text-4xl font-bold text-aurora-navy mb-2 text-center animate-fadeInUp">
             Clubes Destacados
           </h2>
-          <p className="text-center text-gray-500 mb-10">
+          <p className="text-center text-aurora-navy/50 mb-10">
             Los clubes mejor calificados por nuestra comunidad
           </p>
 
           {loading ? (
-            <div className="text-center py-8">Cargando clubes...</div>
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-6">
+              {Array.from({ length: 5 }).map((_, i) => (
+                <div key={i} className="h-56 bg-white rounded-2xl shadow-aurora-sm animate-pulse" />
+              ))}
+            </div>
           ) : featuredClubs.length === 0 ? (
-            <div className="text-center py-8 text-gray-500">
+            <div className="text-center py-8 text-aurora-navy/50">
               No hay clubes destacados disponibles aún.
             </div>
           ) : (
@@ -223,29 +265,30 @@ const HomePage: React.FC = () => {
           )}
         </section>
 
-        <section className="mb-16">
+        <section className="mb-20">
           <AlternatingContent
             title="Experiencias Curadas, Directo a Tu Puerta"
-            description="Olvídate de la búsqueda. Nuestros clubes seleccionan lo mejor para ti, desde libros fascinantes hasta delicias gourmet, entregados con la comodidad que mereces. Cada caja es una sorpresa cuidadosamente preparada para deleitar tus sentidos."
+            description="Olvidate de la búsqueda. Nuestros clubes seleccionan lo mejor para vos, desde libros fascinantes hasta delicias gourmet, entregados con la comodidad que merecés. Cada caja es una sorpresa cuidadosamente preparada para deleitar tus sentidos."
             imageUrl="/assets/content-image-1.jpg"
             imageAlt="Caja sorpresa de AuraBox"
             reverse={false}
           />
           <AlternatingContent
-            title="Apoya Emprendedores Locales con Pasión"
-            description="Cada suscripción en AuraBox impulsa a pequeños y medianos emprendedores argentinos, quienes ponen su corazón en cada caja. Descubre sus historias, sus valores y sé parte de su crecimiento, fomentando la economía local."
+            title="Apoyá Emprendedores Locales con Pasión"
+            description="Cada suscripción en AuraBox impulsa a pequeños y medianos emprendedores argentinos, quienes ponen su corazón en cada caja. Descubrí sus historias, sus valores y sé parte de su crecimiento, fomentando la economía local."
             imageUrl="/assets/content-image-2.jpg"
             imageAlt="Emprendedora preparando cajas"
             reverse={true}
           />
         </section>
 
-        <section className="mb-16">
+        <section className="mb-20">
           <HowItWorks />
         </section>
 
-        <section className="mb-16 bg-gradient-to-r from-blue-50 to-purple-50 py-16 rounded-xl shadow-inner">
-          <h2 className="text-4xl font-bold text-gray-800 mb-12 text-center animate-fadeInUp">Lo que dicen nuestros usuarios</h2>
+        <section className="mb-20 bg-white py-16 rounded-2xl shadow-aurora-sm border border-aurora-navy/5">
+          <span className="section-eyebrow block text-center">Voces reales</span>
+          <h2 className="font-display text-4xl font-bold text-aurora-navy mb-12 text-center animate-fadeInUp">Lo que dicen nuestros usuarios</h2>
           <Slider {...testimonialCarouselSettings}>
             {testimonialsData.map((testimonial) => (
               <div key={testimonial.id} className="px-4">
@@ -260,19 +303,15 @@ const HomePage: React.FC = () => {
           </Slider>
         </section>
 
-        <section className="text-center py-16 bg-blue-600 text-white rounded-lg shadow-xl transform transition-all duration-500 hover:scale-[1.01] hover:shadow-2xl">
-          <h2 className="text-4xl font-bold mb-4 animate-pulse-subtle">¿Eres un emprendedor?</h2>
-          <p className="text-xl mb-8 max-w-3xl mx-auto opacity-0 animate-fadeInUp delay-200">
-            Profesionaliza tu club de suscripción con AuraBox. Centraliza tu gestión, amplía tu visibilidad y conecta con una comunidad apasionada.
+        <section className="text-center py-16 px-6 bg-gradient-to-br from-aurora-navy to-aurora-navyDark text-white rounded-2xl shadow-aurora transform transition-all duration-500 hover:scale-[1.005] relative overflow-hidden">
+          <div className="absolute -top-10 -right-10 w-64 h-64 bg-aurora-gold/10 rounded-full blur-3xl animate-glowPulse" />
+          <h2 className="font-display text-3xl md:text-4xl font-bold mb-4">¿Sos un emprendedor?</h2>
+          <p className="text-lg mb-8 max-w-2xl mx-auto text-white/75">
+            Profesionalizá tu club de suscripción con AuraBox. Centralizá tu gestión, ampliá tu visibilidad y conectá con una comunidad apasionada.
             Te brindamos las herramientas para escalar tu negocio sin complicaciones.
           </p>
-          <Link
-            to="/register"
-            className="inline-block bg-white text-blue-600 px-10 py-4 rounded-full font-bold text-xl
-                       hover:bg-blue-100 hover:scale-105 transition-all duration-300 shadow-lg
-                       focus:outline-none focus:ring-4 focus:ring-white focus:ring-opacity-70 animate-bounce-once"
-          >
-            Registra tu Club Ahora
+          <Link to="/register" className="btn-primary !px-10 !py-4 !text-xl">
+            Registrá tu Club Ahora
           </Link>
         </section>
       </div>

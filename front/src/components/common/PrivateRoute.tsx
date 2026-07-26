@@ -15,8 +15,8 @@ const PrivateRoute: React.FC<PrivateRouteProps> = ({ isAuthenticated, allowedRol
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-indigo-600" />
+      <div className="min-h-screen flex items-center justify-center bg-aurora-cream">
+        <div className="animate-spin rounded-full h-10 w-10 border-4 border-aurora-navy/15 border-t-aurora-terracotta" />
       </div>
     );
   }

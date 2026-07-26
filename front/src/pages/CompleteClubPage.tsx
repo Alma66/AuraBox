@@ -69,65 +69,68 @@ const CompleteClubPage: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100 py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-md w-full space-y-6 p-10 bg-white rounded-xl shadow-lg">
+    <div className="min-h-[calc(100vh-64px)] flex items-center justify-center bg-aurora-cream py-12 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
+      <div className="absolute -top-32 -left-20 w-96 h-96 bg-aurora-gold/10 rounded-full blur-3xl pointer-events-none" />
+
+      <div className="max-w-md w-full space-y-6 p-10 card-surface shadow-aurora relative animate-fadeInUp">
         <div>
-          <h2 className="text-center text-3xl font-extrabold text-gray-900">Registrá tu club</h2>
-          <p className="mt-2 text-center text-sm text-gray-600">
+          <span className="section-eyebrow block text-center">Último paso</span>
+          <h2 className="text-center font-display text-3xl font-bold text-aurora-navy">Registrá tu club</h2>
+          <p className="mt-2 text-center text-sm text-aurora-navy/60">
             Contanos sobre tu emprendimiento. Podés completar los detalles ahora o terminar de configurarlo desde tu perfil.
           </p>
         </div>
 
         <form className="space-y-4" onSubmit={handleSubmit}>
           <div>
-            <label htmlFor="club-name" className="block text-sm font-medium text-gray-700 mb-1">Nombre del club <span className="text-red-500">*</span></label>
-            <input id="club-name" type="text" required className="w-full px-3 py-2 border border-gray-300 rounded-md text-gray-900 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm" placeholder="Ej: Manjar Literario" value={clubName} onChange={(e) => setClubName(e.target.value)} />
+            <label htmlFor="club-name" className="block text-sm font-medium text-aurora-navy/70 mb-1">Nombre del club <span className="text-aurora-terracotta">*</span></label>
+            <input id="club-name" type="text" required className="input-aurora" placeholder="Ej: Manjar Literario" value={clubName} onChange={(e) => setClubName(e.target.value)} />
           </div>
 
           <div>
-            <label htmlFor="short-description" className="block text-sm font-medium text-gray-700 mb-1">Descripción corta <span className="text-red-500">*</span></label>
-            <textarea id="short-description" required rows={3} className="w-full px-3 py-2 border border-gray-300 rounded-md text-gray-900 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm" placeholder="Describí tu club en pocas palabras" value={shortDescription} onChange={(e) => setShortDescription(e.target.value)} />
+            <label htmlFor="short-description" className="block text-sm font-medium text-aurora-navy/70 mb-1">Descripción corta <span className="text-aurora-terracotta">*</span></label>
+            <textarea id="short-description" required rows={3} className="input-aurora resize-none" placeholder="Describí tu club en pocas palabras" value={shortDescription} onChange={(e) => setShortDescription(e.target.value)} />
           </div>
 
           <div>
-            <label htmlFor="contact-email" className="block text-sm font-medium text-gray-700 mb-1">Email de contacto del club <span className="text-red-500">*</span></label>
-            <input id="contact-email" type="email" required className="w-full px-3 py-2 border border-gray-300 rounded-md text-gray-900 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm" placeholder="contacto@tuclub.com" value={contactEmail} onChange={(e) => setContactEmail(e.target.value)} />
+            <label htmlFor="contact-email" className="block text-sm font-medium text-aurora-navy/70 mb-1">Email de contacto del club <span className="text-aurora-terracotta">*</span></label>
+            <input id="contact-email" type="email" required className="input-aurora" placeholder="contacto@tuclub.com" value={contactEmail} onChange={(e) => setContactEmail(e.target.value)} />
           </div>
 
           <div>
-            <label htmlFor="slogan" className="block text-sm font-medium text-gray-700 mb-1">Slogan (opcional)</label>
-            <input id="slogan" type="text" className="w-full px-3 py-2 border border-gray-300 rounded-md text-gray-900 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm" placeholder="Ej: Cada mes, una nueva aventura" value={slogan} onChange={(e) => setSlogan(e.target.value)} />
+            <label htmlFor="slogan" className="block text-sm font-medium text-aurora-navy/70 mb-1">Slogan (opcional)</label>
+            <input id="slogan" type="text" className="input-aurora" placeholder="Ej: Cada mes, una nueva aventura" value={slogan} onChange={(e) => setSlogan(e.target.value)} />
           </div>
 
           <div>
-            <label htmlFor="whatsapp" className="block text-sm font-medium text-gray-700 mb-1">WhatsApp de contacto (opcional)</label>
-            <input id="whatsapp" type="text" className="w-full px-3 py-2 border border-gray-300 rounded-md text-gray-900 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm" placeholder="+54 11 1234-5678" value={whatsappContact} onChange={(e) => setWhatsappContact(e.target.value)} />
+            <label htmlFor="whatsapp" className="block text-sm font-medium text-aurora-navy/70 mb-1">WhatsApp de contacto (opcional)</label>
+            <input id="whatsapp" type="text" className="input-aurora" placeholder="+54 11 1234-5678" value={whatsappContact} onChange={(e) => setWhatsappContact(e.target.value)} />
           </div>
 
-          <hr className="border-gray-200" />
+          <hr className="border-aurora-navy/10" />
 
-          <p className="text-sm font-medium text-gray-700">Tu ubicación (opcional)</p>
+          <p className="text-sm font-medium text-aurora-navy/70">Tu ubicación (opcional)</p>
 
           <div>
-            <label htmlFor="city" className="block text-sm font-medium text-gray-700 mb-1">Ciudad</label>
-            <input id="city" type="text" className="w-full px-3 py-2 border border-gray-300 rounded-md text-gray-900 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm" placeholder="Ej: Buenos Aires" value={city} onChange={(e) => setCity(e.target.value)} />
+            <label htmlFor="city" className="block text-sm font-medium text-aurora-navy/70 mb-1">Ciudad</label>
+            <input id="city" type="text" className="input-aurora" placeholder="Ej: Buenos Aires" value={city} onChange={(e) => setCity(e.target.value)} />
           </div>
 
           <div>
-            <label htmlFor="province" className="block text-sm font-medium text-gray-700 mb-1">Provincia</label>
-            <select id="province" className="w-full px-3 py-2 border border-gray-300 rounded-md text-gray-900 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm" value={province} onChange={(e) => setProvince(e.target.value)}>
+            <label htmlFor="province" className="block text-sm font-medium text-aurora-navy/70 mb-1">Provincia</label>
+            <select id="province" className="input-aurora" value={province} onChange={(e) => setProvince(e.target.value)}>
               <option value="">Seleccioná una provincia</option>
               {PROVINCES.map((p) => (<option key={p} value={p}>{p}</option>))}
             </select>
           </div>
 
-          {error && <p className="text-red-500 text-sm text-center">{error}</p>}
+          {error && <p className="text-red-600 text-sm text-center bg-red-50 border border-red-100 rounded-lg py-2 px-3">{error}</p>}
 
           <div className="flex flex-col space-y-3 pt-2">
-            <button type="submit" disabled={loading} className="w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50">
+            <button type="submit" disabled={loading} className="btn-primary w-full">
               {loading ? 'Creando club...' : 'Crear mi club'}
             </button>
-            <button type="button" onClick={handleSkip} className="w-full flex justify-center py-2 px-4 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none">
+            <button type="button" onClick={handleSkip} className="btn-outline w-full">
               Completar más tarde
             </button>
           </div>

@@ -47,6 +47,7 @@ const ExploreClubsPage: React.FC = () => {
   const [minRating, setMinRating] = useState(0);
   const [minReviews, setMinReviews] = useState(0);
   const [sortBy, setSortBy] = useState<SortOption>('newest');
+  const [showFilters, setShowFilters] = useState(false);
 
   useEffect(() => {
     const timeout = setTimeout(() => setDebouncedSearch(searchInput.trim()), 400);
@@ -85,7 +86,7 @@ const ExploreClubsPage: React.FC = () => {
         const clubsData = getResponseData(response);
         setClubs(Array.isArray(clubsData) ? clubsData : []);
       } catch {
-        setError('Error al cargar los clubes. Intenta más tarde.');
+        setError('Error al cargar los clubes. Intentá más tarde.');
       } finally {
         setLoading(false);
       }
@@ -123,137 +124,149 @@ const ExploreClubsPage: React.FC = () => {
     setSortBy('newest');
   };
 
-  const hasActiveFilters = searchInput || selectedCategoryIds.length > 0 || minRating > 0 || minReviews > 0;
+  const activeFilterCount = [
+    searchInput.length > 0,
+    selectedCategoryIds.length > 0,
+    minRating > 0,
+    minReviews > 0,
+  ].filter(Boolean).length;
 
   if (loading && clubs.length === 0) {
     return (
-      <div className="container mx-auto px-4 py-8 text-center">
-        <div className="animate-pulse">
-          <div className="h-8 bg-gray-200 rounded w-1/3 mx-auto mb-4"></div>
-          <div className="h-4 bg-gray-200 rounded w-1/2 mx-auto"></div>
+      <div className="container mx-auto px-4 py-8">
+        <div className="animate-pulse space-y-6">
+          <div className="h-10 bg-aurora-navy/10 rounded-lg w-1/3 mx-auto"></div>
+          <div className="h-24 bg-aurora-navy/5 rounded-2xl"></div>
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4">
+            {Array.from({ length: 10 }).map((_, i) => (
+              <div key={i} className="aspect-square bg-aurora-navy/10 rounded-2xl"></div>
+            ))}
+          </div>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <h1 className="text-5xl font-extrabold text-center text-gray-900 mb-12 animate-fadeInDown">
-        Explora Todos los Clubes
-      </h1>
-      <section className="mb-10 p-6 bg-white rounded-xl shadow-lg animate-fadeInUp">
-        <div className="flex flex-col md:flex-row items-stretch md:items-center gap-4 mb-5">
-          <input
-            type="text"
-            placeholder="Buscar clubes por nombre, slogan o descripción..."
-            className="flex-grow p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-200 text-lg"
-            value={searchInput}
-            onChange={(e) => setSearchInput(e.target.value)}
-          />
-          <select
-            className="p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-200 text-lg"
-            value={minRating}
-            onChange={(e) => setMinRating(Number(e.target.value))}
-          >
-            {RATING_OPTIONS.map((opt) => (
-              <option key={opt.value} value={opt.value}>{opt.label}</option>
-            ))}
-          </select>
-          <select
-            className="p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-200 text-lg"
-            value={minReviews}
-            onChange={(e) => setMinReviews(Number(e.target.value))}
-          >
-            {REVIEW_OPTIONS.map((opt) => (
-              <option key={opt.value} value={opt.value}>{opt.label}</option>
-            ))}
-          </select>
-          <select
-            className="p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-200 text-lg"
-            value={sortBy}
-            onChange={(e) => setSortBy(e.target.value as SortOption)}
-          >
-            {SORT_OPTIONS.map((opt) => (
-              <option key={opt.value} value={opt.value}>{opt.label}</option>
-            ))}
-          </select>
-        </div>
-        {categories.length > 0 && (
-          <div className="flex flex-wrap items-center gap-2">
-            <span className="text-sm font-semibold text-gray-500 mr-1">Categorías:</span>
-            {categories.map((cat) => {
-              const isSelected = selectedCategoryIds.includes(cat.id);
-              return (
-                <button
-                  key={cat.id}
-                  onClick={() => toggleCategory(cat.id)}
-                  className={`px-4 py-1.5 rounded-full text-sm font-medium border transition-colors duration-200 ${
-                    isSelected
-                      ? 'bg-blue-600 text-white border-blue-600'
-                      : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
-                  }`}
-                >
-                  {cat.name}
-                </button>
-              );
-            })}
-            {hasActiveFilters && (
-              <button
-                onClick={clearFilters}
-                className="ml-2 text-sm text-red-500 hover:text-red-700 font-medium underline"
-              >
-                Limpiar filtros
-              </button>
-            )}
-          </div>
-        )}
-      </section>
-      {error && (
-        <div className="text-center py-4 mb-6">
-          <p className="text-red-600 text-lg">{error}</p>
-        </div>
-      )}
-      <section>
-        {sortedClubs.length > 0 ? (
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 sm:gap-4">
-            {sortedClubs.map((club) => (
-              <ExploreClubCard
-                key={club.id}
-                id={String(club.id)}
-                name={club.name}
-                slogan={club.slogan || ''}
-                description={club.shortDescription || club.slogan || ''}
-                image={club.logoUrl || '/assets/default-club.jpg'}
-                rating={Number(club.averageRating) || 0}
-                reviewsCount={club.totalReviews || 0}
-              />
-            ))}
-          </div>
-        ) : (
-          !loading && (
-            <div className="text-center py-16 bg-gray-100 rounded-lg shadow-inner">
-              <p className="text-2xl text-gray-600 font-semibold">
-                No se encontraron clubes que coincidan con tu búsqueda.
-              </p>
-              <p className="text-gray-500 mt-4">Intenta ajustar tus filtros o términos de búsqueda.</p>
-            </div>
-          )
-        )}
-      </section>
-      <section className="text-center py-16 bg-blue-600 text-white rounded-lg shadow-xl transform transition-all duration-500 hover:scale-[1.01] hover:shadow-2xl mt-16">
-        <h2 className="text-4xl font-bold mb-4 animate-pulse-subtle">¿Tienes un Club de Suscripción?</h2>
-        <p className="text-xl mb-8 max-w-3xl mx-auto opacity-0 animate-fadeInUp delay-200">
-          Únete a AuraBox y profesionaliza tu negocio. Llega a miles de nuevos suscriptores y gestiona todo de forma sencilla.
+    <div className="bg-aurora-cream min-h-screen">
+      <div className="bg-aurora-navy py-14 px-4 text-center relative overflow-hidden">
+        <div className="absolute -top-16 -right-16 w-64 h-64 bg-aurora-gold/10 rounded-full blur-3xl" />
+        <span className="section-eyebrow !text-aurora-gold">Catálogo completo</span>
+        <h1 className="font-display text-4xl md:text-5xl font-bold text-white mb-3 animate-fadeInUp">
+          Explorá Todos los Clubes
+        </h1>
+        <p className="text-white/70 max-w-xl mx-auto">
+          Filtrá por categoría, rating y reseñas hasta encontrar el club perfecto para vos.
         </p>
-        <Link
-          to="/register"
-          className="inline-block bg-white text-blue-600 px-10 py-4 rounded-full font-bold text-xl
-                     hover:bg-blue-100 hover:scale-105 transition-all duration-300 shadow-lg
-                     focus:outline-none focus:ring-4 focus:ring-white focus:ring-opacity-70 animate-bounce-once"
-        >
-          Registra tu Club Hoy
-        </Link>
-      </section>
+      </div>
+
+      <div className="container mx-auto px-4 py-10">
+        <section className="mb-10 p-5 md:p-6 bg-white rounded-2xl shadow-aurora-sm border border-aurora-navy/5 -mt-10 relative z-10 animate-fadeInUp">
+          <div className="flex flex-col md:flex-row items-stretch md:items-center gap-3 mb-4">
+            <div className="relative flex-grow">
+              <svg className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-aurora-navy/30" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+              </svg>
+              <input
+                type="text"
+                placeholder="Buscar clubes por nombre, slogan o descripción..."
+                className="input-aurora !pl-11"
+                value={searchInput}
+                onChange={(e) => setSearchInput(e.target.value)}
+              />
+            </div>
+            <button
+              onClick={() => setShowFilters((v) => !v)}
+              className="md:hidden flex items-center justify-center gap-2 input-aurora !w-auto px-4 font-semibold text-aurora-navy"
+            >
+              Filtros {activeFilterCount > 0 && <span className="bg-aurora-terracotta text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">{activeFilterCount}</span>}
+            </button>
+            <div className={`${showFilters ? 'grid' : 'hidden'} md:grid grid-cols-1 md:grid-cols-3 gap-3 md:contents`}>
+              <select className="input-aurora" value={minRating} onChange={(e) => setMinRating(Number(e.target.value))}>
+                {RATING_OPTIONS.map((opt) => (<option key={opt.value} value={opt.value}>{opt.label}</option>))}
+              </select>
+              <select className="input-aurora" value={minReviews} onChange={(e) => setMinReviews(Number(e.target.value))}>
+                {REVIEW_OPTIONS.map((opt) => (<option key={opt.value} value={opt.value}>{opt.label}</option>))}
+              </select>
+              <select className="input-aurora" value={sortBy} onChange={(e) => setSortBy(e.target.value as SortOption)}>
+                {SORT_OPTIONS.map((opt) => (<option key={opt.value} value={opt.value}>{opt.label}</option>))}
+              </select>
+            </div>
+          </div>
+          {categories.length > 0 && (
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="text-sm font-semibold text-aurora-navy/50 mr-1">Categorías:</span>
+              {categories.map((cat) => {
+                const isSelected = selectedCategoryIds.includes(cat.id);
+                return (
+                  <button
+                    key={cat.id}
+                    onClick={() => toggleCategory(cat.id)}
+                    className={`px-4 py-1.5 rounded-full text-sm font-medium border transition-colors duration-200 ${
+                      isSelected
+                        ? 'bg-aurora-terracotta text-white border-aurora-terracotta'
+                        : 'bg-white text-aurora-navy/70 border-aurora-navy/15 hover:border-aurora-terracotta/50'
+                    }`}
+                  >
+                    {cat.name}
+                  </button>
+                );
+              })}
+              {activeFilterCount > 0 && (
+                <button onClick={clearFilters} className="ml-2 text-sm text-red-500 hover:text-red-700 font-medium underline">
+                  Limpiar filtros
+                </button>
+              )}
+            </div>
+          )}
+        </section>
+
+        {error && (
+          <div className="text-center py-4 mb-6">
+            <p className="text-red-600 text-lg">{error}</p>
+          </div>
+        )}
+
+        <section>
+          {sortedClubs.length > 0 ? (
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 sm:gap-4">
+              {sortedClubs.map((club) => (
+                <ExploreClubCard
+                  key={club.id}
+                  id={String(club.id)}
+                  name={club.name}
+                  slogan={club.slogan || ''}
+                  description={club.shortDescription || club.slogan || ''}
+                  image={club.logoUrl || '/assets/default-club.jpg'}
+                  rating={Number(club.averageRating) || 0}
+                  reviewsCount={club.totalReviews || 0}
+                />
+              ))}
+            </div>
+          ) : (
+            !loading && (
+              <div className="text-center py-16 bg-white rounded-2xl shadow-aurora-sm border border-aurora-navy/5">
+                <p className="text-5xl mb-4">🔍</p>
+                <p className="text-2xl text-aurora-navy font-display font-semibold">
+                  No se encontraron clubes que coincidan con tu búsqueda.
+                </p>
+                <p className="text-aurora-navy/50 mt-2">Intentá ajustar tus filtros o términos de búsqueda.</p>
+              </div>
+            )
+          )}
+        </section>
+
+        <section className="text-center py-16 px-6 bg-gradient-to-br from-aurora-navy to-aurora-navyDark text-white rounded-2xl shadow-aurora transform transition-all duration-500 hover:scale-[1.005] mt-16 relative overflow-hidden">
+          <div className="absolute -top-10 -left-10 w-56 h-56 bg-aurora-gold/10 rounded-full blur-3xl" />
+          <h2 className="font-display text-3xl md:text-4xl font-bold mb-4">¿Tenés un Club de Suscripción?</h2>
+          <p className="text-lg mb-8 max-w-2xl mx-auto text-white/75">
+            Unite a AuraBox y profesionalizá tu negocio. Llegá a miles de nuevos suscriptores y gestioná todo de forma sencilla.
+          </p>
+          <Link to="/register" className="btn-primary !px-10 !py-4 !text-xl">
+            Registrá tu Club Hoy
+          </Link>
+        </section>
+      </div>
     </div>
   );
 };
