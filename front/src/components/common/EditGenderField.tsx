@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import EditProfileField from './EditProfileField';
 
 interface EditGenderFieldProps {
@@ -11,7 +11,7 @@ interface EditGenderFieldProps {
 }
 
 const validCustomGenders = [
-  'no binario', 'genero fluido', 'agenere', 'bigenere', 'transgenere', 'intergenere', 'intersex'
+  'no binario', 'genero fluido', 'agenere', 'bigenere', 'transgenere', 'intergenere', 'intersex',
 ];
 
 const EditGenderField: React.FC<EditGenderFieldProps> = ({
@@ -26,7 +26,7 @@ const EditGenderField: React.FC<EditGenderFieldProps> = ({
   const [customGender, setCustomGender] = useState('');
   const [error, setError] = useState('');
 
-  React.useEffect(() => {
+  useEffect(() => {
     setSelectedOption(value);
     if (!['Femenino', 'Masculino', 'Prefiero no decirlo'].includes(value)) {
       setCustomGender(value);
@@ -34,6 +34,7 @@ const EditGenderField: React.FC<EditGenderFieldProps> = ({
     } else {
       setCustomGender('');
     }
+    setError('');
   }, [value, isEditing]);
 
   const handleOptionChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
@@ -52,9 +53,9 @@ const EditGenderField: React.FC<EditGenderFieldProps> = ({
   const handleSave = () => {
     let genderToSave = selectedOption;
     if (selectedOption === '+ Agregar genero personalizado') {
-      const normalizedCustomGender = customGender.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+      const normalizedCustomGender = customGender.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
       if (!validCustomGenders.includes(normalizedCustomGender)) {
-        setError('Género personalizado no válido. Por favor, ingresa uno de los géneros permitidos.');
+        setError('Género personalizado no válido. Por favor, ingresá uno de los géneros permitidos.');
         return;
       }
       genderToSave = customGender;
@@ -63,18 +64,12 @@ const EditGenderField: React.FC<EditGenderFieldProps> = ({
   };
 
   return (
-    <EditProfileField
-      label={label}
-      value={value}
-      isEditing={isEditing}
-      onEdit={onEdit}
-      onCancel={onCancel}
-    >
-      <div className="space-y-2">
+    <EditProfileField label={label} value={value} isEditing={isEditing} onEdit={onEdit} onCancel={onCancel}>
+      <div className="space-y-3">
         <select
           value={selectedOption}
           onChange={handleOptionChange}
-          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
+          className="mt-1 block w-full rounded-lg border-aurora-navy/15 shadow-sm focus:border-aurora-terracotta focus:ring-aurora-terracotta sm:text-sm"
         >
           <option value="Femenino">Femenino</option>
           <option value="Masculino">Masculino</option>
@@ -87,13 +82,13 @@ const EditGenderField: React.FC<EditGenderFieldProps> = ({
             value={customGender}
             onChange={handleCustomGenderChange}
             placeholder="Ej: No binario, Género fluido..."
-            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
+            className="mt-1 block w-full rounded-lg border-aurora-navy/15 shadow-sm focus:border-aurora-terracotta focus:ring-aurora-terracotta sm:text-sm"
           />
         )}
-        {error && <p className="text-red-500 text-sm mt-1">{error}</p>}
+        {error && <p className="text-red-600 text-sm">{error}</p>}
         <button
           onClick={handleSave}
-          className="mt-4 bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors duration-200"
+          className="mt-2 bg-aurora-terracotta text-white px-4 py-2 rounded-lg hover:bg-aurora-terracottaDark transition-colors duration-200 text-sm font-semibold"
         >
           Guardar Género
         </button>

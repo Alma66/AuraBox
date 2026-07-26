@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import EditProfileField from './EditProfileField';
 
 interface EditPhoneFieldProps {
@@ -23,7 +23,7 @@ const EditPhoneField: React.FC<EditPhoneFieldProps> = ({ label, value, onSave })
     return fullNumber;
   };
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (value) {
       const match = value.match(/^\+(\d{1,3})(\d{1,4})(\d{6,10})$/);
       if (match) {
@@ -89,12 +89,12 @@ const EditPhoneField: React.FC<EditPhoneFieldProps> = ({ label, value, onSave })
     >
       <div className="flex space-x-2">
         <div className="w-1/4">
-          <label htmlFor="countryCode" className="block text-sm font-medium text-gray-700">País</label>
+          <label htmlFor="countryCode" className="block text-sm font-medium text-aurora-navy">País</label>
           <select
             id="countryCode"
             value={countryCode}
             onChange={(e) => setCountryCode(e.target.value)}
-            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
+            className="mt-1 block w-full rounded-lg border-aurora-navy/15 shadow-sm focus:border-aurora-terracotta focus:ring-aurora-terracotta sm:text-sm"
           >
             <option value="+54">+54 (Argentina)</option>
             <option value="+1">+1 (EEUU/Canadá)</option>
@@ -103,34 +103,34 @@ const EditPhoneField: React.FC<EditPhoneFieldProps> = ({ label, value, onSave })
           </select>
         </div>
         <div className="w-1/4">
-          <label htmlFor="areaCode" className="block text-sm font-medium text-gray-700">Área</label>
+          <label htmlFor="areaCode" className="block text-sm font-medium text-aurora-navy">Área</label>
           <input
             type="text"
             id="areaCode"
             value={areaCode}
             onChange={(e) => setAreaCode(e.target.value)}
-            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
+            className="mt-1 block w-full rounded-lg border-aurora-navy/15 shadow-sm focus:border-aurora-terracotta focus:ring-aurora-terracotta sm:text-sm"
             placeholder="Ej: 911"
             maxLength={4}
           />
         </div>
         <div className="w-1/2">
-          <label htmlFor="phoneNumber" className="block text-sm font-medium text-gray-700">Número</label>
+          <label htmlFor="phoneNumber" className="block text-sm font-medium text-aurora-navy">Número</label>
           <input
             type="text"
             id="phoneNumber"
             value={phoneNumber}
             onChange={(e) => setPhoneNumber(e.target.value)}
-            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
+            className="mt-1 block w-full rounded-lg border-aurora-navy/15 shadow-sm focus:border-aurora-terracotta focus:ring-aurora-terracotta sm:text-sm"
             placeholder="Ej: 55551234"
             maxLength={10}
           />
         </div>
       </div>
-      {error && <p className="text-red-500 text-sm mt-1">{error}</p>}
+      {error && <p className="text-red-600 text-sm mt-1">{error}</p>}
       <button
         onClick={handleSave}
-        className="mt-4 bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors duration-200"
+        className="mt-4 bg-aurora-terracotta text-white px-4 py-2 rounded-lg hover:bg-aurora-terracottaDark transition-colors duration-200 text-sm font-semibold"
       >
         Guardar Teléfono
       </button>

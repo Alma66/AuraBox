@@ -159,93 +159,93 @@ const EntrepreneurSettingsSection: React.FC<EntrepreneurSettingsSectionProps> = 
     }
   };
 
-  if (loading) return <p className="text-gray-600">Cargando configuración...</p>;
+  if (loading) return <p className="text-aurora-navy/60">Cargando configuración...</p>;
 
   return (
     <div className="space-y-8">
-      <h2 className="text-2xl font-bold text-gray-800 mb-6">Configuración</h2>
+      <h2 className="text-2xl font-serif font-bold text-aurora-navy mb-2">Configuración</h2>
 
-      {error && <p className="text-red-600 text-sm bg-red-50 p-2 rounded">{error}</p>}
-      {success && <p className="text-green-600 text-sm bg-green-50 p-2 rounded">{success}</p>}
+      {error && <p className="text-red-600 text-sm bg-red-50 p-2 rounded-lg">{error}</p>}
+      {success && <p className="text-green-600 text-sm bg-green-50 p-2 rounded-lg">{success}</p>}
 
-      <div className="bg-white p-6 rounded-lg shadow-md">
-        <h3 className="text-xl font-semibold text-gray-800 mb-4">Idioma</h3>
-        <p className="text-gray-700">Español (Argentina)</p>
+      <div className="bg-white p-6 rounded-xl shadow-aurora-sm border border-aurora-navy/10">
+        <h3 className="text-xl font-semibold text-aurora-navy mb-4">Idioma</h3>
+        <p className="text-aurora-navy/80">Español (Argentina)</p>
       </div>
 
-      <div className="bg-white p-6 rounded-lg shadow-md">
-        <h3 className="text-xl font-semibold text-gray-800 mb-4">Contacto del Club</h3>
-        <p className="text-gray-600 text-sm mb-4">
+      <div className="bg-white p-6 rounded-xl shadow-aurora-sm border border-aurora-navy/10">
+        <h3 className="text-xl font-semibold text-aurora-navy mb-4">Contacto del Club</h3>
+        <p className="text-aurora-navy/60 text-sm mb-4">
           Estos datos se muestran a los suscriptores para consultas sobre tu club.
         </p>
         <div className="space-y-4 max-w-sm">
           <div>
-            <label className="block text-sm font-medium text-gray-700">Email de contacto</label>
+            <label className="block text-sm font-medium text-aurora-navy">Email de contacto</label>
             <input
               type="email"
               value={contactEmail}
               onChange={(e) => setContactEmail(e.target.value)}
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
+              className="mt-1 block w-full rounded-lg border-aurora-navy/15 shadow-sm focus:border-aurora-navy focus:ring-aurora-navy sm:text-sm"
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700">WhatsApp</label>
+            <label className="block text-sm font-medium text-aurora-navy">WhatsApp</label>
             <input
               type="text"
               value={whatsappContact}
               onChange={(e) => setWhatsappContact(e.target.value)}
               placeholder="Ej: +5491122334455"
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
+              className="mt-1 block w-full rounded-lg border-aurora-navy/15 shadow-sm focus:border-aurora-navy focus:ring-aurora-navy sm:text-sm"
             />
           </div>
         </div>
       </div>
 
-      <div className="bg-white p-6 rounded-lg shadow-md">
-        <h3 className="text-xl font-semibold text-gray-800 mb-4">Ventana de Envíos Mensual</h3>
-        <p className="text-gray-600 text-sm mb-4">
+      <div className="bg-white p-6 rounded-xl shadow-aurora-sm border border-aurora-navy/10">
+        <h3 className="text-xl font-semibold text-aurora-navy mb-4">Ventana de Envíos Mensual</h3>
+        <p className="text-aurora-navy/60 text-sm mb-4">
           Definí entre qué días del mes se despachan las cajas de tu club.
         </p>
         <div className="flex gap-4 max-w-sm">
           <div className="flex-1">
-            <label className="block text-sm font-medium text-gray-700">Día de inicio</label>
+            <label className="block text-sm font-medium text-aurora-navy">Día de inicio</label>
             <input
               type="number"
               min={1}
               max={31}
               value={shippingWindowStartDay}
               onChange={(e) => setShippingWindowStartDay(e.target.value)}
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
+              className="mt-1 block w-full rounded-lg border-aurora-navy/15 shadow-sm focus:border-aurora-navy focus:ring-aurora-navy sm:text-sm"
             />
           </div>
           <div className="flex-1">
-            <label className="block text-sm font-medium text-gray-700">Día de fin</label>
+            <label className="block text-sm font-medium text-aurora-navy">Día de fin</label>
             <input
               type="number"
               min={1}
               max={31}
               value={shippingWindowEndDay}
               onChange={(e) => setShippingWindowEndDay(e.target.value)}
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
+              className="mt-1 block w-full rounded-lg border-aurora-navy/15 shadow-sm focus:border-aurora-navy focus:ring-aurora-navy sm:text-sm"
             />
           </div>
         </div>
         <button
           onClick={handleSaveContact}
           disabled={saving}
-          className={`mt-4 bg-blue-600 text-white px-6 py-2 rounded-md hover:bg-blue-700 transition-colors duration-200 ${saving ? 'opacity-50 cursor-not-allowed' : ''}`}
+          className={`mt-4 bg-aurora-navy text-white px-6 py-2 rounded-lg hover:bg-aurora-navy/90 transition-colors duration-200 text-sm font-semibold ${saving ? 'opacity-50 cursor-not-allowed' : ''}`}
         >
           {saving ? 'Guardando...' : 'Guardar Contacto y Envíos'}
         </button>
       </div>
 
-      <div className="bg-white p-6 rounded-lg shadow-md">
-        <h3 className="text-xl font-semibold text-gray-800 mb-2">Métodos de Pago Aceptados</h3>
-        <p className="text-gray-600 text-sm mb-4">
+      <div className="bg-white p-6 rounded-xl shadow-aurora-sm border border-aurora-navy/10">
+        <h3 className="text-xl font-semibold text-aurora-navy mb-2">Métodos de Pago Aceptados</h3>
+        <p className="text-aurora-navy/60 text-sm mb-4">
           Elegí qué formas de pago aceptás para las suscripciones de tu club.
         </p>
         {allPaymentMethods.length === 0 ? (
-          <p className="text-gray-500 text-sm">No hay métodos de pago disponibles en la plataforma todavía.</p>
+          <p className="text-aurora-navy/50 text-sm">No hay métodos de pago disponibles en la plataforma todavía.</p>
         ) : (
           <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
             {allPaymentMethods.map((method) => {
@@ -253,8 +253,8 @@ const EntrepreneurSettingsSection: React.FC<EntrepreneurSettingsSectionProps> = 
               return (
                 <label
                   key={method.id}
-                  className={`flex items-center gap-2 border rounded-md px-3 py-2 text-sm cursor-pointer ${
-                    selected ? 'border-blue-500 bg-blue-50 text-blue-700' : 'border-gray-300 text-gray-700'
+                  className={`flex items-center gap-2 border rounded-lg px-3 py-2 text-sm cursor-pointer ${
+                    selected ? 'border-aurora-navy bg-aurora-navy/5 text-aurora-navy' : 'border-aurora-navy/15 text-aurora-navy/80'
                   } ${togglingPaymentMethodId === method.id ? 'opacity-50' : ''}`}
                 >
                   <input
@@ -262,7 +262,7 @@ const EntrepreneurSettingsSection: React.FC<EntrepreneurSettingsSectionProps> = 
                     checked={selected}
                     disabled={togglingPaymentMethodId === method.id}
                     onChange={() => handleTogglePaymentMethod(method)}
-                    className="h-4 w-4 text-blue-600 rounded focus:ring-blue-500"
+                    className="h-4 w-4 text-aurora-navy rounded focus:ring-aurora-navy"
                   />
                   {method.method}
                 </label>
@@ -272,13 +272,13 @@ const EntrepreneurSettingsSection: React.FC<EntrepreneurSettingsSectionProps> = 
         )}
       </div>
 
-      <div className="bg-white p-6 rounded-lg shadow-md">
-        <h3 className="text-xl font-semibold text-gray-800 mb-2">Couriers y Mensajerías</h3>
-        <p className="text-gray-600 text-sm mb-4">
+      <div className="bg-white p-6 rounded-xl shadow-aurora-sm border border-aurora-navy/10">
+        <h3 className="text-xl font-semibold text-aurora-navy mb-2">Couriers y Mensajerías</h3>
+        <p className="text-aurora-navy/60 text-sm mb-4">
           Elegí con qué servicios de envío trabaja tu club y, si querés, definí una tarifa base para cada uno.
         </p>
         {allCouriers.length === 0 ? (
-          <p className="text-gray-500 text-sm">No hay couriers disponibles en la plataforma todavía.</p>
+          <p className="text-aurora-navy/50 text-sm">No hay couriers disponibles en la plataforma todavía.</p>
         ) : (
           <div className="space-y-3">
             {allCouriers.map((courier) => {
@@ -286,29 +286,29 @@ const EntrepreneurSettingsSection: React.FC<EntrepreneurSettingsSectionProps> = 
               return (
                 <div
                   key={courier.id}
-                  className={`flex flex-col sm:flex-row sm:items-center gap-3 border rounded-md px-4 py-3 ${
-                    selected ? 'border-blue-500 bg-blue-50' : 'border-gray-300'
+                  className={`flex flex-col sm:flex-row sm:items-center gap-3 border rounded-lg px-4 py-3 ${
+                    selected ? 'border-aurora-navy bg-aurora-navy/5' : 'border-aurora-navy/15'
                   }`}
                 >
-                  <label className="flex items-center gap-2 text-sm font-medium text-gray-700 flex-1 cursor-pointer">
+                  <label className="flex items-center gap-2 text-sm font-medium text-aurora-navy flex-1 cursor-pointer">
                     <input
                       type="checkbox"
                       checked={selected}
                       onChange={() => toggleCourierSelection(courier.id)}
-                      className="h-4 w-4 text-blue-600 rounded focus:ring-blue-500"
+                      className="h-4 w-4 text-aurora-navy rounded focus:ring-aurora-navy"
                     />
-                    {courier.name} {courier.isInternal && <span className="text-xs text-gray-500">(interno)</span>}
+                    {courier.name} {courier.isInternal && <span className="text-xs text-aurora-navy/50">(interno)</span>}
                   </label>
                   {selected && (
                     <div className="flex items-center gap-2">
-                      <label className="text-xs text-gray-500">Tarifa base ($)</label>
+                      <label className="text-xs text-aurora-navy/60">Tarifa base ($)</label>
                       <input
                         type="number"
                         min={0}
                         step="0.01"
                         value={courierFees[courier.id] ?? ''}
                         onChange={(e) => handleCourierFeeChange(courier.id, e.target.value)}
-                        className="w-28 rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
+                        className="w-28 rounded-lg border-aurora-navy/15 shadow-sm focus:border-aurora-navy focus:ring-aurora-navy sm:text-sm"
                       />
                     </div>
                   )}
@@ -320,7 +320,7 @@ const EntrepreneurSettingsSection: React.FC<EntrepreneurSettingsSectionProps> = 
         <button
           onClick={handleSaveCouriers}
           disabled={savingCouriers}
-          className={`mt-4 bg-blue-600 text-white px-6 py-2 rounded-md hover:bg-blue-700 transition-colors duration-200 ${savingCouriers ? 'opacity-50 cursor-not-allowed' : ''}`}
+          className={`mt-4 bg-aurora-navy text-white px-6 py-2 rounded-lg hover:bg-aurora-navy/90 transition-colors duration-200 text-sm font-semibold ${savingCouriers ? 'opacity-50 cursor-not-allowed' : ''}`}
         >
           {savingCouriers ? 'Guardando...' : 'Guardar Couriers'}
         </button>

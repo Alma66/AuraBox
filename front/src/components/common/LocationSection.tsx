@@ -211,22 +211,22 @@ const LocationSection: React.FC<LocationSectionProps> = ({
 
   return (
     <div className="space-y-4">
-      {saveSuccess && <p className="text-green-600 text-sm bg-green-50 p-2 rounded">{saveSuccess}</p>}
-      {saveError && <p className="text-red-600 text-sm bg-red-50 p-2 rounded">{saveError}</p>}
+      {saveSuccess && <p className="text-green-600 text-sm bg-green-50 p-2 rounded-lg">{saveSuccess}</p>}
+      {saveError && <p className="text-red-600 text-sm bg-red-50 p-2 rounded-lg">{saveError}</p>}
 
       <EditProfileField label="País" value={editedCountry} isEditing={isEditingCountry}
         onEdit={() => setIsEditingCountry(true)}
         onCancel={() => { setEditedCountry(country); setIsEditingCountry(false); }}>
         <input list="countries" value={editedCountry}
           onChange={(e) => { setEditedCountry(e.target.value); setEditedCity(''); setEditedLocality(''); }}
-          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm" />
+          className="mt-1 block w-full rounded-lg border-aurora-navy/15 shadow-sm focus:border-aurora-terracotta focus:ring-aurora-terracotta sm:text-sm" />
         <datalist id="countries">
           {(locationsData as LocationData[]).map((loc) => <option key={loc.country} value={loc.country} />)}
         </datalist>
         <button onClick={async () => {
           await persistLocation({ country: editedCountry });
           setIsEditingCountry(false);
-        }} className="mt-4 bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors duration-200">
+        }} className="mt-3 bg-aurora-terracotta text-white px-4 py-2 rounded-lg hover:bg-aurora-terracottaDark transition-colors duration-200 text-sm font-semibold">
           Guardar País
         </button>
       </EditProfileField>
@@ -236,14 +236,14 @@ const LocationSection: React.FC<LocationSectionProps> = ({
         onCancel={() => { setEditedCity(city); setIsEditingCity(false); }}>
         <input list="cities" value={editedCity}
           onChange={(e) => { setEditedCity(e.target.value); setEditedLocality(''); }}
-          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm" />
+          className="mt-1 block w-full rounded-lg border-aurora-navy/15 shadow-sm focus:border-aurora-terracotta focus:ring-aurora-terracotta sm:text-sm" />
         <datalist id="cities">
           {availableCities.map((c) => <option key={c} value={c} />)}
         </datalist>
         <button onClick={async () => {
           await persistLocation({ city: editedCity });
           setIsEditingCity(false);
-        }} className="mt-4 bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors duration-200">
+        }} className="mt-3 bg-aurora-terracotta text-white px-4 py-2 rounded-lg hover:bg-aurora-terracottaDark transition-colors duration-200 text-sm font-semibold">
           Guardar Ciudad
         </button>
       </EditProfileField>
@@ -253,109 +253,109 @@ const LocationSection: React.FC<LocationSectionProps> = ({
         onCancel={() => { setEditedLocality(locality); setIsEditingLocality(false); }}>
         <input list="localities" value={editedLocality}
           onChange={(e) => setEditedLocality(e.target.value)}
-          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm" />
+          className="mt-1 block w-full rounded-lg border-aurora-navy/15 shadow-sm focus:border-aurora-terracotta focus:ring-aurora-terracotta sm:text-sm" />
         <datalist id="localities">
           {availableLocalities.map((c) => <option key={c} value={c} />)}
         </datalist>
         <button onClick={async () => {
           await persistLocation({ province: editedLocality });
           setIsEditingLocality(false);
-        }} className="mt-4 bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors duration-200">
+        }} className="mt-3 bg-aurora-terracotta text-white px-4 py-2 rounded-lg hover:bg-aurora-terracottaDark transition-colors duration-200 text-sm font-semibold">
           Guardar Localidad
         </button>
       </EditProfileField>
 
-      <div className="relative bg-gray-100 p-6 rounded-lg shadow-md mt-8">
-          <h3 className="text-xl font-bold text-gray-800 mb-4">Detalles de Dirección y Mapa</h3>
-          {!showSensitiveLocationInfo && (
-            <div className="absolute inset-0 bg-gray-200 bg-opacity-90 flex flex-col items-center justify-center rounded-lg z-10">
-              <p className="text-lg font-semibold text-gray-700 mb-4">Contenido sensible oculto</p>
-              <p className="text-gray-800 mb-2 text-center">Para ver o editar esta información, ingresá tu contraseña:</p>
-              <input type="password"
-                className="mt-1 block mx-auto w-full max-w-xs rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm text-center"
-                value={locationPassword} onChange={(e) => setLocationPassword(e.target.value)}
-                placeholder="Contraseña"
-                onKeyDown={(e) => e.key === 'Enter' && handleLocationPasswordCheck()} />
-              {locationPasswordError && <p className="text-red-500 text-sm mt-2">{locationPasswordError}</p>}
-              <button onClick={handleLocationPasswordCheck}
-                className="mt-4 bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors duration-200">
-                Verificar
-              </button>
-            </div>
-          )}
-          <div className={`space-y-4 ${!showSensitiveLocationInfo ? 'blur-sm pointer-events-none' : ''}`}>
-            <EditProfileField label="Código Postal" value={editedPostalCode} isEditing={isEditingPostalCode}
-              onEdit={() => setIsEditingPostalCode(true)}
-              onCancel={() => { setEditedPostalCode(postalCode); setIsEditingPostalCode(false); }}>
-              <input type="text" value={editedPostalCode} onChange={(e) => setEditedPostalCode(e.target.value)}
-                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm" />
-              <button onClick={async () => { await persistLocation({ postalCode: editedPostalCode }); setIsEditingPostalCode(false); }}
-                className="mt-4 bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors duration-200">
-                Guardar Código Postal
-              </button>
-            </EditProfileField>
-
-            <EditProfileField label="Calle" value={editedStreet} isEditing={isEditingStreet}
-              onEdit={() => setIsEditingStreet(true)}
-              onCancel={() => { setEditedStreet(street); setIsEditingStreet(false); }}>
-              <input type="text" value={editedStreet} onChange={(e) => setEditedStreet(e.target.value)}
-                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm" />
-              <button onClick={async () => { await persistLocation({ streetAddress: editedStreet }); setIsEditingStreet(false); }}
-                className="mt-4 bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors duration-200">
-                Guardar Calle
-              </button>
-            </EditProfileField>
-
-            <EditProfileField label="Número" value={editedStreetNumber} isEditing={isEditingStreetNumber}
-              onEdit={() => setIsEditingStreetNumber(true)}
-              onCancel={() => { setEditedStreetNumber(streetNumber); setIsEditingStreetNumber(false); }}>
-              <input type="text" value={editedStreetNumber} onChange={(e) => setEditedStreetNumber(e.target.value)}
-                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm" />
-              <button onClick={async () => {
-                await persistLocation({ addressNumber: editedStreetNumber ? parseInt(editedStreetNumber) : null });
-                setIsEditingStreetNumber(false);
-              }} className="mt-4 bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors duration-200">
-                Guardar Número
-              </button>
-            </EditProfileField>
-
-            <EditProfileField label="Piso" value={editedFloor} isEditing={isEditingFloor}
-              onEdit={() => setIsEditingFloor(true)}
-              onCancel={() => { setEditedFloor(floor); setIsEditingFloor(false); }}>
-              <input type="text" value={editedFloor} onChange={(e) => setEditedFloor(e.target.value)}
-                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm" />
-              <button onClick={async () => { await persistLocation({ floorNumber: editedFloor }); setIsEditingFloor(false); }}
-                className="mt-4 bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors duration-200">
-                Guardar Piso
-              </button>
-            </EditProfileField>
-
-            <EditProfileField label="Detalles" value={editedDetails} isEditing={isEditingDetails}
-              onEdit={() => setIsEditingDetails(true)}
-              onCancel={() => { setEditedDetails(details); setIsEditingDetails(false); }}>
-              <input type="text" value={editedDetails} onChange={(e) => setEditedDetails(e.target.value)}
-                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm" />
-              <button onClick={async () => { await persistLocation({ addressDetails: editedDetails }); setIsEditingDetails(false); }}
-                className="mt-4 bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors duration-200">
-                Guardar Detalles
-              </button>
-            </EditProfileField>
-
-            <div className="mt-6 border border-gray-300 rounded p-4 relative bg-gray-50">
-              <p className="mb-2 font-semibold text-gray-700">Mapa de Ubicación (hacé clic para marcar tu dirección)</p>
-              <MapContainer center={coordinates ?? DEFAULT_CENTER} zoom={coordinates ? 16 : 13} style={{ height: '400px', width: '100%' }}>
-                <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-                  attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors' />
-                <LocationMarker />
-                <RecenterMap position={coordinates} />
-              </MapContainer>
-              {coordinates && (
-                <p className="mt-2 text-sm text-gray-600">
-                  Coordenadas: {coordinates.lat.toFixed(6)}, {coordinates.lng.toFixed(6)}
-                </p>
-              )}
-            </div>
+      <div className="relative bg-aurora-cream p-6 rounded-xl shadow-aurora-sm mt-8">
+        <h3 className="text-xl font-serif font-bold text-aurora-navy mb-4">Detalles de Dirección y Mapa</h3>
+        {!showSensitiveLocationInfo && (
+          <div className="absolute inset-0 bg-aurora-cream/95 flex flex-col items-center justify-center rounded-xl z-10">
+            <p className="text-lg font-semibold text-aurora-navy mb-4">Contenido sensible oculto</p>
+            <p className="text-aurora-navy/80 mb-2 text-center px-6">Para ver o editar esta información, ingresá tu contraseña:</p>
+            <input type="password"
+              className="mt-1 block mx-auto w-full max-w-xs rounded-lg border-aurora-navy/15 shadow-sm focus:border-aurora-terracotta focus:ring-aurora-terracotta sm:text-sm text-center"
+              value={locationPassword} onChange={(e) => setLocationPassword(e.target.value)}
+              placeholder="Contraseña"
+              onKeyDown={(e) => e.key === 'Enter' && handleLocationPasswordCheck()} />
+            {locationPasswordError && <p className="text-red-600 text-sm mt-2">{locationPasswordError}</p>}
+            <button onClick={handleLocationPasswordCheck}
+              className="mt-4 bg-aurora-terracotta text-white px-4 py-2 rounded-lg hover:bg-aurora-terracottaDark transition-colors duration-200 text-sm font-semibold">
+              Verificar
+            </button>
           </div>
+        )}
+        <div className={`space-y-4 ${!showSensitiveLocationInfo ? 'blur-sm pointer-events-none' : ''}`}>
+          <EditProfileField label="Código Postal" value={editedPostalCode} isEditing={isEditingPostalCode}
+            onEdit={() => setIsEditingPostalCode(true)}
+            onCancel={() => { setEditedPostalCode(postalCode); setIsEditingPostalCode(false); }}>
+            <input type="text" value={editedPostalCode} onChange={(e) => setEditedPostalCode(e.target.value)}
+              className="mt-1 block w-full rounded-lg border-aurora-navy/15 shadow-sm focus:border-aurora-terracotta focus:ring-aurora-terracotta sm:text-sm" />
+            <button onClick={async () => { await persistLocation({ postalCode: editedPostalCode }); setIsEditingPostalCode(false); }}
+              className="mt-3 bg-aurora-terracotta text-white px-4 py-2 rounded-lg hover:bg-aurora-terracottaDark transition-colors duration-200 text-sm font-semibold">
+              Guardar Código Postal
+            </button>
+          </EditProfileField>
+
+          <EditProfileField label="Calle" value={editedStreet} isEditing={isEditingStreet}
+            onEdit={() => setIsEditingStreet(true)}
+            onCancel={() => { setEditedStreet(street); setIsEditingStreet(false); }}>
+            <input type="text" value={editedStreet} onChange={(e) => setEditedStreet(e.target.value)}
+              className="mt-1 block w-full rounded-lg border-aurora-navy/15 shadow-sm focus:border-aurora-terracotta focus:ring-aurora-terracotta sm:text-sm" />
+            <button onClick={async () => { await persistLocation({ streetAddress: editedStreet }); setIsEditingStreet(false); }}
+              className="mt-3 bg-aurora-terracotta text-white px-4 py-2 rounded-lg hover:bg-aurora-terracottaDark transition-colors duration-200 text-sm font-semibold">
+              Guardar Calle
+            </button>
+          </EditProfileField>
+
+          <EditProfileField label="Número" value={editedStreetNumber} isEditing={isEditingStreetNumber}
+            onEdit={() => setIsEditingStreetNumber(true)}
+            onCancel={() => { setEditedStreetNumber(streetNumber); setIsEditingStreetNumber(false); }}>
+            <input type="text" value={editedStreetNumber} onChange={(e) => setEditedStreetNumber(e.target.value)}
+              className="mt-1 block w-full rounded-lg border-aurora-navy/15 shadow-sm focus:border-aurora-terracotta focus:ring-aurora-terracotta sm:text-sm" />
+            <button onClick={async () => {
+              await persistLocation({ addressNumber: editedStreetNumber ? parseInt(editedStreetNumber) : null });
+              setIsEditingStreetNumber(false);
+            }} className="mt-3 bg-aurora-terracotta text-white px-4 py-2 rounded-lg hover:bg-aurora-terracottaDark transition-colors duration-200 text-sm font-semibold">
+              Guardar Número
+            </button>
+          </EditProfileField>
+
+          <EditProfileField label="Piso" value={editedFloor} isEditing={isEditingFloor}
+            onEdit={() => setIsEditingFloor(true)}
+            onCancel={() => { setEditedFloor(floor); setIsEditingFloor(false); }}>
+            <input type="text" value={editedFloor} onChange={(e) => setEditedFloor(e.target.value)}
+              className="mt-1 block w-full rounded-lg border-aurora-navy/15 shadow-sm focus:border-aurora-terracotta focus:ring-aurora-terracotta sm:text-sm" />
+            <button onClick={async () => { await persistLocation({ floorNumber: editedFloor }); setIsEditingFloor(false); }}
+              className="mt-3 bg-aurora-terracotta text-white px-4 py-2 rounded-lg hover:bg-aurora-terracottaDark transition-colors duration-200 text-sm font-semibold">
+              Guardar Piso
+            </button>
+          </EditProfileField>
+
+          <EditProfileField label="Detalles" value={editedDetails} isEditing={isEditingDetails}
+            onEdit={() => setIsEditingDetails(true)}
+            onCancel={() => { setEditedDetails(details); setIsEditingDetails(false); }}>
+            <input type="text" value={editedDetails} onChange={(e) => setEditedDetails(e.target.value)}
+              className="mt-1 block w-full rounded-lg border-aurora-navy/15 shadow-sm focus:border-aurora-terracotta focus:ring-aurora-terracotta sm:text-sm" />
+            <button onClick={async () => { await persistLocation({ addressDetails: editedDetails }); setIsEditingDetails(false); }}
+              className="mt-3 bg-aurora-terracotta text-white px-4 py-2 rounded-lg hover:bg-aurora-terracottaDark transition-colors duration-200 text-sm font-semibold">
+              Guardar Detalles
+            </button>
+          </EditProfileField>
+
+          <div className="mt-6 border border-aurora-navy/10 rounded-xl p-4 relative bg-white">
+            <p className="mb-2 font-semibold text-aurora-navy">Mapa de Ubicación (hacé clic para marcar tu dirección)</p>
+            <MapContainer center={coordinates ?? DEFAULT_CENTER} zoom={coordinates ? 16 : 13} style={{ height: '400px', width: '100%' }}>
+              <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors' />
+              <LocationMarker />
+              <RecenterMap position={coordinates} />
+            </MapContainer>
+            {coordinates && (
+              <p className="mt-2 text-sm text-aurora-navy/70">
+                Coordenadas: {coordinates.lat.toFixed(6)}, {coordinates.lng.toFixed(6)}
+              </p>
+            )}
+          </div>
+        </div>
       </div>
     </div>
   );
