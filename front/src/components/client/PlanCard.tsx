@@ -4,37 +4,37 @@ import { SubscriptionPlan } from '../../types/club';
 interface PlanCardProps {
   plan: SubscriptionPlan;
   onRemove: () => void;
-  onAddToCart?: () => void; 
-  isInCart?: boolean; 
+  onAddToCart?: () => void;
+  isInCart?: boolean;
   className?: string;
 }
 
-const PlanCard: React.FC<PlanCardProps> = ({ 
-  plan, 
-  onRemove, 
-  onAddToCart, 
-  isInCart = false, 
-  className = '' 
+const PlanCard: React.FC<PlanCardProps> = ({
+  plan,
+  onRemove,
+  onAddToCart,
+  isInCart = false,
+  className = '',
 }) => {
   return (
-    <div className={`bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300 border border-gray-200 ${className}`}>
-      <div className="relative h-48 bg-gradient-to-br from-blue-50 to-purple-50">
-        <img 
-          src={plan.image || '/assets/placeholder-plan.jpg'} 
+    <div className={`bg-white rounded-xl shadow-aurora-sm border border-aurora-navy/10 overflow-hidden hover:shadow-lg transition-shadow duration-300 ${className}`}>
+      <div className="relative h-48 bg-aurora-cream">
+        <img
+          src={plan.image || '/assets/placeholder-plan.jpg'}
           alt={plan.name}
           className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
         />
-        <div className="absolute top-3 right-3 bg-green-500 text-white px-2 py-1 rounded-full text-xs font-bold">
+        <div className="absolute top-3 right-3 bg-aurora-gold text-aurora-navy px-2 py-1 rounded-full text-xs font-bold">
           {isInCart ? 'En Carrito' : 'Favorito'}
         </div>
       </div>
 
       <div className="p-6">
-        <h3 className="text-xl font-bold text-gray-800 mb-2">{plan.name}</h3>
-        <p className="text-gray-600 mb-3 line-clamp-2">{plan.description}</p>
-        
+        <h3 className="text-xl font-serif font-bold text-aurora-navy mb-2">{plan.name}</h3>
+        <p className="text-aurora-navy/70 mb-3 line-clamp-2">{plan.description}</p>
+
         <div className="flex items-center justify-between mb-4">
-          <div className="text-2xl font-bold text-blue-600">
+          <div className="text-2xl font-bold text-aurora-terracotta">
             ${plan.price.toLocaleString()} {plan.currency}
           </div>
           <span className="text-sm text-green-600 font-semibold">
@@ -43,8 +43,8 @@ const PlanCard: React.FC<PlanCardProps> = ({
         </div>
 
         <div className="mb-4">
-          <h4 className="text-sm font-semibold text-gray-700 mb-2">Incluye:</h4>
-          <ul className="space-y-1 text-sm text-gray-600">
+          <h4 className="text-sm font-semibold text-aurora-navy mb-2">Incluye:</h4>
+          <ul className="space-y-1 text-sm text-aurora-navy/70">
             {plan.includes.slice(0, 3).map((item, idx) => (
               <li key={idx} className="flex items-center">
                 <svg className="w-4 h-4 text-green-500 mr-2" fill="currentColor" viewBox="0 0 20 20">
@@ -54,7 +54,7 @@ const PlanCard: React.FC<PlanCardProps> = ({
               </li>
             ))}
             {plan.includes.length > 3 && (
-              <li className="text-xs text-gray-500">... y más</li>
+              <li className="text-xs text-aurora-navy/50">... y más</li>
             )}
           </ul>
         </div>
@@ -63,7 +63,7 @@ const PlanCard: React.FC<PlanCardProps> = ({
           {onAddToCart && !isInCart && (
             <button
               onClick={onAddToCart}
-              className="flex-1 bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors duration-200 font-semibold"
+              className="flex-1 bg-aurora-terracotta text-white py-2 px-4 rounded-xl hover:bg-aurora-terracottaDark transition-colors duration-200 font-semibold"
             >
               Agregar al Carrito
             </button>
@@ -71,15 +71,15 @@ const PlanCard: React.FC<PlanCardProps> = ({
           {isInCart && (
             <button
               onClick={onRemove}
-              className="flex-1 bg-red-500 text-white py-2 px-4 rounded-lg hover:bg-red-600 transition-colors duration-200 font-semibold"
+              className="flex-1 bg-red-500 text-white py-2 px-4 rounded-xl hover:bg-red-600 transition-colors duration-200 font-semibold"
             >
               Eliminar del Carrito
             </button>
           )}
-          {!isInCart && (
+          {!isInCart && !onAddToCart && (
             <button
               onClick={onRemove}
-              className="flex-1 bg-gray-300 text-gray-700 py-2 px-4 rounded-lg hover:bg-gray-400 transition-colors duration-200 font-semibold"
+              className="flex-1 bg-aurora-cream text-aurora-navy py-2 px-4 rounded-xl hover:bg-aurora-creamDark transition-colors duration-200 font-semibold"
             >
               Quitar Favorito
             </button>

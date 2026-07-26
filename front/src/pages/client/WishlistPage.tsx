@@ -109,21 +109,21 @@ const WishlistPage: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 py-12 px-4">
+      <div className="min-h-screen bg-aurora-cream py-12 px-4">
         <div className="max-w-6xl mx-auto text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">Cargando tu lista de deseos...</p>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-aurora-terracotta mx-auto mb-4"></div>
+          <p className="text-aurora-navy/70">Cargando tu lista de deseos...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 py-8 px-4">
+    <div className="min-h-screen bg-aurora-cream py-8 px-4">
       <div className="max-w-6xl mx-auto">
         <div className="text-center mb-8">
-          <h1 className="text-4xl font-bold text-gray-800 mb-2">Mi Lista de Deseos</h1>
-          <p className="text-gray-600">
+          <h1 className="text-4xl font-serif font-bold text-aurora-navy mb-2">Mi Lista de Deseos</h1>
+          <p className="text-aurora-navy/70">
             {user ? `Hola, ${user.firstName}! ` : ''}Estos son los planes que marcaste con corazón, agrupados por club.
           </p>
         </div>
@@ -135,18 +135,18 @@ const WishlistPage: React.FC = () => {
         )}
 
         {entries.length > 0 && (
-          <div className="bg-white rounded-xl shadow-md p-5 mb-8 flex flex-col md:flex-row gap-4">
+          <div className="bg-white rounded-xl shadow-aurora-sm border border-aurora-navy/10 p-5 mb-8 flex flex-col md:flex-row gap-4">
             <input
               type="text"
               placeholder="Buscar por club o nombre de plan..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="flex-grow p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="flex-grow p-3 border border-aurora-navy/15 rounded-xl focus:outline-none focus:ring-2 focus:ring-aurora-terracotta"
             />
             <select
               value={selectedClubId ?? ''}
               onChange={(e) => setSelectedClubId(e.target.value ? Number(e.target.value) : null)}
-              className="p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="p-3 border border-aurora-navy/15 rounded-xl focus:outline-none focus:ring-2 focus:ring-aurora-terracotta"
             >
               <option value="">Todos los clubes</option>
               {clubOptions.map((club) => (
@@ -157,46 +157,46 @@ const WishlistPage: React.FC = () => {
         )}
 
         {entries.length === 0 ? (
-          <div className="text-center py-16 bg-white rounded-xl shadow-inner">
-            <svg className="mx-auto h-20 w-20 text-gray-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <div className="text-center py-16 bg-white rounded-xl shadow-aurora-sm border border-aurora-navy/10">
+            <svg className="mx-auto h-20 w-20 text-aurora-navy/15 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
             </svg>
-            <h3 className="text-lg font-medium text-gray-900 mb-2">Todavía no marcaste ningún plan</h3>
-            <p className="text-gray-500 mb-4">Explorá clubes y tocá el corazón en los planes que te gusten.</p>
+            <h3 className="text-lg font-semibold text-aurora-navy mb-2">Todavía no marcaste ningún plan</h3>
+            <p className="text-aurora-navy/60 mb-4">Explorá clubes y tocá el corazón en los planes que te gusten.</p>
             <button
               onClick={() => navigate('/explore')}
-              className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors"
+              className="bg-aurora-terracotta text-white px-6 py-3 rounded-xl hover:bg-aurora-terracottaDark transition-colors font-semibold"
             >
               Explorar Clubes
             </button>
           </div>
         ) : groupedByClub.length === 0 ? (
-          <div className="text-center py-16 bg-white rounded-xl shadow-inner">
-            <p className="text-lg text-gray-600 font-medium">No hay resultados para tu búsqueda.</p>
+          <div className="text-center py-16 bg-white rounded-xl shadow-aurora-sm border border-aurora-navy/10">
+            <p className="text-lg text-aurora-navy/70 font-medium">No hay resultados para tu búsqueda.</p>
           </div>
         ) : (
           <div className="space-y-6">
             {groupedByClub.map((group) => (
-              <div key={group.club.id} className="bg-white rounded-2xl shadow-md overflow-hidden">
+              <div key={group.club.id} className="bg-white rounded-2xl shadow-aurora-sm border border-aurora-navy/10 overflow-hidden">
                 <div
-                  className="flex items-center gap-4 p-5 border-b border-gray-100 cursor-pointer"
+                  className="flex items-center gap-4 p-5 border-b border-aurora-navy/10 cursor-pointer"
                   onClick={() => navigate(`/club/${group.club.id}`)}
                 >
                   <img
                     src={group.club.logoUrl || '/assets/default-club.jpg'}
                     alt={group.club.name}
-                    className="w-14 h-14 rounded-full object-cover border border-gray-100"
+                    className="w-14 h-14 rounded-full object-cover border border-aurora-navy/10"
                   />
                   <div>
-                    <h3 className="font-bold text-gray-900 text-lg hover:text-blue-600 transition-colors">{group.club.name}</h3>
-                    {group.club.slogan && <p className="text-sm text-gray-500 italic">{group.club.slogan}</p>}
+                    <h3 className="font-bold text-aurora-navy text-lg hover:text-aurora-terracotta transition-colors">{group.club.name}</h3>
+                    {group.club.slogan && <p className="text-sm text-aurora-navy/50 italic">{group.club.slogan}</p>}
                   </div>
                 </div>
                 <div className="p-5 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                   {group.entries.map((entry) => {
                     const descuento = Math.max(entry.plan.cashDiscount ?? 0, entry.plan.transferDiscount ?? 0);
                     return (
-                      <div key={entry.favoriteId} className="relative border border-gray-100 rounded-xl overflow-hidden bg-gray-50">
+                      <div key={entry.favoriteId} className="relative border border-aurora-navy/10 rounded-xl overflow-hidden bg-aurora-cream hover:shadow-md transition-shadow duration-200">
                         <button
                           onClick={() => handleRemove(entry.favoriteId)}
                           disabled={removingId === entry.favoriteId}
@@ -212,15 +212,15 @@ const WishlistPage: React.FC = () => {
                           className="w-full text-left"
                         >
                           <img
-                            src={entry.plan.image || 'https://placehold.co/400x160/e2e8f0/94a3b8?text=Sin+imagen'}
+                            src={entry.plan.image || 'https://placehold.co/400x160/FBF4E9/1F3350?text=Sin+imagen'}
                             alt={entry.plan.name}
                             className="w-full h-28 object-cover"
                           />
                           <div className="p-3">
-                            <h4 className="font-semibold text-gray-900 text-sm truncate pr-6">{entry.plan.name}</h4>
-                            <p className="text-xs text-gray-500 mb-1">{entry.plan.deliveryFrequency}</p>
+                            <h4 className="font-semibold text-aurora-navy text-sm truncate pr-6">{entry.plan.name}</h4>
+                            <p className="text-xs text-aurora-navy/50 mb-1">{entry.plan.deliveryFrequency}</p>
                             <div className="flex items-center justify-between">
-                              <span className="font-bold text-indigo-700 text-sm">ARS {entry.plan.price.toLocaleString('es-AR')}</span>
+                              <span className="font-bold text-aurora-terracotta text-sm">ARS {entry.plan.price.toLocaleString('es-AR')}</span>
                               {descuento > 0 && (
                                 <span className="text-xs bg-red-100 text-red-600 px-2 py-0.5 rounded-full font-semibold">-{descuento}%</span>
                               )}

@@ -137,35 +137,35 @@ const MisReviewsPage: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 py-12 px-4">
+      <div className="min-h-screen bg-aurora-cream py-12 px-4">
         <div className="max-w-4xl mx-auto text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">Cargando tus reseñas...</p>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-aurora-terracotta mx-auto mb-4"></div>
+          <p className="text-aurora-navy/70">Cargando tus reseñas...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-blue-50 py-8 px-4">
+    <div className="min-h-screen bg-aurora-cream py-8 px-4">
       <div className="max-w-4xl mx-auto">
         <div className="text-center mb-8">
-          <h1 className="text-4xl font-bold text-gray-800 mb-2">Mis Reseñas</h1>
-          <p className="text-gray-600">
-            {user ? `Hola, ${user.firstName}!` : 'Tus opiniones sobre los clubes.'} Aquí puedes ver y gestionar tus reseñas.
+          <h1 className="text-4xl font-serif font-bold text-aurora-navy mb-2">Mis Reseñas</h1>
+          <p className="text-aurora-navy/70">
+            {user ? `Hola, ${user.firstName}!` : 'Tus opiniones sobre los clubes.'} Acá podés ver y gestionar tus reseñas.
           </p>
         </div>
 
         {reviews.length === 0 ? (
           <div className="text-center py-12">
-            <svg className="mx-auto h-24 w-24 text-gray-400 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="mx-auto h-24 w-24 text-aurora-navy/20 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
             </svg>
-            <h3 className="text-lg font-medium text-gray-900 mb-2">No tienes reseñas aún</h3>
-            <p className="text-gray-500 mb-4">¡Deja tu opinión en los clubes que has probado!</p>
+            <h3 className="text-lg font-semibold text-aurora-navy mb-2">No tenés reseñas aún</h3>
+            <p className="text-aurora-navy/60 mb-4">¡Dejá tu opinión en los clubes que probaste!</p>
             <button
               onClick={() => navigate('/explore')}
-              className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors"
+              className="bg-aurora-terracotta text-white px-6 py-3 rounded-xl hover:bg-aurora-terracottaDark transition-colors font-semibold"
             >
               Explorar Clubes
             </button>
@@ -187,7 +187,7 @@ const MisReviewsPage: React.FC = () => {
         <div className="mt-12 text-center">
           <button
             onClick={() => navigate('/customer/profile')}
-            className="bg-purple-600 text-white px-8 py-3 rounded-lg hover:bg-purple-700 transition-colors font-semibold"
+            className="bg-aurora-navy text-white px-8 py-3 rounded-xl hover:bg-aurora-navy/90 transition-colors font-semibold"
           >
             Volver a Mi Perfil
           </button>
@@ -195,11 +195,11 @@ const MisReviewsPage: React.FC = () => {
       </div>
 
       {editingReview && (
-        <div className="fixed inset-0 z-50 bg-black/60 flex items-center justify-center p-4">
+        <div className="fixed inset-0 z-50 bg-aurora-navy/60 flex items-center justify-center p-4">
           <div className="bg-white rounded-2xl shadow-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto">
-            <div className="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
-              <h3 className="text-lg font-semibold text-gray-900">Editar reseña</h3>
-              <button onClick={closeEdit} className="text-gray-400 hover:text-gray-600 transition-colors">
+            <div className="px-6 py-4 border-b border-aurora-navy/10 flex items-center justify-between">
+              <h3 className="text-lg font-serif font-semibold text-aurora-navy">Editar reseña</h3>
+              <button onClick={closeEdit} className="text-aurora-navy/40 hover:text-aurora-navy transition-colors">
                 <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
                 </svg>
@@ -212,12 +212,12 @@ const MisReviewsPage: React.FC = () => {
                 </div>
               )}
               <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">Calificación</label>
+                <label className="block text-sm font-semibold text-aurora-navy mb-2">Calificación</label>
                 <div className="flex gap-1">
                   {[1, 2, 3, 4, 5].map((n) => (
                     <button key={n} type="button" onClick={() => setEditRating(n)}>
                       <svg
-                        className={`w-8 h-8 ${n <= editRating ? 'text-yellow-400 fill-current' : 'text-gray-300'}`}
+                        className={`w-8 h-8 ${n <= editRating ? 'text-aurora-gold fill-current' : 'text-aurora-navy/20'}`}
                         fill="currentColor"
                         viewBox="0 0 20 20"
                       >
@@ -228,27 +228,27 @@ const MisReviewsPage: React.FC = () => {
                 </div>
               </div>
               <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-1">Título</label>
+                <label className="block text-sm font-semibold text-aurora-navy mb-1">Título</label>
                 <input
                   type="text"
                   value={editTitle}
                   onChange={(e) => setEditTitle(e.target.value)}
                   maxLength={120}
-                  className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full border border-aurora-navy/15 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-aurora-terracotta"
                 />
               </div>
               <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-1">Comentario</label>
+                <label className="block text-sm font-semibold text-aurora-navy mb-1">Comentario</label>
                 <textarea
                   value={editComment}
                   onChange={(e) => setEditComment(e.target.value)}
                   maxLength={2000}
                   rows={4}
-                  className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
+                  className="w-full border border-aurora-navy/15 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-aurora-terracotta resize-none"
                 />
               </div>
               <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">
+                <label className="block text-sm font-semibold text-aurora-navy mb-2">
                   Fotos y videos ({editingReview.media.length + newFiles.length} / {MAX_MEDIA})
                 </label>
                 <div className="flex flex-wrap gap-3 mb-3">
@@ -290,18 +290,18 @@ const MisReviewsPage: React.FC = () => {
                 )}
               </div>
             </div>
-            <div className="px-6 py-4 bg-gray-50 flex gap-3">
+            <div className="px-6 py-4 bg-aurora-cream flex gap-3">
               <button
                 onClick={closeEdit}
                 disabled={saving}
-                className="flex-1 px-4 py-2.5 rounded-xl border border-gray-200 text-gray-700 text-sm font-medium hover:bg-gray-100 disabled:opacity-50 transition-colors"
+                className="flex-1 px-4 py-2.5 rounded-xl border border-aurora-navy/15 text-aurora-navy text-sm font-medium hover:bg-white disabled:opacity-50 transition-colors"
               >
                 Cancelar
               </button>
               <button
                 onClick={handleSaveEdit}
                 disabled={saving}
-                className="flex-1 px-4 py-2.5 rounded-xl bg-blue-600 text-white text-sm font-semibold hover:bg-blue-700 disabled:opacity-50 transition-colors"
+                className="flex-1 px-4 py-2.5 rounded-xl bg-aurora-terracotta text-white text-sm font-semibold hover:bg-aurora-terracottaDark disabled:opacity-50 transition-colors"
               >
                 {saving ? 'Guardando...' : 'Guardar cambios'}
               </button>

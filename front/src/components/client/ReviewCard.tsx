@@ -15,7 +15,7 @@ const ReviewCard: React.FC<ReviewCardProps> = ({ review, club, onDelete, onEdit 
       {[...Array(5)].map((_, i) => (
         <svg
           key={i}
-          className={`w-5 h-5 ${i < rating ? 'text-yellow-400 fill-current' : 'text-gray-300'}`}
+          className={`w-5 h-5 ${i < rating ? 'text-aurora-gold fill-current' : 'text-aurora-navy/20'}`}
           fill="currentColor"
           viewBox="0 0 20 20"
         >
@@ -36,18 +36,18 @@ const ReviewCard: React.FC<ReviewCardProps> = ({ review, club, onDelete, onEdit 
     : '';
 
   return (
-    <div className="bg-white rounded-xl shadow-md p-6 hover:shadow-lg transition-shadow duration-300 border border-gray-200">
+    <div className="bg-white rounded-xl shadow-aurora-sm border border-aurora-navy/10 p-6 hover:shadow-lg transition-shadow duration-300">
       <div className="flex justify-between items-start mb-4">
         <div>
-          <h4 className="font-bold text-gray-800">{club?.name || 'Club Desconocido'}</h4>
-          <p className="text-sm text-gray-500">
+          <h4 className="font-bold text-aurora-navy">{club?.name || 'Club Desconocido'}</h4>
+          <p className="text-sm text-aurora-navy/50">
             {new Date(review.reviewDate).toLocaleDateString('es-AR', { year: 'numeric', month: 'long', day: 'numeric' })}
           </p>
         </div>
         <Stars rating={review.rating} />
       </div>
-      {review.title && <p className="font-semibold text-gray-800 mb-1">{review.title}</p>}
-      <p className="text-gray-700 mb-4 leading-relaxed">{review.comment}</p>
+      {review.title && <p className="font-semibold text-aurora-navy mb-1">{review.title}</p>}
+      <p className="text-aurora-navy/80 mb-4 leading-relaxed">{review.comment}</p>
       {review.media && review.media.length > 0 && (
         <div className="flex flex-wrap gap-2 mb-4">
           {review.media.map((m) => (
@@ -66,14 +66,14 @@ const ReviewCard: React.FC<ReviewCardProps> = ({ review, club, onDelete, onEdit 
         {!review.isHidden && onEdit && (
           <button
             onClick={onEdit}
-            className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition-colors text-sm"
+            className="bg-aurora-navy text-white px-4 py-2 rounded-xl hover:bg-aurora-navy/90 transition-colors text-sm font-semibold"
           >
             Editar
           </button>
         )}
         <button
           onClick={onDelete}
-          className="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600 transition-colors text-sm"
+          className="bg-red-500 text-white px-4 py-2 rounded-xl hover:bg-red-600 transition-colors text-sm font-semibold"
         >
           Eliminar
         </button>
