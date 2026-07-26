@@ -1,0 +1,148 @@
+[
+  {
+    "id": "del-1",
+    "subscriptionId": "sub-1",
+    "userId": "user-1",
+    "clubId": "club-1",
+    "planId": "plan-ml-1",
+    "deliveryDate": "2024-07-28",
+    "status": "pending",
+    "assignedRiderId": null,
+    "trackingNumber": null,
+    "shippingProvider": "rider_propio",
+    "address": {
+      "street": "Av. Santa Fe",
+      "number": "1234",
+      "locality": "Palermo",
+      "city": "Buenos Aires",
+      "postalCode": "1425",
+      "province": "Buenos Aires",
+      "instructions": "Dejar en conserjería si no hay nadie"
+    },
+    "boxContent": "Libro de julio + marcapáginas temático + infusión",
+    "estimatedDeliveryWindow": {
+      "from": "10:00",
+      "to": "18:00"
+    },
+    "cost": 1500,
+    "notes": "Cliente fiel, entregas previas exitosas",
+    "createdAt": "2024-07-01T09:00:00Z",
+    "updatedAt": "2024-07-01T09:00:00Z"
+  },
+  {
+    "id": "del-2",
+    "subscriptionId": "sub-2",
+    "userId": "user-2",
+    "clubId": "club-2",
+    "planId": "plan-bv-1",
+    "deliveryDate": "2024-07-29",
+    "status": "assigned",
+    "assignedRiderId": "rider-1",
+    "trackingNumber": "CA123456789AR",
+    "shippingProvider": "correo_argentino",
+    "address": {
+      "street": "Calle 27",
+      "number": "456",
+      "locality": "Nueva Córdoba",
+      "city": "Córdoba",
+      "postalCode": "5000",
+      "province": "Córdoba"
+    },
+    "boxContent": "2 botellas de vino tinto + ficha de cata",
+    "estimatedDeliveryWindow": {
+      "from": "14:00",
+      "to": "20:00"
+    },
+    "cost": 2500,
+    "notes": "Verificar edad al entregar (alcohol)",
+    "createdAt": "2024-07-01T10:30:00Z",
+    "updatedAt": "2024-07-25T14:00:00Z"
+  },
+  {
+    "id": "del-3",
+    "subscriptionId": "sub-3",
+    "userId": "user-1",
+    "clubId": "club-5",
+    "planId": "plan-aromas-1",
+    "deliveryDate": "2024-07-30",
+    "status": "in_transit",
+    "assignedRiderId": "rider-2",
+    "trackingNumber": null,
+    "shippingProvider": "rider_propio",
+    "address": {
+      "street": "Av. Santa Fe",
+      "number": "1234",
+      "locality": "Palermo",
+      "city": "Buenos Aires",
+      "postalCode": "1425",
+      "province": "Buenos Aires"
+    },
+    "boxContent": "Vela aromática + aceite esencial",
+    "estimatedDeliveryWindow": {
+      "from": "09:00",
+      "to": "17:00"
+    },
+    "cost": 1200,
+    "notes": "",
+    "createdAt": "2024-07-01T11:00:00Z",
+    "updatedAt": "2024-07-28T12:00:00Z"
+  },
+  {
+    "id": "del-4",
+    "subscriptionId": "sub-4",
+    "userId": "user-2",
+    "clubId": "club-3",
+    "planId": "plan-cq-1",
+    "deliveryDate": "2024-06-25",
+    "status": "delivered",
+    "assignedRiderId": "rider-1",
+    "trackingNumber": null,
+    "shippingProvider": "rider_propio",
+    "address": {
+      "street": "Calle 27",
+      "number": "456",
+      "locality": "Nueva Córdoba",
+      "city": "Córdoba",
+      "postalCode": "5000",
+      "province": "Córdoba"
+    },
+    "boxContent": "4 variedades de queso (1kg total)",
+    "estimatedDeliveryWindow": {
+      "from": "11:00",
+      "to": "19:00"
+    },
+    "cost": 1800,
+    "notes": "Entrega exitosa, cliente satisfecho",
+    "createdAt": "2024-06-01T08:00:00Z",
+    "updatedAt": "2024-06-25T16:30:00Z"
+  },
+  {
+    "id": "del-5",
+    "subscriptionId": "sub-5",
+    "userId": "user-3",
+    "clubId": "club-1",
+    "planId": "plan-ml-1",
+    "deliveryDate": "2024-08-28",
+    "status": "pending",
+    "assignedRiderId": null,
+    "trackingNumber": null,
+    "shippingProvider": "oca",
+    "address": {
+      "street": "Av. Callao",
+      "number": "789",
+      "locality": "Recoleta",
+      "city": "Buenos Aires",
+      "postalCode": "1426",
+      "province": "Buenos Aires"
+    },
+    "boxContent": "Libro de agosto + accesorios",
+    "estimatedDeliveryWindow": {
+      "from": "12:00",
+      "to": "20:00"
+    },
+    "cost": 2000,
+    "notes": "Suscripción semestral, entrega prioritaria",
+    "createdAt": "2024-07-01T12:00:00Z",
+    "updatedAt": "2024-07-01T12:00:00Z"
+  }
+]
