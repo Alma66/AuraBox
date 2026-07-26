@@ -25,7 +25,7 @@ export class UserSubscriptionsController {
   async findAll(@Query('userId') userId: string | undefined, @Request() req) {
     if (userId) {
       const targetId = Number(userId);
-      if (req.user.id !== targetId && req.user.role !== 'admin') {
+      if (req.user.role !== 'admin' && (req.user.role !== 'customer' || req.user.id !== targetId)) {
         throw new ForbiddenException('No autorizado para ver estas suscripciones');
       }
       return this.svc.findByUser(targetId);
@@ -52,7 +52,7 @@ export class UserSubscriptionsController {
   @Post(':id/cancel')
   async cancel(@Param('id', ParseIntPipe) id: number, @Body() body: { reason?: string }, @Request() req) {
     const sub = await this.svc.findById(id);
-    if (req.user?.id !== sub.idUser && req.user?.role !== 'admin') {
+    if (req.user?.role !== 'admin' && (req.user?.role !== 'customer' || req.user?.id !== sub.idUser)) {
       throw new ForbiddenException('No autorizado para cancelar esta suscripción');
     }
     return this.svc.cancel(id, body?.reason);

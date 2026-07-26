@@ -25,7 +25,8 @@ const licenseFileOptions = {
 };
 
 @Controller('entrepreneur-licenses')
-@UseGuards(JwtAuthGuard)
+@UseGuards(JwtAuthGuard, RolesGuard)
+@Roles('entrepreneur', 'admin')
 export class EntrepreneurLicensesController {
   constructor(private readonly service: EntrepreneurLicensesService) {}
 
@@ -39,7 +40,6 @@ export class EntrepreneurLicensesController {
     return this.service.create(dto, document);
   }
 
-  @UseGuards(RolesGuard)
   @Roles('admin')
   @Get()
   async findAll() {
@@ -84,7 +84,6 @@ export class EntrepreneurLicensesController {
     return this.service.update(id, dto, document);
   }
 
-  @UseGuards(RolesGuard)
   @Roles('admin')
   @Put(':id/verify')
   @UsePipes(new ValidationPipe({ whitelist: true, transform: true }))
@@ -92,7 +91,6 @@ export class EntrepreneurLicensesController {
     return this.service.verify(id, body.verificationStatus, body.verificationNotes);
   }
 
-  @UseGuards(RolesGuard)
   @Roles('admin')
   @Delete(':id')
   async remove(@Param('id', ParseIntPipe) id: number) {

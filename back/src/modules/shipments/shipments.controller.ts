@@ -19,7 +19,7 @@ export class ShipmentsController {
   @Post()
   @UsePipes(new ValidationPipe({ whitelist: true, transform: true }))
   async create(@Body() dto: CreateShipmentDto, @Request() req) {
-    if (req.user.id !== dto.idUser && req.user.role !== 'admin') {
+    if (req.user.role !== 'admin' && (req.user.role !== 'customer' || req.user.id !== dto.idUser)) {
       throw new ForbiddenException('No autorizado para crear este envío');
     }
     return this.shipmentsService.create(dto);
@@ -43,7 +43,7 @@ export class ShipmentsController {
 
   @Get('by-user/:idUser')
   async findByUser(@Param('idUser', ParseIntPipe) idUser: number, @Request() req) {
-    if (req.user.id !== idUser && req.user.role !== 'admin') {
+    if (req.user.role !== 'admin' && (req.user.role !== 'customer' || req.user.id !== idUser)) {
       throw new ForbiddenException('No autorizado para ver estos envíos');
     }
     return this.shipmentsService.findByUser(idUser);

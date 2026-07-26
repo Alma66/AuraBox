@@ -247,7 +247,7 @@ export class ReviewsService {
 
   async updateForRequester(id: number, dto: UpdateReviewDto, user: RequestUser) {
     const review = await this.findOne(id);
-    const isOwner = user.id === review.idUser;
+    const isOwner = user.role === 'customer' && user.id === review.idUser;
 
     if (isOwner) {
       const { isHidden, hiddenReason, ...ownerFields } = dto;

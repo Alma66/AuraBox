@@ -32,7 +32,7 @@ export class PaymentsController {
 
   @Get('by-user/:idUser')
   async findByUser(@Param('idUser', ParseIntPipe) idUser: number, @Request() req) {
-    if (req.user.id !== idUser && req.user.role !== 'admin') {
+    if (req.user.role !== 'admin' && (req.user.role !== 'customer' || req.user.id !== idUser)) {
       throw new ForbiddenException('No autorizado para ver estos pagos');
     }
     return this.paymentsService.findByUser(idUser);

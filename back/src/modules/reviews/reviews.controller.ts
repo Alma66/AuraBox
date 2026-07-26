@@ -24,12 +24,16 @@ const MAX_VIDEO_BYTES = 30 * 1024 * 1024;
 export class ReviewsController {
   constructor(private readonly reviewsService: ReviewsService) {}
 
+  @UseGuards(RolesGuard)
+  @Roles('customer')
   @Post()
   @UsePipes(new ValidationPipe({ whitelist: true, transform: true }))
   async create(@Body() dto: CreateReviewDto, @Request() req) {
     return this.reviewsService.create(dto, req.user.id);
   }
 
+  @UseGuards(RolesGuard)
+  @Roles('customer')
   @Get('eligibility/:idSubscriptionTypes')
   async checkEligibility(
     @Param('idSubscriptionTypes', ParseIntPipe) idSubscriptionTypes: number,
@@ -38,6 +42,8 @@ export class ReviewsController {
     return this.reviewsService.checkEligibility(req.user.id, idSubscriptionTypes);
   }
 
+  @UseGuards(RolesGuard)
+  @Roles('customer')
   @Post(':id/media')
   @UseInterceptors(FilesInterceptor('files', MAX_MEDIA_FILES, {
     storage: memoryStorage(),
@@ -64,6 +70,8 @@ export class ReviewsController {
     return this.reviewsService.addMedia(id, files, req.user.id);
   }
 
+  @UseGuards(RolesGuard)
+  @Roles('customer')
   @Delete(':id/media/:mediaId')
   async removeMedia(
     @Param('id', ParseIntPipe) id: number,
@@ -82,7 +90,7 @@ export class ReviewsController {
 
   @Get('by-user/:idUser')
   async findByUser(@Param('idUser', ParseIntPipe) idUser: number, @Request() req) {
-    if (req.user.id !== idUser && req.user.role !== 'admin') {
+    if (req.user.role !== 'admin' && (req.user.role !== 'customer' || req.user.id !== idUser)) {
       throw new ForbiddenException('No autorizado para ver estas reseñas');
     }
     return this.reviewsService.findByUser(idUser);
@@ -175,7 +183,7 @@ export class ReviewsController {
   @Delete(':id')
   async remove(@Param('id', ParseIntPipe) id: number, @Request() req) {
     const review = await this.reviewsService.findOne(id);
-    const isOwner = req.user.id === review.idUser;
+    const isOwner = req.user.role === 'customer' && req.user.id === review.idUser;
     if (!isOwner && req.user.role !== 'admin') {
       throw new ForbiddenException('No autorizado para eliminar esta reseña');
     }
