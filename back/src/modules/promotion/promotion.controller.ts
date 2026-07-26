@@ -18,32 +18,32 @@ export class PromotionController {
   @Post()
   @UsePipes(new ValidationPipe({ whitelist: true, transform: true }))
   async create(@Body() dto: CreatePromotionDto, @Request() req) {
-    return this.svc.create(dto, req.user?.id);
+    return this.svc.create(dto, req.user);
   }
 
   @Get('by-club/:idClub')
-  async findByClub(@Param('idClub', ParseIntPipe) idClub: number) {
-    return this.svc.findByClub(idClub);
+  async findByClub(@Param('idClub', ParseIntPipe) idClub: number, @Request() req) {
+    return this.svc.findByClub(idClub, req.user);
   }
 
   @Get(':id')
-  async findOne(@Param('id', ParseIntPipe) id: number) {
-    return this.svc.findOne(id);
+  async findOne(@Param('id', ParseIntPipe) id: number, @Request() req) {
+    return this.svc.findOne(id, req.user);
   }
 
   @Put(':id')
   @UsePipes(new ValidationPipe({ whitelist: true, transform: true }))
-  async update(@Param('id', ParseIntPipe) id: number, @Body() dto: UpdatePromotionDto) {
-    return this.svc.update(id, dto);
+  async update(@Param('id', ParseIntPipe) id: number, @Body() dto: UpdatePromotionDto, @Request() req) {
+    return this.svc.update(id, dto, req.user);
   }
 
   @Patch(':id/toggle')
-  async toggle(@Param('id', ParseIntPipe) id: number, @Body() body: { active: boolean }) {
-    return this.svc.toggleActive(id, body.active);
+  async toggle(@Param('id', ParseIntPipe) id: number, @Body() body: { active: boolean }, @Request() req) {
+    return this.svc.toggleActive(id, body.active, req.user);
   }
 
   @Delete(':id')
-  async remove(@Param('id', ParseIntPipe) id: number) {
-    return this.svc.remove(id);
+  async remove(@Param('id', ParseIntPipe) id: number, @Request() req) {
+    return this.svc.remove(id, req.user);
   }
 }

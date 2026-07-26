@@ -1,4 +1,4 @@
-import { Injectable, ConflictException, NotFoundException, UnauthorizedException } from '@nestjs/common';
+import { Injectable, ConflictException, NotFoundException, UnauthorizedException, BadRequestException } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
 import { CreateEntrepreneurDto } from './dto/create-entrepreneurs.dto';
 import { UpdateEntrepreneurDto } from './dto/update-entrepreneurs.dto';
@@ -24,6 +24,11 @@ export class EntrepreneursService {
       where: { OR: [{ email: dto.email }, { documentNumber: dto.documentNumber }] },
     });
     if (exists) throw new ConflictException('Email o documento ya registrado');
+
+    const birthDate = new Date(dto.birthDate);
+    const age = new Date().getFullYear() - birthDate.getFullYear();
+    if (age < 18) throw new BadRequestException('Debes tener al menos 18 años para registrarte como emprendedor.');
+
     const passwordHash = await bcrypt.hash(dto.password, 10);
     const created = await this.prisma.entrepreneurs.create({
       data: {
@@ -35,7 +40,7 @@ export class EntrepreneursService {
         documentNumber: dto.documentNumber,
         cuitCuil: dto.cuitCuil ?? null,
         phoneNumber: dto.phoneNumber ?? null,
-        birthDate: new Date(dto.birthDate),
+        birthDate,
         registrationDate: new Date(),
         city: dto.city ?? null,
         province: dto.province ?? null,
@@ -72,6 +77,16 @@ export class EntrepreneursService {
   async update(id: number, dto: UpdateEntrepreneurDto) {
     const entrepreneur = await this.prisma.entrepreneurs.findUnique({ where: { id } });
     if (!entrepreneur) throw new NotFoundException('Emprendedor no encontrado');
+
+    if (dto.email && dto.email !== entrepreneur.email) {
+      const dup = await this.prisma.entrepreneurs.findUnique({ where: { email: dto.email } });
+      if (dup) throw new ConflictException('Ese email ya está en uso');
+    }
+    if (dto.documentNumber && dto.documentNumber !== entrepreneur.documentNumber) {
+      const dup = await this.prisma.entrepreneurs.findFirst({ where: { documentNumber: dto.documentNumber } });
+      if (dup) throw new ConflictException('Ese documento ya está en uso');
+    }
+
     const data: any = { ...dto };
     if (data.password) {
       data.passwordHash = await bcrypt.hash(data.password, 10);
@@ -102,17 +117,5 @@ export class EntrepreneursService {
     if (!entrepreneur) throw new NotFoundException('Emprendedor no encontrado');
     await this.prisma.entrepreneurs.delete({ where: { id } });
     return { message: 'Emprendedor eliminado correctamente' };
-  }
-
-  async findClubByEntrepreneur(entrepreneurId: number) {
-    const association = await this.prisma.entrepreneur_Club.findFirst({
-      where: { idEntrepreneurs: entrepreneurId },
-    });
-    if (!association) return null;
-    try {
-      return await this.findOne(association.idClub);
-    } catch {
-      return null;
-    }
   }
 }

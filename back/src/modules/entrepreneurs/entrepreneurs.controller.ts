@@ -3,6 +3,7 @@ import {
   Param, ParseIntPipe, UseGuards, Request, UsePipes,
   ValidationPipe, ForbiddenException,
 } from '@nestjs/common';
+import { Throttle } from '@nestjs/throttler';
 import { EntrepreneursService } from './entrepreneurs.service';
 import { CreateEntrepreneurDto } from './dto/create-entrepreneurs.dto';
 import { UpdateEntrepreneurDto } from './dto/update-entrepreneurs.dto';
@@ -19,6 +20,8 @@ export class EntrepreneursController {
     private readonly clubsService: ClubsService,
   ) {}
 
+  @UseGuards(RolesGuard)
+  @Roles('admin')
   @Post()
   @UsePipes(new ValidationPipe({ whitelist: true, transform: true }))
   async create(@Body() dto: CreateEntrepreneurDto) {
@@ -42,6 +45,7 @@ export class EntrepreneursController {
     };
   }
 
+  @Throttle({ default: { limit: 5, ttl: 60000 } })
   @Post('me/verify-password')
   async verifyPassword(@Request() req: any, @Body() body: { password: string }) {
     return this.entrepreneursService.verifyPassword(req.user.id, body.password);
@@ -76,6 +80,7 @@ export class EntrepreneursController {
   }
 
   @Patch(':id')
+  @UsePipes(new ValidationPipe({ whitelist: true, transform: true }))
   async update(@Param('id', ParseIntPipe) id: number, @Body() dto: UpdateEntrepreneurDto, @Request() req: any) {
     if (req.user.id !== id && req.user.role !== 'admin') {
       throw new ForbiddenException('No autorizado para actualizar este emprendedor');

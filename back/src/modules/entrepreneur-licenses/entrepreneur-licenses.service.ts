@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException, BadRequestException, ForbiddenException } from '@nestjs/common';
+import { Injectable, NotFoundException, BadRequestException, ForbiddenException, ConflictException } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
 import { CreateEntrepreneurLicenseDto } from './dto/create-entrepreneur-licenses.dto';
 import { UpdateEntrepreneurLicenseDto } from './dto/update-entrepreneur-licenses.dto';
@@ -30,6 +30,11 @@ export class EntrepreneurLicensesService {
       where: { id: dto.idLicenseTypes },
     });
     if (!licenseType) throw new NotFoundException('Tipo de licencia no encontrado');
+
+    const duplicate = await this.prisma.entrepreneur_Licenses.findFirst({
+      where: { idEntrepreneurs: dto.idEntrepreneurs, idLicenseTypes: dto.idLicenseTypes },
+    });
+    if (duplicate) throw new ConflictException('Ya existe una licencia de este tipo para este emprendedor');
 
     let documentUrl = dto.documentUrl ?? null;
     if (documentFile) {
@@ -75,21 +80,16 @@ export class EntrepreneurLicensesService {
     const existing = await this.prisma.entrepreneur_Licenses.findUnique({ where: { id } });
     if (!existing) throw new NotFoundException('Licencia no encontrada');
 
-    if ((dto as any).idEntrepreneurs) {
-      const e = await this.prisma.entrepreneurs.findUnique({ where: { id: (dto as any).idEntrepreneurs } });
-      if (!e) throw new NotFoundException('Emprendedor (nuevo) no encontrado');
-    }
-    if ((dto as any).idLicenseTypes) {
-      const lt = await this.prisma.license_Types.findUnique({ where: { id: (dto as any).idLicenseTypes } });
-      if (!lt) throw new NotFoundException('Tipo de licencia (nuevo) no encontrado');
-    }
-
-    let documentUrl = (dto as any).documentUrl ?? existing.documentUrl;
+    let documentUrl = dto.documentUrl ?? existing.documentUrl;
     let verificationStatus = existing.verificationStatus;
     let verificationDate = existing.verificationDate;
-    let verificationNotes = (dto as any).verificationNotes ?? existing.verificationNotes;
+    let verificationNotes = dto.verificationNotes ?? existing.verificationNotes;
 
     if (documentFile) {
+      if (existing.documentUrl) {
+        const publicId = this.cloudinary.extractPublicId(existing.documentUrl);
+        await this.cloudinary.deleteImage(publicId);
+      }
       documentUrl = await this.cloudinary.uploadDocument(documentFile, 'aurabox/licenses');
       verificationStatus = VerificationStatus.PENDIENTE;
       verificationDate = null;
@@ -99,10 +99,8 @@ export class EntrepreneurLicensesService {
     const updated = await this.prisma.entrepreneur_Licenses.update({
       where: { id },
       data: {
-        idEntrepreneurs: (dto as any).idEntrepreneurs ?? existing.idEntrepreneurs,
-        idLicenseTypes: (dto as any).idLicenseTypes ?? existing.idLicenseTypes,
-        issueDate: (dto as any).issueDate ? new Date((dto as any).issueDate) : existing.issueDate,
-        expirationDate: (dto as any).expirationDate ? new Date((dto as any).expirationDate) : existing.expirationDate,
+        issueDate: dto.issueDate ? new Date(dto.issueDate) : existing.issueDate,
+        expirationDate: dto.expirationDate ? new Date(dto.expirationDate) : existing.expirationDate,
         documentUrl,
         verificationStatus,
         verificationDate,
@@ -176,6 +174,10 @@ export class EntrepreneurLicensesService {
   async remove(id: number) {
     const existing = await this.prisma.entrepreneur_Licenses.findUnique({ where: { id } });
     if (!existing) throw new NotFoundException('Licencia no encontrada');
+    if (existing.documentUrl) {
+      const publicId = this.cloudinary.extractPublicId(existing.documentUrl);
+      await this.cloudinary.deleteImage(publicId);
+    }
     await this.prisma.entrepreneur_Licenses.delete({ where: { id } });
     return { message: 'Licencia eliminada correctamente' };
   }

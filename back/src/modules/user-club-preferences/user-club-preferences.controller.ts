@@ -39,19 +39,23 @@ export class UserClubPreferencesController {
     return this.svc.findByUser(idUser);
   }
 
+  @UseGuards(RolesGuard)
+  @Roles('entrepreneur', 'admin')
   @Get('by-club/:idClub')
-  async findByClub(@Param('idClub', ParseIntPipe) idClub: number) {
-    return this.svc.findByClub(idClub);
+  async findByClub(@Param('idClub', ParseIntPipe) idClub: number, @Request() req) {
+    return this.svc.findByClub(idClub, req.user);
   }
 
+  @UseGuards(RolesGuard)
+  @Roles('entrepreneur', 'admin')
   @Get('by-subscription-type/:idSubscriptionTypes')
-  async findBySubscriptionType(@Param('idSubscriptionTypes', ParseIntPipe) idSubscriptionTypes: number) {
-    return this.svc.findBySubscriptionType(idSubscriptionTypes);
+  async findBySubscriptionType(@Param('idSubscriptionTypes', ParseIntPipe) idSubscriptionTypes: number, @Request() req) {
+    return this.svc.findBySubscriptionType(idSubscriptionTypes, req.user);
   }
 
   @Get(':id')
-  async findOne(@Param('id', ParseIntPipe) id: number) {
-    return this.svc.findOne(id);
+  async findOne(@Param('id', ParseIntPipe) id: number, @Request() req) {
+    return this.svc.findOne(id, req.user);
   }
 
   @Put(':id')

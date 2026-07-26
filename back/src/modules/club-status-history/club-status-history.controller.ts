@@ -10,20 +10,17 @@ import { RolesGuard } from '../auth/roles.guard';
 import { Roles } from '../auth/roles.decorator';
 
 @Controller('club-status-history')
-@UseGuards(JwtAuthGuard)
+@UseGuards(JwtAuthGuard, RolesGuard)
+@Roles('admin')
 export class ClubStatusHistoryController {
   constructor(private readonly svc: ClubStatusHistoryService) {}
 
-  @UseGuards(RolesGuard)
-  @Roles('admin')
   @Post()
   @UsePipes(new ValidationPipe({ whitelist: true, transform: true }))
   async create(@Body() dto: CreateClubStatusHistoryDto) {
     return this.svc.create(dto);
   }
 
-  @UseGuards(RolesGuard)
-  @Roles('admin')
   @Get()
   async findAll() {
     return this.svc.findAll();
@@ -44,16 +41,12 @@ export class ClubStatusHistoryController {
     return this.svc.findOne(id);
   }
 
-  @UseGuards(RolesGuard)
-  @Roles('admin')
   @Put(':id')
   @UsePipes(new ValidationPipe({ whitelist: true, transform: true }))
   async update(@Param('id', ParseIntPipe) id: number, @Body() dto: UpdateClubStatusHistoryDto) {
     return this.svc.update(id, dto);
   }
 
-  @UseGuards(RolesGuard)
-  @Roles('admin')
   @Delete(':id')
   async remove(@Param('id', ParseIntPipe) id: number) {
     return this.svc.remove(id);

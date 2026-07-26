@@ -1,6 +1,6 @@
 import {
   Body, Controller, Get, Post, Delete,
-  Param, ParseIntPipe, UseGuards, UsePipes, ValidationPipe, Patch,
+  Param, ParseIntPipe, UseGuards, UsePipes, ValidationPipe, Patch, Request,
 } from '@nestjs/common';
 import { ClubCategoriesService } from './club-categories.service';
 import { CreateClubCategoryDto } from './dto/create-club-category.dto';
@@ -18,8 +18,8 @@ export class ClubCategoriesController {
   @Roles('entrepreneur', 'admin')
   @Post()
   @UsePipes(new ValidationPipe({ whitelist: true, transform: true }))
-  async create(@Body() dto: CreateClubCategoryDto) {
-    return this.service.create(dto);
+  async create(@Body() dto: CreateClubCategoryDto, @Request() req) {
+    return this.service.create(dto, req.user);
   }
 
   @UseGuards(RolesGuard)

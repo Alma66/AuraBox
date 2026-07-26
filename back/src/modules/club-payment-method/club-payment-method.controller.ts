@@ -1,6 +1,6 @@
 import {
   Body, Controller, Get, Post, Put, Delete,
-  Param, ParseIntPipe, UseGuards, UsePipes, ValidationPipe,
+  Param, ParseIntPipe, UseGuards, UsePipes, ValidationPipe, Request,
 } from '@nestjs/common';
 import { ClubPaymentMethodService } from './club-payment-method.service';
 import { CreateClubPaymentMethodDto } from './dto/create-club-payment-method.dto';
@@ -18,8 +18,8 @@ export class ClubPaymentMethodController {
   @Roles('entrepreneur', 'admin')
   @Post()
   @UsePipes(new ValidationPipe({ whitelist: true, transform: true }))
-  async create(@Body() dto: CreateClubPaymentMethodDto) {
-    return this.svc.create(dto);
+  async create(@Body() dto: CreateClubPaymentMethodDto, @Request() req) {
+    return this.svc.create(dto, req.user);
   }
 
   @UseGuards(RolesGuard)
@@ -55,7 +55,7 @@ export class ClubPaymentMethodController {
   @UseGuards(RolesGuard)
   @Roles('entrepreneur', 'admin')
   @Delete(':id')
-  async remove(@Param('id', ParseIntPipe) id: number) {
-    return this.svc.remove(id);
+  async remove(@Param('id', ParseIntPipe) id: number, @Request() req) {
+    return this.svc.remove(id, req.user);
   }
 }

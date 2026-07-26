@@ -1,4 +1,24 @@
-import { PartialType } from '@nestjs/mapped-types';
-import { CreateEntrepreneurLicenseDto } from './create-entrepreneur-licenses.dto';
+import {
+  IsOptional,
+  IsDateString,
+  IsString,
+  IsUrl,
+} from 'class-validator';
 
-export class UpdateEntrepreneurLicenseDto extends PartialType(CreateEntrepreneurLicenseDto) {}
+export class UpdateEntrepreneurLicenseDto {
+  @IsOptional()
+  @IsDateString()
+  issueDate?: string;
+
+  @IsOptional()
+  @IsDateString()
+  expirationDate?: string;
+
+  @IsOptional()
+  @IsUrl()
+  documentUrl?: string;
+
+  @IsOptional()
+  @IsString()
+  verificationNotes?: string;
+}

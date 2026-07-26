@@ -1,6 +1,6 @@
 import {
   Body, Controller, Get, Post, Put, Delete,
-  Param, ParseIntPipe, UseGuards, UsePipes, ValidationPipe,
+  Param, ParseIntPipe, UseGuards, UsePipes, ValidationPipe, Request,
 } from '@nestjs/common';
 import { ClubSocialNetworksService } from './club-social-networks.service';
 import { CreateClubSocialNetworkDto } from './dto/create-club-social-network.dto';
@@ -18,8 +18,8 @@ export class ClubSocialNetworksController {
   @Roles('entrepreneur', 'admin')
   @Post()
   @UsePipes(new ValidationPipe({ whitelist: true, transform: true }))
-  async create(@Body() dto: CreateClubSocialNetworkDto) {
-    return this.svc.create(dto);
+  async create(@Body() dto: CreateClubSocialNetworkDto, @Request() req) {
+    return this.svc.create(dto, req.user);
   }
 
   @UseGuards(RolesGuard)
@@ -43,14 +43,14 @@ export class ClubSocialNetworksController {
   @Roles('entrepreneur', 'admin')
   @Put(':id')
   @UsePipes(new ValidationPipe({ whitelist: true, transform: true }))
-  async update(@Param('id', ParseIntPipe) id: number, @Body() dto: UpdateClubSocialNetworkDto) {
-    return this.svc.update(id, dto);
+  async update(@Param('id', ParseIntPipe) id: number, @Body() dto: UpdateClubSocialNetworkDto, @Request() req) {
+    return this.svc.update(id, dto, req.user);
   }
 
   @UseGuards(RolesGuard)
   @Roles('entrepreneur', 'admin')
   @Delete(':id')
-  async remove(@Param('id', ParseIntPipe) id: number) {
-    return this.svc.remove(id);
+  async remove(@Param('id', ParseIntPipe) id: number, @Request() req) {
+    return this.svc.remove(id, req.user);
   }
 }
