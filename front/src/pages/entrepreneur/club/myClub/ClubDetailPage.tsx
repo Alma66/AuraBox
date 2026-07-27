@@ -447,10 +447,10 @@ const ClubDetailPage: React.FC = () => {
     return (
       <div className="container mx-auto px-4 py-8">
         <div className="animate-pulse">
-          <div className="h-72 bg-gray-200 rounded-2xl mb-6" />
-          <div className="h-8 bg-gray-200 rounded w-1/3 mb-3" />
-          <div className="h-4 bg-gray-200 rounded w-2/3 mb-2" />
-          <div className="h-4 bg-gray-200 rounded w-1/2" />
+          <div className="h-72 bg-aurora-navy/10 rounded-2xl mb-6" />
+          <div className="h-8 bg-aurora-navy/10 rounded w-1/3 mb-3" />
+          <div className="h-4 bg-aurora-navy/10 rounded w-2/3 mb-2" />
+          <div className="h-4 bg-aurora-navy/10 rounded w-1/2" />
         </div>
       </div>
     );
@@ -459,9 +459,9 @@ const ClubDetailPage: React.FC = () => {
   if (error || !club) {
     return (
       <div className="container mx-auto px-4 py-16 text-center">
-        <h1 className="text-3xl font-bold text-gray-900 mb-3">Club no encontrado</h1>
-        <p className="text-gray-500 mb-8">El club que buscás no existe o fue eliminado.</p>
-        <button onClick={() => navigate('/')} className="bg-blue-600 text-white px-6 py-3 rounded-xl font-semibold hover:bg-blue-700 transition-colors shadow-sm">
+        <h1 className="text-3xl font-serif font-bold text-aurora-navy mb-3">Club no encontrado</h1>
+        <p className="text-aurora-navy/60 mb-8">El club que buscás no existe o fue eliminado.</p>
+        <button onClick={() => navigate('/')} className="bg-aurora-terracotta text-white px-6 py-3 rounded-xl font-semibold hover:bg-aurora-terracottaDark transition-colors shadow-sm">
           Volver al inicio
         </button>
       </div>
@@ -482,7 +482,7 @@ const ClubDetailPage: React.FC = () => {
   );
 
   return (
-    <div className="bg-gray-50 min-h-screen">
+    <div className="bg-aurora-cream min-h-screen">
       {toast && (
         <div
           role="alert"
@@ -501,22 +501,22 @@ const ClubDetailPage: React.FC = () => {
         </div>
       )}
       {cropState && (
-        <div className="fixed inset-0 z-50 bg-black/80 flex flex-col items-center justify-center p-4">
+        <div className="fixed inset-0 z-50 bg-aurora-navy/80 flex flex-col items-center justify-center p-4">
           <div className="bg-white rounded-2xl shadow-2xl w-full max-w-2xl overflow-hidden">
-            <div className="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
+            <div className="px-6 py-4 border-b border-aurora-navy/10 flex items-center justify-between">
               <div>
-                <h3 className="text-lg font-semibold text-gray-900">
+                <h3 className="text-lg font-serif font-semibold text-aurora-navy">
                   {cropState.target === 'logo' ? 'Ajustar logo' : cropState.target === 'banner' ? 'Ajustar banner' : 'Ajustar imagen de historia'}
                 </h3>
-                <p className="text-sm text-gray-500 mt-0.5">Mové y hacé zoom para encuadrar la imagen</p>
+                <p className="text-sm text-aurora-navy/50 mt-0.5">Mové y hacé zoom para encuadrar la imagen</p>
               </div>
-              <button onClick={() => setCropState(null)} className="text-gray-400 hover:text-gray-600 transition-colors" aria-label="Cerrar">
+              <button onClick={() => setCropState(null)} className="text-aurora-navy/40 hover:text-aurora-navy transition-colors" aria-label="Cerrar">
                 <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
                 </svg>
               </button>
             </div>
-            <div className="relative bg-gray-900" style={{ height: cropState.target === 'logo' ? '320px' : '280px' }}>
+            <div className="relative bg-aurora-navy" style={{ height: cropState.target === 'logo' ? '320px' : '280px' }}>
               <Cropper
                 image={cropState.imageSrc}
                 crop={cropState.crop}
@@ -529,7 +529,7 @@ const ClubDetailPage: React.FC = () => {
                 onCropComplete={(_, croppedAreaPixels) => setCropState((prev) => (prev ? { ...prev, croppedAreaPixels } : null))}
               />
             </div>
-            <div className="px-6 py-4 bg-gray-50">
+            <div className="px-6 py-4 bg-aurora-cream">
               {cropError && (
                 <p className="text-xs text-red-600 mb-3 flex items-center gap-1.5">
                   <svg className="w-3.5 h-3.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -539,7 +539,7 @@ const ClubDetailPage: React.FC = () => {
                 </p>
               )}
               <div className="flex items-center gap-3 mb-4">
-                <svg className="w-4 h-4 text-gray-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-4 h-4 text-aurora-navy/40 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7" />
                 </svg>
                 <input
@@ -549,7 +549,7 @@ const ClubDetailPage: React.FC = () => {
                   step={0.01}
                   value={cropState.zoom}
                   onChange={(e) => setCropState((prev) => (prev ? { ...prev, zoom: Number(e.target.value) } : null))}
-                  className="flex-1 accent-blue-600"
+                  className="flex-1 accent-aurora-terracotta"
                   aria-label="Zoom"
                 />
               </div>
@@ -557,14 +557,14 @@ const ClubDetailPage: React.FC = () => {
                 <button
                   onClick={() => setCropState(null)}
                   disabled={uploading}
-                  className="flex-1 px-4 py-2.5 rounded-xl border border-gray-200 text-gray-700 text-sm font-medium hover:bg-gray-100 disabled:opacity-50 transition-colors"
+                  className="flex-1 px-4 py-2.5 rounded-xl border border-aurora-navy/15 text-aurora-navy text-sm font-medium hover:bg-white disabled:opacity-50 transition-colors"
                 >
                   Cancelar
                 </button>
                 <button
                   onClick={handleCropConfirm}
                   disabled={uploading}
-                  className="flex-1 px-4 py-2.5 rounded-xl bg-blue-600 text-white text-sm font-semibold hover:bg-blue-700 disabled:opacity-50 transition-colors"
+                  className="flex-1 px-4 py-2.5 rounded-xl bg-aurora-terracotta text-white text-sm font-semibold hover:bg-aurora-terracottaDark disabled:opacity-50 transition-colors"
                 >
                   {uploading ? 'Guardando...' : 'Guardar imagen'}
                 </button>
@@ -574,14 +574,14 @@ const ClubDetailPage: React.FC = () => {
         </div>
       )}
       {confirmDeleteBannerId !== null && (
-        <div className="fixed inset-0 z-50 bg-black/60 flex items-center justify-center p-4">
+        <div className="fixed inset-0 z-50 bg-aurora-navy/60 flex items-center justify-center p-4">
           <div className="bg-white rounded-2xl shadow-2xl w-full max-w-sm p-6">
-            <h3 className="text-lg font-semibold text-gray-900 mb-2">¿Eliminar este banner?</h3>
-            <p className="text-sm text-gray-500 mb-6">Esta acción no se puede deshacer.</p>
+            <h3 className="text-lg font-serif font-semibold text-aurora-navy mb-2">¿Eliminar este banner?</h3>
+            <p className="text-sm text-aurora-navy/50 mb-6">Esta acción no se puede deshacer.</p>
             <div className="flex gap-3">
               <button
                 onClick={() => setConfirmDeleteBannerId(null)}
-                className="flex-1 px-4 py-2.5 rounded-xl border border-gray-200 text-gray-700 text-sm font-medium hover:bg-gray-100 transition-colors"
+                className="flex-1 px-4 py-2.5 rounded-xl border border-aurora-navy/15 text-aurora-navy text-sm font-medium hover:bg-aurora-cream transition-colors"
               >
                 Cancelar
               </button>
@@ -596,14 +596,14 @@ const ClubDetailPage: React.FC = () => {
         </div>
       )}
       {confirmDeleteSocialId !== null && (
-        <div className="fixed inset-0 z-50 bg-black/60 flex items-center justify-center p-4">
+        <div className="fixed inset-0 z-50 bg-aurora-navy/60 flex items-center justify-center p-4">
           <div className="bg-white rounded-2xl shadow-2xl w-full max-w-sm p-6">
-            <h3 className="text-lg font-semibold text-gray-900 mb-2">¿Eliminar esta red social?</h3>
-            <p className="text-sm text-gray-500 mb-6">Dejará de mostrarse en el perfil del club.</p>
+            <h3 className="text-lg font-serif font-semibold text-aurora-navy mb-2">¿Eliminar esta red social?</h3>
+            <p className="text-sm text-aurora-navy/50 mb-6">Dejará de mostrarse en el perfil del club.</p>
             <div className="flex gap-3">
               <button
                 onClick={() => setConfirmDeleteSocialId(null)}
-                className="flex-1 px-4 py-2.5 rounded-xl border border-gray-200 text-gray-700 text-sm font-medium hover:bg-gray-100 transition-colors"
+                className="flex-1 px-4 py-2.5 rounded-xl border border-aurora-navy/15 text-aurora-navy text-sm font-medium hover:bg-aurora-cream transition-colors"
               >
                 Cancelar
               </button>
@@ -628,7 +628,7 @@ const ClubDetailPage: React.FC = () => {
               ))}
             </Slider>
           ) : (
-            <div className="w-full h-72 md:h-96 bg-gradient-to-br from-blue-600 to-purple-700" />
+            <div className="w-full h-72 md:h-96 bg-gradient-to-br from-aurora-navy to-aurora-terracotta" />
           )}
         </div>
         <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent pointer-events-none" />
@@ -638,8 +638,8 @@ const ClubDetailPage: React.FC = () => {
               {logoSrc ? (
                 <img src={logoSrc} alt={`${club.name} logo`} className="w-full h-full object-cover" />
               ) : (
-                <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-blue-500 to-purple-600">
-                  <span className="text-white text-3xl font-bold">{club.name?.charAt(0)}</span>
+                <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-aurora-navy to-aurora-terracotta">
+                  <span className="text-white text-3xl font-serif font-bold">{club.name?.charAt(0)}</span>
                 </div>
               )}
             </div>
@@ -647,7 +647,7 @@ const ClubDetailPage: React.FC = () => {
               <>
                 <button
                   onClick={() => logoInputRef.current?.click()}
-                  className="absolute bottom-1 right-1 bg-white text-gray-700 rounded-full p-2 shadow-lg hover:bg-gray-50 border border-gray-200 transition-colors"
+                  className="absolute bottom-1 right-1 bg-white text-aurora-navy rounded-full p-2 shadow-lg hover:bg-aurora-cream border border-aurora-navy/10 transition-colors"
                   title="Cambiar logo (JPG, PNG o WEBP, máx. 8MB)"
                 >
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -666,7 +666,7 @@ const ClubDetailPage: React.FC = () => {
             )}
           </div>
           <div className="flex-1 min-w-0 pb-2">
-            <h1 className="text-2xl md:text-4xl font-extrabold text-white drop-shadow-lg truncate">{club.name}</h1>
+            <h1 className="text-2xl md:text-4xl font-serif font-extrabold text-white drop-shadow-lg truncate">{club.name}</h1>
             {club.slogan && <p className="text-white/85 text-sm md:text-base drop-shadow mt-1">{club.slogan}</p>}
           </div>
           {isOwner && (
@@ -692,25 +692,25 @@ const ClubDetailPage: React.FC = () => {
         </div>
       </div>
       <div className="container mx-auto px-4 pt-20 pb-8">
-        <button onClick={() => navigate(-1)} className="mb-6 flex items-center text-blue-600 hover:text-blue-800 transition-colors text-sm font-medium">
+        <button onClick={() => navigate(-1)} className="mb-6 flex items-center text-aurora-terracotta hover:text-aurora-terracottaDark transition-colors text-sm font-medium">
           <svg className="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
           </svg>
           Volver
         </button>
         {isOwner && club.bannerImagesRaw && club.bannerImagesRaw.length > 0 && (
-          <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-5 mb-6">
+          <div className="bg-white rounded-2xl shadow-aurora-sm border border-aurora-navy/10 p-5 mb-6">
             <div className="flex items-center gap-2 mb-4">
-              <div className="w-1 h-5 bg-blue-600 rounded-full" />
-              <h3 className="text-sm font-semibold text-gray-800">Banners del club</h3>
-              <span className="ml-auto text-xs text-gray-400">
+              <div className="w-1 h-5 bg-aurora-terracotta rounded-full" />
+              <h3 className="text-sm font-semibold text-aurora-navy">Banners del club</h3>
+              <span className="ml-auto text-xs text-aurora-navy/40">
                 {club.bannerImagesRaw.length} / {MAX_BANNERS} imágenes
               </span>
             </div>
             <div className="flex flex-wrap gap-3">
               {club.bannerImagesRaw.map((img) => (
                 <div key={img.id} className="relative group">
-                  <img src={img.imageUrl} alt="banner" className="w-36 h-24 object-cover rounded-xl border border-gray-100 shadow-sm" />
+                  <img src={img.imageUrl} alt="banner" className="w-36 h-24 object-cover rounded-xl border border-aurora-navy/10 shadow-sm" />
                   <div className="absolute inset-0 bg-black/40 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
                     <button
                       onClick={() => setConfirmDeleteBannerId(img.id)}
@@ -724,20 +724,20 @@ const ClubDetailPage: React.FC = () => {
             </div>
           </div>
         )}
-        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 md:p-8 mb-6">
+        <div className="bg-white rounded-2xl shadow-aurora-sm border border-aurora-navy/10 p-6 md:p-8 mb-6">
           <div className="flex justify-between items-center mb-6">
-            <span className="inline-flex items-center bg-purple-50 text-purple-700 text-xs font-semibold px-3 py-1.5 rounded-full border border-purple-100">
+            <span className="inline-flex items-center bg-aurora-gold/10 text-aurora-navy text-xs font-semibold px-3 py-1.5 rounded-full border border-aurora-gold/30">
               {club.category}
             </span>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
             <div>
               <div className="flex items-center justify-between mb-3">
-                <h2 className="text-xl font-bold text-gray-900">Sobre Nosotros</h2>
+                <h2 className="text-xl font-serif font-bold text-aurora-navy">Sobre Nosotros</h2>
                 {isOwner && !editingDescription && (
                   <button
                     onClick={() => { setEditDescription(club.shortDescription || ''); setDescriptionError(''); setEditingDescription(true); }}
-                    className="inline-flex items-center gap-2 text-sm font-semibold text-white bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded-lg transition-colors shadow-sm"
+                    className="inline-flex items-center gap-2 text-sm font-semibold text-white bg-aurora-terracotta hover:bg-aurora-terracottaDark px-4 py-2 rounded-lg transition-colors shadow-sm"
                   >
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
@@ -747,17 +747,17 @@ const ClubDetailPage: React.FC = () => {
                 )}
               </div>
               {editingDescription && isOwner ? (
-                <div className="bg-gray-50 rounded-xl p-4 border border-gray-200">
+                <div className="bg-aurora-cream rounded-xl p-4 border border-aurora-navy/10">
                   <textarea
                     value={editDescription}
                     onChange={(e) => handleDescriptionChange(e.target.value)}
-                    className={`w-full border rounded-xl p-3 h-36 text-sm text-gray-700 focus:ring-2 focus:border-transparent outline-none resize-none transition-all bg-white ${descriptionError ? 'border-red-300 focus:ring-red-400' : 'border-gray-200 focus:ring-blue-500'}`}
+                    className={`w-full border rounded-xl p-3 h-36 text-sm text-aurora-navy focus:ring-2 focus:border-transparent outline-none resize-none transition-all bg-white ${descriptionError ? 'border-red-300 focus:ring-red-400' : 'border-aurora-navy/15 focus:ring-aurora-terracotta'}`}
                     placeholder="Contá de qué se trata tu club..."
                     autoFocus
                     maxLength={MAX_DESCRIPTION_LENGTH}
                   />
                   <div className="flex items-center justify-between mt-1.5">
-                    <span className={`text-xs ${descriptionError ? 'text-red-600' : 'text-gray-400'}`}>
+                    <span className={`text-xs ${descriptionError ? 'text-red-600' : 'text-aurora-navy/40'}`}>
                       {descriptionError || `${editDescription.length} / ${MAX_DESCRIPTION_LENGTH} caracteres`}
                     </span>
                   </div>
@@ -765,30 +765,30 @@ const ClubDetailPage: React.FC = () => {
                     <button
                       onClick={handleSaveDescription}
                       disabled={saving}
-                      className="bg-blue-600 text-white text-sm px-5 py-2.5 rounded-lg font-semibold hover:bg-blue-700 disabled:opacity-50 transition-colors shadow-sm"
+                      className="bg-aurora-terracotta text-white text-sm px-5 py-2.5 rounded-lg font-semibold hover:bg-aurora-terracottaDark disabled:opacity-50 transition-colors shadow-sm"
                     >
                       {saving ? 'Guardando...' : 'Guardar cambios'}
                     </button>
                     <button
                       onClick={() => { setEditingDescription(false); setEditDescription(club.shortDescription || ''); setDescriptionError(''); }}
-                      className="text-gray-600 text-sm px-4 py-2.5 rounded-lg hover:bg-gray-200 transition-colors font-medium"
+                      className="text-aurora-navy/70 text-sm px-4 py-2.5 rounded-lg hover:bg-aurora-navy/10 transition-colors font-medium"
                     >
                       Cancelar
                     </button>
                   </div>
                 </div>
               ) : (
-                <p className="text-gray-600 leading-relaxed text-sm">{club.shortDescription || 'Este club todavía no cargó una descripción.'}</p>
+                <p className="text-aurora-navy/70 leading-relaxed text-sm">{club.shortDescription || 'Este club todavía no cargó una descripción.'}</p>
               )}
             </div>
             <div>
               {isOwner ? (
                 <div>
                   <div className="flex items-center justify-between mb-3">
-                    <h2 className="text-xl font-bold text-gray-900">Imagen de historia</h2>
+                    <h2 className="text-xl font-serif font-bold text-aurora-navy">Imagen de historia</h2>
                     <button
                       onClick={() => historyInputRef.current?.click()}
-                      className="inline-flex items-center gap-2 text-sm font-semibold text-white bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded-lg transition-colors shadow-sm"
+                      className="inline-flex items-center gap-2 text-sm font-semibold text-white bg-aurora-terracotta hover:bg-aurora-terracottaDark px-4 py-2 rounded-lg transition-colors shadow-sm"
                     >
                       <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
@@ -798,17 +798,17 @@ const ClubDetailPage: React.FC = () => {
                     </button>
                   </div>
                   {historyImage ? (
-                    <img ref={historyDisplayRef as React.RefObject<HTMLImageElement>} src={historyImage} alt="Historia" className="w-full h-56 object-cover rounded-xl border border-gray-100 shadow-sm" />
+                    <img ref={historyDisplayRef as React.RefObject<HTMLImageElement>} src={historyImage} alt="Historia" className="w-full h-56 object-cover rounded-xl border border-aurora-navy/10 shadow-sm" />
                   ) : (
-                    <div ref={historyDisplayRef as React.RefObject<HTMLDivElement>} className="w-full h-56 rounded-xl border-2 border-dashed border-gray-200 bg-gray-50 flex flex-col items-center justify-center gap-2">
-                      <svg className="w-8 h-8 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <div ref={historyDisplayRef as React.RefObject<HTMLDivElement>} className="w-full h-56 rounded-xl border-2 border-dashed border-aurora-navy/15 bg-aurora-cream flex flex-col items-center justify-center gap-2">
+                      <svg className="w-8 h-8 text-aurora-navy/20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
                       </svg>
-                      <span className="text-xs text-gray-400 font-medium">Sin imagen de historia</span>
-                      <span className="text-xs text-gray-300">Hacé click en "Cambiar imagen" para agregar una</span>
+                      <span className="text-xs text-aurora-navy/40 font-medium">Sin imagen de historia</span>
+                      <span className="text-xs text-aurora-navy/30">Hacé click en "Cambiar imagen" para agregar una</span>
                     </div>
                   )}
-                  <p className="text-xs text-gray-400 mt-2">Formatos aceptados: JPG, PNG o WEBP. Tamaño máximo {MAX_IMAGE_SIZE_MB}MB.</p>
+                  <p className="text-xs text-aurora-navy/40 mt-2">Formatos aceptados: JPG, PNG o WEBP. Tamaño máximo {MAX_IMAGE_SIZE_MB}MB.</p>
                   <input
                     ref={historyInputRef}
                     type="file"
@@ -828,7 +828,7 @@ const ClubDetailPage: React.FC = () => {
                     <div className="absolute inset-0 flex items-center justify-center rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                       <Link
                         to={`/club/${club.id}/history`}
-                        className="text-white text-sm font-semibold px-5 py-2.5 bg-blue-600 rounded-full hover:bg-blue-700 transition-colors shadow-lg"
+                        className="text-white text-sm font-semibold px-5 py-2.5 bg-aurora-terracotta rounded-full hover:bg-aurora-terracottaDark transition-colors shadow-lg"
                       >
                         Conocer Nuestra Historia
                       </Link>
@@ -838,20 +838,20 @@ const ClubDetailPage: React.FC = () => {
               )}
             </div>
           </div>
-          <div className="border-t border-gray-100 pt-6">
-            <h3 className="text-sm font-semibold text-gray-700 uppercase tracking-wider mb-4">Redes Sociales</h3>
+          <div className="border-t border-aurora-navy/10 pt-6">
+            <h3 className="text-sm font-semibold text-aurora-navy/70 uppercase tracking-wider mb-4">Redes Sociales</h3>
             {!isOwner && <ClubSocialMedia socialMedia={socialMediaForDisplay} />}
             {isOwner && (
               <div>
                 {socialNetworks.length > 0 && (
                   <div className="flex flex-wrap gap-2 mb-5">
                     {socialNetworks.map((sn) => (
-                      <div key={sn.id} className="flex items-center gap-2 bg-gray-50 border border-gray-200 rounded-xl px-3 py-2">
-                        <span className="text-xs font-semibold text-gray-700 capitalize">{sn.networkType}</span>
-                        <span className="text-xs text-gray-400 max-w-[120px] truncate">{sn.profileUrl}</span>
+                      <div key={sn.id} className="flex items-center gap-2 bg-aurora-cream border border-aurora-navy/10 rounded-xl px-3 py-2">
+                        <span className="text-xs font-semibold text-aurora-navy capitalize">{sn.networkType}</span>
+                        <span className="text-xs text-aurora-navy/40 max-w-[120px] truncate">{sn.profileUrl}</span>
                         <button
                           onClick={() => setConfirmDeleteSocialId(sn.id)}
-                          className="text-gray-300 hover:text-red-500 transition-colors ml-1"
+                          className="text-aurora-navy/30 hover:text-red-500 transition-colors ml-1"
                           title="Eliminar"
                         >
                           <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -863,15 +863,15 @@ const ClubDetailPage: React.FC = () => {
                   </div>
                 )}
                 {availableNetworkTypes.length > 0 ? (
-                  <div className="bg-gray-50 rounded-xl border border-gray-200 p-4">
-                    <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-3">Agregar red social</p>
+                  <div className="bg-aurora-cream rounded-xl border border-aurora-navy/10 p-4">
+                    <p className="text-xs font-semibold text-aurora-navy/60 uppercase tracking-wide mb-3">Agregar red social</p>
                     <div className="flex flex-wrap gap-3 items-start">
                       <div>
-                        <label className="block text-xs text-gray-500 mb-1.5">Plataforma</label>
+                        <label className="block text-xs text-aurora-navy/50 mb-1.5">Plataforma</label>
                         <select
                           value={newSocialType}
                           onChange={(e) => setNewSocialType(e.target.value)}
-                          className="border border-gray-200 rounded-lg px-3 py-2 text-sm bg-white focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
+                          className="border border-aurora-navy/15 rounded-lg px-3 py-2 text-sm bg-white focus:ring-2 focus:ring-aurora-terracotta focus:border-transparent outline-none"
                         >
                           {availableNetworkTypes.map((n) => (
                             <option key={n.key} value={n.key}>{n.label}</option>
@@ -879,13 +879,13 @@ const ClubDetailPage: React.FC = () => {
                         </select>
                       </div>
                       <div className="flex-1 min-w-[200px]">
-                        <label className="block text-xs text-gray-500 mb-1.5">URL del perfil</label>
+                        <label className="block text-xs text-aurora-navy/50 mb-1.5">URL del perfil</label>
                         <input
                           type="url"
                           value={newSocialUrl}
                           onChange={(e) => handleSocialUrlChange(e.target.value)}
                           placeholder="https://instagram.com/tu_club"
-                          className={`border rounded-lg px-3 py-2 text-sm w-full bg-white focus:ring-2 focus:border-transparent outline-none ${socialUrlError ? 'border-red-300 focus:ring-red-400' : 'border-gray-200 focus:ring-blue-500'}`}
+                          className={`border rounded-lg px-3 py-2 text-sm w-full bg-white focus:ring-2 focus:border-transparent outline-none ${socialUrlError ? 'border-red-300 focus:ring-red-400' : 'border-aurora-navy/15 focus:ring-aurora-terracotta'}`}
                         />
                         {socialUrlError && (
                           <p className="text-xs text-red-600 mt-1.5 flex items-center gap-1">
@@ -899,18 +899,18 @@ const ClubDetailPage: React.FC = () => {
                       <button
                         onClick={handleAddSocial}
                         disabled={socialSaving || !newSocialUrl.trim()}
-                        className="bg-blue-600 text-white text-sm px-5 py-2.5 rounded-lg font-semibold hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors shadow-sm mt-px"
+                        className="bg-aurora-terracotta text-white text-sm px-5 py-2.5 rounded-lg font-semibold hover:bg-aurora-terracottaDark disabled:opacity-50 disabled:cursor-not-allowed transition-colors shadow-sm mt-px"
                       >
                         {socialSaving ? 'Agregando...' : 'Agregar'}
                       </button>
                     </div>
                   </div>
                 ) : (
-                  <p className="text-xs text-gray-400 italic">Ya agregaste todas las redes sociales disponibles.</p>
+                  <p className="text-xs text-aurora-navy/40 italic">Ya agregaste todas las redes sociales disponibles.</p>
                 )}
                 {socialNetworks.length > 0 && (
                   <div className="mt-4">
-                    <p className="text-xs text-gray-400 mb-2">Vista previa para el cliente:</p>
+                    <p className="text-xs text-aurora-navy/40 mb-2">Vista previa para el cliente:</p>
                     <ClubSocialMedia socialMedia={socialMediaForDisplay} />
                   </div>
                 )}
@@ -920,7 +920,7 @@ const ClubDetailPage: React.FC = () => {
         </div>
         {club.subscriptionPlans && club.subscriptionPlans.length > 0 && (
           <div className="mb-10">
-            <h2 className="text-2xl font-bold text-gray-900 mb-6 text-center">Nuestros Planes de Suscripción</h2>
+            <h2 className="text-2xl font-serif font-bold text-aurora-navy mb-6 text-center">Nuestros Planes de Suscripción</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {club.subscriptionPlans.map((plan) => {
                 const planForCard: SubscriptionPlanCardType = {
@@ -947,7 +947,7 @@ const ClubDetailPage: React.FC = () => {
                         onClick={() => handleTogglePlanFavorite(numericPlanId)}
                         disabled={favoriteLoadingId === numericPlanId}
                         className={`absolute top-3 right-3 z-10 p-2 rounded-full shadow-md transition-colors disabled:opacity-50 ${
-                          isPlanFavorite ? 'bg-red-500 text-white' : 'bg-white/90 text-gray-400 hover:text-red-500'
+                          isPlanFavorite ? 'bg-red-500 text-white' : 'bg-white/90 text-aurora-navy/40 hover:text-red-500'
                         }`}
                         title={isPlanFavorite ? 'Quitar de favoritos' : 'Guardar en favoritos'}
                       >
