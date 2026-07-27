@@ -31,7 +31,6 @@ const CustomerHistoryPage: React.FC = () => {
   const managedClubId = clubId || user?.managedClubId;
 
   useEffect(() => {
-    console.log('CustomerHistoryPage debug:', { authLoading, userRole, managedClubId, customerId, clubId, userManagedClubId: user?.managedClubId });
     if (authLoading) return;
     if (userRole !== 'entrepreneur' || !managedClubId || !customerId) {
       setLoading(false);
@@ -61,7 +60,6 @@ const CustomerHistoryPage: React.FC = () => {
         );
       } catch (err: any) {
         if (cancelled) return;
-        console.error('Error cargando historial de cliente:', err);
         setFetchError(
           err?.response?.data?.message ||
           err?.message ||
@@ -76,25 +74,25 @@ const CustomerHistoryPage: React.FC = () => {
   }, [authLoading, managedClubId, customerId, userRole, clubId, user?.managedClubId]);
 
   if (authLoading || loading) return (
-    <div className="min-h-screen flex items-center justify-center">
-      <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-indigo-600" />
+    <div className="min-h-screen flex items-center justify-center bg-aurora-cream">
+      <div className="animate-spin rounded-full h-10 w-10 border-4 border-aurora-navy/15 border-t-aurora-terracotta" />
     </div>
   );
 
   if (!authLoading && (userRole !== 'entrepreneur' || !managedClubId || !customerId)) {
     return (
-      <div className="min-h-screen flex items-center justify-center text-gray-500">
+      <div className="min-h-screen flex items-center justify-center text-aurora-navy/50 bg-aurora-cream">
         Faltan datos para mostrar esta página (club o cliente no especificado).
       </div>
     );
   }
 
   if (fetchError) return (
-    <div className="min-h-screen flex flex-col items-center justify-center text-center gap-3 px-4">
+    <div className="min-h-screen flex flex-col items-center justify-center text-center gap-3 px-4 bg-aurora-cream">
       <p className="text-red-500 font-medium">{fetchError}</p>
       <button
         onClick={() => navigate(-1)}
-        className="text-sm text-indigo-600 hover:underline"
+        className="text-sm text-aurora-terracotta hover:underline"
       >
         Volver
       </button>
@@ -102,7 +100,7 @@ const CustomerHistoryPage: React.FC = () => {
   );
 
   if (!customer) return (
-    <div className="min-h-screen flex items-center justify-center text-gray-500">Cliente no encontrado.</div>
+    <div className="min-h-screen flex items-center justify-center text-aurora-navy/50 bg-aurora-cream">Cliente no encontrado.</div>
   );
 
   const totalSpent = subscriptions.reduce((sum, s) => sum + (s.monthlyAmountPaid ? Number(s.monthlyAmountPaid) : 0), 0);
@@ -110,30 +108,30 @@ const CustomerHistoryPage: React.FC = () => {
   const activeSub = subscriptions.find(s => normalizeStatus(s.subscriptionStatus) === 'active');
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="bg-white border-b">
+    <div className="min-h-screen bg-aurora-cream">
+      <div className="bg-white border-b border-aurora-navy/10">
         <div className="container mx-auto px-4 py-5">
-          <nav className="text-xs text-gray-500 mb-1 flex items-center gap-1 flex-wrap">
-            <Link to="/entrepreneur/dashboard" className="hover:text-indigo-600">Dashboard</Link>
+          <nav className="text-xs text-aurora-navy/50 mb-1 flex items-center gap-1 flex-wrap">
+            <Link to="/entrepreneur/dashboard" className="hover:text-aurora-terracotta">Dashboard</Link>
             <span>›</span>
-            <Link to={`/entrepreneur/club/${managedClubId}`} className="hover:text-indigo-600">{club?.name || 'Club'}</Link>
+            <Link to={`/entrepreneur/club/${managedClubId}`} className="hover:text-aurora-terracotta">{club?.name || 'Club'}</Link>
             <span>›</span>
-            <Link to={`/entrepreneur/club/${managedClubId}/manage-customers`} className="hover:text-indigo-600">Directorio de clientes</Link>
+            <Link to={`/entrepreneur/club/${managedClubId}/manage-customers`} className="hover:text-aurora-terracotta">Directorio de clientes</Link>
             <span>›</span>
-            <span className="text-gray-700">{customer.firstName} {customer.lastName}</span>
+            <span className="text-aurora-navy/70">{customer.firstName} {customer.lastName}</span>
           </nav>
           <div className="flex items-center gap-4 mt-2">
-            <button onClick={() => navigate(-1)} className="text-gray-400 hover:text-gray-600">
+            <button onClick={() => navigate(-1)} className="text-aurora-navy/40 hover:text-aurora-navy">
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 19l-7-7 7-7" />
               </svg>
             </button>
-            <div className="w-12 h-12 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-700 text-xl font-bold shrink-0">
+            <div className="w-12 h-12 rounded-full bg-aurora-navy/10 flex items-center justify-center text-aurora-navy text-xl font-bold shrink-0">
               {customer.firstName[0].toUpperCase()}
             </div>
             <div>
-              <h1 className="text-2xl font-bold text-gray-900">{customer.firstName} {customer.lastName}</h1>
-              <p className="text-sm text-gray-500">{customer.email}</p>
+              <h1 className="font-display text-2xl font-bold text-aurora-navy">{customer.firstName} {customer.lastName}</h1>
+              <p className="text-sm text-aurora-navy/50">{customer.email}</p>
             </div>
           </div>
         </div>
@@ -142,25 +140,25 @@ const CustomerHistoryPage: React.FC = () => {
       <div className="container mx-auto px-4 py-6 space-y-6">
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           {[
-            { label: 'Suscripciones totales', value: subscriptions.length, color: 'border-indigo-500', text: 'text-indigo-700' },
-            { label: 'Actualmente activa', value: activeSub ? 'Sí' : 'No', color: activeSub ? 'border-green-500' : 'border-gray-300', text: activeSub ? 'text-green-700' : 'text-gray-500' },
-            { label: 'Total abonado', value: totalSpent > 0 ? `$${totalSpent.toLocaleString('es-AR')}` : '—', color: 'border-blue-400', text: 'text-blue-700' },
-            { label: 'Cliente desde', value: firstSub ? new Date(firstSub.startDate).toLocaleDateString('es-AR') : '—', color: 'border-gray-400', text: 'text-gray-700' },
+            { label: 'Suscripciones totales', value: subscriptions.length, color: 'border-aurora-navy', text: 'text-aurora-navy' },
+            { label: 'Actualmente activa', value: activeSub ? 'Sí' : 'No', color: activeSub ? 'border-green-500' : 'border-aurora-navy/20', text: activeSub ? 'text-green-700' : 'text-aurora-navy/50' },
+            { label: 'Total abonado', value: totalSpent > 0 ? `$${totalSpent.toLocaleString('es-AR')}` : '—', color: 'border-aurora-terracotta', text: 'text-aurora-terracotta' },
+            { label: 'Cliente desde', value: firstSub ? new Date(firstSub.startDate).toLocaleDateString('es-AR') : '—', color: 'border-aurora-navy/20', text: 'text-aurora-navy/70' },
           ].map(stat => (
-            <div key={stat.label} className={`bg-white rounded-xl shadow-sm border-l-4 ${stat.color} px-4 py-4`}>
-              <p className="text-xs text-gray-500 font-medium uppercase tracking-wide">{stat.label}</p>
-              <p className={`text-xl font-bold mt-1 ${stat.text}`}>{stat.value}</p>
+            <div key={stat.label} className={`bg-white rounded-xl shadow-aurora-sm border-l-4 ${stat.color} px-4 py-4`}>
+              <p className="text-xs text-aurora-navy/50 font-medium uppercase tracking-wide">{stat.label}</p>
+              <p className={`text-xl font-display font-bold mt-1 ${stat.text}`}>{stat.value}</p>
             </div>
           ))}
         </div>
 
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
-          <h2 className="text-base font-bold text-gray-800 mb-6">Línea de tiempo de suscripciones</h2>
+        <div className="bg-white rounded-xl shadow-aurora-sm border border-aurora-navy/10 p-6">
+          <h2 className="font-display text-base font-bold text-aurora-navy mb-6">Línea de tiempo de suscripciones</h2>
           {subscriptions.length === 0 ? (
-            <p className="text-gray-400 text-sm text-center py-8">Sin suscripciones registradas.</p>
+            <p className="text-aurora-navy/40 text-sm text-center py-8">Sin suscripciones registradas.</p>
           ) : (
             <div className="relative">
-              <div className="absolute left-5 top-0 bottom-0 w-0.5 bg-gray-100" />
+              <div className="absolute left-5 top-0 bottom-0 w-0.5 bg-aurora-navy/10" />
               <div className="space-y-6">
                 {subscriptions.map((sub, idx) => {
                   const status = normalizeStatus(sub.subscriptionStatus);
@@ -170,11 +168,11 @@ const CustomerHistoryPage: React.FC = () => {
                       <div className={`relative z-10 w-10 h-10 rounded-full flex items-center justify-center shrink-0 border-2 border-white shadow-sm ${STATUS_DOT[status]}`}>
                         <span className="text-white text-xs font-bold">{subscriptions.length - idx}</span>
                       </div>
-                      <div className="flex-1 bg-gray-50 rounded-xl p-4 border border-gray-100">
+                      <div className="flex-1 bg-aurora-cream rounded-xl p-4 border border-aurora-navy/5">
                         <div className="flex items-start justify-between gap-3 flex-wrap">
                           <div>
-                            <p className="font-semibold text-gray-900 text-sm">{plan?.name || `Plan #${sub.idSubscriptionTypes}`}</p>
-                            <p className="text-xs text-gray-500 mt-0.5">
+                            <p className="font-semibold text-aurora-navy text-sm">{plan?.name || `Plan #${sub.idSubscriptionTypes}`}</p>
+                            <p className="text-xs text-aurora-navy/50 mt-0.5">
                               Inicio: {new Date(sub.startDate).toLocaleDateString('es-AR')}
                               {sub.expectedEndDate && ` · Fin estimado: ${new Date(sub.expectedEndDate).toLocaleDateString('es-AR')}`}
                             </p>
@@ -183,36 +181,36 @@ const CustomerHistoryPage: React.FC = () => {
                             {STATUS_LABEL[status]}
                           </span>
                         </div>
-                        <div className="mt-3 grid grid-cols-2 md:grid-cols-4 gap-3 text-xs text-gray-600">
+                        <div className="mt-3 grid grid-cols-2 md:grid-cols-4 gap-3 text-xs text-aurora-navy/60">
                           {sub.lastPaymentDate && (
                             <div>
-                              <span className="text-gray-400 block">Último pago</span>
+                              <span className="text-aurora-navy/40 block">Último pago</span>
                               <span className="font-medium">{new Date(sub.lastPaymentDate).toLocaleDateString('es-AR')}</span>
                             </div>
                           )}
                           {sub.nextPaymentDate && status === 'active' && (
                             <div>
-                              <span className="text-gray-400 block">Próximo pago</span>
+                              <span className="text-aurora-navy/40 block">Próximo pago</span>
                               <span className="font-medium">{new Date(sub.nextPaymentDate).toLocaleDateString('es-AR')}</span>
                             </div>
                           )}
                           {sub.monthlyAmountPaid && (
                             <div>
-                              <span className="text-gray-400 block">Monto pagado</span>
-                              <span className="font-medium text-indigo-700">${Number(sub.monthlyAmountPaid).toLocaleString('es-AR')}</span>
+                              <span className="text-aurora-navy/40 block">Monto pagado</span>
+                              <span className="font-medium text-aurora-terracotta">${Number(sub.monthlyAmountPaid).toLocaleString('es-AR')}</span>
                             </div>
                           )}
                           {sub.cancellationDate && (
                             <div>
-                              <span className="text-gray-400 block">Cancelada</span>
+                              <span className="text-aurora-navy/40 block">Cancelada</span>
                               <span className="font-medium text-red-600">{new Date(sub.cancellationDate).toLocaleDateString('es-AR')}</span>
                             </div>
                           )}
                         </div>
                         {sub.cancellationReason && (
-                          <div className="mt-2 pt-2 border-t border-gray-200">
-                            <span className="text-xs text-gray-400">Motivo: </span>
-                            <span className="text-xs text-gray-600">{sub.cancellationReason}</span>
+                          <div className="mt-2 pt-2 border-t border-aurora-navy/10">
+                            <span className="text-xs text-aurora-navy/40">Motivo: </span>
+                            <span className="text-xs text-aurora-navy/70">{sub.cancellationReason}</span>
                           </div>
                         )}
                       </div>

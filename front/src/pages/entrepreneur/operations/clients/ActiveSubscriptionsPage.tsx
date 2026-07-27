@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
+import toast from 'react-hot-toast';
 import { useAuth } from '../../../../App';
-import { Subscription, NormalizedStatus, normalizeStatus } from '../../../../types/subscription';
+import { Subscription, SubscriptionStatus, NormalizedStatus, normalizeStatus } from '../../../../types/subscription';
 import { User } from '../../../../types/user';
 import { SubscriptionPlan, Club } from '../../../../types/club';
 import api, { getResponseData } from '../../../../api/config';
@@ -38,7 +39,6 @@ const ActiveSubscriptionsPage: React.FC = () => {
   const [clubPlans, setClubPlans] = useState<SubscriptionPlan[]>([]);
   const [club, setClub] = useState<Club | null>(null);
   const [loading, setLoading] = useState(true);
-  const [toast, setToast] = useState<{ msg: string; type: 'success' | 'error' } | null>(null);
 
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState<'all' | NormalizedStatus>('all');
@@ -50,11 +50,6 @@ const ActiveSubscriptionsPage: React.FC = () => {
   const [updatingStatus, setUpdatingStatus] = useState(false);
 
   const managedClubId = clubId || user?.managedClubId;
-
-  const showToast = (msg: string, type: 'success' | 'error' = 'success') => {
-    setToast({ msg, type });
-    setTimeout(() => setToast(null), 3500);
-  };
 
   useEffect(() => {
     if (userRole !== 'entrepreneur' || !managedClubId) { navigate('/'); return; }
@@ -71,7 +66,7 @@ const ActiveSubscriptionsPage: React.FC = () => {
         setSubscriptions(getResponseData(subsRes) || []);
         setCustomers(getResponseData(customersRes) || []);
       } catch {
-        showToast('Error al cargar los datos.', 'error');
+        toast.error('Error al cargar los datos.');
       } finally {
         setLoading(false);
       }
@@ -127,7 +122,7 @@ const ActiveSubscriptionsPage: React.FC = () => {
   };
 
   const SortIcon = ({ field }: { field: typeof sortField }) => (
-    <span className="ml-1 inline-block text-gray-400">
+    <span className="ml-1 inline-block text-aurora-navy/30">
       {sortField === field ? (sortDir === 'asc' ? '↑' : '↓') : '↕'}
     </span>
   );
@@ -140,58 +135,51 @@ const ActiveSubscriptionsPage: React.FC = () => {
     .filter(s => normalizeStatus(s.subscriptionStatus) === 'active')
     .reduce((sum, sub) => sum + (getPlan(sub.idSubscriptionTypes)?.price || 0), 0);
 
-  const handleStatusChange = async (sub: Subscription, newStatus: string) => {
-    setUpdatingStatus(true);
-    try {
-      await api.patch(`/user-subscriptions/${sub.id}`, { subscriptionStatus: newStatus });
-      setSubscriptions(prev =>
-        prev.map(s => s.id === sub.id ? { ...s, subscriptionStatus: newStatus as any } : s)
-      );
-      if (selectedSub?.id === sub.id) setSelectedSub({ ...sub, subscriptionStatus: newStatus as any });
-      showToast('Estado actualizado correctamente.');
-    } catch {
-      showToast('Error al actualizar el estado.', 'error');
-    } finally {
-      setUpdatingStatus(false);
-    }
-  };
+  const handleStatusChange = async (sub: Subscription, newStatus: SubscriptionStatus) => {
+  setUpdatingStatus(true);
+  try {
+    await api.patch(`/user-subscriptions/${sub.id}`, { subscriptionStatus: newStatus });
+    setSubscriptions(prev =>
+      prev.map(s => s.id === sub.id ? { ...s, subscriptionStatus: newStatus } : s)
+    );
+    if (selectedSub?.id === sub.id) setSelectedSub({ ...sub, subscriptionStatus: newStatus });
+    toast.success('Estado actualizado correctamente.');
+  } catch {
+    toast.error('Error al actualizar el estado.');
+  } finally {
+    setUpdatingStatus(false);
+  }
+};
 
   const selectedCustomer = selectedSub ? getCustomer(selectedSub.idUser) : null;
   const selectedPlan = selectedSub ? getPlan(selectedSub.idSubscriptionTypes) : null;
   const selectedStatus = selectedSub ? normalizeStatus(selectedSub.subscriptionStatus) : null;
 
   if (loading) return (
-    <div className="min-h-screen flex items-center justify-center">
-      <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-indigo-600" />
+    <div className="min-h-screen flex items-center justify-center bg-aurora-cream">
+      <div className="animate-spin rounded-full h-10 w-10 border-4 border-aurora-navy/15 border-t-aurora-terracotta" />
     </div>
   );
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {toast && (
-        <div className={`fixed top-4 right-4 z-50 px-5 py-3 rounded-lg shadow-xl text-white text-sm font-medium flex items-center gap-3 ${toast.type === 'success' ? 'bg-green-600' : 'bg-red-600'}`}>
-          {toast.msg}
-          <button onClick={() => setToast(null)} className="text-white/80 hover:text-white">✕</button>
-        </div>
-      )}
-
-      <div className="bg-white border-b">
+    <div className="min-h-screen bg-aurora-cream">
+      <div className="bg-white border-b border-aurora-navy/10">
         <div className="container mx-auto px-4 py-5">
-          <nav className="text-xs text-gray-500 mb-1 flex items-center gap-1">
-            <Link to="/entrepreneur/dashboard" className="hover:text-indigo-600">Dashboard</Link>
+          <nav className="text-xs text-aurora-navy/50 mb-1 flex items-center gap-1">
+            <Link to="/entrepreneur/dashboard" className="hover:text-aurora-terracotta">Dashboard</Link>
             <span>›</span>
-            <Link to={`/entrepreneur/club/${managedClubId}`} className="hover:text-indigo-600">{club?.name || 'Club'}</Link>
+            <Link to={`/entrepreneur/club/${managedClubId}`} className="hover:text-aurora-terracotta">{club?.name || 'Club'}</Link>
             <span>›</span>
-            <span className="text-gray-700">Monitor de suscripciones</span>
+            <span className="text-aurora-navy/70">Monitor de suscripciones</span>
           </nav>
           <div className="flex items-center justify-between mt-1">
             <div>
-              <h1 className="text-2xl font-bold text-gray-900">Monitor de Suscripciones</h1>
-              <p className="text-sm text-gray-500 mt-0.5">Estado en tiempo real · Cambiá estados · Actuá rápido sobre pagos pendientes.</p>
+              <h1 className="font-display text-2xl font-bold text-aurora-navy">Monitor de Suscripciones</h1>
+              <p className="text-sm text-aurora-navy/50 mt-0.5">Estado en tiempo real · Cambiá estados · Actuá rápido sobre pagos pendientes.</p>
             </div>
             <Link
               to={`/entrepreneur/club/${managedClubId}/manage-customers`}
-              className="hidden md:flex items-center gap-2 text-sm font-medium text-indigo-600 border border-indigo-200 rounded-lg px-4 py-2 hover:bg-indigo-50 transition"
+              className="hidden md:flex items-center gap-2 text-sm font-medium text-aurora-navy border border-aurora-navy/20 rounded-lg px-4 py-2 hover:bg-aurora-cream transition"
             >
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" />
@@ -209,35 +197,35 @@ const ActiveSubscriptionsPage: React.FC = () => {
             { label: 'Pausadas', value: totalPaused, color: 'border-yellow-500', text: 'text-yellow-700', bg: 'bg-yellow-50', filter: 'paused' as NormalizedStatus },
             { label: 'Pago pendiente', value: totalPending, color: 'border-orange-500', text: 'text-orange-700', bg: 'bg-orange-50', filter: 'pending' as NormalizedStatus },
             { label: 'Canceladas', value: totalCancelled, color: 'border-red-400', text: 'text-red-700', bg: 'bg-red-50', filter: 'cancelled' as NormalizedStatus },
-            { label: 'Ingreso mensual est.', value: `$${estimatedRevenue.toLocaleString('es-AR')}`, color: 'border-indigo-500', text: 'text-indigo-700', bg: 'bg-indigo-50', filter: null },
+            { label: 'Ingreso mensual est.', value: `$${estimatedRevenue.toLocaleString('es-AR')}`, color: 'border-aurora-navy', text: 'text-aurora-navy', bg: 'bg-aurora-navy/5', filter: null },
           ].map(stat => (
             <button
               key={stat.label}
               onClick={() => stat.filter && setStatusFilter(statusFilter === stat.filter ? 'all' : stat.filter)}
-              className={`text-left bg-white rounded-xl shadow-sm border-l-4 ${stat.color} px-4 py-4 transition hover:shadow-md ${stat.filter && statusFilter === stat.filter ? stat.bg : ''} ${stat.filter ? 'cursor-pointer' : 'cursor-default'}`}
+              className={`text-left bg-white rounded-xl shadow-aurora-sm border-l-4 ${stat.color} px-4 py-4 transition hover:shadow-aurora ${stat.filter && statusFilter === stat.filter ? stat.bg : ''} ${stat.filter ? 'cursor-pointer' : 'cursor-default'}`}
             >
-              <p className="text-xs text-gray-500 font-medium uppercase tracking-wide">{stat.label}</p>
-              <p className={`text-2xl font-bold mt-1 ${stat.text}`}>{stat.value}</p>
-              {stat.filter && <p className="text-xs text-gray-400 mt-1">{statusFilter === stat.filter ? 'Filtrando ↑' : 'Click para filtrar'}</p>}
+              <p className="text-xs text-aurora-navy/50 font-medium uppercase tracking-wide">{stat.label}</p>
+              <p className={`text-2xl font-display font-bold mt-1 ${stat.text}`}>{stat.value}</p>
+              {stat.filter && <p className="text-xs text-aurora-navy/40 mt-1">{statusFilter === stat.filter ? 'Filtrando ↑' : 'Click para filtrar'}</p>}
             </button>
           ))}
         </div>
 
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-4 mb-4 flex flex-col md:flex-row gap-3 items-center">
+        <div className="bg-white rounded-xl shadow-aurora-sm border border-aurora-navy/10 p-4 mb-4 flex flex-col md:flex-row gap-3 items-center">
           <div className="relative flex-grow">
-            <svg className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-aurora-navy/30" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-4.35-4.35M17 11A6 6 0 115 11a6 6 0 0112 0z" />
             </svg>
             <input
               type="text"
               placeholder="Buscar por nombre, email o plan..."
-              className="w-full pl-9 pr-4 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400"
+              className="w-full pl-9 pr-4 py-2 border border-aurora-navy/15 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-aurora-terracotta/40"
               value={searchTerm}
               onChange={e => setSearchTerm(e.target.value)}
             />
           </div>
           <select
-            className="py-2 px-3 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400"
+            className="py-2 px-3 border border-aurora-navy/15 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-aurora-terracotta/40"
             value={statusFilter}
             onChange={e => setStatusFilter(e.target.value as any)}
           >
@@ -249,7 +237,7 @@ const ActiveSubscriptionsPage: React.FC = () => {
             <option value="finished">Finalizadas</option>
           </select>
           <select
-            className="py-2 px-3 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400"
+            className="py-2 px-3 border border-aurora-navy/15 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-aurora-terracotta/40"
             value={planFilter}
             onChange={e => setPlanFilter(e.target.value)}
           >
@@ -266,39 +254,39 @@ const ActiveSubscriptionsPage: React.FC = () => {
               Limpiar filtros
             </button>
           )}
-          <span className="text-sm text-gray-500 whitespace-nowrap">{filtered.length} resultado{filtered.length !== 1 ? 's' : ''}</span>
+          <span className="text-sm text-aurora-navy/50 whitespace-nowrap">{filtered.length} resultado{filtered.length !== 1 ? 's' : ''}</span>
         </div>
 
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+        <div className="bg-white rounded-xl shadow-aurora-sm border border-aurora-navy/10 overflow-hidden">
           <div className="overflow-x-auto">
-            <table className="min-w-full divide-y divide-gray-100">
-              <thead className="bg-gray-50">
+            <table className="min-w-full divide-y divide-aurora-navy/10">
+              <thead className="bg-aurora-cream">
                 <tr>
-                  <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wide cursor-pointer select-none" onClick={() => toggleSort('customer')}>
+                  <th className="px-4 py-3 text-left text-xs font-semibold text-aurora-navy/50 uppercase tracking-wide cursor-pointer select-none" onClick={() => toggleSort('customer')}>
                     Cliente <SortIcon field="customer" />
                   </th>
-                  <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wide cursor-pointer select-none" onClick={() => toggleSort('plan')}>
+                  <th className="px-4 py-3 text-left text-xs font-semibold text-aurora-navy/50 uppercase tracking-wide cursor-pointer select-none" onClick={() => toggleSort('plan')}>
                     Plan <SortIcon field="plan" />
                   </th>
-                  <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wide cursor-pointer select-none" onClick={() => toggleSort('status')}>
+                  <th className="px-4 py-3 text-left text-xs font-semibold text-aurora-navy/50 uppercase tracking-wide cursor-pointer select-none" onClick={() => toggleSort('status')}>
                     Estado <SortIcon field="status" />
                   </th>
-                  <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wide cursor-pointer select-none" onClick={() => toggleSort('startDate')}>
+                  <th className="px-4 py-3 text-left text-xs font-semibold text-aurora-navy/50 uppercase tracking-wide cursor-pointer select-none" onClick={() => toggleSort('startDate')}>
                     Inicio <SortIcon field="startDate" />
                   </th>
-                  <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wide cursor-pointer select-none" onClick={() => toggleSort('nextPayment')}>
+                  <th className="px-4 py-3 text-left text-xs font-semibold text-aurora-navy/50 uppercase tracking-wide cursor-pointer select-none" onClick={() => toggleSort('nextPayment')}>
                     Próximo pago <SortIcon field="nextPayment" />
                   </th>
-                  <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wide">
+                  <th className="px-4 py-3 text-left text-xs font-semibold text-aurora-navy/50 uppercase tracking-wide">
                     Monto
                   </th>
                   <th className="px-4 py-3" />
                 </tr>
               </thead>
-              <tbody className="divide-y divide-gray-50">
+              <tbody className="divide-y divide-aurora-navy/5">
                 {filtered.length === 0 ? (
                   <tr>
-                    <td colSpan={7} className="px-4 py-16 text-center text-gray-400 text-sm">
+                    <td colSpan={7} className="px-4 py-16 text-center text-aurora-navy/40 text-sm">
                       No se encontraron suscripciones con los filtros aplicados.
                     </td>
                   </tr>
@@ -310,49 +298,49 @@ const ActiveSubscriptionsPage: React.FC = () => {
                   return (
                     <tr
                       key={sub.id}
-                      className={`hover:bg-indigo-50/40 transition-colors cursor-pointer ${selectedSub?.id === sub.id ? 'bg-indigo-50' : ''} ${isOverdue ? 'border-l-2 border-l-red-400' : ''}`}
+                      className={`hover:bg-aurora-cream/60 transition-colors cursor-pointer ${selectedSub?.id === sub.id ? 'bg-aurora-cream' : ''} ${isOverdue ? 'border-l-2 border-l-red-400' : ''}`}
                       onClick={() => setSelectedSub(sub)}
                     >
                       <td className="px-4 py-3">
                         <div className="flex items-center gap-3">
-                          <div className="w-8 h-8 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-700 font-bold text-sm shrink-0">
+                          <div className="w-8 h-8 rounded-full bg-aurora-navy/10 flex items-center justify-center text-aurora-navy font-bold text-sm shrink-0">
                             {customer ? customer.firstName[0].toUpperCase() : '?'}
                           </div>
                           <div>
-                            <p className="text-sm font-semibold text-gray-800">
+                            <p className="text-sm font-semibold text-aurora-navy">
                               {customer ? `${customer.firstName} ${customer.lastName}` : `Usuario #${sub.idUser}`}
                             </p>
-                            <p className="text-xs text-gray-400">{customer?.email || ''}</p>
+                            <p className="text-xs text-aurora-navy/40">{customer?.email || ''}</p>
                           </div>
                         </div>
                       </td>
                       <td className="px-4 py-3">
-                        <p className="text-sm text-gray-700 font-medium">{plan?.name || `Plan #${sub.idSubscriptionTypes}`}</p>
-                        <p className="text-xs text-gray-400">{plan?.deliveryFrequency || ''}</p>
+                        <p className="text-sm text-aurora-navy/80 font-medium">{plan?.name || `Plan #${sub.idSubscriptionTypes}`}</p>
+                        <p className="text-xs text-aurora-navy/40">{plan?.deliveryFrequency || ''}</p>
                       </td>
                       <td className="px-4 py-3">
                         <span className={`inline-flex px-2.5 py-1 rounded-full text-xs font-semibold ${STATUS_COLOR[status]}`}>
                           {STATUS_LABEL[status]}
                         </span>
                       </td>
-                      <td className="px-4 py-3 text-sm text-gray-600">
+                      <td className="px-4 py-3 text-sm text-aurora-navy/70">
                         {sub.startDate ? new Date(sub.startDate).toLocaleDateString('es-AR') : '—'}
                       </td>
                       <td className="px-4 py-3 text-sm">
                         {sub.nextPaymentDate ? (
-                          <span className={isOverdue ? 'text-red-600 font-semibold' : 'text-gray-600'}>
+                          <span className={isOverdue ? 'text-red-600 font-semibold' : 'text-aurora-navy/70'}>
                             {new Date(sub.nextPaymentDate).toLocaleDateString('es-AR')}
                             {isOverdue && <span className="ml-1 text-xs bg-red-100 text-red-600 px-1.5 py-0.5 rounded-full">Vencido</span>}
                           </span>
                         ) : '—'}
                       </td>
-                      <td className="px-4 py-3 text-sm font-semibold text-indigo-700">
+                      <td className="px-4 py-3 text-sm font-semibold text-aurora-navy">
                         {plan ? `$${plan.price.toLocaleString('es-AR')}` : '—'}
                       </td>
                       <td className="px-4 py-3 text-right">
                         <button
                           onClick={e => { e.stopPropagation(); setSelectedSub(sub); }}
-                          className="text-xs text-indigo-600 hover:text-indigo-800 font-medium px-3 py-1.5 rounded-lg border border-indigo-200 hover:bg-indigo-50 transition"
+                          className="text-xs text-aurora-navy hover:text-aurora-terracotta font-medium px-3 py-1.5 rounded-lg border border-aurora-navy/20 hover:bg-aurora-cream transition"
                         >
                           Gestionar
                         </button>
@@ -368,17 +356,17 @@ const ActiveSubscriptionsPage: React.FC = () => {
 
       {selectedSub && (
         <div className="fixed inset-0 z-40 flex justify-end" onClick={() => setSelectedSub(null)}>
-          <div className="absolute inset-0 bg-black/30 backdrop-blur-sm" />
+          <div className="absolute inset-0 bg-aurora-navyDark/40 backdrop-blur-sm" />
           <div
-            className={`relative z-50 w-full max-w-md bg-white h-full shadow-2xl overflow-y-auto border-l-4 ${selectedStatus ? STATUS_BORDER[selectedStatus] : 'border-gray-200'}`}
+            className={`relative z-50 w-full max-w-md bg-white h-full shadow-2xl overflow-y-auto border-l-4 ${selectedStatus ? STATUS_BORDER[selectedStatus] : 'border-aurora-navy/20'}`}
             onClick={e => e.stopPropagation()}
           >
-            <div className="sticky top-0 bg-white border-b px-6 py-4 flex items-center justify-between z-10">
+            <div className="sticky top-0 bg-white border-b border-aurora-navy/10 px-6 py-4 flex items-center justify-between z-10">
               <div>
-                <h2 className="text-lg font-bold text-gray-900">Gestión de suscripción</h2>
-                <p className="text-xs text-gray-400">Cambiá el estado o navegá al perfil del cliente</p>
+                <h2 className="font-display text-lg font-bold text-aurora-navy">Gestión de suscripción</h2>
+                <p className="text-xs text-aurora-navy/40">Cambiá el estado o navegá al perfil del cliente</p>
               </div>
-              <button onClick={() => setSelectedSub(null)} className="text-gray-400 hover:text-gray-600">
+              <button onClick={() => setSelectedSub(null)} className="text-aurora-navy/40 hover:text-aurora-navy">
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
                 </svg>
@@ -387,14 +375,14 @@ const ActiveSubscriptionsPage: React.FC = () => {
 
             <div className="p-6 space-y-6">
               <div className="flex items-center gap-4">
-                <div className="w-12 h-12 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-700 text-xl font-bold shrink-0">
+                <div className="w-12 h-12 rounded-full bg-aurora-navy/10 flex items-center justify-center text-aurora-navy text-xl font-bold shrink-0">
                   {selectedCustomer ? selectedCustomer.firstName[0].toUpperCase() : '?'}
                 </div>
                 <div>
-                  <p className="text-base font-bold text-gray-900">
+                  <p className="text-base font-bold text-aurora-navy">
                     {selectedCustomer ? `${selectedCustomer.firstName} ${selectedCustomer.lastName}` : `Usuario #${selectedSub.idUser}`}
                   </p>
-                  <p className="text-xs text-gray-500">{selectedCustomer?.email || '—'}</p>
+                  <p className="text-xs text-aurora-navy/50">{selectedCustomer?.email || '—'}</p>
                   {selectedStatus && (
                     <span className={`inline-flex mt-1 px-2.5 py-0.5 rounded-full text-xs font-semibold ${STATUS_COLOR[selectedStatus]}`}>
                       {STATUS_LABEL[selectedStatus]}
@@ -403,8 +391,8 @@ const ActiveSubscriptionsPage: React.FC = () => {
                 </div>
               </div>
 
-              <div className="bg-gray-50 rounded-xl p-4 space-y-2">
-                <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-2">Esta suscripción</p>
+              <div className="bg-aurora-cream rounded-xl p-4 space-y-2">
+                <p className="text-xs font-semibold text-aurora-navy/40 uppercase tracking-wide mb-2">Esta suscripción</p>
                 {[
                   { label: 'Plan', value: selectedPlan?.name || `#${selectedSub.idSubscriptionTypes}` },
                   { label: 'Frecuencia', value: selectedPlan?.deliveryFrequency },
@@ -416,43 +404,43 @@ const ActiveSubscriptionsPage: React.FC = () => {
                   { label: 'Próximo pago', value: selectedSub.nextPaymentDate ? new Date(selectedSub.nextPaymentDate).toLocaleDateString('es-AR') : null },
                 ].map(({ label, value }) => value ? (
                   <div key={label} className="flex justify-between text-sm">
-                    <span className="text-gray-500">{label}</span>
-                    <span className="text-gray-800 font-medium">{value}</span>
+                    <span className="text-aurora-navy/50">{label}</span>
+                    <span className="text-aurora-navy font-medium">{value}</span>
                   </div>
                 ) : null)}
                 {selectedSub.cancellationReason && (
-                  <div className="mt-2 pt-2 border-t border-gray-200">
-                    <p className="text-xs text-gray-500">Motivo de cancelación</p>
-                    <p className="text-sm text-gray-700 mt-0.5">{selectedSub.cancellationReason}</p>
+                  <div className="mt-2 pt-2 border-t border-aurora-navy/10">
+                    <p className="text-xs text-aurora-navy/50">Motivo de cancelación</p>
+                    <p className="text-sm text-aurora-navy/80 mt-0.5">{selectedSub.cancellationReason}</p>
                   </div>
                 )}
               </div>
 
               <div>
-                <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-3">Cambiar estado</p>
+                <p className="text-xs font-semibold text-aurora-navy/40 uppercase tracking-wide mb-3">Cambiar estado</p>
                 <div className="grid grid-cols-2 gap-2">
                   {([
-                    { status: 'ACTIVA', label: 'Activar', color: 'border-green-300 text-green-700 hover:bg-green-50' },
-                    { status: 'PAUSADA', label: 'Pausar', color: 'border-yellow-300 text-yellow-700 hover:bg-yellow-50' },
-                    { status: 'PENDIENTE_PAGO', label: 'Pago pendiente', color: 'border-orange-300 text-orange-700 hover:bg-orange-50' },
-                    { status: 'CANCELADA', label: 'Cancelar', color: 'border-red-300 text-red-700 hover:bg-red-50' },
-                  ] as const).map(opt => (
-                    <button
-                      key={opt.status}
-                      disabled={updatingStatus || selectedSub.subscriptionStatus === opt.status}
-                      onClick={() => handleStatusChange(selectedSub, opt.status)}
-                      className={`py-2 text-sm font-medium rounded-lg border transition ${opt.color} disabled:opacity-40 disabled:cursor-not-allowed`}
-                    >
-                      {updatingStatus ? '...' : opt.label}
-                    </button>
-                  ))}
+                      { status: 'Activa', label: 'Activar', color: 'border-green-300 text-green-700 hover:bg-green-50' },
+                      { status: 'Pausada', label: 'Pausar', color: 'border-yellow-300 text-yellow-700 hover:bg-yellow-50' },
+                      { status: 'Pendiente_Pago', label: 'Pago pendiente', color: 'border-orange-300 text-orange-700 hover:bg-orange-50' },
+                      { status: 'Cancelada', label: 'Cancelar', color: 'border-red-300 text-red-700 hover:bg-red-50' },
+                    ] satisfies { status: SubscriptionStatus; label: string; color: string }[]).map(opt => (
+                      <button
+                        key={opt.status}
+                        disabled={updatingStatus || selectedSub.subscriptionStatus === opt.status}
+                        onClick={() => handleStatusChange(selectedSub, opt.status)}
+                        className={`py-2 text-sm font-medium rounded-lg border transition ${opt.color} disabled:opacity-40 disabled:cursor-not-allowed`}
+                      >
+                        {updatingStatus ? '...' : opt.label}
+                      </button>
+                    ))} 
                 </div>
               </div>
 
-              <div className="pt-2 border-t border-gray-100 flex flex-col gap-2">
+              <div className="pt-2 border-t border-aurora-navy/10 flex flex-col gap-2">
                 <Link
                   to={`/entrepreneur/club/${managedClubId}/manage-customers?customerId=${selectedSub.idUser}`}
-                  className="flex items-center justify-center gap-2 w-full py-2.5 text-sm font-medium text-indigo-700 border border-indigo-200 rounded-lg hover:bg-indigo-50 transition"
+                  className="flex items-center justify-center gap-2 w-full py-2.5 text-sm font-medium text-aurora-navy border border-aurora-navy/20 rounded-lg hover:bg-aurora-cream transition"
                 >
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
@@ -461,7 +449,7 @@ const ActiveSubscriptionsPage: React.FC = () => {
                 </Link>
                 <Link
                   to={`/entrepreneur/club/${managedClubId}/customer-history/${selectedSub.idUser}`}
-                  className="flex items-center justify-center gap-2 w-full py-2.5 text-sm font-medium text-gray-600 border border-gray-200 rounded-lg hover:bg-gray-50 transition"
+                  className="flex items-center justify-center gap-2 w-full py-2.5 text-sm font-medium text-aurora-navy/70 border border-aurora-navy/10 rounded-lg hover:bg-aurora-cream transition"
                 >
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />

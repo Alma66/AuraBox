@@ -31,23 +31,23 @@ const CustomerTable: React.FC<CustomerTableProps> = ({ customers, onViewCustomer
   const getStatusColor = (status?: string) => {
     switch (status) {
       case 'active':
-        return 'bg-green-200 text-green-800';
+        return 'bg-green-100 text-green-800';
       case 'paused':
-        return 'bg-yellow-200 text-yellow-800';
+        return 'bg-yellow-100 text-yellow-800';
       case 'cancelled':
-        return 'bg-red-200 text-red-800';
+        return 'bg-red-100 text-red-800';
       default:
-        return 'bg-gray-200 text-gray-800';
+        return 'bg-aurora-navy/10 text-aurora-navy/70';
     }
   };
 
   return (
-    <div className="bg-white rounded-xl shadow-lg p-8">
+    <div className="bg-white rounded-xl shadow-aurora-sm border border-aurora-navy/10 p-8">
       <div className="mb-6 flex flex-col md:flex-row justify-between items-center">
         <input
           type="text"
           placeholder="Buscar cliente por nombre, email o estado..."
-          className="w-full md:w-1/2 p-3 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 mb-4 md:mb-0"
+          className="w-full md:w-1/2 p-3 border border-aurora-navy/15 rounded-lg focus:outline-none focus:ring-2 focus:ring-aurora-terracotta/40 mb-4 md:mb-0"
           value={searchTerm}
           onChange={(e) => {
             setSearchTerm(e.target.value);
@@ -57,13 +57,13 @@ const CustomerTable: React.FC<CustomerTableProps> = ({ customers, onViewCustomer
       </div>
 
       {filteredCustomers.length === 0 ? (
-        <p className="text-center text-gray-600">No se encontraron clientes que coincidan con la búsqueda.</p>
+        <p className="text-center text-aurora-navy/50">No se encontraron clientes que coincidan con la búsqueda.</p>
       ) : (
         <>
           <div className="overflow-x-auto">
-            <table className="min-w-full bg-white border border-gray-200 rounded-lg">
+            <table className="min-w-full bg-white border border-aurora-navy/10 rounded-lg">
               <thead>
-                <tr className="bg-gray-100 text-gray-600 uppercase text-sm leading-normal">
+                <tr className="bg-aurora-cream text-aurora-navy/60 uppercase text-sm leading-normal">
                   <th className="py-3 px-6 text-left">Nombre</th>
                   <th className="py-3 px-6 text-left">Email</th>
                   <th className="py-3 px-6 text-left">Estado Suscripción</th>
@@ -71,9 +71,9 @@ const CustomerTable: React.FC<CustomerTableProps> = ({ customers, onViewCustomer
                   <th className="py-3 px-6 text-center">Acciones</th>
                 </tr>
               </thead>
-              <tbody className="text-gray-700 text-sm font-light">
+              <tbody className="text-aurora-navy/80 text-sm font-light">
                 {currentCustomers.map((customer) => (
-                  <tr key={String(customer.id)} className="border-b border-gray-200 hover:bg-gray-50">
+                  <tr key={String(customer.id)} className="border-b border-aurora-navy/5 hover:bg-aurora-cream/60">
                     <td className="py-3 px-6 text-left whitespace-nowrap">
                       {customer.firstName} {customer.lastName}
                     </td>
@@ -95,7 +95,7 @@ const CustomerTable: React.FC<CustomerTableProps> = ({ customers, onViewCustomer
                     <td className="py-3 px-6 text-center">
                       <button
                         onClick={() => onViewCustomer(String(customer.id))}
-                        className="text-blue-600 hover:text-blue-800 font-medium"
+                        className="text-aurora-navy hover:text-aurora-terracotta font-medium"
                         title="Ver/Editar Cliente"
                       >
                         Ver
@@ -103,7 +103,7 @@ const CustomerTable: React.FC<CustomerTableProps> = ({ customers, onViewCustomer
                       {customer.subscriptionId && onViewSubscription && (
                         <button
                           onClick={() => onViewSubscription(customer.subscriptionId!)}
-                          className="ml-2 text-purple-600 hover:text-purple-800 font-medium"
+                          className="ml-2 text-aurora-terracotta hover:text-aurora-terracottaDark font-medium"
                           title="Ver Suscripción"
                         >
                           Ver Suscripción
@@ -121,7 +121,7 @@ const CustomerTable: React.FC<CustomerTableProps> = ({ customers, onViewCustomer
               <button
                 onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
                 disabled={currentPage === 1}
-                className="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 disabled:opacity-50"
+                className="px-4 py-2 bg-aurora-cream text-aurora-navy/70 rounded-lg hover:bg-aurora-navy/10 disabled:opacity-50"
               >
                 Anterior
               </button>
@@ -130,7 +130,7 @@ const CustomerTable: React.FC<CustomerTableProps> = ({ customers, onViewCustomer
                   key={page}
                   onClick={() => setCurrentPage(page)}
                   className={`px-4 py-2 rounded-lg ${
-                    currentPage === page ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                    currentPage === page ? 'bg-aurora-navy text-white' : 'bg-aurora-cream text-aurora-navy/70 hover:bg-aurora-navy/10'
                   }`}
                 >
                   {page}
@@ -139,7 +139,7 @@ const CustomerTable: React.FC<CustomerTableProps> = ({ customers, onViewCustomer
               <button
                 onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
                 disabled={currentPage === totalPages}
-                className="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 disabled:opacity-50"
+                className="px-4 py-2 bg-aurora-cream text-aurora-navy/70 rounded-lg hover:bg-aurora-navy/10 disabled:opacity-50"
               >
                 Siguiente
               </button>
