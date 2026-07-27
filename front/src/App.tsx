@@ -1,5 +1,6 @@
 import React, { useState, useEffect, createContext, useContext } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { Toaster } from 'react-hot-toast';
 import Navbar from './components/common/Navbar';
 import Footer from './components/common/Footer';
 import FloatingButtons from './components/common/FloatingButtons';
@@ -227,6 +228,21 @@ const App: React.FC = () => (
     <AuthProvider>
       <AppContent />
     </AuthProvider>
+    <Toaster
+      position="top-right"
+      toastOptions={{
+        duration: 4000,
+        style: {
+          background: '#1B2A4A',
+          color: '#FDF8F0',
+          fontWeight: 500,
+          borderRadius: '12px',
+          padding: '12px 16px',
+        },
+        success: { iconTheme: { primary: '#C9762E', secondary: '#FDF8F0' } },
+        error: { iconTheme: { primary: '#DC2626', secondary: '#FDF8F0' } },
+      }}
+    />
   </Router>
 );
 
