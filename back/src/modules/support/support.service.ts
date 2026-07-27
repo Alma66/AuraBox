@@ -7,6 +7,7 @@ import { CreateAutoReplyDto } from './dto/create-auto-reply.dto';
 import { UpdateAutoReplyDto } from './dto/update-auto-reply.dto';
 import { RequestVerificationDto } from './dto/request-verification.dto';
 import { ConfirmVerificationDto } from './dto/confirm-verification.dto';
+import { MailerService } from '../mailer/mailer.service';
 
 type RequestUser = { id: number; role: string };
 
@@ -20,7 +21,10 @@ function sanitize(item: any) {
 
 @Injectable()
 export class SupportService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly mailer: MailerService,
+  ) {}
 
   private async assertClubAccess(idClub: number, user: RequestUser) {
     if (user.role === 'admin') return;
@@ -275,19 +279,29 @@ export class SupportService {
   }
 
   async requestVerification(dto: RequestVerificationDto, user: RequestUser) {
-    const conversation = await this.prisma.support_Conversation.findUnique({ where: { id: dto.idConversation } });
-    if (!conversation) throw new NotFoundException('Conversación no encontrada');
-    await this.assertClubAccess(conversation.idClub, user);
+  const conversation = await this.prisma.support_Conversation.findUnique({ where: { id: dto.idConversation } });
+  if (!conversation) throw new NotFoundException('Conversación no encontrada');
+  await this.assertClubAccess(conversation.idClub, user);
 
-    const code = randomInt(100000, 1000000).toString();
-    const expiresAt = new Date(Date.now() + 10 * 60 * 1000);
+  const customer = await this.prisma.user.findUnique({ where: { id: conversation.idUser } });
+  if (!customer) throw new NotFoundException('Usuario no encontrado');
 
-    await this.prisma.sensitive_Data_Verification.create({
-      data: { idConversation: dto.idConversation, code, channel: dto.channel, expiresAt, createdBy: user.id },
-    });
+  const code = randomInt(100000, 1000000).toString();
+  const expiresAt = new Date(Date.now() + 10 * 60 * 1000);
 
-    return { channel: dto.channel, expiresAt: expiresAt.toISOString() };
+  await this.prisma.sensitive_Data_Verification.create({
+    data: { idConversation: dto.idConversation, code, channel: dto.channel, expiresAt, createdBy: user.id },
+  });
+
+  let sent = false;
+  if (dto.channel === 'Email') {
+    if (!customer.email) throw new BadRequestException('El cliente no tiene un email registrado');
+    await this.mailer.sendVerificationCode(customer.email, code, expiresAt);
+    sent = true;
   }
+
+  return { channel: dto.channel, expiresAt: expiresAt.toISOString(), sent };
+}
 
   async confirmVerification(dto: ConfirmVerificationDto, user: RequestUser) {
     const conversation = await this.prisma.support_Conversation.findUnique({ where: { id: dto.idConversation } });

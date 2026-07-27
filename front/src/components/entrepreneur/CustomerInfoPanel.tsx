@@ -13,6 +13,7 @@ const CustomerInfoPanel: React.FC<CustomerInfoPanelProps> = ({ idConversation, o
   const [step, setStep] = useState<'basic' | 'request' | 'confirm' | 'sensitive'>('basic');
   const [channel, setChannel] = useState<VerificationChannel>('Email');
   const [codeRequestedAt, setCodeRequestedAt] = useState<string | null>(null);
+  const [sent, setSent] = useState(false);
   const [enteredCode, setEnteredCode] = useState('');
   const [dni, setDni] = useState('');
   const [sensitiveData, setSensitiveData] = useState<SensitiveCustomerData | null>(null);
@@ -42,10 +43,11 @@ const CustomerInfoPanel: React.FC<CustomerInfoPanelProps> = ({ idConversation, o
       const res = await api.post('/support/verification/request', { idConversation, channel });
       const data = getResponseData(res);
       setCodeRequestedAt(data.expiresAt);
+      setSent(!!data.sent);
       setStep('confirm');
-    } catch (err) {
+    } catch (err: any) {
       console.error(err);
-      setError('No se pudo generar el código');
+      setError(err?.response?.data?.message ?? 'No se pudo generar el código');
     } finally {
       setRequesting(false);
     }
@@ -121,12 +123,20 @@ const CustomerInfoPanel: React.FC<CustomerInfoPanelProps> = ({ idConversation, o
 
               {step === 'confirm' && (
                 <div className="space-y-3">
-                  <div className="bg-aurora-gold/10 border border-aurora-gold/40 rounded-lg p-3 text-sm text-aurora-terracottaDark">
-                    Se generó un código y se le envió al cliente por <strong>{channel === 'Email' ? 'email' : 'SMS/WhatsApp'}</strong>{codeRequestedAt ? ` (vence a las ${new Date(codeRequestedAt).toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit' })})` : ''}. Pedile ese código al cliente por el chat.
-                  </div>
-                  <div className="bg-red-50 border border-red-200 rounded-lg p-3 text-xs text-red-700">
-                    ⚠️ El envío automático por email/SMS todavía no está implementado en el backend — este flujo no le va a llegar al cliente hasta que se desarrolle esa parte. Por ahora avisale al equipo técnico si necesitás usarlo con un cliente real.
-                  </div>
+                  {sent ? (
+                    <div className="bg-emerald-50 border border-emerald-200 rounded-lg p-3 text-sm text-emerald-700">
+                      El código se envió por email al cliente{codeRequestedAt ? ` (vence a las ${new Date(codeRequestedAt).toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit' })})` : ''}. Pedile ese código por el chat.
+                    </div>
+                  ) : (
+                    <>
+                      <div className="bg-aurora-gold/10 border border-aurora-gold/40 rounded-lg p-3 text-sm text-aurora-terracottaDark">
+                        Se generó un código para enviar por <strong>SMS/WhatsApp</strong>{codeRequestedAt ? ` (vence a las ${new Date(codeRequestedAt).toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit' })})` : ''}.
+                      </div>
+                      <div className="bg-red-50 border border-red-200 rounded-lg p-3 text-xs text-red-700">
+                        El envío automático por SMS/WhatsApp todavía no está implementado. Avisale al equipo técnico si necesitás usarlo con un cliente real.
+                      </div>
+                    </>
+                  )}
                   <input
                     type="text"
                     placeholder="DNI del cliente"
