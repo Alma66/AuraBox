@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import {
   BarChart, Bar, PieChart, Pie, Cell, AreaChart, Area,
   XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer,
@@ -11,6 +11,8 @@ interface SalesReportsContentProps {
   filters: { from: string; to: string; paymentStatus: string };
   onFilterChange: (k: string, v: string) => void;
   onExportCsv: () => void;
+  page: number;
+  onPageChange: (page: number) => void;
 }
 
 const COLORS = ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#06b6d4'];
@@ -24,8 +26,9 @@ const SalesReportsContent: React.FC<SalesReportsContentProps> = ({
   filters,
   onFilterChange,
   onExportCsv,
+  page,
+  onPageChange,
 }) => {
-  const [page, setPage] = useState(1);
   const pageSize = 20;
 
   if (activeSection === 'resumen') {
@@ -169,9 +172,7 @@ const SalesReportsContent: React.FC<SalesReportsContentProps> = ({
   }
 
   if (activeSection === 'pagos') {
-    const start = (page - 1) * pageSize;
-    const paginated: PaymentRow[] = data.payments.slice(start, start + pageSize);
-    const totalPages = Math.ceil(data.totalCount / pageSize);
+    const totalPages = Math.max(1, Math.ceil(data.totalCount / pageSize));
 
     return (
       <div className="space-y-4">
@@ -202,7 +203,7 @@ const SalesReportsContent: React.FC<SalesReportsContentProps> = ({
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100">
-              {paginated.map((p) => (
+              {data.payments.map((p) => (
                 <tr key={p.id} className="hover:bg-gray-50">
                   <td className="px-4 py-2 whitespace-nowrap text-gray-700">
                     {p.paymentDate ? new Date(p.paymentDate).toLocaleDateString('es-AR') : '—'}
@@ -225,7 +226,7 @@ const SalesReportsContent: React.FC<SalesReportsContentProps> = ({
                   </td>
                 </tr>
               ))}
-              {paginated.length === 0 && (
+              {data.payments.length === 0 && (
                 <tr>
                   <td colSpan={8} className="px-4 py-10 text-center text-gray-500">No hay pagos con los filtros seleccionados.</td>
                 </tr>
@@ -238,7 +239,7 @@ const SalesReportsContent: React.FC<SalesReportsContentProps> = ({
             <p className="text-xs text-gray-500">{data.totalCount} pagos en total</p>
             <div className="flex gap-2">
               <button
-                onClick={() => setPage((p) => Math.max(1, p - 1))}
+                onClick={() => onPageChange(Math.max(1, page - 1))}
                 disabled={page === 1}
                 className="px-3 py-1 text-sm border border-gray-300 rounded-lg disabled:opacity-40 hover:bg-gray-50"
               >
@@ -246,7 +247,7 @@ const SalesReportsContent: React.FC<SalesReportsContentProps> = ({
               </button>
               <span className="px-3 py-1 text-sm text-gray-600">{page} / {totalPages}</span>
               <button
-                onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+                onClick={() => onPageChange(Math.min(totalPages, page + 1))}
                 disabled={page === totalPages}
                 className="px-3 py-1 text-sm border border-gray-300 rounded-lg disabled:opacity-40 hover:bg-gray-50"
               >

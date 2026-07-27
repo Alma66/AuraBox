@@ -1,3 +1,5 @@
+import React from 'react';
+
 interface StatsCardsProps {
   subscribers: number;
   revenue: number;

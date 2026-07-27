@@ -1,3 +1,5 @@
+import React from 'react';
+
 interface RatingDistributionProps {
   reviews: { rating: number }[];
 }
@@ -17,7 +19,7 @@ const RatingDistribution: React.FC<RatingDistributionProps> = ({ reviews }) => {
               <span className="text-sm font-medium text-gray-700">{rating} ★</span>
               <div className="flex items-center w-full ml-4">
                 <div className="w-full bg-gray-200 rounded-full h-2 mr-2">
-                  <div 
+                  <div
                     className={`h-2 rounded-full ${rating >= 4 ? 'bg-green-500' : rating === 3 ? 'bg-yellow-500' : 'bg-red-500'}`}
                     style={{ width: `${percentage}%` }}
                   ></div>

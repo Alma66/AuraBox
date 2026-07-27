@@ -8,6 +8,8 @@ import { SalesReportData } from '../../../../types/analystics';
 
 type SalesSection = 'resumen' | 'graficos' | 'pagos' | 'metodos' | 'proyecciones';
 
+const PAGE_SIZE = 20;
+
 const SalesReportsPage: React.FC = () => {
   const { clubId } = useParams<{ clubId: string }>();
   const { userRole, loading: authLoading } = useAuth();
@@ -16,12 +18,13 @@ const SalesReportsPage: React.FC = () => {
   const [data, setData] = useState<SalesReportData | null>(null);
   const [loading, setLoading] = useState(true);
   const [filters, setFilters] = useState({ from: '', to: '', paymentStatus: '' });
+  const [page, setPage] = useState(1);
 
   const fetchData = useCallback(async () => {
     if (!clubId) return;
     setLoading(true);
     try {
-      const params: Record<string, string> = { page: '1', pageSize: '500' };
+      const params: Record<string, string> = { page: String(page), pageSize: String(PAGE_SIZE) };
       if (filters.from) params.from = filters.from;
       if (filters.to) params.to = filters.to;
       if (filters.paymentStatus) params.paymentStatus = filters.paymentStatus;
@@ -32,7 +35,7 @@ const SalesReportsPage: React.FC = () => {
     } finally {
       setLoading(false);
     }
-  }, [clubId, filters, navigate]);
+  }, [clubId, filters, page, navigate]);
 
   useEffect(() => {
     if (authLoading) return;
@@ -45,6 +48,7 @@ const SalesReportsPage: React.FC = () => {
 
   const handleFilterChange = (k: string, v: string) => {
     setFilters((prev) => ({ ...prev, [k]: v }));
+    setPage(1);
   };
 
   const handleExportCsv = async () => {
@@ -96,6 +100,8 @@ const SalesReportsPage: React.FC = () => {
             filters={filters}
             onFilterChange={handleFilterChange}
             onExportCsv={handleExportCsv}
+            page={page}
+            onPageChange={setPage}
           />
         </div>
       </div>
