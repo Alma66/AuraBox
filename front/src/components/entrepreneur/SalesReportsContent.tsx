@@ -3,7 +3,7 @@ import {
   BarChart, Bar, PieChart, Pie, Cell, AreaChart, Area,
   XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer,
 } from 'recharts';
-import { SalesReportData, PaymentRow } from '../../types/analystics';
+import { SalesReportData } from '../../types/analystics';
 
 interface SalesReportsContentProps {
   activeSection: string;
