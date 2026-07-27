@@ -13,15 +13,15 @@ const SettingsSidebar: React.FC<SettingsSidebarProps> = ({ activeSection, setAct
   ];
 
   return (
-    <nav className="bg-white rounded-xl shadow-lg p-6 w-full lg:w-64">
-      <h3 className="text-lg font-bold text-gray-800 mb-4">Ajustes Generales</h3>
+    <nav className="bg-white rounded-xl shadow-aurora-sm border border-aurora-navy/10 p-6 w-full lg:w-64">
+      <h3 className="text-lg font-serif font-bold text-aurora-navy mb-4">Ajustes Generales</h3>
       <ul className="space-y-2">
         {sidebarItems.map((item) => (
           <li key={item.id}>
             <button
               onClick={() => setActiveSection(item.id)}
-              className={`w-full flex items-center p-3 rounded-lg text-left font-medium transition-colors duration-200 
-                ${activeSection === item.id ? 'bg-blue-600 text-white shadow-md' : 'text-gray-700 hover:bg-gray-100 hover:text-blue-600'}`}
+              className={`w-full flex items-center p-3 rounded-lg text-left font-medium transition-colors duration-200
+                ${activeSection === item.id ? 'bg-aurora-navy text-white shadow-sm' : 'text-aurora-navy/80 hover:bg-aurora-cream hover:text-aurora-navy'}`}
             >
               <svg className="w-5 h-5 mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={item.icon} />

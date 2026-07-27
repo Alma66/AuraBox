@@ -92,28 +92,28 @@ const AssignDeliveriesPage: React.FC = () => {
     }
   };
 
-  if (authLoading || loading) return <div className="text-center py-16 text-gray-500">Cargando envíos pendientes...</div>;
-  if (error || !club) return <div className="text-center py-16 text-red-500">{error || 'Club no encontrado.'}</div>;
+  if (authLoading || loading) return <div className="text-center py-16 text-aurora-navy/60">Cargando envíos pendientes...</div>;
+  if (error || !club) return <div className="text-center py-16 text-red-600">{error || 'Club no encontrado.'}</div>;
 
   return (
     <div className="container mx-auto px-4 py-10 max-w-6xl">
       <div className="mb-8">
-        <h1 className="text-2xl font-bold text-gray-900">Asignar Envíos</h1>
-        <p className="text-sm text-gray-500 mt-1">{club.name} · Pendientes del mes actual</p>
+        <h1 className="text-2xl font-serif font-bold text-aurora-navy">Asignar Envíos</h1>
+        <p className="text-sm text-aurora-navy/50 mt-1">{club.name} · Pendientes del mes actual</p>
       </div>
 
-      <div className="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden">
-        <div className="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
-          <h2 className="text-base font-semibold text-gray-900">Suscriptores sin envío asignado</h2>
-          <span className="text-sm text-gray-500">{pending.length} pendientes</span>
+      <div className="bg-white border border-aurora-navy/10 rounded-xl shadow-aurora-sm overflow-hidden">
+        <div className="px-6 py-4 border-b border-aurora-navy/10 flex items-center justify-between">
+          <h2 className="text-base font-semibold text-aurora-navy">Suscriptores sin envío asignado</h2>
+          <span className="text-sm text-aurora-navy/50">{pending.length} pendientes</span>
         </div>
 
         {pending.length === 0 ? (
-          <div className="px-6 py-16 text-center text-gray-500">
+          <div className="px-6 py-16 text-center text-aurora-navy/50">
             No hay envíos pendientes de asignación para este mes.
           </div>
         ) : (
-          <ul className="divide-y divide-gray-100">
+          <ul className="divide-y divide-aurora-navy/10">
             {pending.map((delivery) => {
               const selection = selections[delivery.idUserSubscriptions] ?? { idCourier: '', idAssignedRider: '' };
               const internal = isInternalCourier(delivery, selection.idCourier);
@@ -121,12 +121,12 @@ const AssignDeliveriesPage: React.FC = () => {
                 <li key={delivery.idUserSubscriptions} className="px-6 py-5">
                   <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
                     <div>
-                      <p className="font-medium text-gray-900">
+                      <p className="font-medium text-aurora-navy">
                         {delivery.user ? `${delivery.user.firstName} ${delivery.user.lastName}` : `Usuario #${delivery.idUser}`}
                       </p>
-                      <p className="text-sm text-gray-500">{delivery.subscriptionName ?? 'Suscripción'}</p>
+                      <p className="text-sm text-aurora-navy/50">{delivery.subscriptionName ?? 'Suscripción'}</p>
                       {delivery.user && (
-                        <p className="text-sm text-gray-400 mt-1">
+                        <p className="text-sm text-aurora-navy/40 mt-1">
                           {[delivery.user.address.street, delivery.user.address.addressNumber, delivery.user.address.city, delivery.user.address.province]
                             .filter(Boolean)
                             .join(', ') || 'Sin dirección registrada'}
@@ -138,7 +138,7 @@ const AssignDeliveriesPage: React.FC = () => {
                       <select
                         value={selection.idCourier}
                         onChange={(e) => updateSelection(delivery.idUserSubscriptions, 'idCourier', e.target.value ? Number(e.target.value) : '')}
-                        className="px-3 py-2 border border-gray-300 rounded-lg text-sm min-w-[200px] focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                        className="px-3 py-2 border border-aurora-navy/15 rounded-lg text-sm min-w-[200px] focus:ring-2 focus:ring-aurora-navy focus:outline-none"
                       >
                         <option value="">Método de envío</option>
                         {delivery.availableCouriers.map((c) => (
@@ -150,7 +150,7 @@ const AssignDeliveriesPage: React.FC = () => {
                         <select
                           value={selection.idAssignedRider}
                           onChange={(e) => updateSelection(delivery.idUserSubscriptions, 'idAssignedRider', e.target.value ? Number(e.target.value) : '')}
-                          className="px-3 py-2 border border-gray-300 rounded-lg text-sm min-w-[200px] focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                          className="px-3 py-2 border border-aurora-navy/15 rounded-lg text-sm min-w-[200px] focus:ring-2 focus:ring-aurora-navy focus:outline-none"
                         >
                           <option value="">Seleccionar rider</option>
                           {riders.map((r) => (
@@ -162,7 +162,7 @@ const AssignDeliveriesPage: React.FC = () => {
                       <button
                         onClick={() => assign(delivery)}
                         disabled={assigningId === delivery.idUserSubscriptions}
-                        className="px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 disabled:opacity-50 transition-colors"
+                        className="px-4 py-2 bg-aurora-terracotta text-white text-sm font-medium rounded-lg hover:bg-aurora-terracottaDark disabled:opacity-50 transition-colors"
                       >
                         {assigningId === delivery.idUserSubscriptions ? 'Asignando...' : 'Asignar'}
                       </button>

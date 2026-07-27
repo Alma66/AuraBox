@@ -33,8 +33,8 @@ const ViewDeliveriesPage: React.FC = () => {
     fetchClub();
   }, [clubId, userRole, authLoading, navigate]);
 
-  if (authLoading || loading) return <div className="text-center py-16 text-gray-500">Cargando...</div>;
-  if (error || !club || !clubId) return <div className="text-center py-16 text-red-500">{error || 'Club no encontrado.'}</div>;
+  if (authLoading || loading) return <div className="text-center py-16 text-aurora-navy/60">Cargando...</div>;
+  if (error || !club || !clubId) return <div className="text-center py-16 text-red-600">{error || 'Club no encontrado.'}</div>;
 
   return <ShipmentsListView clubId={clubId} clubName={club.name} title="Envíos Recientes" defaultRangeDays={7} />;
 };
