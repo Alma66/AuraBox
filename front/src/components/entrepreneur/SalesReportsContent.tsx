@@ -3,8 +3,7 @@ import {
   BarChart, Bar, PieChart, Pie, Cell, AreaChart, Area,
   XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer,
 } from 'recharts';
-import { SalesReportData, PaymentRow } from '../../types/analystics';
-
+import { SalesReportData } from '../../types/analystics';
 interface SalesReportsContentProps {
   activeSection: string;
   data: SalesReportData;
@@ -14,12 +13,9 @@ interface SalesReportsContentProps {
   page: number;
   onPageChange: (page: number) => void;
 }
-
 const COLORS = ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#06b6d4'];
-
 const fmt = (n: number | string) =>
   Number(n).toLocaleString('es-AR', { style: 'currency', currency: 'ARS', maximumFractionDigits: 0 });
-
 const SalesReportsContent: React.FC<SalesReportsContentProps> = ({
   activeSection,
   data,
@@ -30,13 +26,11 @@ const SalesReportsContent: React.FC<SalesReportsContentProps> = ({
   onPageChange,
 }) => {
   const pageSize = 20;
-
   if (activeSection === 'resumen') {
     const netRevenue = data.payments.reduce((s, p) => s + Number(p.clubAmount), 0);
     const commissions = data.payments.reduce((s, p) => s + Number(p.commissionAmount ?? 0), 0);
     const exitosos = data.payments.filter((p) => p.paymentStatus === 'Exitoso').length;
     const tasaExito = data.payments.length > 0 ? ((exitosos / data.payments.length) * 100).toFixed(1) : '0.0';
-
     return (
       <div className="space-y-6">
         <h2 className="font-display text-xl font-bold text-aurora-navy">Resumen de Ventas</h2>
@@ -105,14 +99,12 @@ const SalesReportsContent: React.FC<SalesReportsContentProps> = ({
       </div>
     );
   }
-
   if (activeSection === 'graficos') {
     const acumulado = data.monthlyRevenue.reduce<{ month: string; acumulado: number }[]>((acc, r, i) => {
       const prev = i > 0 ? acc[i - 1].acumulado : 0;
       acc.push({ month: r.month, acumulado: prev + r.current });
       return acc;
     }, []);
-
     return (
       <div className="space-y-8">
         <h2 className="font-display text-xl font-bold text-aurora-navy">Gráficos de Ventas</h2>
@@ -170,10 +162,8 @@ const SalesReportsContent: React.FC<SalesReportsContentProps> = ({
       </div>
     );
   }
-
   if (activeSection === 'pagos') {
     const totalPages = Math.max(1, Math.ceil(data.totalCount / pageSize));
-
     return (
       <div className="space-y-4">
         <div className="flex items-center justify-between">
@@ -259,7 +249,6 @@ const SalesReportsContent: React.FC<SalesReportsContentProps> = ({
       </div>
     );
   }
-
   if (activeSection === 'metodos') {
     const metodos = data.byPaymentMethod;
     const totalMonto = metodos.reduce((s, m) => s + m.amount, 0);
@@ -277,7 +266,6 @@ const SalesReportsContent: React.FC<SalesReportsContentProps> = ({
     });
     const masUsado = [...metodosConStats].sort((a, b) => b.count - a.count)[0];
     const masRentable = [...metodosConStats].sort((a, b) => b.amount - a.amount)[0];
-
     return (
       <div className="space-y-6">
         <h2 className="font-display text-xl font-bold text-aurora-navy">Análisis de Métodos de Pago</h2>
@@ -329,7 +317,6 @@ const SalesReportsContent: React.FC<SalesReportsContentProps> = ({
       </div>
     );
   }
-
   if (activeSection === 'proyecciones') {
     const monthly = data.monthlyRevenue;
     const last3 = monthly.slice(-3);
@@ -339,7 +326,6 @@ const SalesReportsContent: React.FC<SalesReportsContentProps> = ({
       const variacion = prev > 0 ? (((r.current - prev) / prev) * 100).toFixed(1) : '—';
       return { ...r, variacion };
     });
-
     return (
       <div className="space-y-6">
         <h2 className="font-display text-xl font-bold text-aurora-navy">Proyecciones</h2>
@@ -388,8 +374,6 @@ const SalesReportsContent: React.FC<SalesReportsContentProps> = ({
       </div>
     );
   }
-
   return null;
 };
-
 export default SalesReportsContent;
