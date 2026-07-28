@@ -9,7 +9,7 @@ import { AppService } from './app.service';
 import { ConfigModule } from '@nestjs/config';
 import { CloudinaryModule } from './modules/cloudinary/cloudinary.module';
 import { PrismaModule } from './prisma/prisma.module';
-
+import { NewsletterModule } from './modules/newsletter/newsletter.module';
 import { UserCategoryPreferencesModule } from './modules/user-category-preferences/user-category-preferences.module';
 import { CartItemModule } from './modules/cart-item/cart-item.module';
 import { AnalyticsModule } from './modules/analytics/analytics.module';
@@ -111,6 +111,7 @@ if (!jwtSecret) {
     CartItemModule,
     UserCategoryPreferencesModule,
     ClubLegalContentModule,
+    NewsletterModule,
   ],
   controllers: [AppController],
 

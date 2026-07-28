@@ -15,12 +15,18 @@ interface Draft {
   createdAt: string;
 }
 
-interface SentRecord {
-  id: string;
+interface NewsletterSendRecord {
+  id: number;
   subject: string;
   content: string;
-  sentAt: string;
-  recipients: number;
+  recipientCount: number;
+  sentCount: number;
+  failedCount: number;
+  status: 'Enviando' | 'Completado' | 'Con_Errores';
+  createdAt: string;
+  completedAt: string | null;
+  truncatedByDailyLimit?: boolean;
+  totalEligibleSubscribers?: number;
 }
 
 const TEMPLATES = [
@@ -29,7 +35,19 @@ const TEMPLATES = [
   { id: 'tpl-3', name: 'Aviso de envío', subject: 'Tu caja de {club} ya salió', content: 'Tu pedido de este mes ya está en camino. Pronto la recibirás en tu domicilio.' },
 ];
 
-const STORAGE_KEY_PREFIX = 'aurabox-newsletter-';
+const DRAFTS_STORAGE_KEY_PREFIX = 'aurabox-newsletter-drafts-';
+
+const STATUS_LABELS: Record<NewsletterSendRecord['status'], string> = {
+  Enviando: 'Enviando',
+  Completado: 'Completado',
+  Con_Errores: 'Con errores',
+};
+
+const STATUS_COLORS: Record<NewsletterSendRecord['status'], string> = {
+  Enviando: 'bg-aurora-gold/15 text-aurora-navy',
+  Completado: 'bg-emerald-100 text-emerald-800',
+  Con_Errores: 'bg-red-100 text-red-700',
+};
 
 const SendNewsletterContent: React.FC<SendNewsletterContentProps> = ({ activeSection, club }) => {
   const idClub = Number(club.id);
@@ -37,18 +55,17 @@ const SendNewsletterContent: React.FC<SendNewsletterContentProps> = ({ activeSec
   const [content, setContent] = useState('');
   const [subscriberCount, setSubscriberCount] = useState<number | null>(null);
   const [loadingSubscribers, setLoadingSubscribers] = useState(false);
+  const [sending, setSending] = useState(false);
   const [drafts, setDrafts] = useState<Draft[]>([]);
-  const [sent, setSent] = useState<SentRecord[]>([]);
+  const [history, setHistory] = useState<NewsletterSendRecord[]>([]);
+  const [loadingHistory, setLoadingHistory] = useState(false);
 
-  const draftsKey = `${STORAGE_KEY_PREFIX}drafts-${idClub}`;
-  const sentKey = `${STORAGE_KEY_PREFIX}sent-${idClub}`;
+  const draftsKey = `${DRAFTS_STORAGE_KEY_PREFIX}${idClub}`;
 
   useEffect(() => {
     const storedDrafts = localStorage.getItem(draftsKey);
-    const storedSent = localStorage.getItem(sentKey);
     setDrafts(storedDrafts ? JSON.parse(storedDrafts) : []);
-    setSent(storedSent ? JSON.parse(storedSent) : []);
-  }, [draftsKey, sentKey]);
+  }, [draftsKey]);
 
   useEffect(() => {
     if (activeSection !== 'nuevo') return;
@@ -67,14 +84,26 @@ const SendNewsletterContent: React.FC<SendNewsletterContentProps> = ({ activeSec
     fetchSubscribers();
   }, [activeSection, idClub]);
 
+  useEffect(() => {
+    if (activeSection !== 'historial') return;
+    const fetchHistory = async () => {
+      setLoadingHistory(true);
+      try {
+        const res = await api.get(`/newsletter/history/${idClub}`);
+        setHistory(getResponseData(res) || []);
+      } catch (err) {
+        console.error(err);
+        toast.error('No se pudo cargar el historial de envíos');
+      } finally {
+        setLoadingHistory(false);
+      }
+    };
+    fetchHistory();
+  }, [activeSection, idClub]);
+
   const persistDrafts = (next: Draft[]) => {
     setDrafts(next);
     localStorage.setItem(draftsKey, JSON.stringify(next));
-  };
-
-  const persistSent = (next: SentRecord[]) => {
-    setSent(next);
-    localStorage.setItem(sentKey, JSON.stringify(next));
   };
 
   const saveDraft = () => {
@@ -101,27 +130,31 @@ const SendNewsletterContent: React.FC<SendNewsletterContentProps> = ({ activeSec
   };
 
   const handleSend = async () => {
-    if (!subject || !content) {
+    if (!subject.trim() || !content.trim()) {
       toast.error('Completá el asunto y el contenido del newsletter');
       return;
     }
+    setSending(true);
     try {
-      const res = await api.get(`/users/newsletter-subscribers/${idClub}`);
-      const recipients = (getResponseData(res) || []).length;
-      const record: SentRecord = {
-        id: `sent-${Date.now()}`,
-        subject,
-        content,
-        sentAt: new Date().toISOString(),
-        recipients,
-      };
-      persistSent([record, ...sent]);
+      const res = await api.post('/newsletter/send', { idClub, subject: subject.trim(), content: content.trim() });
+      const record: NewsletterSendRecord = getResponseData(res);
+      if (record.truncatedByDailyLimit) {
+        toast(
+          `Se alcanzó el límite diario de emails: se envió a ${record.sentCount} de ${record.totalEligibleSubscribers ?? record.sentCount} suscriptores. El resto queda pendiente para mañana.`,
+          { icon: '⚠️' },
+        );
+      } else if (record.failedCount > 0) {
+        toast(`Enviado a ${record.sentCount} suscriptor(es), con ${record.failedCount} error(es) de entrega.`, { icon: '⚠️' });
+      } else {
+        toast.success(`Newsletter enviado correctamente a ${record.sentCount} suscriptor(es).`);
+      }
       setSubject('');
       setContent('');
-      toast.success(`Newsletter registrado para ${recipients} suscriptor(es).`);
-    } catch (err) {
-      console.error(err);
-      toast.error('Error al procesar el newsletter');
+    } catch (err: any) {
+      const msg = err?.response?.data?.message;
+      toast.error(Array.isArray(msg) ? msg.join(', ') : msg ?? 'Error al enviar el newsletter');
+    } finally {
+      setSending(false);
     }
   };
 
@@ -129,11 +162,8 @@ const SendNewsletterContent: React.FC<SendNewsletterContentProps> = ({ activeSec
     return (
       <div className="animate-fadeInUp">
         <h2 className="font-serif text-xl font-bold text-aurora-navy mb-2">Nuevo Newsletter</h2>
-        <div className="bg-red-50 border border-red-200 rounded-lg p-3 text-xs text-red-700 mb-4">
-          ⚠️ El envío automático por email todavía no está implementado en el backend — al guardar acá, el newsletter queda registrado en este navegador pero <strong>no le llega ningún email real a tus suscriptores</strong>. Avisale al equipo técnico si necesitás enviarlo de verdad.
-        </div>
         <p className="text-sm text-aurora-navy/60 mb-6">
-          {loadingSubscribers ? 'Calculando audiencia...' : `Se registraría el envío a ${subscriberCount ?? 0} suscriptor(es) que aceptaron recibir novedades.`}
+          {loadingSubscribers ? 'Calculando audiencia...' : `Se enviará por email a ${subscriberCount ?? 0} suscriptor(es) que aceptaron recibir novedades.`}
         </p>
         <div className="space-y-4 max-w-2xl">
           <input
@@ -151,11 +181,11 @@ const SendNewsletterContent: React.FC<SendNewsletterContentProps> = ({ activeSec
             rows={10}
           />
           <div className="flex gap-3">
-            <button onClick={saveDraft} className="px-4 py-2 bg-aurora-cream text-aurora-navy text-sm font-medium rounded-lg hover:bg-aurora-creamDark transition-colors">
+            <button onClick={saveDraft} disabled={sending} className="px-4 py-2 bg-aurora-cream text-aurora-navy text-sm font-medium rounded-lg hover:bg-aurora-creamDark transition-colors disabled:opacity-50">
               Guardar borrador
             </button>
-            <button onClick={handleSend} className="px-4 py-2 bg-aurora-terracotta text-white text-sm font-medium rounded-lg hover:bg-aurora-terracottaDark transition-colors">
-              Registrar envío
+            <button onClick={handleSend} disabled={sending} className="px-4 py-2 bg-aurora-terracotta text-white text-sm font-medium rounded-lg hover:bg-aurora-terracottaDark transition-colors disabled:opacity-50">
+              {sending ? 'Enviando...' : 'Enviar newsletter'}
             </button>
           </div>
           {(subject || content) && (
@@ -216,8 +246,13 @@ const SendNewsletterContent: React.FC<SendNewsletterContentProps> = ({ activeSec
     );
   }
 
-  const totalSent = sent.length;
-  const totalRecipients = sent.reduce((acc, s) => acc + s.recipients, 0);
+  const completedRecords = history.filter((r) => r.status !== 'Enviando');
+  const totalSent = completedRecords.length;
+  const totalRecipients = completedRecords.reduce((acc, r) => acc + r.sentCount, 0);
+
+  if (loadingHistory) {
+    return <div className="text-center py-16 text-aurora-navy/50">Cargando historial...</div>;
+  }
 
   return (
     <div className="animate-fadeInUp">
@@ -225,7 +260,7 @@ const SendNewsletterContent: React.FC<SendNewsletterContentProps> = ({ activeSec
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
         <div className="bg-aurora-navy/10 rounded-xl p-5 text-center">
           <p className="text-3xl font-bold text-aurora-navy">{totalSent}</p>
-          <p className="text-sm text-aurora-navy/60 mt-1">Newsletters registrados</p>
+          <p className="text-sm text-aurora-navy/60 mt-1">Newsletters enviados</p>
         </div>
         <div className="bg-emerald-50 rounded-xl p-5 text-center">
           <p className="text-3xl font-bold text-emerald-600">{totalRecipients}</p>
@@ -237,8 +272,8 @@ const SendNewsletterContent: React.FC<SendNewsletterContentProps> = ({ activeSec
         </div>
       </div>
       <h3 className="text-md font-semibold text-aurora-navy mb-3">Historial de Envíos</h3>
-      {sent.length === 0 ? (
-        <div className="text-center py-16 text-aurora-navy/50">Todavía no registraste ningún newsletter.</div>
+      {history.length === 0 ? (
+        <div className="text-center py-16 text-aurora-navy/50">Todavía no enviaste ningún newsletter.</div>
       ) : (
         <div className="overflow-x-auto">
           <table className="min-w-full divide-y divide-aurora-navy/10 border border-aurora-navy/10 rounded-xl">
@@ -247,14 +282,20 @@ const SendNewsletterContent: React.FC<SendNewsletterContentProps> = ({ activeSec
                 <th className="px-4 py-3 text-left text-xs font-semibold text-aurora-navy/60 uppercase">Fecha</th>
                 <th className="px-4 py-3 text-left text-xs font-semibold text-aurora-navy/60 uppercase">Asunto</th>
                 <th className="px-4 py-3 text-left text-xs font-semibold text-aurora-navy/60 uppercase">Destinatarios</th>
+                <th className="px-4 py-3 text-left text-xs font-semibold text-aurora-navy/60 uppercase">Estado</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-aurora-navy/10">
-              {sent.map((record) => (
+              {history.map((record) => (
                 <tr key={record.id}>
-                  <td className="px-4 py-3 text-sm text-aurora-navy/80 whitespace-nowrap">{new Date(record.sentAt).toLocaleDateString('es-AR')}</td>
+                  <td className="px-4 py-3 text-sm text-aurora-navy/80 whitespace-nowrap">{new Date(record.createdAt).toLocaleDateString('es-AR')}</td>
                   <td className="px-4 py-3 text-sm text-aurora-navy">{record.subject}</td>
-                  <td className="px-4 py-3 text-sm text-aurora-navy/70">{record.recipients}</td>
+                  <td className="px-4 py-3 text-sm text-aurora-navy/70">{record.sentCount} / {record.recipientCount}</td>
+                  <td className="px-4 py-3">
+                    <span className={`px-2 py-1 text-xs font-semibold rounded-full ${STATUS_COLORS[record.status]}`}>
+                      {STATUS_LABELS[record.status]}
+                    </span>
+                  </td>
                 </tr>
               ))}
             </tbody>

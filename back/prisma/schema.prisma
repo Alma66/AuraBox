@@ -6,6 +6,27 @@ datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
+model Newsletter_Send {
+  id             Int              @id @default(autoincrement()) @map("ID")
+  idClub         Int              @map("ID_Club")
+  idEntrepreneur Int              @map("ID_Entrepreneur")
+  subject        String           @map("Subject")
+  content        String           @map("Content")
+  recipientCount Int              @map("Recipient_Count")
+  sentCount      Int              @default(0) @map("Sent_Count")
+  failedCount    Int              @default(0) @map("Failed_Count")
+  status         NewsletterStatus @default(Enviando) @map("Status")
+  createdAt      DateTime         @default(now()) @map("Created_At")
+  completedAt    DateTime?        @map("Completed_At")
+
+  @@map("Newsletter_Send")
+}
+
+enum NewsletterStatus {
+  Enviando    @map("Enviando")
+  Completado  @map("Completado")
+  Con_Errores @map("Con_Errores")
+}
 
 model AdminOrEntrepreneurRole {
   id             Int            @id @default(autoincrement()) @map("ID")

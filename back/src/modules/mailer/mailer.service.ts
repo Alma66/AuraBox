@@ -1,4 +1,4 @@
-import { Injectable, InternalServerErrorException, Logger } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import * as nodemailer from 'nodemailer';
 
 @Injectable()
@@ -31,7 +31,17 @@ export class MailerService {
       });
     } catch (err) {
       this.logger.error(`No se pudo enviar el email de verificación a ${to}`, err as Error);
-      throw new InternalServerErrorException('No se pudo enviar el código por email');
+      throw new Error('No se pudo enviar el código por email');
+    }
+  }
+
+  async sendRaw(to: string, subject: string, html: string): Promise<boolean> {
+    try {
+      await this.transporter.sendMail({ from: this.from, to, subject, html });
+      return true;
+    } catch (err) {
+      this.logger.error(`No se pudo enviar el email a ${to}`, err as Error);
+      return false;
     }
   }
 }
