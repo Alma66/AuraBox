@@ -37,22 +37,22 @@ const ManageClubImagesPage: React.FC = () => {
   }, [clubId, userRole, authLoading, navigate]);
 
   if (authLoading || loading) {
-    return <div className="text-center py-20 text-gray-500">Cargando imágenes del club...</div>;
+    return <div className="text-center py-20 text-aurora-navy/60">Cargando imágenes del club...</div>;
   }
 
   if (!club) {
-    return <div className="text-center py-20 text-gray-500">Club no encontrado</div>;
+    return <div className="text-center py-20 text-aurora-navy/60">Club no encontrado</div>;
   }
 
   return (
     <div className="container mx-auto px-4 py-10 max-w-6xl">
-      <h1 className="text-2xl font-bold text-gray-900 mb-8">Imágenes del Club</h1>
+      <h1 className="text-2xl font-serif font-bold text-aurora-navy mb-8">Imágenes del Club</h1>
       <div className="flex flex-col lg:flex-row gap-8">
         <div className="lg:w-1/4">
           <ManageClubImagesSidebar activeSection={activeSection} setActiveSection={setActiveSection} />
         </div>
-        <div className="lg:w-3/4 bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-          <ManageClubImagesContent activeSection={activeSection} club={club} onUpdateClub={() => {}} />
+        <div className="lg:w-3/4 bg-white rounded-xl shadow-aurora-sm border border-aurora-navy/10 p-6">
+          <ManageClubImagesContent activeSection={activeSection} club={club} />
         </div>
       </div>
     </div>

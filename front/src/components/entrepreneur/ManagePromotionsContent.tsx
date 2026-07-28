@@ -1,4 +1,6 @@
+
 import React, { useEffect, useMemo, useState } from 'react';
+import toast from 'react-hot-toast';
 import api, { getResponseData } from '../../api/config';
 import { Club } from '../../types/club';
 import { Promotion, PromotionType } from '../../types/promotion';
@@ -6,7 +8,6 @@ import { Promotion, PromotionType } from '../../types/promotion';
 interface ManagePromotionsContentProps {
   activeSection: string;
   club: Club;
-  onUpdateClub: (updatedClub: Club) => void;
 }
 
 interface SubscriptionTypeOption {
@@ -59,6 +60,7 @@ const ManagePromotionsContent: React.FC<ManagePromotionsContentProps> = ({ activ
       setSubscriptionTypes(getResponseData(subsRes) || []);
     } catch (err) {
       console.error(err);
+      toast.error('No se pudieron cargar las promociones');
     } finally {
       setLoading(false);
     }
@@ -76,7 +78,7 @@ const ManagePromotionsContent: React.FC<ManagePromotionsContentProps> = ({ activ
 
   const handleSubmit = async () => {
     if (!form.name) {
-      alert('El nombre de la promoción es obligatorio');
+      toast.error('El nombre de la promoción es obligatorio');
       return;
     }
     const payload: any = {
@@ -102,10 +104,10 @@ const ManagePromotionsContent: React.FC<ManagePromotionsContentProps> = ({ activ
       }
       resetForm();
       await fetchData();
-      alert('Promoción guardada correctamente');
+      toast.success('Promoción guardada correctamente');
     } catch (err) {
       console.error(err);
-      alert('Error al guardar la promoción');
+      toast.error('Error al guardar la promoción');
     }
   };
 
@@ -114,7 +116,7 @@ const ManagePromotionsContent: React.FC<ManagePromotionsContentProps> = ({ activ
       name: promo.name,
       description: promo.description ?? '',
       promotionType: promo.promotionType,
-      discountPercentage: promo.discountPercentage ?? '',
+      discountPercentage: promo.discountPercentage ? String(promo.discountPercentage) : '',
       idSubscriptionTypes: promo.idSubscriptionTypes ? String(promo.idSubscriptionTypes) : '',
       comboSubscriptionIds: promo.comboSubscriptionIds ? promo.comboSubscriptionIds.split(',').map(Number) : [],
       minSubscriptionsQty: promo.minSubscriptionsQty ? String(promo.minSubscriptionsQty) : '',
@@ -133,7 +135,7 @@ const ManagePromotionsContent: React.FC<ManagePromotionsContentProps> = ({ activ
       await fetchData();
     } catch (err) {
       console.error(err);
-      alert('Error al cambiar el estado de la promoción');
+      toast.error('Error al cambiar el estado de la promoción');
     }
   };
 
@@ -141,10 +143,11 @@ const ManagePromotionsContent: React.FC<ManagePromotionsContentProps> = ({ activ
     if (!window.confirm('¿Eliminar esta promoción permanentemente?')) return;
     try {
       await api.delete(`/promotions/${id}`);
+      toast.success('Promoción eliminada');
       await fetchData();
     } catch (err) {
       console.error(err);
-      alert('Error al eliminar la promoción');
+      toast.error('Error al eliminar la promoción');
     }
   };
 
@@ -168,24 +171,24 @@ const ManagePromotionsContent: React.FC<ManagePromotionsContentProps> = ({ activ
     }));
   };
 
-  if (loading) return <div className="text-center py-16 text-gray-500">Cargando promociones...</div>;
+  if (loading) return <div className="text-center py-16 text-aurora-navy/50">Cargando promociones...</div>;
 
   if (activeSection === 'nueva') {
     return (
       <div className="animate-fadeInUp">
-        <h2 className="text-xl font-bold text-gray-900 mb-6">{editingId ? 'Editar Promoción' : 'Crear Promoción'}</h2>
+        <h2 className="font-serif text-xl font-bold text-aurora-navy mb-6">{editingId ? 'Editar Promoción' : 'Crear Promoción'}</h2>
         <div className="space-y-4 max-w-xl">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Nombre</label>
-            <input type="text" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm" />
+            <label className="block text-sm font-medium text-aurora-navy/80 mb-1">Nombre</label>
+            <input type="text" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} className="w-full px-3 py-2 border border-aurora-navy/15 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-aurora-terracotta/40" />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Descripción</label>
-            <textarea value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm" rows={2} />
+            <label className="block text-sm font-medium text-aurora-navy/80 mb-1">Descripción</label>
+            <textarea value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} className="w-full px-3 py-2 border border-aurora-navy/15 rounded-lg text-sm" rows={2} />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Tipo de promoción</label>
-            <select value={form.promotionType} onChange={(e) => setForm({ ...form, promotionType: e.target.value as PromotionType })} className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm">
+            <label className="block text-sm font-medium text-aurora-navy/80 mb-1">Tipo de promoción</label>
+            <select value={form.promotionType} onChange={(e) => setForm({ ...form, promotionType: e.target.value as PromotionType })} className="w-full px-3 py-2 border border-aurora-navy/15 rounded-lg text-sm">
               {Object.entries(TYPE_LABELS).map(([value, label]) => (
                 <option key={value} value={value}>{label}</option>
               ))}
@@ -195,8 +198,8 @@ const ManagePromotionsContent: React.FC<ManagePromotionsContentProps> = ({ activ
           {form.promotionType === 'Descuento_Temporal' && (
             <>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Suscripción aplicable</label>
-                <select value={form.idSubscriptionTypes} onChange={(e) => setForm({ ...form, idSubscriptionTypes: e.target.value })} className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm">
+                <label className="block text-sm font-medium text-aurora-navy/80 mb-1">Suscripción aplicable</label>
+                <select value={form.idSubscriptionTypes} onChange={(e) => setForm({ ...form, idSubscriptionTypes: e.target.value })} className="w-full px-3 py-2 border border-aurora-navy/15 rounded-lg text-sm">
                   <option value="">Todas las suscripciones</option>
                   {subscriptionTypes.map((s) => (
                     <option key={s.id} value={s.id}>{s.name}</option>
@@ -204,8 +207,8 @@ const ManagePromotionsContent: React.FC<ManagePromotionsContentProps> = ({ activ
                 </select>
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Descuento (%)</label>
-                <input type="number" min={0} max={100} value={form.discountPercentage} onChange={(e) => setForm({ ...form, discountPercentage: e.target.value })} className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm" />
+                <label className="block text-sm font-medium text-aurora-navy/80 mb-1">Descuento (%)</label>
+                <input type="number" min={0} max={100} value={form.discountPercentage} onChange={(e) => setForm({ ...form, discountPercentage: e.target.value })} className="w-full px-3 py-2 border border-aurora-navy/15 rounded-lg text-sm" />
               </div>
             </>
           )}
@@ -213,14 +216,14 @@ const ManagePromotionsContent: React.FC<ManagePromotionsContentProps> = ({ activ
           {form.promotionType === 'Combo_Suscripciones' && (
             <>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Suscripciones incluidas en el combo</label>
+                <label className="block text-sm font-medium text-aurora-navy/80 mb-1">Suscripciones incluidas en el combo</label>
                 <div className="flex flex-wrap gap-2">
                   {subscriptionTypes.map((s) => (
                     <button
                       key={s.id}
                       type="button"
                       onClick={() => toggleComboId(s.id)}
-                      className={`px-3 py-1 rounded-full text-xs font-medium border ${form.comboSubscriptionIds.includes(s.id) ? 'bg-blue-600 text-white border-blue-600' : 'bg-white text-gray-600 border-gray-300'}`}
+                      className={`px-3 py-1 rounded-full text-xs font-medium border ${form.comboSubscriptionIds.includes(s.id) ? 'bg-aurora-navy text-white border-aurora-navy' : 'bg-white text-aurora-navy/70 border-aurora-navy/15'}`}
                     >
                       {s.name}
                     </button>
@@ -228,8 +231,8 @@ const ManagePromotionsContent: React.FC<ManagePromotionsContentProps> = ({ activ
                 </div>
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Descuento (%)</label>
-                <input type="number" min={0} max={100} value={form.discountPercentage} onChange={(e) => setForm({ ...form, discountPercentage: e.target.value })} className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm" />
+                <label className="block text-sm font-medium text-aurora-navy/80 mb-1">Descuento (%)</label>
+                <input type="number" min={0} max={100} value={form.discountPercentage} onChange={(e) => setForm({ ...form, discountPercentage: e.target.value })} className="w-full px-3 py-2 border border-aurora-navy/15 rounded-lg text-sm" />
               </div>
             </>
           )}
@@ -237,20 +240,20 @@ const ManagePromotionsContent: React.FC<ManagePromotionsContentProps> = ({ activ
           {form.promotionType === 'Descuento_Por_Cantidad' && (
             <>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Cantidad mínima de suscripciones</label>
-                <input type="number" min={2} value={form.minSubscriptionsQty} onChange={(e) => setForm({ ...form, minSubscriptionsQty: e.target.value })} className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm" />
+                <label className="block text-sm font-medium text-aurora-navy/80 mb-1">Cantidad mínima de suscripciones</label>
+                <input type="number" min={2} value={form.minSubscriptionsQty} onChange={(e) => setForm({ ...form, minSubscriptionsQty: e.target.value })} className="w-full px-3 py-2 border border-aurora-navy/15 rounded-lg text-sm" />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Descuento (%)</label>
-                <input type="number" min={0} max={100} value={form.discountPercentage} onChange={(e) => setForm({ ...form, discountPercentage: e.target.value })} className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm" />
+                <label className="block text-sm font-medium text-aurora-navy/80 mb-1">Descuento (%)</label>
+                <input type="number" min={0} max={100} value={form.discountPercentage} onChange={(e) => setForm({ ...form, discountPercentage: e.target.value })} className="w-full px-3 py-2 border border-aurora-navy/15 rounded-lg text-sm" />
               </div>
             </>
           )}
 
           {form.promotionType === 'Envio_Gratis' && (
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Suscripción aplicable</label>
-              <select value={form.idSubscriptionTypes} onChange={(e) => setForm({ ...form, idSubscriptionTypes: e.target.value })} className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm">
+              <label className="block text-sm font-medium text-aurora-navy/80 mb-1">Suscripción aplicable</label>
+              <select value={form.idSubscriptionTypes} onChange={(e) => setForm({ ...form, idSubscriptionTypes: e.target.value })} className="w-full px-3 py-2 border border-aurora-navy/15 rounded-lg text-sm">
                 <option value="">Todas las suscripciones</option>
                 {subscriptionTypes.map((s) => (
                   <option key={s.id} value={s.id}>{s.name}</option>
@@ -262,8 +265,8 @@ const ManagePromotionsContent: React.FC<ManagePromotionsContentProps> = ({ activ
           {form.promotionType === 'Cupon_Proxima' && (
             <>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Suscripción que activa el cupón</label>
-                <select value={form.idSubscriptionTypes} onChange={(e) => setForm({ ...form, idSubscriptionTypes: e.target.value })} className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm">
+                <label className="block text-sm font-medium text-aurora-navy/80 mb-1">Suscripción que activa el cupón</label>
+                <select value={form.idSubscriptionTypes} onChange={(e) => setForm({ ...form, idSubscriptionTypes: e.target.value })} className="w-full px-3 py-2 border border-aurora-navy/15 rounded-lg text-sm">
                   <option value="">Cualquier suscripción</option>
                   {subscriptionTypes.map((s) => (
                     <option key={s.id} value={s.id}>{s.name}</option>
@@ -271,12 +274,12 @@ const ManagePromotionsContent: React.FC<ManagePromotionsContentProps> = ({ activ
                 </select>
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Código del cupón</label>
-                <input type="text" value={form.couponCode} onChange={(e) => setForm({ ...form, couponCode: e.target.value })} className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm" />
+                <label className="block text-sm font-medium text-aurora-navy/80 mb-1">Código del cupón</label>
+                <input type="text" value={form.couponCode} onChange={(e) => setForm({ ...form, couponCode: e.target.value })} className="w-full px-3 py-2 border border-aurora-navy/15 rounded-lg text-sm" />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Descuento del cupón (%)</label>
-                <input type="number" min={0} max={100} value={form.discountPercentage} onChange={(e) => setForm({ ...form, discountPercentage: e.target.value })} className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm" />
+                <label className="block text-sm font-medium text-aurora-navy/80 mb-1">Descuento del cupón (%)</label>
+                <input type="number" min={0} max={100} value={form.discountPercentage} onChange={(e) => setForm({ ...form, discountPercentage: e.target.value })} className="w-full px-3 py-2 border border-aurora-navy/15 rounded-lg text-sm" />
               </div>
             </>
           )}
@@ -284,8 +287,8 @@ const ManagePromotionsContent: React.FC<ManagePromotionsContentProps> = ({ activ
           {form.promotionType === 'Descuento_Primeros_Meses' && (
             <>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Suscripción aplicable</label>
-                <select value={form.idSubscriptionTypes} onChange={(e) => setForm({ ...form, idSubscriptionTypes: e.target.value })} className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm">
+                <label className="block text-sm font-medium text-aurora-navy/80 mb-1">Suscripción aplicable</label>
+                <select value={form.idSubscriptionTypes} onChange={(e) => setForm({ ...form, idSubscriptionTypes: e.target.value })} className="w-full px-3 py-2 border border-aurora-navy/15 rounded-lg text-sm">
                   <option value="">Todas las suscripciones</option>
                   {subscriptionTypes.map((s) => (
                     <option key={s.id} value={s.id}>{s.name}</option>
@@ -294,39 +297,39 @@ const ManagePromotionsContent: React.FC<ManagePromotionsContentProps> = ({ activ
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Cantidad de meses</label>
-                  <input type="number" min={1} value={form.durationMonths} onChange={(e) => setForm({ ...form, durationMonths: e.target.value })} className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm" />
+                  <label className="block text-sm font-medium text-aurora-navy/80 mb-1">Cantidad de meses</label>
+                  <input type="number" min={1} value={form.durationMonths} onChange={(e) => setForm({ ...form, durationMonths: e.target.value })} className="w-full px-3 py-2 border border-aurora-navy/15 rounded-lg text-sm" />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Descuento (%)</label>
-                  <input type="number" min={0} max={100} value={form.discountPercentage} onChange={(e) => setForm({ ...form, discountPercentage: e.target.value })} className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm" />
+                  <label className="block text-sm font-medium text-aurora-navy/80 mb-1">Descuento (%)</label>
+                  <input type="number" min={0} max={100} value={form.discountPercentage} onChange={(e) => setForm({ ...form, discountPercentage: e.target.value })} className="w-full px-3 py-2 border border-aurora-navy/15 rounded-lg text-sm" />
                 </div>
               </div>
             </>
           )}
 
-          <label className="flex items-center text-sm text-gray-700">
+          <label className="flex items-center text-sm text-aurora-navy/70">
             <input type="checkbox" checked={form.freeShipping} onChange={(e) => setForm({ ...form, freeShipping: e.target.checked })} className="mr-2" />
             Incluir envío gratis en esta promoción
           </label>
 
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Fecha de inicio</label>
-              <input type="date" value={form.startDate} onChange={(e) => setForm({ ...form, startDate: e.target.value })} className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm" />
+              <label className="block text-sm font-medium text-aurora-navy/80 mb-1">Fecha de inicio</label>
+              <input type="date" value={form.startDate} onChange={(e) => setForm({ ...form, startDate: e.target.value })} className="w-full px-3 py-2 border border-aurora-navy/15 rounded-lg text-sm" />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Fecha de fin</label>
-              <input type="date" value={form.endDate} onChange={(e) => setForm({ ...form, endDate: e.target.value })} className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm" />
+              <label className="block text-sm font-medium text-aurora-navy/80 mb-1">Fecha de fin</label>
+              <input type="date" value={form.endDate} onChange={(e) => setForm({ ...form, endDate: e.target.value })} className="w-full px-3 py-2 border border-aurora-navy/15 rounded-lg text-sm" />
             </div>
           </div>
 
           <div className="flex gap-3 pt-2">
-            <button onClick={handleSubmit} className="px-5 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition-colors">
+            <button onClick={handleSubmit} className="px-5 py-2 bg-aurora-terracotta text-white text-sm font-medium rounded-lg hover:bg-aurora-terracottaDark transition-colors">
               {editingId ? 'Guardar cambios' : 'Crear promoción'}
             </button>
             {editingId && (
-              <button onClick={resetForm} className="px-5 py-2 bg-gray-100 text-gray-700 text-sm font-medium rounded-lg hover:bg-gray-200 transition-colors">
+              <button onClick={resetForm} className="px-5 py-2 bg-aurora-cream text-aurora-navy text-sm font-medium rounded-lg hover:bg-aurora-creamDark transition-colors">
                 Cancelar
               </button>
             )}
@@ -338,17 +341,17 @@ const ManagePromotionsContent: React.FC<ManagePromotionsContentProps> = ({ activ
 
   return (
     <div className="animate-fadeInUp">
-      <h2 className="text-xl font-bold text-gray-900 mb-6">{activeSection === 'historial' ? 'Historial de Promociones' : 'Promociones Activas'}</h2>
+      <h2 className="font-serif text-xl font-bold text-aurora-navy mb-6">{activeSection === 'historial' ? 'Historial de Promociones' : 'Promociones Activas'}</h2>
 
       <div className="flex flex-wrap gap-3 mb-6">
-        <select value={filterType} onChange={(e) => setFilterType(e.target.value)} className="px-3 py-2 border border-gray-300 rounded-lg text-sm">
+        <select value={filterType} onChange={(e) => setFilterType(e.target.value)} className="px-3 py-2 border border-aurora-navy/15 rounded-lg text-sm">
           <option value="all">Todos los tipos</option>
           {Object.entries(TYPE_LABELS).map(([value, label]) => (
             <option key={value} value={value}>{label}</option>
           ))}
         </select>
         {activeSection === 'historial' && (
-          <select value={filterActive} onChange={(e) => setFilterActive(e.target.value)} className="px-3 py-2 border border-gray-300 rounded-lg text-sm">
+          <select value={filterActive} onChange={(e) => setFilterActive(e.target.value)} className="px-3 py-2 border border-aurora-navy/15 rounded-lg text-sm">
             <option value="all">Todos los estados</option>
             <option value="active">Activas</option>
             <option value="inactive">Inactivas</option>
@@ -360,18 +363,18 @@ const ManagePromotionsContent: React.FC<ManagePromotionsContentProps> = ({ activ
         {filteredPromotions
           .filter((p) => (activeSection === 'activas' ? p.active : true))
           .map((promo) => (
-            <div key={promo.id} className="border border-gray-200 rounded-xl p-5 bg-white">
+            <div key={promo.id} className="border border-aurora-navy/10 rounded-xl p-5 bg-white">
               <div className="flex justify-between items-start mb-2">
                 <div>
-                  <h3 className="font-semibold text-gray-900">{promo.name}</h3>
-                  <p className="text-xs text-gray-500">{TYPE_LABELS[promo.promotionType]}</p>
+                  <h3 className="font-semibold text-aurora-navy">{promo.name}</h3>
+                  <p className="text-xs text-aurora-navy/50">{TYPE_LABELS[promo.promotionType]}</p>
                 </div>
-                <span className={`px-2 py-1 text-xs font-semibold rounded-full ${promo.active ? 'bg-emerald-100 text-emerald-800' : 'bg-gray-100 text-gray-600'}`}>
+                <span className={`px-2 py-1 text-xs font-semibold rounded-full ${promo.active ? 'bg-emerald-100 text-emerald-800' : 'bg-aurora-navy/10 text-aurora-navy/60'}`}>
                   {promo.active ? 'Activa' : 'Inactiva'}
                 </span>
               </div>
-              {promo.description && <p className="text-sm text-gray-600 mb-2">{promo.description}</p>}
-              <div className="flex flex-wrap gap-4 text-xs text-gray-500 mb-3">
+              {promo.description && <p className="text-sm text-aurora-navy/70 mb-2">{promo.description}</p>}
+              <div className="flex flex-wrap gap-4 text-xs text-aurora-navy/50 mb-3">
                 {promo.discountPercentage && <span>Descuento: {promo.discountPercentage}%</span>}
                 {promo.idSubscriptionTypes && <span>Suscripción: {subscriptionName(promo.idSubscriptionTypes)}</span>}
                 {promo.comboSubscriptionIds && <span>Combo: {promo.comboSubscriptionIds.split(',').map((id) => subscriptionName(Number(id))).join(' + ')}</span>}
@@ -383,10 +386,10 @@ const ManagePromotionsContent: React.FC<ManagePromotionsContentProps> = ({ activ
                 {promo.endDate && <span>Hasta: {new Date(promo.endDate).toLocaleDateString('es-AR')}</span>}
               </div>
               <div className="flex gap-2">
-                <button onClick={() => toggleActive(promo)} className="text-xs font-medium px-3 py-1 rounded bg-gray-100 text-gray-700 hover:bg-gray-200">
+                <button onClick={() => toggleActive(promo)} className="text-xs font-medium px-3 py-1 rounded bg-aurora-cream text-aurora-navy/80 hover:bg-aurora-creamDark">
                   {promo.active ? 'Desactivar' : 'Activar'}
                 </button>
-                <button onClick={() => loadForEdit(promo)} className="text-xs font-medium px-3 py-1 rounded bg-blue-50 text-blue-700 hover:bg-blue-100">
+                <button onClick={() => loadForEdit(promo)} className="text-xs font-medium px-3 py-1 rounded bg-aurora-navy/10 text-aurora-navy hover:bg-aurora-navy/20">
                   Editar
                 </button>
                 <button onClick={() => remove(promo.id)} className="text-xs font-medium px-3 py-1 rounded bg-red-50 text-red-600 hover:bg-red-100">
@@ -396,7 +399,7 @@ const ManagePromotionsContent: React.FC<ManagePromotionsContentProps> = ({ activ
             </div>
           ))}
         {filteredPromotions.length === 0 && (
-          <div className="text-center py-16 text-gray-500">No hay promociones para mostrar.</div>
+          <div className="text-center py-16 text-aurora-navy/50">No hay promociones para mostrar.</div>
         )}
       </div>
     </div>

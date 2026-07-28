@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
+import toast from 'react-hot-toast';
 import api, { getResponseData } from '../../api/config';
 import { Club } from '../../types/club';
 import { ClubImage } from '../../types/image';
@@ -7,7 +8,6 @@ import { useAuth } from '../../App';
 interface ManageClubImagesContentProps {
   activeSection: string;
   club: Club;
-  onUpdateClub: (updatedClub: Club) => void;
 }
 
 const SECTION_LABELS: Record<string, string> = {
@@ -46,6 +46,7 @@ const ManageClubImagesContent: React.FC<ManageClubImagesContentProps> = ({ activ
       setImages(getResponseData(res) || []);
     } catch (err) {
       console.error(err);
+      toast.error('No se pudieron cargar las imágenes');
     } finally {
       setLoading(false);
       setSelectedIds([]);
@@ -76,11 +77,11 @@ const ManageClubImagesContent: React.FC<ManageClubImagesContentProps> = ({ activ
     const file = e.target.files?.[0];
     if (!file) return;
     if (!file.type.startsWith('image/')) {
-      alert('Solo se permiten imágenes');
+      toast.error('Solo se permiten imágenes');
       return;
     }
     if (file.size > 5 * 1024 * 1024) {
-      alert('La imagen no puede superar los 5MB');
+      toast.error('La imagen no puede superar los 5MB');
       return;
     }
     setUploading(true);
@@ -95,10 +96,11 @@ const ManageClubImagesContent: React.FC<ManageClubImagesContentProps> = ({ activ
       await api.post('/image-club', formData, { headers: { 'Content-Type': 'multipart/form-data' } });
       setDescription('');
       setMarkActive(false);
+      toast.success('Imagen subida correctamente');
       await fetchImages();
     } catch (err) {
       console.error(err);
-      alert('Error al subir la imagen');
+      toast.error('Error al subir la imagen');
     } finally {
       setUploading(false);
       e.target.value = '';
@@ -111,7 +113,7 @@ const ManageClubImagesContent: React.FC<ManageClubImagesContentProps> = ({ activ
       await fetchImages();
     } catch (err) {
       console.error(err);
-      alert('Error al actualizar el estado de uso');
+      toast.error('Error al actualizar el estado de uso');
     }
   };
 
@@ -124,10 +126,11 @@ const ManageClubImagesContent: React.FC<ManageClubImagesContentProps> = ({ activ
     if (!window.confirm(`¿Eliminar ${selectedIds.length} imagen(es) seleccionada(s)? Esta acción no se puede deshacer.`)) return;
     try {
       await api.delete('/image-club/bulk', { data: { ids: selectedIds } });
+      toast.success('Imágenes eliminadas');
       await fetchImages();
     } catch (err) {
       console.error(err);
-      alert('Error al eliminar las imágenes');
+      toast.error('Error al eliminar las imágenes');
     }
   };
 
@@ -135,10 +138,11 @@ const ManageClubImagesContent: React.FC<ManageClubImagesContentProps> = ({ activ
     if (!window.confirm('¿Eliminar esta imagen?')) return;
     try {
       await api.delete(`/image-club/${id}`);
+      toast.success('Imagen eliminada');
       await fetchImages();
     } catch (err) {
       console.error(err);
-      alert('Error al eliminar la imagen');
+      toast.error('Error al eliminar la imagen');
     }
   };
 
@@ -151,27 +155,27 @@ const ManageClubImagesContent: React.FC<ManageClubImagesContentProps> = ({ activ
   return (
     <div className="animate-fadeInUp">
       <div className="flex items-center justify-between mb-6">
-        <h2 className="text-xl font-bold text-gray-900">{SECTION_LABELS[activeSection] ?? activeSection}</h2>
+        <h2 className="font-serif text-xl font-bold text-aurora-navy">{SECTION_LABELS[activeSection] ?? activeSection}</h2>
         {activeSection === 'Banner' && (
-          <span className="text-xs text-gray-500">Las imágenes marcadas "En uso" forman el carrusel del banner.</span>
+          <span className="text-xs text-aurora-navy/50">Las imágenes marcadas "En uso" forman el carrusel del banner.</span>
         )}
       </div>
 
-      <div className="bg-gray-50 border border-gray-200 rounded-xl p-4 mb-6">
-        <p className="text-sm font-medium text-gray-700 mb-3">Subir nueva imagen</p>
+      <div className="bg-aurora-cream/50 border border-aurora-navy/10 rounded-xl p-4 mb-6">
+        <p className="text-sm font-medium text-aurora-navy/80 mb-3">Subir nueva imagen</p>
         <div className="flex flex-wrap gap-3 items-center">
           <input
             type="text"
             placeholder="Descripción (opcional)"
             value={description}
             onChange={(e) => setDescription(e.target.value)}
-            className="px-3 py-2 border border-gray-300 rounded-lg text-sm flex-1 min-w-[200px]"
+            className="px-3 py-2 border border-aurora-navy/15 rounded-lg text-sm flex-1 min-w-[200px] focus:outline-none focus:ring-2 focus:ring-aurora-terracotta/40"
           />
-          <label className="flex items-center text-sm text-gray-600">
+          <label className="flex items-center text-sm text-aurora-navy/70">
             <input type="checkbox" checked={markActive} onChange={(e) => setMarkActive(e.target.checked)} className="mr-2" />
             Marcar como "en uso"
           </label>
-          <label className="px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg cursor-pointer hover:bg-blue-700 transition-colors">
+          <label className="px-4 py-2 bg-aurora-terracotta text-white text-sm font-medium rounded-lg cursor-pointer hover:bg-aurora-terracottaDark transition-colors">
             {uploading ? 'Subiendo...' : 'Elegir imagen'}
             <input type="file" accept="image/*" onChange={handleUpload} className="hidden" disabled={uploading} />
           </label>
@@ -179,21 +183,21 @@ const ManageClubImagesContent: React.FC<ManageClubImagesContentProps> = ({ activ
       </div>
 
       <div className="flex flex-wrap gap-3 mb-6 items-center">
-        <select value={filterEntrepreneur} onChange={(e) => setFilterEntrepreneur(e.target.value)} className="px-3 py-2 border border-gray-300 rounded-lg text-sm">
+        <select value={filterEntrepreneur} onChange={(e) => setFilterEntrepreneur(e.target.value)} className="px-3 py-2 border border-aurora-navy/15 rounded-lg text-sm">
           <option value="all">Todos los emprendedores</option>
           {entrepreneurOptions.map((e) => (
             <option key={e.id} value={e.id}>{e.firstName} {e.lastName}</option>
           ))}
         </select>
-        <select value={filterFormat} onChange={(e) => setFilterFormat(e.target.value)} className="px-3 py-2 border border-gray-300 rounded-lg text-sm">
+        <select value={filterFormat} onChange={(e) => setFilterFormat(e.target.value)} className="px-3 py-2 border border-aurora-navy/15 rounded-lg text-sm">
           <option value="all">Todos los formatos</option>
           {formats.map((f) => (
             <option key={f} value={f}>{f.toUpperCase()}</option>
           ))}
         </select>
-        <input type="date" value={filterFrom} onChange={(e) => setFilterFrom(e.target.value)} className="px-3 py-2 border border-gray-300 rounded-lg text-sm" />
-        <span className="text-gray-400 text-sm">a</span>
-        <input type="date" value={filterTo} onChange={(e) => setFilterTo(e.target.value)} className="px-3 py-2 border border-gray-300 rounded-lg text-sm" />
+        <input type="date" value={filterFrom} onChange={(e) => setFilterFrom(e.target.value)} className="px-3 py-2 border border-aurora-navy/15 rounded-lg text-sm" />
+        <span className="text-aurora-navy/40 text-sm">a</span>
+        <input type="date" value={filterTo} onChange={(e) => setFilterTo(e.target.value)} className="px-3 py-2 border border-aurora-navy/15 rounded-lg text-sm" />
         {selectedIds.length > 0 && (
           <button onClick={deleteSelected} className="ml-auto px-4 py-2 bg-red-600 text-white text-sm font-medium rounded-lg hover:bg-red-700 transition-colors">
             Eliminar seleccionadas ({selectedIds.length})
@@ -202,13 +206,13 @@ const ManageClubImagesContent: React.FC<ManageClubImagesContentProps> = ({ activ
       </div>
 
       {loading ? (
-        <div className="text-center py-16 text-gray-500">Cargando imágenes...</div>
+        <div className="text-center py-16 text-aurora-navy/50">Cargando imágenes...</div>
       ) : filtered.length === 0 ? (
-        <div className="text-center py-16 text-gray-500">No hay imágenes en esta sección con los filtros seleccionados.</div>
+        <div className="text-center py-16 text-aurora-navy/50">No hay imágenes en esta sección con los filtros seleccionados.</div>
       ) : (
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
           {filtered.map((img) => (
-            <div key={img.id} className="relative border border-gray-200 rounded-xl overflow-hidden bg-white group">
+            <div key={img.id} className="relative border border-aurora-navy/10 rounded-xl overflow-hidden bg-white group">
               <div className="absolute top-2 left-2 z-10">
                 <input
                   type="checkbox"
@@ -222,7 +226,7 @@ const ManageClubImagesContent: React.FC<ManageClubImagesContentProps> = ({ activ
                 className="absolute top-2 right-2 z-10 bg-white/90 rounded-full p-1 shadow hover:bg-white"
                 title="Detalles técnicos"
               >
-                <svg className="w-4 h-4 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-4 h-4 text-aurora-navy/70" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
               </button>
@@ -233,12 +237,12 @@ const ManageClubImagesContent: React.FC<ManageClubImagesContentProps> = ({ activ
               )}
               <img src={img.imageUrl} alt={img.description ?? ''} className="w-full h-32 object-cover" />
               <div className="p-2">
-                <p className="text-xs text-gray-500 truncate">{entrepreneurName(img.uploadedBy)}</p>
-                <p className="text-xs text-gray-400">{new Date(img.uploadDate).toLocaleDateString('es-AR')}</p>
+                <p className="text-xs text-aurora-navy/50 truncate">{entrepreneurName(img.uploadedBy)}</p>
+                <p className="text-xs text-aurora-navy/40">{new Date(img.uploadDate).toLocaleDateString('es-AR')}</p>
                 <div className="flex gap-2 mt-2">
                   <button
                     onClick={() => toggleActive(img)}
-                    className={`flex-1 text-xs font-medium px-2 py-1 rounded ${img.isActive ? 'bg-gray-100 text-gray-700' : 'bg-emerald-50 text-emerald-700'}`}
+                    className={`flex-1 text-xs font-medium px-2 py-1 rounded ${img.isActive ? 'bg-aurora-cream text-aurora-navy/70' : 'bg-emerald-50 text-emerald-700'}`}
                   >
                     {img.isActive ? 'Quitar de uso' : 'Usar'}
                   </button>
@@ -274,22 +278,22 @@ const ImageInfoModal: React.FC<{ image: ClubImage; onClose: () => void; uploader
   }, [image.imageUrl]);
 
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4" onClick={onClose}>
-      <div className="bg-white rounded-xl shadow-xl max-w-md w-full p-6" onClick={(e) => e.stopPropagation()}>
+    <div className="fixed inset-0 bg-aurora-navyDark/40 flex items-center justify-center z-50 p-4" onClick={onClose}>
+      <div className="bg-white rounded-xl shadow-2xl max-w-md w-full p-6" onClick={(e) => e.stopPropagation()}>
         <div className="flex justify-between items-start mb-4">
-          <h3 className="text-lg font-bold text-gray-900">Detalles de la imagen</h3>
-          <button onClick={onClose} className="text-gray-400 hover:text-gray-600">✕</button>
+          <h3 className="font-serif text-lg font-bold text-aurora-navy">Detalles de la imagen</h3>
+          <button onClick={onClose} className="text-aurora-navy/40 hover:text-aurora-navy">✕</button>
         </div>
         <img src={image.imageUrl} alt="" className="w-full h-40 object-cover rounded-lg mb-4" />
         <div className="space-y-2 text-sm">
-          <p><span className="font-medium text-gray-600">Sección:</span> {image.section}</p>
-          <p><span className="font-medium text-gray-600">Tipo:</span> {image.contentType}</p>
-          <p><span className="font-medium text-gray-600">Dimensiones:</span> {dimensions}</p>
-          <p><span className="font-medium text-gray-600">Subida por:</span> {uploaderName}</p>
-          <p><span className="font-medium text-gray-600">Fecha:</span> {new Date(image.uploadDate).toLocaleString('es-AR')}</p>
-          <p><span className="font-medium text-gray-600">En uso:</span> {image.isActive ? 'Sí' : 'No'}</p>
-          <p className="break-all"><span className="font-medium text-gray-600">URL:</span> {image.imageUrl}</p>
-          {image.description && <p><span className="font-medium text-gray-600">Descripción:</span> {image.description}</p>}
+          <p><span className="font-medium text-aurora-navy/60">Sección:</span> {image.section}</p>
+          <p><span className="font-medium text-aurora-navy/60">Tipo:</span> {image.contentType}</p>
+          <p><span className="font-medium text-aurora-navy/60">Dimensiones:</span> {dimensions}</p>
+          <p><span className="font-medium text-aurora-navy/60">Subida por:</span> {uploaderName}</p>
+          <p><span className="font-medium text-aurora-navy/60">Fecha:</span> {new Date(image.uploadDate).toLocaleString('es-AR')}</p>
+          <p><span className="font-medium text-aurora-navy/60">En uso:</span> {image.isActive ? 'Sí' : 'No'}</p>
+          <p className="break-all"><span className="font-medium text-aurora-navy/60">URL:</span> {image.imageUrl}</p>
+          {image.description && <p><span className="font-medium text-aurora-navy/60">Descripción:</span> {image.description}</p>}
         </div>
       </div>
     </div>
