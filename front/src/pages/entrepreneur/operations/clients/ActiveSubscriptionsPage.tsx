@@ -29,6 +29,13 @@ const STATUS_BORDER: Record<NormalizedStatus, string> = {
   finished: 'border-gray-400',
 };
 
+const STATUS_CHANGE_OPTIONS: { status: SubscriptionStatus; label: string; color: string }[] = [
+  { status: 'Activa', label: 'Activar', color: 'border-green-300 text-green-700 hover:bg-green-50' },
+  { status: 'Pausada', label: 'Pausar', color: 'border-yellow-300 text-yellow-700 hover:bg-yellow-50' },
+  { status: 'Pendiente_Pago', label: 'Pago pendiente', color: 'border-orange-300 text-orange-700 hover:bg-orange-50' },
+  { status: 'Cancelada', label: 'Cancelar', color: 'border-red-300 text-red-700 hover:bg-red-50' },
+];
+
 const ActiveSubscriptionsPage: React.FC = () => {
   const { clubId } = useParams<{ clubId: string }>();
   const { user, userRole } = useAuth();
@@ -166,7 +173,7 @@ const ActiveSubscriptionsPage: React.FC = () => {
       <div className="bg-white border-b border-aurora-navy/10">
         <div className="container mx-auto px-4 py-5">
           <nav className="text-xs text-aurora-navy/50 mb-1 flex items-center gap-1">
-            <Link to="/entrepreneur/profile" className="hover:text-aurora-terracotta">Mi Club</Link>
+            <Link to="/entrepreneur/dashboard" className="hover:text-aurora-terracotta">Dashboard</Link>
             <span>›</span>
             <Link to={`/entrepreneur/club/${managedClubId}`} className="hover:text-aurora-terracotta">{club?.name || 'Club'}</Link>
             <span>›</span>
@@ -419,12 +426,7 @@ const ActiveSubscriptionsPage: React.FC = () => {
               <div>
                 <p className="text-xs font-semibold text-aurora-navy/40 uppercase tracking-wide mb-3">Cambiar estado</p>
                 <div className="grid grid-cols-2 gap-2">
-                  {([
-                    { status: 'Activa', label: 'Activar', color: 'border-green-300 text-green-700 hover:bg-green-50' },
-                    { status: 'Pausada', label: 'Pausar', color: 'border-yellow-300 text-yellow-700 hover:bg-yellow-50' },
-                    { status: 'Pendiente_Pago', label: 'Pago pendiente', color: 'border-orange-300 text-orange-700 hover:bg-orange-50' },
-                    { status: 'Cancelada', label: 'Cancelar', color: 'border-red-300 text-red-700 hover:bg-red-50' },
-                  ] satisfies { status: SubscriptionStatus; label: string; color: string }[]).map(opt => (
+                  {STATUS_CHANGE_OPTIONS.map(opt => (
                     <button
                       key={opt.status}
                       disabled={updatingStatus || selectedSub.subscriptionStatus === opt.status}
@@ -435,6 +437,13 @@ const ActiveSubscriptionsPage: React.FC = () => {
                     </button>
                   ))}
                 </div>
+                <button
+                  disabled={updatingStatus || selectedSub.subscriptionStatus === 'Finalizada'}
+                  onClick={() => handleStatusChange(selectedSub, 'Finalizada')}
+                  className="mt-2 w-full py-2 text-sm font-medium rounded-lg border border-aurora-navy/20 text-aurora-navy/60 hover:bg-aurora-cream transition disabled:opacity-40 disabled:cursor-not-allowed"
+                >
+                  {updatingStatus ? '...' : 'Marcar como Finalizada'}
+                </button>
               </div>
 
               <div className="pt-2 border-t border-aurora-navy/10 flex flex-col gap-2">
