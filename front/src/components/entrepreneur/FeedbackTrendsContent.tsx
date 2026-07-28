@@ -16,10 +16,10 @@ const ReviewCard: React.FC<{ review: ReviewHighlight; positive: boolean }> = ({ 
   <div className={`border rounded-xl p-4 ${positive ? 'border-green-200 bg-green-50' : 'border-red-200 bg-red-50'}`}>
     <div className="flex items-center gap-2 mb-2">
       <span className="text-yellow-500 font-bold">{review.rating} ★</span>
-      {review.title && <span className="text-sm font-semibold text-gray-800">{review.title}</span>}
+      {review.title && <span className="text-sm font-semibold text-aurora-navy">{review.title}</span>}
     </div>
-    {review.comment && <p className="text-sm text-gray-600 line-clamp-3">{review.comment}</p>}
-    <p className="text-xs text-gray-400 mt-2">
+    {review.comment && <p className="text-sm text-aurora-navy/70 line-clamp-3">{review.comment}</p>}
+    <p className="text-xs text-aurora-navy/40 mt-2">
       {review.reviewDate ? new Date(review.reviewDate).toLocaleDateString('es-AR') : ''}
     </p>
   </div>
@@ -44,7 +44,7 @@ const FeedbackTrendsContent: React.FC<FeedbackTrendsContentProps> = ({ activeSec
 
     return (
       <div className="space-y-6">
-        <h2 className="text-xl font-bold text-gray-900">Tendencias de Rating</h2>
+        <h2 className="font-display text-xl font-bold text-aurora-navy">Tendencias de Rating</h2>
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           <div className="border border-blue-100 bg-blue-50 rounded-xl px-5 py-4">
             <p className="text-xs text-blue-600 uppercase tracking-wide mb-1">Tasa de conversión a reseña</p>
@@ -71,7 +71,7 @@ const FeedbackTrendsContent: React.FC<FeedbackTrendsContentProps> = ({ activeSec
           )}
         </div>
         <div>
-          <h3 className="text-base font-semibold text-gray-700 mb-3">Rating promedio por mes (12 meses)</h3>
+          <h3 className="text-base font-semibold text-aurora-navy/80 mb-3">Rating promedio por mes (12 meses)</h3>
           <ResponsiveContainer width="100%" height={260}>
             <LineChart data={evo}>
               <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
@@ -99,18 +99,18 @@ const FeedbackTrendsContent: React.FC<FeedbackTrendsContentProps> = ({ activeSec
           )}
         </div>
         <div>
-          <h3 className="text-base font-semibold text-gray-700 mb-3">Distribución de ratings (muestra)</h3>
+          <h3 className="text-base font-semibold text-aurora-navy/80 mb-3">Distribución de ratings (muestra)</h3>
           <div className="space-y-2">
             {ratingDist.map((r) => (
               <div key={r.star} className="flex items-center gap-3">
-                <span className="text-sm text-gray-600 w-8 flex-shrink-0">{r.star} ★</span>
-                <div className="flex-1 bg-gray-100 rounded-full h-3">
+                <span className="text-sm text-aurora-navy/80 w-8 flex-shrink-0">{r.star} ★</span>
+                <div className="flex-1 bg-aurora-cream rounded-full h-3">
                   <div
                     className="bg-yellow-400 h-3 rounded-full transition-all"
                     style={{ width: total > 0 ? `${(r.count / total) * 100}%` : '0%' }}
                   />
                 </div>
-                <span className="text-xs text-gray-500 w-8 text-right">{r.count}</span>
+                <span className="text-xs text-aurora-navy/50 w-8 text-right">{r.count}</span>
               </div>
             ))}
           </div>
@@ -127,7 +127,7 @@ const FeedbackTrendsContent: React.FC<FeedbackTrendsContentProps> = ({ activeSec
 
     return (
       <div className="space-y-6">
-        <h2 className="text-xl font-bold text-gray-900">Altas y Bajas de Suscriptores</h2>
+        <h2 className="font-display text-xl font-bold text-aurora-navy">Altas y Bajas de Suscriptores</h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           {bestNet && (
             <div className="border border-green-200 bg-green-50 rounded-xl p-5">
@@ -156,24 +156,24 @@ const FeedbackTrendsContent: React.FC<FeedbackTrendsContentProps> = ({ activeSec
           </BarChart>
         </ResponsiveContainer>
         <div>
-          <h3 className="text-base font-semibold text-gray-700 mb-3">Detalle mes a mes</h3>
-          <div className="overflow-x-auto rounded-xl border border-gray-200">
-            <table className="min-w-full divide-y divide-gray-200 text-sm">
+          <h3 className="text-base font-semibold text-aurora-navy/80 mb-3">Detalle mes a mes</h3>
+          <div className="overflow-x-auto rounded-xl border border-aurora-navy/10">
+            <table className="min-w-full divide-y divide-aurora-navy/10 text-sm">
               <thead>
-                <tr className="bg-gray-50">
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Mes</th>
-                  <th className="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase">Altas</th>
-                  <th className="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase">Bajas</th>
-                  <th className="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase">Saldo neto</th>
+                <tr className="bg-aurora-cream">
+                  <th className="px-4 py-3 text-left text-xs font-medium text-aurora-navy/50 uppercase">Mes</th>
+                  <th className="px-4 py-3 text-right text-xs font-medium text-aurora-navy/50 uppercase">Altas</th>
+                  <th className="px-4 py-3 text-right text-xs font-medium text-aurora-navy/50 uppercase">Bajas</th>
+                  <th className="px-4 py-3 text-right text-xs font-medium text-aurora-navy/50 uppercase">Saldo neto</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-gray-100">
+              <tbody className="divide-y divide-aurora-navy/10">
                 {netByMonth.map((r) => (
-                  <tr key={r.month} className="hover:bg-gray-50">
-                    <td className="px-4 py-2 text-gray-700">{r.month}</td>
+                  <tr key={r.month} className="hover:bg-aurora-cream">
+                    <td className="px-4 py-2 text-aurora-navy/80">{r.month}</td>
                     <td className="px-4 py-2 text-right font-medium text-green-600">{r.newSubs}</td>
                     <td className="px-4 py-2 text-right font-medium text-red-500">{r.cancelledSubs}</td>
-                    <td className={`px-4 py-2 text-right font-bold ${r.neto > 0 ? 'text-green-600' : r.neto < 0 ? 'text-red-500' : 'text-gray-400'}`}>
+                    <td className={`px-4 py-2 text-right font-bold ${r.neto > 0 ? 'text-green-600' : r.neto < 0 ? 'text-red-500' : 'text-aurora-navy/40'}`}>
                       {r.neto > 0 ? '+' : ''}{r.neto}
                     </td>
                   </tr>
@@ -190,10 +190,10 @@ const FeedbackTrendsContent: React.FC<FeedbackTrendsContentProps> = ({ activeSec
     return (
       <div className="space-y-6">
         <div className="flex items-center justify-between">
-          <h2 className="text-xl font-bold text-gray-900">Reseñas Destacadas</h2>
+          <h2 className="font-display text-xl font-bold text-aurora-navy">Reseñas Destacadas</h2>
           <Link
             to={`/entrepreneur/club/${clubId}/moderate-reviews`}
-            className="text-sm text-blue-600 hover:text-blue-800 font-medium"
+            className="text-sm text-aurora-terracotta hover:underline font-medium"
           >
             Ir a Moderar Reseñas →
           </Link>
@@ -201,7 +201,7 @@ const FeedbackTrendsContent: React.FC<FeedbackTrendsContentProps> = ({ activeSec
         <div>
           <h3 className="text-sm font-semibold text-green-700 mb-3">Las mejores</h3>
           {data.topReviews.length === 0 ? (
-            <p className="text-gray-500 text-sm">No hay reseñas positivas registradas.</p>
+            <p className="text-aurora-navy/50 text-sm">No hay reseñas positivas registradas.</p>
           ) : (
             <div className="space-y-3">
               {data.topReviews.map((r) => <ReviewCard key={r.id} review={r} positive={true} />)}
@@ -211,7 +211,7 @@ const FeedbackTrendsContent: React.FC<FeedbackTrendsContentProps> = ({ activeSec
         <div>
           <h3 className="text-sm font-semibold text-red-700 mb-3">Las peores</h3>
           {data.bottomReviews.length === 0 ? (
-            <p className="text-gray-500 text-sm">No hay reseñas negativas registradas.</p>
+            <p className="text-aurora-navy/50 text-sm">No hay reseñas negativas registradas.</p>
           ) : (
             <div className="space-y-3">
               {data.bottomReviews.map((r) => <ReviewCard key={r.id} review={r} positive={false} />)}
@@ -220,7 +220,7 @@ const FeedbackTrendsContent: React.FC<FeedbackTrendsContentProps> = ({ activeSec
         </div>
         {[...data.topReviews, ...data.bottomReviews].filter((r) => r.mediaUrl).length > 0 && (
           <div>
-            <h3 className="text-sm font-semibold text-gray-700 mb-3">Reseñas con multimedia</h3>
+            <h3 className="text-sm font-semibold text-aurora-navy/80 mb-3">Reseñas con multimedia</h3>
             <div className="space-y-3">
               {[...data.topReviews, ...data.bottomReviews]
                 .filter((r) => r.mediaUrl)
@@ -252,9 +252,9 @@ const FeedbackTrendsContent: React.FC<FeedbackTrendsContentProps> = ({ activeSec
 
     return (
       <div className="space-y-6">
-        <h2 className="text-xl font-bold text-gray-900">Palabras Frecuentes en Reseñas</h2>
+        <h2 className="font-display text-xl font-bold text-aurora-navy">Palabras Frecuentes en Reseñas</h2>
         {words.length === 0 ? (
-          <p className="text-gray-500 text-sm">No hay suficientes reseñas para analizar palabras.</p>
+          <p className="text-aurora-navy/50 text-sm">No hay suficientes reseñas para analizar palabras.</p>
         ) : (
           <>
             <div className="flex flex-wrap gap-3 items-end">
@@ -273,15 +273,15 @@ const FeedbackTrendsContent: React.FC<FeedbackTrendsContentProps> = ({ activeSec
               })}
             </div>
             <div>
-              <h3 className="text-base font-semibold text-gray-700 mb-3">Top 10 palabras</h3>
+              <h3 className="text-base font-semibold text-aurora-navy/80 mb-3">Top 10 palabras</h3>
               <div className="space-y-2">
                 {top10.map((w) => (
                   <div key={w.word} className="flex items-center gap-3">
-                    <span className="text-sm text-gray-700 w-28 flex-shrink-0 font-medium">{w.word}</span>
-                    <div className="flex-1 bg-gray-100 rounded-full h-3">
+                    <span className="text-sm text-aurora-navy/80 w-28 flex-shrink-0 font-medium">{w.word}</span>
+                    <div className="flex-1 bg-aurora-cream rounded-full h-3">
                       <div className="bg-blue-500 h-3 rounded-full" style={{ width: `${(w.count / max) * 100}%` }} />
                     </div>
-                    <span className="text-xs text-gray-500 w-8 text-right">{w.count}</span>
+                    <span className="text-xs text-aurora-navy/50 w-8 text-right">{w.count}</span>
                   </div>
                 ))}
               </div>
@@ -293,7 +293,7 @@ const FeedbackTrendsContent: React.FC<FeedbackTrendsContentProps> = ({ activeSec
                   <div className="space-y-2">
                     {posTop.map(([word, count]) => (
                       <div key={word} className="flex items-center justify-between border border-green-100 bg-green-50 rounded-lg px-3 py-2">
-                        <span className="text-sm text-gray-700">{word}</span>
+                        <span className="text-sm text-aurora-navy/80">{word}</span>
                         <span className="text-xs font-semibold text-green-700">{count}</span>
                       </div>
                     ))}
@@ -304,7 +304,7 @@ const FeedbackTrendsContent: React.FC<FeedbackTrendsContentProps> = ({ activeSec
                   <div className="space-y-2">
                     {negTop.map(([word, count]) => (
                       <div key={word} className="flex items-center justify-between border border-red-100 bg-red-50 rounded-lg px-3 py-2">
-                        <span className="text-sm text-gray-700">{word}</span>
+                        <span className="text-sm text-aurora-navy/80">{word}</span>
                         <span className="text-xs font-semibold text-red-700">{count}</span>
                       </div>
                     ))}
@@ -328,30 +328,30 @@ const FeedbackTrendsContent: React.FC<FeedbackTrendsContentProps> = ({ activeSec
 
     return (
       <div className="space-y-6">
-        <h2 className="text-xl font-bold text-gray-900">Reseñas con Media</h2>
+        <h2 className="font-display text-xl font-bold text-aurora-navy">Reseñas con Media</h2>
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           <div className="border border-blue-200 bg-blue-50 rounded-xl p-5">
             <p className="text-xs text-blue-600 uppercase tracking-wide mb-1">Con multimedia</p>
             <p className="text-3xl font-bold text-blue-700">{conMedia.length}</p>
             <p className="text-xs text-blue-500 mt-1">{pctConMedia}% del total</p>
           </div>
-          <div className="border border-gray-200 rounded-xl p-5 bg-white">
-            <p className="text-xs text-gray-500 uppercase tracking-wide mb-1">Sin multimedia</p>
-            <p className="text-3xl font-bold text-gray-900">{sinMedia.length}</p>
+          <div className="border border-aurora-navy/10 rounded-xl p-5 bg-white shadow-aurora-sm">
+            <p className="text-xs text-aurora-navy/50 uppercase tracking-wide mb-1">Sin multimedia</p>
+            <p className="text-3xl font-bold text-aurora-navy">{sinMedia.length}</p>
           </div>
-          <div className="border border-gray-200 rounded-xl p-5 bg-white">
-            <p className="text-xs text-gray-500 uppercase tracking-wide mb-1">Total de la muestra</p>
-            <p className="text-3xl font-bold text-gray-900">{total}</p>
+          <div className="border border-aurora-navy/10 rounded-xl p-5 bg-white shadow-aurora-sm">
+            <p className="text-xs text-aurora-navy/50 uppercase tracking-wide mb-1">Total de la muestra</p>
+            <p className="text-3xl font-bold text-aurora-navy">{total}</p>
           </div>
         </div>
         {galeria.length === 0 ? (
-          <p className="text-gray-500 text-sm">No hay reseñas con multimedia en la muestra actual.</p>
+          <p className="text-aurora-navy/50 text-sm">No hay reseñas con multimedia en la muestra actual.</p>
         ) : (
           <div>
-            <h3 className="text-base font-semibold text-gray-700 mb-3">Galería (hasta 12)</h3>
+            <h3 className="text-base font-semibold text-aurora-navy/80 mb-3">Galería (hasta 12)</h3>
             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
               {galeria.map((r) => (
-                <div key={r.id} className="border border-gray-200 rounded-xl overflow-hidden bg-white">
+                <div key={r.id} className="border border-aurora-navy/10 rounded-xl overflow-hidden bg-white">
                   <a href={r.mediaUrl!} target="_blank" rel="noopener noreferrer">
                     <img
                       src={r.mediaUrl!}
@@ -362,7 +362,7 @@ const FeedbackTrendsContent: React.FC<FeedbackTrendsContentProps> = ({ activeSec
                   </a>
                   <div className="p-2">
                     <span className="text-xs font-semibold text-yellow-500">{r.rating} ★</span>
-                    {r.title && <p className="text-xs text-gray-600 truncate mt-0.5">{r.title}</p>}
+                    {r.title && <p className="text-xs text-aurora-navy/70 truncate mt-0.5">{r.title}</p>}
                   </div>
                 </div>
               ))}

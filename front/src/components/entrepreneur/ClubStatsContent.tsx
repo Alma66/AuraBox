@@ -26,29 +26,29 @@ const ClubStatsContent: React.FC<ClubStatsContentProps> = ({ activeSection, data
 
     return (
       <div className="space-y-6">
-        <h2 className="text-xl font-bold text-gray-900">Resumen General</h2>
+        <h2 className="font-display text-xl font-bold text-aurora-navy">Resumen General</h2>
         <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
-          <div className="border border-gray-200 rounded-xl p-5 bg-white">
-            <p className="text-xs text-gray-500 uppercase tracking-wide mb-1">Suscriptores activos</p>
-            <p className="text-3xl font-bold text-gray-900">{data.activeSubscribers}</p>
+          <div className="border border-aurora-navy/10 rounded-xl p-5 bg-white shadow-aurora-sm">
+            <p className="text-xs text-aurora-navy/50 uppercase tracking-wide mb-1">Suscriptores activos</p>
+            <p className="text-3xl font-bold text-aurora-navy">{data.activeSubscribers}</p>
           </div>
-          <div className="border border-gray-200 rounded-xl p-5 bg-white">
-            <p className="text-xs text-gray-500 uppercase tracking-wide mb-1">Nuevos este mes</p>
+          <div className="border border-aurora-navy/10 rounded-xl p-5 bg-white shadow-aurora-sm">
+            <p className="text-xs text-aurora-navy/50 uppercase tracking-wide mb-1">Nuevos este mes</p>
             <p className="text-3xl font-bold text-green-600">{data.newThisMonth}</p>
           </div>
-          <div className="border border-gray-200 rounded-xl p-5 bg-white">
-            <p className="text-xs text-gray-500 uppercase tracking-wide mb-1">Cancelados este mes</p>
+          <div className="border border-aurora-navy/10 rounded-xl p-5 bg-white shadow-aurora-sm">
+            <p className="text-xs text-aurora-navy/50 uppercase tracking-wide mb-1">Cancelados este mes</p>
             <p className="text-3xl font-bold text-red-500">{data.cancelledThisMonth}</p>
           </div>
-          <div className="border border-gray-200 rounded-xl p-5 bg-white">
-            <p className="text-xs text-gray-500 uppercase tracking-wide mb-1">Tasa de retención</p>
+          <div className="border border-aurora-navy/10 rounded-xl p-5 bg-white shadow-aurora-sm">
+            <p className="text-xs text-aurora-navy/50 uppercase tracking-wide mb-1">Tasa de retención</p>
             <p className="text-3xl font-bold text-blue-600">{data.retentionRate}%</p>
           </div>
-          <div className="border border-gray-200 rounded-xl p-5 bg-white">
-            <p className="text-xs text-gray-500 uppercase tracking-wide mb-1">Ticket promedio</p>
-            <p className="text-3xl font-bold text-gray-900">{fmt(data.avgTicket)}</p>
+          <div className="border border-aurora-navy/10 rounded-xl p-5 bg-white shadow-aurora-sm">
+            <p className="text-xs text-aurora-navy/50 uppercase tracking-wide mb-1">Ticket promedio</p>
+            <p className="text-3xl font-bold text-aurora-navy">{fmt(data.avgTicket)}</p>
           </div>
-          <div className="bg-gradient-to-br from-blue-600 to-blue-700 rounded-xl p-5 text-white">
+          <div className="bg-gradient-to-br from-aurora-navy to-aurora-navyDark rounded-xl p-5 text-white">
             <p className="text-xs uppercase tracking-wide mb-1 opacity-80">MRR estimado</p>
             <p className="text-3xl font-bold">{fmt(data.mrr)}</p>
           </div>
@@ -76,9 +76,9 @@ const ClubStatsContent: React.FC<ClubStatsContentProps> = ({ activeSection, data
 
     return (
       <div className="space-y-6">
-        <h2 className="text-xl font-bold text-gray-900">Evolución de Suscriptores</h2>
+        <h2 className="font-display text-xl font-bold text-aurora-navy">Evolución de Suscriptores</h2>
         <div>
-          <h3 className="text-base font-semibold text-gray-700 mb-3">Suscriptores activos por mes (12 meses)</h3>
+          <h3 className="text-base font-semibold text-aurora-navy/80 mb-3">Suscriptores activos por mes (12 meses)</h3>
           <ResponsiveContainer width="100%" height={260}>
             <LineChart data={evo}>
               <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
@@ -102,25 +102,25 @@ const ClubStatsContent: React.FC<ClubStatsContentProps> = ({ activeSection, data
           </div>
         </div>
         <div>
-          <h3 className="text-base font-semibold text-gray-700 mb-3">Detalle mes a mes</h3>
-          <div className="overflow-x-auto rounded-xl border border-gray-200">
-            <table className="min-w-full divide-y divide-gray-200 text-sm">
+          <h3 className="text-base font-semibold text-aurora-navy/80 mb-3">Detalle mes a mes</h3>
+          <div className="overflow-x-auto rounded-xl border border-aurora-navy/10">
+            <table className="min-w-full divide-y divide-aurora-navy/10 text-sm">
               <thead>
-                <tr className="bg-gray-50">
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Mes</th>
-                  <th className="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase">Suscriptores</th>
-                  <th className="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase">Variación</th>
+                <tr className="bg-aurora-cream">
+                  <th className="px-4 py-3 text-left text-xs font-medium text-aurora-navy/50 uppercase">Mes</th>
+                  <th className="px-4 py-3 text-right text-xs font-medium text-aurora-navy/50 uppercase">Suscriptores</th>
+                  <th className="px-4 py-3 text-right text-xs font-medium text-aurora-navy/50 uppercase">Variación</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-gray-100">
+              <tbody className="divide-y divide-aurora-navy/10">
                 {evo.map((row, i) => {
                   const prev = i > 0 ? evo[i - 1].count : row.count;
                   const diff = row.count - prev;
                   return (
-                    <tr key={row.month} className="hover:bg-gray-50">
-                      <td className="px-4 py-2 text-gray-700">{row.month}</td>
-                      <td className="px-4 py-2 text-right font-medium text-gray-900">{row.count}</td>
-                      <td className={`px-4 py-2 text-right font-medium ${diff > 0 ? 'text-green-600' : diff < 0 ? 'text-red-500' : 'text-gray-400'}`}>
+                    <tr key={row.month} className="hover:bg-aurora-cream">
+                      <td className="px-4 py-2 text-aurora-navy/80">{row.month}</td>
+                      <td className="px-4 py-2 text-right font-medium text-aurora-navy">{row.count}</td>
+                      <td className={`px-4 py-2 text-right font-medium ${diff > 0 ? 'text-green-600' : diff < 0 ? 'text-red-500' : 'text-aurora-navy/40'}`}>
                         {i === 0 ? '—' : `${diff >= 0 ? '+' : ''}${diff}`}
                       </td>
                     </tr>
@@ -152,7 +152,7 @@ const ClubStatsContent: React.FC<ClubStatsContentProps> = ({ activeSection, data
 
     return (
       <div className="space-y-6">
-        <h2 className="text-xl font-bold text-gray-900">Logística y Envíos</h2>
+        <h2 className="font-display text-xl font-bold text-aurora-navy">Logística y Envíos</h2>
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           <div className={`${semaforoBg} text-white rounded-xl p-5`}>
             <p className="text-xs uppercase tracking-wide mb-1 opacity-80">Tasa de éxito de envíos</p>
@@ -171,7 +171,7 @@ const ClubStatsContent: React.FC<ClubStatsContentProps> = ({ activeSection, data
           </div>
         </div>
         {breakdown.length === 0 ? (
-          <p className="text-gray-500 text-sm">No hay envíos registrados para este club.</p>
+          <p className="text-aurora-navy/50 text-sm">No hay envíos registrados para este club.</p>
         ) : (
           <div className="flex flex-col lg:flex-row gap-8 items-center">
             <div className="w-full lg:w-1/2">
@@ -196,14 +196,14 @@ const ClubStatsContent: React.FC<ClubStatsContentProps> = ({ activeSection, data
             </div>
             <div className="w-full lg:w-1/2 space-y-2">
               {breakdown.map((item, i) => (
-                <div key={item.status} className="flex items-center justify-between border border-gray-100 rounded-lg px-4 py-3">
+                <div key={item.status} className="flex items-center justify-between border border-aurora-navy/10 rounded-lg px-4 py-3">
                   <div className="flex items-center gap-2">
                     <span className="w-3 h-3 rounded-full inline-block" style={{ background: COLORS[i % COLORS.length] }} />
-                    <span className="text-sm text-gray-700">{item.status}</span>
+                    <span className="text-sm text-aurora-navy/80">{item.status}</span>
                   </div>
                   <div className="text-right">
-                    <span className="text-sm font-semibold text-gray-900">{item.count}</span>
-                    <span className="text-xs text-gray-400 ml-2">{total > 0 ? ((item.count / total) * 100).toFixed(1) : '0'}%</span>
+                    <span className="text-sm font-semibold text-aurora-navy">{item.count}</span>
+                    <span className="text-xs text-aurora-navy/40 ml-2">{total > 0 ? ((item.count / total) * 100).toFixed(1) : '0'}%</span>
                   </div>
                 </div>
               ))}
@@ -229,22 +229,22 @@ const ClubStatsContent: React.FC<ClubStatsContentProps> = ({ activeSection, data
 
     return (
       <div className="space-y-6">
-        <h2 className="text-xl font-bold text-gray-900">Reputación</h2>
+        <h2 className="font-display text-xl font-bold text-aurora-navy">Reputación</h2>
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-          <div className="border border-gray-200 rounded-xl p-5 bg-white">
-            <p className="text-xs text-gray-500 uppercase tracking-wide mb-1">Rating promedio</p>
+          <div className="border border-aurora-navy/10 rounded-xl p-5 bg-white shadow-aurora-sm">
+            <p className="text-xs text-aurora-navy/50 uppercase tracking-wide mb-1">Rating promedio</p>
             <p className="text-3xl font-bold text-yellow-500">{rep.avgRating} ★</p>
           </div>
-          <div className="border border-gray-200 rounded-xl p-5 bg-white">
-            <p className="text-xs text-gray-500 uppercase tracking-wide mb-1">Total reseñas</p>
-            <p className="text-3xl font-bold text-gray-900">{rep.totalReviews}</p>
+          <div className="border border-aurora-navy/10 rounded-xl p-5 bg-white shadow-aurora-sm">
+            <p className="text-xs text-aurora-navy/50 uppercase tracking-wide mb-1">Total reseñas</p>
+            <p className="text-3xl font-bold text-aurora-navy">{rep.totalReviews}</p>
           </div>
-          <div className="border border-gray-200 rounded-xl p-5 bg-white">
-            <p className="text-xs text-gray-500 uppercase tracking-wide mb-1">Con multimedia</p>
+          <div className="border border-aurora-navy/10 rounded-xl p-5 bg-white shadow-aurora-sm">
+            <p className="text-xs text-aurora-navy/50 uppercase tracking-wide mb-1">Con multimedia</p>
             <p className="text-3xl font-bold text-blue-600">{rep.withMediaPercent}%</p>
           </div>
-          <div className="border border-gray-200 rounded-xl p-5 bg-white">
-            <p className="text-xs text-gray-500 uppercase tracking-wide mb-1">Reseñas ocultas</p>
+          <div className="border border-aurora-navy/10 rounded-xl p-5 bg-white shadow-aurora-sm">
+            <p className="text-xs text-aurora-navy/50 uppercase tracking-wide mb-1">Reseñas ocultas</p>
             <p className="text-3xl font-bold text-red-500">{rep.hiddenCount}</p>
           </div>
         </div>
@@ -254,18 +254,18 @@ const ClubStatsContent: React.FC<ClubStatsContentProps> = ({ activeSection, data
           <p className="text-xs text-indigo-500 mt-1">% ratings 4-5★ menos % ratings 1-2★</p>
         </div>
         <div>
-          <h3 className="text-base font-semibold text-gray-700 mb-3">Distribución de ratings (estimada)</h3>
+          <h3 className="text-base font-semibold text-aurora-navy/80 mb-3">Distribución de ratings (estimada)</h3>
           <div className="space-y-2">
             {ratingBars.map((r) => (
               <div key={r.star} className="flex items-center gap-3">
-                <span className="text-sm text-gray-600 w-8 flex-shrink-0">{r.star} ★</span>
-                <div className="flex-1 bg-gray-100 rounded-full h-3">
+                <span className="text-sm text-aurora-navy/80 w-8 flex-shrink-0">{r.star} ★</span>
+                <div className="flex-1 bg-aurora-cream rounded-full h-3">
                   <div
                     className="bg-yellow-400 h-3 rounded-full transition-all"
                     style={{ width: totalRev > 0 ? `${(r.count / totalRev) * 100}%` : '0%' }}
                   />
                 </div>
-                <span className="text-xs text-gray-500 w-8 text-right">{r.count}</span>
+                <span className="text-xs text-aurora-navy/50 w-8 text-right">{r.count}</span>
               </div>
             ))}
           </div>
@@ -273,7 +273,7 @@ const ClubStatsContent: React.FC<ClubStatsContentProps> = ({ activeSection, data
         <div className="pt-2">
           <Link
             to={`/entrepreneur/club/${clubId}/moderate-reviews`}
-            className="inline-flex items-center gap-2 text-sm text-blue-600 hover:text-blue-800 font-medium"
+            className="inline-flex items-center gap-2 text-sm text-aurora-terracotta hover:underline font-medium"
           >
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
@@ -292,10 +292,10 @@ const ClubStatsContent: React.FC<ClubStatsContentProps> = ({ activeSection, data
 
     return (
       <div className="space-y-6">
-        <h2 className="text-xl font-bold text-gray-900">Planes y Suscripciones</h2>
+        <h2 className="font-display text-xl font-bold text-aurora-navy">Planes y Suscripciones</h2>
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           <div>
-            <h3 className="text-base font-semibold text-gray-700 mb-3">Distribución por plan</h3>
+            <h3 className="text-base font-semibold text-aurora-navy/80 mb-3">Distribución por plan</h3>
             <ResponsiveContainer width="100%" height={240}>
               <PieChart>
                 <Pie data={plans} dataKey="activeCount" nameKey="name" cx="50%" cy="50%" outerRadius={90}>
@@ -309,7 +309,7 @@ const ClubStatsContent: React.FC<ClubStatsContentProps> = ({ activeSection, data
             </ResponsiveContainer>
           </div>
           <div>
-            <h3 className="text-base font-semibold text-gray-700 mb-3">Ranking de planes</h3>
+            <h3 className="text-base font-semibold text-aurora-navy/80 mb-3">Ranking de planes</h3>
             <ResponsiveContainer width="100%" height={240}>
               <BarChart data={plans} layout="vertical" margin={{ left: 10, right: 40 }}>
                 <XAxis type="number" tick={{ fontSize: 11 }} />
@@ -324,31 +324,31 @@ const ClubStatsContent: React.FC<ClubStatsContentProps> = ({ activeSection, data
           </div>
         </div>
         <div>
-          <h3 className="text-base font-semibold text-gray-700 mb-3">Tabla de planes</h3>
-          <div className="overflow-x-auto rounded-xl border border-gray-200">
-            <table className="min-w-full divide-y divide-gray-200 text-sm">
+          <h3 className="text-base font-semibold text-aurora-navy/80 mb-3">Tabla de planes</h3>
+          <div className="overflow-x-auto rounded-xl border border-aurora-navy/10">
+            <table className="min-w-full divide-y divide-aurora-navy/10 text-sm">
               <thead>
-                <tr className="bg-gray-50">
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">#</th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Plan</th>
-                  <th className="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase">Activos</th>
-                  <th className="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase">% del total</th>
+                <tr className="bg-aurora-cream">
+                  <th className="px-4 py-3 text-left text-xs font-medium text-aurora-navy/50 uppercase">#</th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-aurora-navy/50 uppercase">Plan</th>
+                  <th className="px-4 py-3 text-right text-xs font-medium text-aurora-navy/50 uppercase">Activos</th>
+                  <th className="px-4 py-3 text-right text-xs font-medium text-aurora-navy/50 uppercase">% del total</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-gray-100">
+              <tbody className="divide-y divide-aurora-navy/10">
                 {plans.map((plan, i) => (
-                  <tr key={plan.name} className="hover:bg-gray-50">
-                    <td className="px-4 py-2 text-gray-400 font-bold">#{i + 1}</td>
-                    <td className="px-4 py-2 font-medium text-gray-900">{plan.name}</td>
+                  <tr key={plan.name} className="hover:bg-aurora-cream">
+                    <td className="px-4 py-2 text-aurora-navy/40 font-bold">#{i + 1}</td>
+                    <td className="px-4 py-2 font-medium text-aurora-navy">{plan.name}</td>
                     <td className="px-4 py-2 text-right font-semibold text-blue-600">{plan.activeCount}</td>
-                    <td className="px-4 py-2 text-right text-gray-500">
+                    <td className="px-4 py-2 text-right text-aurora-navy/50">
                       {totalActivos > 0 ? ((plan.activeCount / totalActivos) * 100).toFixed(1) : '0.0'}%
                     </td>
                   </tr>
                 ))}
                 {plans.length === 0 && (
                   <tr>
-                    <td colSpan={4} className="px-4 py-10 text-center text-gray-500">No hay planes registrados.</td>
+                    <td colSpan={4} className="px-4 py-10 text-center text-aurora-navy/50">No hay planes registrados.</td>
                   </tr>
                 )}
               </tbody>
