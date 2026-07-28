@@ -115,7 +115,7 @@ const ManageCustomersPage: React.FC = () => {
       <div className="bg-white border-b border-aurora-navy/10">
         <div className="container mx-auto px-4 py-5">
           <nav className="text-xs text-aurora-navy/50 mb-1 flex items-center gap-1">
-            <Link to="/entrepreneur/dashboard" className="hover:text-aurora-terracotta">Dashboard</Link>
+            <Link to="/entrepreneur/profile" className="hover:text-aurora-terracotta">Mi Club</Link>
             <span>›</span>
             <Link to={`/entrepreneur/club/${managedClubId}`} className="hover:text-aurora-terracotta">{club?.name || 'Club'}</Link>
             <span>›</span>

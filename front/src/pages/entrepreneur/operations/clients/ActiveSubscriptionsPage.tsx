@@ -136,20 +136,20 @@ const ActiveSubscriptionsPage: React.FC = () => {
     .reduce((sum, sub) => sum + (getPlan(sub.idSubscriptionTypes)?.price || 0), 0);
 
   const handleStatusChange = async (sub: Subscription, newStatus: SubscriptionStatus) => {
-  setUpdatingStatus(true);
-  try {
-    await api.patch(`/user-subscriptions/${sub.id}`, { subscriptionStatus: newStatus });
-    setSubscriptions(prev =>
-      prev.map(s => s.id === sub.id ? { ...s, subscriptionStatus: newStatus } : s)
-    );
-    if (selectedSub?.id === sub.id) setSelectedSub({ ...sub, subscriptionStatus: newStatus });
-    toast.success('Estado actualizado correctamente.');
-  } catch {
-    toast.error('Error al actualizar el estado.');
-  } finally {
-    setUpdatingStatus(false);
-  }
-};
+    setUpdatingStatus(true);
+    try {
+      await api.patch(`/user-subscriptions/${sub.id}`, { subscriptionStatus: newStatus });
+      setSubscriptions(prev =>
+        prev.map(s => s.id === sub.id ? { ...s, subscriptionStatus: newStatus } : s)
+      );
+      if (selectedSub?.id === sub.id) setSelectedSub({ ...sub, subscriptionStatus: newStatus });
+      toast.success('Estado actualizado correctamente.');
+    } catch {
+      toast.error('Error al actualizar el estado.');
+    } finally {
+      setUpdatingStatus(false);
+    }
+  };
 
   const selectedCustomer = selectedSub ? getCustomer(selectedSub.idUser) : null;
   const selectedPlan = selectedSub ? getPlan(selectedSub.idSubscriptionTypes) : null;
@@ -166,7 +166,7 @@ const ActiveSubscriptionsPage: React.FC = () => {
       <div className="bg-white border-b border-aurora-navy/10">
         <div className="container mx-auto px-4 py-5">
           <nav className="text-xs text-aurora-navy/50 mb-1 flex items-center gap-1">
-            <Link to="/entrepreneur/dashboard" className="hover:text-aurora-terracotta">Dashboard</Link>
+            <Link to="/entrepreneur/profile" className="hover:text-aurora-terracotta">Mi Club</Link>
             <span>›</span>
             <Link to={`/entrepreneur/club/${managedClubId}`} className="hover:text-aurora-terracotta">{club?.name || 'Club'}</Link>
             <span>›</span>
@@ -420,20 +420,20 @@ const ActiveSubscriptionsPage: React.FC = () => {
                 <p className="text-xs font-semibold text-aurora-navy/40 uppercase tracking-wide mb-3">Cambiar estado</p>
                 <div className="grid grid-cols-2 gap-2">
                   {([
-                      { status: 'Activa', label: 'Activar', color: 'border-green-300 text-green-700 hover:bg-green-50' },
-                      { status: 'Pausada', label: 'Pausar', color: 'border-yellow-300 text-yellow-700 hover:bg-yellow-50' },
-                      { status: 'Pendiente_Pago', label: 'Pago pendiente', color: 'border-orange-300 text-orange-700 hover:bg-orange-50' },
-                      { status: 'Cancelada', label: 'Cancelar', color: 'border-red-300 text-red-700 hover:bg-red-50' },
-                    ] satisfies { status: SubscriptionStatus; label: string; color: string }[]).map(opt => (
-                      <button
-                        key={opt.status}
-                        disabled={updatingStatus || selectedSub.subscriptionStatus === opt.status}
-                        onClick={() => handleStatusChange(selectedSub, opt.status)}
-                        className={`py-2 text-sm font-medium rounded-lg border transition ${opt.color} disabled:opacity-40 disabled:cursor-not-allowed`}
-                      >
-                        {updatingStatus ? '...' : opt.label}
-                      </button>
-                    ))} 
+                    { status: 'Activa', label: 'Activar', color: 'border-green-300 text-green-700 hover:bg-green-50' },
+                    { status: 'Pausada', label: 'Pausar', color: 'border-yellow-300 text-yellow-700 hover:bg-yellow-50' },
+                    { status: 'Pendiente_Pago', label: 'Pago pendiente', color: 'border-orange-300 text-orange-700 hover:bg-orange-50' },
+                    { status: 'Cancelada', label: 'Cancelar', color: 'border-red-300 text-red-700 hover:bg-red-50' },
+                  ] satisfies { status: SubscriptionStatus; label: string; color: string }[]).map(opt => (
+                    <button
+                      key={opt.status}
+                      disabled={updatingStatus || selectedSub.subscriptionStatus === opt.status}
+                      onClick={() => handleStatusChange(selectedSub, opt.status)}
+                      className={`py-2 text-sm font-medium rounded-lg border transition ${opt.color} disabled:opacity-40 disabled:cursor-not-allowed`}
+                    >
+                      {updatingStatus ? '...' : opt.label}
+                    </button>
+                  ))}
                 </div>
               </div>
 
