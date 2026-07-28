@@ -21,35 +21,35 @@ interface ReviewsTableProps {
 
 const ReviewsTable: React.FC<ReviewsTableProps> = ({ reviews, usersData, clubId }) => {
   const getUserName = (idUser: number) => {
-    const user = usersData.find(u => Number(u.id) === idUser);
+    const user = usersData.find((u) => Number(u.id) === idUser);
     return user ? `${user.firstName} ${user.lastName}` : 'Anónimo';
   };
 
   return (
-    <div className="bg-white rounded-xl shadow-lg overflow-hidden">
-      <h3 className="text-lg font-semibold text-gray-800 p-6 border-b border-gray-200">Reseñas Recientes</h3>
+    <div className="bg-white rounded-xl shadow-aurora-sm border border-aurora-navy/10 overflow-hidden">
+      <h3 className="text-lg font-serif font-semibold text-aurora-navy p-6 border-b border-aurora-navy/10">Reseñas Recientes</h3>
       <div className="overflow-x-auto">
-        <table className="min-w-full divide-y divide-gray-200">
+        <table className="min-w-full divide-y divide-aurora-navy/10">
           <thead>
-            <tr className="bg-gray-50">
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Usuario</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Rating</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Comentario</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Fecha</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Estado</th>
+            <tr className="bg-aurora-cream">
+              <th className="px-6 py-3 text-left text-xs font-medium text-aurora-navy/60 uppercase">Usuario</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-aurora-navy/60 uppercase">Rating</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-aurora-navy/60 uppercase">Comentario</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-aurora-navy/60 uppercase">Fecha</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-aurora-navy/60 uppercase">Estado</th>
             </tr>
           </thead>
           <tbody>
             {reviews.map((review) => (
-              <tr key={review.id} className="border-b hover:bg-gray-50">
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{getUserName(review.idUser)}</td>
+              <tr key={review.id} className="border-b border-aurora-navy/10 hover:bg-aurora-cream/60">
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-aurora-navy">{getUserName(review.idUser)}</td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm">
-                  <span className="text-yellow-500">{review.rating} ★</span>
+                  <span className="text-aurora-gold">{review.rating} ★</span>
                 </td>
-                <td className="px-6 py-4 text-sm text-gray-900 max-w-xs truncate" title={review.comment}>
+                <td className="px-6 py-4 text-sm text-aurora-navy max-w-xs truncate" title={review.comment}>
                   {review.comment}
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-aurora-navy">
                   {new Date(review.reviewDate).toLocaleDateString('es-AR')}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">
@@ -63,15 +63,15 @@ const ReviewsTable: React.FC<ReviewsTableProps> = ({ reviews, usersData, clubId 
             ))}
             {reviews.length === 0 && (
               <tr>
-                <td colSpan={5} className="px-6 py-8 text-center text-gray-500">No hay reseñas recientes para mostrar.</td>
+                <td colSpan={5} className="px-6 py-8 text-center text-aurora-navy/50">No hay reseñas recientes para mostrar.</td>
               </tr>
             )}
           </tbody>
         </table>
       </div>
       {reviews.length > 5 && (
-        <div className="px-6 py-4 bg-gray-50 text-center">
-          <Link to={`/entrepreneur/club/${clubId}/moderate-reviews`} className="text-blue-600 hover:underline">
+        <div className="px-6 py-4 bg-aurora-cream text-center">
+          <Link to={`/entrepreneur/club/${clubId}/moderate-reviews`} className="text-aurora-terracotta hover:underline font-semibold">
             Ver Todas las Reseñas
           </Link>
         </div>

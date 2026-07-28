@@ -44,21 +44,21 @@ const CustomerSupportPage: React.FC = () => {
   }, [clubId, userRole, authLoading, navigate]);
 
   if (authLoading || loading) {
-    return <div className="text-center py-20 text-gray-500">Cargando atención al cliente...</div>;
+    return <div className="text-center py-20 text-aurora-navy/60">Cargando atención al cliente...</div>;
   }
 
   if (!club) {
-    return <div className="text-center py-20 text-gray-500">Club no encontrado</div>;
+    return <div className="text-center py-20 text-aurora-navy/60">Club no encontrado</div>;
   }
 
   return (
     <div className="container mx-auto px-4 py-10 max-w-7xl">
-      <h1 className="text-2xl font-bold text-gray-900 mb-8">Atención Post-Venta</h1>
+      <h1 className="text-2xl font-serif font-bold text-aurora-navy mb-8">Atención Post-Venta</h1>
       <div className="flex flex-col lg:flex-row gap-8">
         <div className="lg:w-1/5">
           <CustomerSupportSidebar activeSection={activeSection} setActiveSection={setActiveSection} openCount={openCount} />
         </div>
-        <div className="lg:w-4/5 bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+        <div className="lg:w-4/5 bg-white rounded-xl shadow-aurora-sm border border-aurora-navy/10 p-6">
           <CustomerSupportContent activeSection={activeSection} club={club} />
         </div>
       </div>

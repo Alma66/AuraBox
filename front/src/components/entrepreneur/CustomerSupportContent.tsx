@@ -240,18 +240,18 @@ const CustomerSupportContent: React.FC<CustomerSupportContentProps> = ({ activeS
   if (activeSection === 'automaticos') {
     return (
       <div className="animate-fadeInUp">
-        <h2 className="text-xl font-bold text-gray-900 mb-2">Mensajes Automáticos</h2>
-        <p className="text-sm text-gray-500 mb-6">Configurá respuestas automáticas para el primer mensaje de cada cliente o cuando se detecte una frase específica.</p>
+        <h2 className="text-xl font-serif font-bold text-aurora-navy mb-2">Mensajes Automáticos</h2>
+        <p className="text-sm text-aurora-navy/60 mb-6">Configurá respuestas automáticas para el primer mensaje de cada cliente o cuando se detecte una frase específica.</p>
 
-        <div className="border border-gray-200 rounded-xl p-5 mb-8 max-w-xl space-y-3">
+        <div className="border border-aurora-navy/10 rounded-xl p-5 mb-8 max-w-xl space-y-3">
           <input
             type="text"
             placeholder="Nombre de la regla"
             value={newRuleName}
             onChange={(e) => setNewRuleName(e.target.value)}
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm"
+            className="w-full px-3 py-2 border border-aurora-navy/15 rounded-lg text-sm"
           />
-          <select value={newRuleTrigger} onChange={(e) => setNewRuleTrigger(e.target.value as AutoReplyTrigger)} className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm">
+          <select value={newRuleTrigger} onChange={(e) => setNewRuleTrigger(e.target.value as AutoReplyTrigger)} className="w-full px-3 py-2 border border-aurora-navy/15 rounded-lg text-sm">
             <option value="Primer_Mensaje">Al recibir el primer mensaje del cliente</option>
             <option value="Contiene_Frase">Cuando el mensaje contiene una frase específica</option>
           </select>
@@ -261,38 +261,38 @@ const CustomerSupportContent: React.FC<CustomerSupportContentProps> = ({ activeS
               placeholder="Frase a detectar"
               value={newRuleValue}
               onChange={(e) => setNewRuleValue(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm"
+              className="w-full px-3 py-2 border border-aurora-navy/15 rounded-lg text-sm"
             />
           )}
           <textarea
             placeholder="Mensaje de respuesta automática"
             value={newRuleMessage}
             onChange={(e) => setNewRuleMessage(e.target.value)}
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm"
+            className="w-full px-3 py-2 border border-aurora-navy/15 rounded-lg text-sm"
             rows={3}
           />
-          <button onClick={createAutoReply} className="px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700">
+          <button onClick={createAutoReply} className="px-4 py-2 bg-aurora-navy text-white text-sm font-medium rounded-lg hover:bg-aurora-navy/90">
             Crear regla
           </button>
         </div>
 
         <div className="space-y-3">
           {autoReplies.map((rule) => (
-            <div key={rule.id} className="border border-gray-200 rounded-xl p-4">
+            <div key={rule.id} className="border border-aurora-navy/10 rounded-xl p-4">
               <div className="flex justify-between items-start mb-2">
                 <div>
-                  <p className="font-semibold text-gray-900">{rule.name}</p>
-                  <p className="text-xs text-gray-500">
+                  <p className="font-semibold text-aurora-navy">{rule.name}</p>
+                  <p className="text-xs text-aurora-navy/50">
                     {rule.triggerType === 'Primer_Mensaje' ? 'Se activa con el primer mensaje' : `Se activa si contiene: "${rule.triggerValue}"`}
                   </p>
                 </div>
-                <span className={`px-2 py-1 text-xs font-semibold rounded-full ${rule.active ? 'bg-emerald-100 text-emerald-800' : 'bg-gray-100 text-gray-600'}`}>
+                <span className={`px-2 py-1 text-xs font-semibold rounded-full ${rule.active ? 'bg-emerald-100 text-emerald-800' : 'bg-aurora-navy/10 text-aurora-navy/60'}`}>
                   {rule.active ? 'Activa' : 'Inactiva'}
                 </span>
               </div>
-              <p className="text-sm text-gray-600 mb-3">{rule.replyMessage}</p>
+              <p className="text-sm text-aurora-navy/70 mb-3">{rule.replyMessage}</p>
               <div className="flex gap-2">
-                <button onClick={() => toggleAutoReply(rule)} className="text-xs font-medium px-3 py-1 rounded bg-gray-100 text-gray-700 hover:bg-gray-200">
+                <button onClick={() => toggleAutoReply(rule)} className="text-xs font-medium px-3 py-1 rounded bg-aurora-navy/5 text-aurora-navy hover:bg-aurora-navy/10">
                   {rule.active ? 'Desactivar' : 'Activar'}
                 </button>
                 <button onClick={() => removeAutoReply(rule.id)} className="text-xs font-medium px-3 py-1 rounded bg-red-50 text-red-600 hover:bg-red-100">
@@ -301,38 +301,38 @@ const CustomerSupportContent: React.FC<CustomerSupportContentProps> = ({ activeS
               </div>
             </div>
           ))}
-          {autoReplies.length === 0 && <p className="text-center py-8 text-gray-500">No hay reglas configuradas todavía.</p>}
+          {autoReplies.length === 0 && <p className="text-center py-8 text-aurora-navy/50">No hay reglas configuradas todavía.</p>}
         </div>
       </div>
     );
   }
 
-  if (loading) return <div className="text-center py-16 text-gray-500">Cargando conversaciones...</div>;
+  if (loading) return <div className="text-center py-16 text-aurora-navy/50">Cargando conversaciones...</div>;
 
   const selectedConv = conversations.find((c) => c.id === selectedId) ?? null;
 
   return (
     <div className="animate-fadeInUp flex flex-col lg:flex-row gap-4 h-[700px]">
-      <div className="lg:w-2/5 flex flex-col border border-gray-200 rounded-xl overflow-hidden">
-        <div className="p-3 border-b border-gray-200 flex flex-wrap gap-2">
-          <select value={filterSub} onChange={(e) => setFilterSub(e.target.value)} className="px-2 py-1 border border-gray-300 rounded text-xs flex-1 min-w-[100px]">
+      <div className="lg:w-2/5 flex flex-col border border-aurora-navy/10 rounded-xl overflow-hidden">
+        <div className="p-3 border-b border-aurora-navy/10 flex flex-wrap gap-2">
+          <select value={filterSub} onChange={(e) => setFilterSub(e.target.value)} className="px-2 py-1 border border-aurora-navy/15 rounded text-xs flex-1 min-w-[100px]">
             <option value="all">Suscripción</option>
             {subscriptionTypes.map((s) => (
               <option key={s.id} value={s.id}>{s.name}</option>
             ))}
           </select>
-          <select value={filterUser} onChange={(e) => setFilterUser(e.target.value)} className="px-2 py-1 border border-gray-300 rounded text-xs flex-1 min-w-[100px]">
+          <select value={filterUser} onChange={(e) => setFilterUser(e.target.value)} className="px-2 py-1 border border-aurora-navy/15 rounded text-xs flex-1 min-w-[100px]">
             <option value="all">Usuario</option>
             {users.map((u) => (
               <option key={u.id} value={u.id}>{u.firstName} {u.lastName}</option>
             ))}
           </select>
-          <select value={filterRead} onChange={(e) => setFilterRead(e.target.value)} className="px-2 py-1 border border-gray-300 rounded text-xs flex-1 min-w-[90px]">
+          <select value={filterRead} onChange={(e) => setFilterRead(e.target.value)} className="px-2 py-1 border border-aurora-navy/15 rounded text-xs flex-1 min-w-[90px]">
             <option value="all">Leídos/No leídos</option>
             <option value="unread">No leídos</option>
             <option value="read">Leídos</option>
           </select>
-          <select value={sortOrder} onChange={(e) => setSortOrder(e.target.value as 'recent' | 'oldest')} className="px-2 py-1 border border-gray-300 rounded text-xs flex-1 min-w-[90px]">
+          <select value={sortOrder} onChange={(e) => setSortOrder(e.target.value as 'recent' | 'oldest')} className="px-2 py-1 border border-aurora-navy/15 rounded text-xs flex-1 min-w-[90px]">
             <option value="recent">Más reciente</option>
             <option value="oldest">Más antiguo</option>
           </select>
@@ -342,33 +342,33 @@ const CustomerSupportContent: React.FC<CustomerSupportContentProps> = ({ activeS
             <button
               key={conv.id}
               onClick={() => openConversation(conv)}
-              className={`w-full text-left p-3 border-b border-gray-100 hover:bg-gray-50 transition-colors ${selectedId === conv.id ? 'bg-blue-50' : ''}`}
+              className={`w-full text-left p-3 border-b border-aurora-navy/10 hover:bg-aurora-cream transition-colors ${selectedId === conv.id ? 'bg-aurora-navy/5' : ''}`}
             >
               <div className="flex justify-between items-start">
-                <p className="font-semibold text-gray-900 text-sm truncate">{userName(conv.idUser)}</p>
-                {conv.hasUnreadForEntrepreneur && <span className="w-2.5 h-2.5 rounded-full bg-blue-600 mt-1" />}
+                <p className="font-semibold text-aurora-navy text-sm truncate">{userName(conv.idUser)}</p>
+                {conv.hasUnreadForEntrepreneur && <span className="w-2.5 h-2.5 rounded-full bg-aurora-terracotta mt-1" />}
               </div>
-              <p className="text-xs text-gray-600 truncate">{conv.subject}</p>
-              <p className="text-xs text-gray-400">{subName(conv.idSubscriptionTypes)} · {formatRelativeDate(conv.lastMessageAt)}</p>
+              <p className="text-xs text-aurora-navy/70 truncate">{conv.subject}</p>
+              <p className="text-xs text-aurora-navy/40">{subName(conv.idSubscriptionTypes)} · {formatRelativeDate(conv.lastMessageAt)}</p>
             </button>
           ))}
-          {filteredConversations.length === 0 && <p className="text-center py-8 text-gray-500 text-sm">No hay conversaciones.</p>}
+          {filteredConversations.length === 0 && <p className="text-center py-8 text-aurora-navy/50 text-sm">No hay conversaciones.</p>}
         </div>
       </div>
 
-      <div className="lg:w-3/5 flex flex-col border border-gray-200 rounded-xl overflow-hidden">
+      <div className="lg:w-3/5 flex flex-col border border-aurora-navy/10 rounded-xl overflow-hidden">
         {!selectedConv ? (
-          <div className="flex-1 flex items-center justify-center text-gray-500 text-sm">Seleccioná una conversación</div>
+          <div className="flex-1 flex items-center justify-center text-aurora-navy/50 text-sm">Seleccioná una conversación</div>
         ) : (
           <>
-            <div className="p-4 border-b border-gray-200 flex justify-between items-center">
+            <div className="p-4 border-b border-aurora-navy/10 flex justify-between items-center">
               <div>
-                <p className="font-semibold text-gray-900">{userName(selectedConv.idUser)}</p>
-                <p className="text-xs text-gray-500">{selectedConv.subject} · {subName(selectedConv.idSubscriptionTypes)}</p>
+                <p className="font-semibold text-aurora-navy">{userName(selectedConv.idUser)}</p>
+                <p className="text-xs text-aurora-navy/50">{selectedConv.subject} · {subName(selectedConv.idSubscriptionTypes)}</p>
               </div>
               <div className="flex items-center gap-2">
                 {selectedConv.status === 'Abierta' ? (
-                  <button onClick={closeConversation} className="text-xs font-medium px-3 py-1 rounded bg-gray-100 text-gray-700 hover:bg-gray-200">
+                  <button onClick={closeConversation} className="text-xs font-medium px-3 py-1 rounded bg-aurora-navy/5 text-aurora-navy/70 hover:bg-aurora-navy/10">
                     Cerrar chat
                   </button>
                 ) : (
@@ -376,20 +376,20 @@ const CustomerSupportContent: React.FC<CustomerSupportContentProps> = ({ activeS
                     Reabrir
                   </button>
                 )}
-                <button onClick={() => setShowInfo(true)} className="p-2 rounded-full bg-gray-100 hover:bg-gray-200" title="Información del cliente">
-                  <svg className="w-5 h-5 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <button onClick={() => setShowInfo(true)} className="p-2 rounded-full bg-aurora-cream hover:bg-aurora-creamDark" title="Información del cliente">
+                  <svg className="w-5 h-5 text-aurora-navy" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                   </svg>
                 </button>
               </div>
             </div>
 
-            <div className="flex-1 overflow-y-auto p-4 space-y-3 bg-gray-50">
+            <div className="flex-1 overflow-y-auto p-4 space-y-3 bg-aurora-cream/40">
               {messages.map((msg) => (
                 <div key={msg.id} className={`flex ${msg.senderType === 'Entrepreneur' ? 'justify-end' : 'justify-start'}`}>
                   <div className={`max-w-md p-3 rounded-2xl text-sm ${
-                    msg.senderType === 'Entrepreneur' ? 'bg-blue-600 text-white' :
-                    msg.senderType === 'System' ? 'bg-amber-100 text-amber-900' : 'bg-white text-gray-900 border border-gray-200'
+                    msg.senderType === 'Entrepreneur' ? 'bg-aurora-navy text-white' :
+                    msg.senderType === 'System' ? 'bg-aurora-gold/15 text-aurora-navy' : 'bg-white text-aurora-navy border border-aurora-navy/10'
                   }`}>
                     {msg.content && <p>{msg.content}</p>}
                     {msg.attachments.map((att) => (
@@ -399,7 +399,7 @@ const CustomerSupportContent: React.FC<CustomerSupportContentProps> = ({ activeS
                         <img key={att.id} src={att.fileUrl} alt="" className="mt-2 max-w-full rounded-lg" />
                       )
                     ))}
-                    <p className={`text-xs mt-1 ${msg.senderType === 'Entrepreneur' ? 'text-blue-100' : 'text-gray-400'}`}>
+                    <p className={`text-xs mt-1 ${msg.senderType === 'Entrepreneur' ? 'text-white/70' : 'text-aurora-navy/40'}`}>
                       {new Date(msg.createdAt).toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit' })}
                       {msg.isAutoReply ? ' · Automático' : ''}
                     </p>
@@ -410,24 +410,24 @@ const CustomerSupportContent: React.FC<CustomerSupportContentProps> = ({ activeS
             </div>
 
             {selectedConv.status === 'Abierta' && (
-              <div className="p-3 border-t border-gray-200 flex flex-col gap-2">
+              <div className="p-3 border-t border-aurora-navy/10 flex flex-col gap-2">
                 <div className="flex gap-2">
                   <input
                     type="text"
                     placeholder="Escribí una respuesta..."
                     value={replyText}
                     onChange={(e) => setReplyText(e.target.value)}
-                    className="flex-1 px-3 py-2 border border-gray-300 rounded-lg text-sm"
+                    className="flex-1 px-3 py-2 border border-aurora-navy/15 rounded-lg text-sm"
                   />
-                  <label className="px-3 py-2 bg-gray-100 text-gray-700 text-sm rounded-lg cursor-pointer hover:bg-gray-200">
+                  <label className="px-3 py-2 bg-aurora-cream text-aurora-navy text-sm rounded-lg cursor-pointer hover:bg-aurora-creamDark">
                     📎
                     <input type="file" accept="image/*,video/*" className="hidden" onChange={(e) => setReplyFile(e.target.files?.[0] ?? null)} />
                   </label>
-                  <button onClick={sendReply} disabled={sending} className="px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 disabled:opacity-50">
+                  <button onClick={sendReply} disabled={sending} className="px-4 py-2 bg-aurora-terracotta text-white text-sm font-medium rounded-lg hover:bg-aurora-terracottaDark disabled:opacity-50">
                     Enviar
                   </button>
                 </div>
-                {replyFile && <p className="text-xs text-gray-500">Adjunto: {replyFile.name}</p>}
+                {replyFile && <p className="text-xs text-aurora-navy/50">Adjunto: {replyFile.name}</p>}
               </div>
             )}
           </>
