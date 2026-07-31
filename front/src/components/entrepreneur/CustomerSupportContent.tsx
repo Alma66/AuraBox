@@ -115,10 +115,13 @@ const CustomerSupportContent: React.FC<CustomerSupportContentProps> = ({ activeS
     }
   };
 
-  const userName = (idUser: number) => {
-    const conv = conversations.find((c) => c.idUser === idUser);
-    return conv?.customerFirstName ? `${conv.customerFirstName} ${conv.customerLastName}` : `Usuario #${idUser}`;
-  };
+  const userName = useCallback(
+    (idUser: number) => {
+      const conv = conversations.find((c) => c.idUser === idUser);
+      return conv?.customerFirstName ? `${conv.customerFirstName} ${conv.customerLastName}` : `Usuario #${idUser}`;
+    },
+    [conversations],
+  );
 
   const subName = (id: number) => subscriptionTypes.find((s) => s.id === id)?.name ?? 'Sin especificar';
 
@@ -141,7 +144,7 @@ const CustomerSupportContent: React.FC<CustomerSupportContentProps> = ({ activeS
       if (!seen.has(c.idUser)) seen.set(c.idUser, userName(c.idUser));
     });
     return Array.from(seen.entries()).map(([id, name]) => ({ id, name }));
-  }, [conversations]);
+  }, [conversations, userName]);
 
   const sendReply = async () => {
     if (!selectedId || (!replyText.trim() && !replyFile)) return;
