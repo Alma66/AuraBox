@@ -15,6 +15,8 @@ export interface SupportConversation {
   lastMessageAt: string;
   hasUnreadForEntrepreneur: boolean;
   hasUnreadForUser: boolean;
+  customerFirstName?: string | null;
+  customerLastName?: string | null;
 }
 
 export interface SupportMessageAttachment {

@@ -23,6 +23,8 @@ export interface Review {
   mediaUrl?: string | null;
   mediaType?: ContentType | null;
   media: ReviewMedia[];
+  customerFirstName?: string | null;
+  customerLastName?: string | null;
 }
 
 export interface ReviewSummary {

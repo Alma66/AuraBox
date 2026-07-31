@@ -14,18 +14,11 @@ interface SubscriptionTypeOption {
   name: string;
 }
 
-interface UserOption {
-  id: number;
-  firstName: string;
-  lastName: string;
-}
-
 const ModerateReviewsContent: React.FC<ModerateReviewsContentProps> = ({ activeSection, club }) => {
   const idClub = Number(club.id);
   const [reviews, setReviews] = useState<Review[]>([]);
   const [hiddenReviews, setHiddenReviews] = useState<Review[]>([]);
   const [subscriptionTypes, setSubscriptionTypes] = useState<SubscriptionTypeOption[]>([]);
-  const [users, setUsers] = useState<UserOption[]>([]);
   const [forbiddenWords, setForbiddenWords] = useState<ForbiddenWord[]>([]);
   const [loading, setLoading] = useState(true);
   const [newWord, setNewWord] = useState('');
@@ -46,18 +39,10 @@ const ModerateReviewsContent: React.FC<ModerateReviewsContentProps> = ({ activeS
         api.get('/subscription-types', { params: { clubId: idClub } }),
         api.get(`/reviews/forbidden-words/by-club/${idClub}`),
       ]);
-      const visible = getResponseData(visibleRes) || [];
-      const hidden = getResponseData(hiddenRes) || [];
-      setReviews(visible);
-      setHiddenReviews(hidden);
+      setReviews(getResponseData(visibleRes) || []);
+      setHiddenReviews(getResponseData(hiddenRes) || []);
       setSubscriptionTypes(getResponseData(subsRes) || []);
       setForbiddenWords(getResponseData(wordsRes) || []);
-
-      const allUserIds = Array.from(new Set([...visible, ...hidden].map((r: Review) => r.idUser)));
-      const userResults = await Promise.all(
-        allUserIds.map((id) => api.get(`/users/${id}`).then((r) => getResponseData(r)).catch(() => null)),
-      );
-      setUsers(userResults.filter(Boolean));
     } catch (err) {
       console.error(err);
       toast.error('No se pudieron cargar las reseñas');
@@ -70,14 +55,20 @@ const ModerateReviewsContent: React.FC<ModerateReviewsContentProps> = ({ activeS
     fetchAll();
   }, [fetchAll]);
 
-  const userName = (idUser: number) => {
-    const u = users.find((x) => x.id === idUser);
-    return u ? `${u.firstName} ${u.lastName}` : `Usuario #${idUser}`;
-  };
+  const userName = (review: Review) =>
+    review.customerFirstName ? `${review.customerFirstName} ${review.customerLastName}` : `Usuario #${review.idUser}`;
 
   const subName = (id?: number | null) => subscriptionTypes.find((s) => s.id === id)?.name ?? 'Sin especificar';
 
   const hasMedia = (r: Review) => (r.media && r.media.length > 0) || !!r.mediaUrl;
+
+  const uniqueUsers = useMemo(() => {
+    const seen = new Map<number, string>();
+    [...reviews, ...hiddenReviews].forEach((r) => {
+      if (!seen.has(r.idUser)) seen.set(r.idUser, userName(r));
+    });
+    return Array.from(seen.entries()).map(([id, name]) => ({ id, name }));
+  }, [reviews, hiddenReviews]);
 
   const applyFilters = useCallback(
     (list: Review[]) => {
@@ -171,8 +162,8 @@ const ModerateReviewsContent: React.FC<ModerateReviewsContentProps> = ({ activeS
     <div className="flex flex-wrap gap-3 mb-6">
       <select value={filterUser} onChange={(e) => setFilterUser(e.target.value)} className="px-3 py-2 border border-aurora-navy/15 rounded-lg text-sm">
         <option value="all">Todos los usuarios</option>
-        {users.map((u) => (
-          <option key={u.id} value={u.id}>{u.firstName} {u.lastName}</option>
+        {uniqueUsers.map((u) => (
+          <option key={u.id} value={u.id}>{u.name}</option>
         ))}
       </select>
       <select value={filterSub} onChange={(e) => setFilterSub(e.target.value)} className="px-3 py-2 border border-aurora-navy/15 rounded-lg text-sm">
@@ -209,7 +200,7 @@ const ModerateReviewsContent: React.FC<ModerateReviewsContentProps> = ({ activeS
       <div className="border border-aurora-navy/10 rounded-xl p-5 bg-white">
         <div className="flex justify-between items-start mb-2">
           <div>
-            <p className="font-semibold text-aurora-navy">{userName(review.idUser)}</p>
+            <p className="font-semibold text-aurora-navy">{userName(review)}</p>
             <p className="text-xs text-aurora-navy/50">{subName(review.idSubscriptionTypes)} · {new Date(review.reviewDate).toLocaleDateString('es-AR')}</p>
           </div>
           <span className="text-aurora-gold font-semibold">{review.rating} ★</span>
