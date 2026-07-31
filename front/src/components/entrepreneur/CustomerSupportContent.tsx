@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useRef, useState, useCallback } from 'react';
+import toast from 'react-hot-toast';
 import api, { getResponseData } from '../../api/config';
 import { Club } from '../../types/club';
 import { SupportConversation, SupportMessage, AutoReplyRule, AutoReplyTrigger } from '../../types/support';
@@ -76,6 +77,7 @@ const CustomerSupportContent: React.FC<CustomerSupportContentProps> = ({ activeS
       setUsers(userResults.filter(Boolean));
     } catch (err) {
       console.error(err);
+      toast.error('No se pudieron cargar las conversaciones');
     } finally {
       setLoading(false);
     }
@@ -161,7 +163,7 @@ const CustomerSupportContent: React.FC<CustomerSupportContentProps> = ({ activeS
       await fetchConversations();
     } catch (err) {
       console.error(err);
-      alert('Error al enviar la respuesta');
+      toast.error('Error al enviar la respuesta');
     } finally {
       setSending(false);
     }
@@ -176,7 +178,7 @@ const CustomerSupportContent: React.FC<CustomerSupportContentProps> = ({ activeS
       setMessages([]);
     } catch (err) {
       console.error(err);
-      alert('Error al cerrar la conversación');
+      toast.error('Error al cerrar la conversación');
     }
   };
 
@@ -189,13 +191,13 @@ const CustomerSupportContent: React.FC<CustomerSupportContentProps> = ({ activeS
       setMessages([]);
     } catch (err) {
       console.error(err);
-      alert('Error al reabrir la conversación');
+      toast.error('Error al reabrir la conversación');
     }
   };
 
   const createAutoReply = async () => {
     if (!newRuleName || !newRuleMessage) {
-      alert('Completá el nombre y el mensaje de respuesta');
+      toast.error('Completá el nombre y el mensaje de respuesta');
       return;
     }
     try {
@@ -209,10 +211,11 @@ const CustomerSupportContent: React.FC<CustomerSupportContentProps> = ({ activeS
       setNewRuleName('');
       setNewRuleValue('');
       setNewRuleMessage('');
+      toast.success('Regla creada correctamente');
       await fetchAutoReplies();
     } catch (err) {
       console.error(err);
-      alert('Error al crear la regla');
+      toast.error('Error al crear la regla');
     }
   };
 
@@ -222,7 +225,7 @@ const CustomerSupportContent: React.FC<CustomerSupportContentProps> = ({ activeS
       await fetchAutoReplies();
     } catch (err) {
       console.error(err);
-      alert('Error al actualizar la regla');
+      toast.error('Error al actualizar la regla');
     }
   };
 
@@ -230,10 +233,11 @@ const CustomerSupportContent: React.FC<CustomerSupportContentProps> = ({ activeS
     if (!window.confirm('¿Eliminar esta regla de mensaje automático?')) return;
     try {
       await api.delete(`/support/auto-replies/${id}`);
+      toast.success('Regla eliminada');
       await fetchAutoReplies();
     } catch (err) {
       console.error(err);
-      alert('Error al eliminar la regla');
+      toast.error('Error al eliminar la regla');
     }
   };
 

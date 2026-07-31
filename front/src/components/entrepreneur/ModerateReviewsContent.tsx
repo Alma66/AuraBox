@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useState, useCallback } from 'react';
+import toast from 'react-hot-toast';
 import api, { getResponseData } from '../../api/config';
 import { Review, ForbiddenWord } from '../../types/review';
 import { Club } from '../../types/club';
@@ -59,6 +60,7 @@ const ModerateReviewsContent: React.FC<ModerateReviewsContentProps> = ({ activeS
       setUsers(userResults.filter(Boolean));
     } catch (err) {
       console.error(err);
+      toast.error('No se pudieron cargar las reseñas');
     } finally {
       setLoading(false);
     }
@@ -99,20 +101,22 @@ const ModerateReviewsContent: React.FC<ModerateReviewsContentProps> = ({ activeS
   const unhideReview = async (id: number) => {
     try {
       await api.put(`/reviews/${id}`, { isHidden: false, hiddenReason: null });
+      toast.success('Reseña visible nuevamente');
       await fetchAll();
     } catch (err) {
       console.error(err);
-      alert('Error al mostrar la reseña');
+      toast.error('Error al mostrar la reseña');
     }
   };
 
   const hideReview = async (id: number) => {
     try {
       await api.put(`/reviews/${id}`, { isHidden: true, hiddenReason: 'Ocultada manualmente por el club' });
+      toast.success('Reseña ocultada');
       await fetchAll();
     } catch (err) {
       console.error(err);
-      alert('Error al ocultar la reseña');
+      toast.error('Error al ocultar la reseña');
     }
   };
 
@@ -120,10 +124,11 @@ const ModerateReviewsContent: React.FC<ModerateReviewsContentProps> = ({ activeS
     if (!window.confirm('¿Eliminar esta reseña permanentemente?')) return;
     try {
       await api.delete(`/reviews/${id}`);
+      toast.success('Reseña eliminada');
       await fetchAll();
     } catch (err) {
       console.error(err);
-      alert('Error al eliminar la reseña');
+      toast.error('Error al eliminar la reseña');
     }
   };
 
@@ -132,10 +137,11 @@ const ModerateReviewsContent: React.FC<ModerateReviewsContentProps> = ({ activeS
     try {
       await api.post('/reviews/forbidden-words', { idClub, word: newWord.trim() });
       setNewWord('');
+      toast.success('Palabra agregada al filtro');
       await fetchAll();
     } catch (err) {
       console.error(err);
-      alert('Error al agregar la palabra');
+      toast.error('Error al agregar la palabra');
     }
   };
 
@@ -145,7 +151,7 @@ const ModerateReviewsContent: React.FC<ModerateReviewsContentProps> = ({ activeS
       await fetchAll();
     } catch (err) {
       console.error(err);
-      alert('Error al actualizar la palabra');
+      toast.error('Error al actualizar la palabra');
     }
   };
 
@@ -153,10 +159,11 @@ const ModerateReviewsContent: React.FC<ModerateReviewsContentProps> = ({ activeS
     if (!window.confirm('¿Eliminar esta palabra del filtro?')) return;
     try {
       await api.delete(`/reviews/forbidden-words/${id}`);
+      toast.success('Palabra eliminada');
       await fetchAll();
     } catch (err) {
       console.error(err);
-      alert('Error al eliminar la palabra');
+      toast.error('Error al eliminar la palabra');
     }
   };
 
