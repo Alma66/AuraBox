@@ -18,6 +18,19 @@ const FREQUENCY_OPTIONS = [
   { label: 'Anual', value: 'Anual' },
 ];
 
+function parseIncludes(raw: any): string[] {
+  if (Array.isArray(raw)) return raw;
+  if (typeof raw === 'string' && raw.trim() !== '') {
+    try {
+      const parsed = JSON.parse(raw);
+      return Array.isArray(parsed) ? parsed : [];
+    } catch {
+      return [];
+    }
+  }
+  return [];
+}
+
 function mapPlanFromApi(raw: any): SubscriptionPlan {
   const totalPrice = Number(raw.basePrice ?? raw.price ?? 0);
   return {
@@ -28,7 +41,7 @@ function mapPlanFromApi(raw: any): SubscriptionPlan {
     currency: 'ARS',
     image: raw.imageUrl ?? '',
     deliveryFrequency: raw.frequency ?? raw.deliveryFrequency ?? 'Mensual',
-    includes: raw.includes ?? [],
+    includes: parseIncludes(raw.includes),
     shippingAreas: raw.shippingAreas ?? '',
     specifications: raw.specifications ?? [],
     descuentoTransferencia: raw.transferDiscount ? Number(raw.transferDiscount) : 0,
@@ -625,7 +638,6 @@ const EditSubscriptionsPage: React.FC = () => {
           </div>
         </div>
       )}
-      <input ref={fileInputRef} type="file" accept="image/*" className="hidden" onChange={handleFileChange} />
     </div>
   );
 };

@@ -85,7 +85,7 @@ async function getCroppedBlob(imageSrc: string, croppedAreaPixels: any): Promise
 const HistoryPage: React.FC = () => {
   const { clubId } = useParams<{ clubId: string }>();
   const navigate = useNavigate();
-  const { userRole } = useAuth();
+  const { user, userRole } = useAuth();
 
   const [club, setClub] = useState<Club | null>(null);
   const [loading, setLoading] = useState(true);
@@ -147,6 +147,7 @@ const HistoryPage: React.FC = () => {
   }, [clubId, fetchClub]);
 
   const isOwner = userRole === 'entrepreneur' && !!club?.isOwner;
+  const isSelf = useCallback((entrepreneurId: number) => user != null && String(user.id) === String(entrepreneurId), [user]);
 
   const handleSaveOrigins = async () => {
     if (!club) return;
@@ -788,7 +789,7 @@ const HistoryPage: React.FC = () => {
                         ) : (
                           <p className="italic text-gray-400 text-sm">Sin bio aún.</p>
                         )}
-                        {isOwner && (
+                        {isOwner && isSelf(member.id) && (
                           <button
                             onClick={() => { setEditingBioId(member.id); setTempBio(member.bio || ''); }}
                             className="mt-3 px-3 py-1 bg-blue-600 text-white rounded-full text-xs font-semibold hover:bg-blue-700 transition-colors duration-200"

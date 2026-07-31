@@ -41,13 +41,15 @@ const SubscriptionDetailForEntrepreneurPage: React.FC = () => {
 
     const fetchData = async () => {
       try {
-        const [clubRes, subRes] = await Promise.all([
+        const [clubRes, subRes, customersRes] = await Promise.all([
           api.get(`/clubs/${clubId}`),
           api.get(`/user-subscriptions/${subscriptionId}`),
+          api.get(`/clubs/${clubId}/customers`),
         ]);
 
         const clubData = getResponseData(clubRes);
         const subData: Subscription = getResponseData(subRes);
+        const customers: User[] = getResponseData(customersRes) || [];
 
         if (!clubData) {
           setError('Club no encontrado.');
@@ -70,8 +72,8 @@ const SubscriptionDetailForEntrepreneurPage: React.FC = () => {
 
         setSubscription(subData);
 
-        const userRes = await api.get(`/users/${subData.idUser}`);
-        setCustomer(getResponseData(userRes));
+        const foundCustomer = customers.find((c) => Number(c.id) === subData.idUser) ?? null;
+        setCustomer(foundCustomer);
       } catch (err) {
         console.error('Error fetching data:', err);
         setError('Error al cargar los datos.');
