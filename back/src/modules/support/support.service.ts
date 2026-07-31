@@ -97,13 +97,27 @@ export class SupportService {
   }
 
   async findByClub(idClub: number, user: RequestUser, status?: 'Abierta' | 'Cerrada') {
-    await this.assertClubAccess(idClub, user);
-    const conversations = await this.prisma.support_Conversation.findMany({
-      where: { idClub, ...(status ? { status } : {}) },
-      orderBy: { lastMessageAt: 'desc' },
-    });
-    return conversations.map(sanitize);
-  }
+  await this.assertClubAccess(idClub, user);
+  const conversations = await this.prisma.support_Conversation.findMany({
+    where: { idClub, ...(status ? { status } : {}) },
+    orderBy: { lastMessageAt: 'desc' },
+  });
+
+  const userIds = Array.from(new Set(conversations.map((c) => c.idUser)));
+  const users = await this.prisma.user.findMany({
+    where: { id: { in: userIds } },
+    select: { id: true, firstName: true, lastName: true },
+  });
+
+  return conversations.map((c) => {
+    const customer = users.find((u) => u.id === c.idUser);
+    return {
+      ...sanitize(c),
+      customerFirstName: customer?.firstName ?? null,
+      customerLastName: customer?.lastName ?? null,
+    };
+  });
+}
 
   async findOne(id: number, user: RequestUser) {
     const conversation = await this.prisma.support_Conversation.findUnique({ where: { id } });

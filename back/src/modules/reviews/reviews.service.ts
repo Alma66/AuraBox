@@ -44,6 +44,22 @@ export class ReviewsService {
     return words.some((w) => lower.includes(w.word.toLowerCase()));
   }
 
+  private async attachCustomerNames(reviews: any[]) {
+    const userIds = Array.from(new Set(reviews.map((r) => r.idUser)));
+    const users = await this.prisma.user.findMany({
+      where: { id: { in: userIds } },
+      select: { id: true, firstName: true, lastName: true },
+    });
+    return reviews.map((r) => {
+      const customer = users.find((u) => u.id === r.idUser);
+      return {
+        ...sanitize(r),
+        customerFirstName: customer?.firstName ?? null,
+        customerLastName: customer?.lastName ?? null,
+      };
+    });
+  }
+
   async checkEligibility(idUser: number, idSubscriptionTypes: number) {
     const cutoff = new Date();
     cutoff.setDate(cutoff.getDate() - REVIEW_WINDOW_AFTER_CANCEL_DAYS);
@@ -201,7 +217,7 @@ export class ReviewsService {
       orderBy: { reviewDate: 'desc' },
       include: { media: true },
     });
-    return reviews.map(sanitize);
+    return this.attachCustomerNames(reviews);
   }
 
   async findBySubscriptionType(idSubscriptionTypes: number, limit = 10, offset = 0) {
@@ -224,7 +240,7 @@ export class ReviewsService {
       orderBy: { reviewDate: 'desc' },
       include: { media: true },
     });
-    return reviews.map(sanitize);
+    return this.attachCustomerNames(reviews);
   }
 
   async getSummaryByClub(idClub: number) {

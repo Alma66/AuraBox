@@ -15,12 +15,6 @@ interface SubscriptionTypeOption {
   name: string;
 }
 
-interface UserOption {
-  id: number;
-  firstName: string;
-  lastName: string;
-}
-
 const formatRelativeDate = (iso: string) => {
   const date = new Date(iso);
   const today = new Date();
@@ -35,7 +29,6 @@ const CustomerSupportContent: React.FC<CustomerSupportContentProps> = ({ activeS
   const idClub = Number(club.id);
   const [conversations, setConversations] = useState<SupportConversation[]>([]);
   const [subscriptionTypes, setSubscriptionTypes] = useState<SubscriptionTypeOption[]>([]);
-  const [users, setUsers] = useState<UserOption[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedId, setSelectedId] = useState<number | null>(null);
   const [messages, setMessages] = useState<SupportMessage[]>([]);
@@ -69,12 +62,6 @@ const CustomerSupportContent: React.FC<CustomerSupportContentProps> = ({ activeS
       const convs: SupportConversation[] = getResponseData(convRes) || [];
       setConversations(convs);
       setSubscriptionTypes(getResponseData(subsRes) || []);
-
-      const userIds = Array.from(new Set(convs.map((c) => c.idUser)));
-      const userResults = await Promise.all(
-        userIds.map((id) => api.get(`/users/${id}`).then((r) => getResponseData(r)).catch(() => null)),
-      );
-      setUsers(userResults.filter(Boolean));
     } catch (err) {
       console.error(err);
       toast.error('No se pudieron cargar las conversaciones');
@@ -129,8 +116,8 @@ const CustomerSupportContent: React.FC<CustomerSupportContentProps> = ({ activeS
   };
 
   const userName = (idUser: number) => {
-    const u = users.find((x) => x.id === idUser);
-    return u ? `${u.firstName} ${u.lastName}` : `Usuario #${idUser}`;
+    const conv = conversations.find((c) => c.idUser === idUser);
+    return conv?.customerFirstName ? `${conv.customerFirstName} ${conv.customerLastName}` : `Usuario #${idUser}`;
   };
 
   const subName = (id: number) => subscriptionTypes.find((s) => s.id === id)?.name ?? 'Sin especificar';
@@ -147,6 +134,14 @@ const CustomerSupportContent: React.FC<CustomerSupportContentProps> = ({ activeS
     });
     return list;
   }, [conversations, filterSub, filterUser, filterRead, sortOrder]);
+
+  const uniqueUsers = useMemo(() => {
+    const seen = new Map<number, string>();
+    conversations.forEach((c) => {
+      if (!seen.has(c.idUser)) seen.set(c.idUser, userName(c.idUser));
+    });
+    return Array.from(seen.entries()).map(([id, name]) => ({ id, name }));
+  }, [conversations]);
 
   const sendReply = async () => {
     if (!selectedId || (!replyText.trim() && !replyFile)) return;
@@ -327,8 +322,8 @@ const CustomerSupportContent: React.FC<CustomerSupportContentProps> = ({ activeS
           </select>
           <select value={filterUser} onChange={(e) => setFilterUser(e.target.value)} className="px-2 py-1 border border-aurora-navy/15 rounded text-xs flex-1 min-w-[100px]">
             <option value="all">Usuario</option>
-            {users.map((u) => (
-              <option key={u.id} value={u.id}>{u.firstName} {u.lastName}</option>
+            {uniqueUsers.map((u) => (
+              <option key={u.id} value={u.id}>{u.name}</option>
             ))}
           </select>
           <select value={filterRead} onChange={(e) => setFilterRead(e.target.value)} className="px-2 py-1 border border-aurora-navy/15 rounded text-xs flex-1 min-w-[90px]">
