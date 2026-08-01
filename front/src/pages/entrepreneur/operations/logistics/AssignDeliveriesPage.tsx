@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import toast from 'react-hot-toast';
 import { useAuth } from '../../../../App';
 import api, { getResponseData } from '../../../../api/config';
 import { PendingDelivery, RiderProfile } from '../../../../types/delivery';
@@ -66,11 +67,11 @@ const AssignDeliveriesPage: React.FC = () => {
   const assign = async (delivery: PendingDelivery) => {
     const selection = selections[delivery.idUserSubscriptions];
     if (!selection || selection.idCourier === '') {
-      alert('Seleccioná un método de envío antes de asignar.');
+      toast.error('Seleccioná un método de envío antes de asignar.');
       return;
     }
     if (isInternalCourier(delivery, selection.idCourier) && selection.idAssignedRider === '') {
-      alert('Seleccioná un rider para este método de envío.');
+      toast.error('Seleccioná un rider para este método de envío.');
       return;
     }
     setAssigningId(delivery.idUserSubscriptions);
@@ -84,9 +85,10 @@ const AssignDeliveriesPage: React.FC = () => {
         boxMonthYear: delivery.boxMonthYear,
       });
       setPending((prev) => prev.filter((p) => p.idUserSubscriptions !== delivery.idUserSubscriptions));
+      toast.success('Envío asignado correctamente.');
     } catch (err) {
       console.error(err);
-      alert('No se pudo asignar el envío.');
+      toast.error('No se pudo asignar el envío.');
     } finally {
       setAssigningId(null);
     }
@@ -98,16 +100,14 @@ const AssignDeliveriesPage: React.FC = () => {
   return (
     <div className="container mx-auto px-4 py-10 max-w-6xl">
       <div className="mb-8">
-        <h1 className="text-2xl font-serif font-bold text-aurora-navy">Asignar Envíos</h1>
+        <h1 className="font-display text-2xl font-bold text-aurora-navy">Asignar Envíos</h1>
         <p className="text-sm text-aurora-navy/50 mt-1">{club.name} · Pendientes del mes actual</p>
       </div>
-
       <div className="bg-white border border-aurora-navy/10 rounded-xl shadow-aurora-sm overflow-hidden">
         <div className="px-6 py-4 border-b border-aurora-navy/10 flex items-center justify-between">
           <h2 className="text-base font-semibold text-aurora-navy">Suscriptores sin envío asignado</h2>
           <span className="text-sm text-aurora-navy/50">{pending.length} pendientes</span>
         </div>
-
         {pending.length === 0 ? (
           <div className="px-6 py-16 text-center text-aurora-navy/50">
             No hay envíos pendientes de asignación para este mes.
@@ -133,24 +133,22 @@ const AssignDeliveriesPage: React.FC = () => {
                         </p>
                       )}
                     </div>
-
                     <div className="flex flex-col sm:flex-row gap-3 lg:items-center">
                       <select
                         value={selection.idCourier}
                         onChange={(e) => updateSelection(delivery.idUserSubscriptions, 'idCourier', e.target.value ? Number(e.target.value) : '')}
-                        className="px-3 py-2 border border-aurora-navy/15 rounded-lg text-sm min-w-[200px] focus:ring-2 focus:ring-aurora-navy focus:outline-none"
+                        className="px-3 py-2 border border-aurora-navy/15 rounded-lg text-sm min-w-[200px] focus:ring-2 focus:ring-aurora-terracotta/40 focus:outline-none"
                       >
                         <option value="">Método de envío</option>
                         {delivery.availableCouriers.map((c) => (
                           <option key={c.id} value={c.id}>{c.name}</option>
                         ))}
                       </select>
-
                       {internal && (
                         <select
                           value={selection.idAssignedRider}
                           onChange={(e) => updateSelection(delivery.idUserSubscriptions, 'idAssignedRider', e.target.value ? Number(e.target.value) : '')}
-                          className="px-3 py-2 border border-aurora-navy/15 rounded-lg text-sm min-w-[200px] focus:ring-2 focus:ring-aurora-navy focus:outline-none"
+                          className="px-3 py-2 border border-aurora-navy/15 rounded-lg text-sm min-w-[200px] focus:ring-2 focus:ring-aurora-terracotta/40 focus:outline-none"
                         >
                           <option value="">Seleccionar rider</option>
                           {riders.map((r) => (
@@ -158,7 +156,6 @@ const AssignDeliveriesPage: React.FC = () => {
                           ))}
                         </select>
                       )}
-
                       <button
                         onClick={() => assign(delivery)}
                         disabled={assigningId === delivery.idUserSubscriptions}
@@ -168,7 +165,6 @@ const AssignDeliveriesPage: React.FC = () => {
                       </button>
                     </div>
                   </div>
-
                   {delivery.availableCouriers.length === 0 && (
                     <p className="text-sm text-amber-600 mt-2">
                       Este club todavía no tiene métodos de envío configurados. Configuralos en "Gestionar Riders".
