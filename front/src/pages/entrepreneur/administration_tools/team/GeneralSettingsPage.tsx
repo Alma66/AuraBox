@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import toast from 'react-hot-toast';
 import { useAuth } from '../../../../App';
 import SettingsSidebar from '../../../../components/entrepreneur/SettingsSidebar';
 import api, { getResponseData } from '../../../../api/config';
@@ -58,6 +59,7 @@ const GeneralSettingsPage: React.FC = () => {
         setEditedSettings(initialEdited);
       } catch (error) {
         console.error('Error fetching settings:', error);
+        toast.error('No se pudieron cargar los ajustes del club.');
       } finally {
         setLoading(false);
       }
@@ -81,7 +83,7 @@ const GeneralSettingsPage: React.FC = () => {
       await api.put(`/clubs/${actualClubId}/settings/${activeSection}`, {
         [activeSection]: payload,
       });
-      alert('Ajustes guardados exitosamente');
+      toast.success('Ajustes guardados correctamente.');
       setSettings((prev) => {
         const newSettings = { ...prev };
         if (newSettings[activeSection]) {
@@ -94,7 +96,7 @@ const GeneralSettingsPage: React.FC = () => {
       });
     } catch (error) {
       console.error('Error saving settings:', error);
-      alert('Error al guardar ajustes');
+      toast.error('Error al guardar los ajustes.');
     } finally {
       setSaving(false);
     }
@@ -239,7 +241,11 @@ const GeneralSettingsPage: React.FC = () => {
   };
 
   if (loading) {
-    return <div className="text-center py-20 text-aurora-navy/60">Cargando ajustes...</div>;
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-aurora-cream">
+        <div className="animate-spin rounded-full h-10 w-10 border-4 border-aurora-navy/15 border-t-aurora-terracotta" />
+      </div>
+    );
   }
 
   return (
