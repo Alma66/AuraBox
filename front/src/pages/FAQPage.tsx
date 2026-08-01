@@ -139,33 +139,34 @@ const FAQPage: React.FC = () => {
   };
 
   return (
-    <div className="container mx-auto px-4 py-12 animate-fadeInUp">
-      <h1 className="text-5xl font-extrabold text-center text-blue-700 mb-8 animate-slideInUp">
+    <div className="container mx-auto px-4 py-12 animate-fadeInUp bg-aurora-cream">
+      <span className="section-eyebrow block text-center">¿Tenés dudas?</span>
+      <h1 className="font-display text-5xl font-bold text-center text-aurora-navy mb-8 animate-slideInUp">
         Preguntas Frecuentes
       </h1>
-      <p className="text-center text-gray-600 mb-12 max-w-2xl mx-auto animate-fadeIn">
-        Encuentra respuestas a las preguntas más comunes sobre AuraBox, cómo funciona para suscriptores y emprendedores, y mucho más.
+      <p className="text-center text-aurora-navy/60 mb-12 max-w-2xl mx-auto animate-fadeIn">
+        Encontrá respuestas a las preguntas más comunes sobre AuraBox, cómo funciona para suscriptores y emprendedores, y mucho más.
       </p>
 
       <div className="mb-10 flex flex-col md:flex-row items-center justify-center space-y-4 md:space-y-0 md:space-x-4 animate-fadeIn">
         <input
           type="text"
-          placeholder="Busca tu pregunta aquí..."
-          className="w-full md:w-1/2 p-3 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300 hover:border-blue-400"
+          placeholder="Buscá tu pregunta aquí..."
+          className="w-full md:w-1/2 input-aurora"
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
         />
         <div className="relative w-full md:w-auto">
           <select
-            className="block appearance-none w-full bg-white border border-gray-300 text-gray-700 py-3 px-4 pr-8 rounded-lg shadow-sm leading-tight focus:outline-none focus:bg-white focus:border-blue-500 transition-all duration-300 hover:border-blue-400"
+            className="input-aurora appearance-none pr-8"
             value={selectedCategory}
-                       onChange={(e) => setSelectedCategory(e.target.value)}
+            onChange={(e) => setSelectedCategory(e.target.value)}
           >
             {categories.map(category => (
               <option key={category} value={category}>{category}</option>
             ))}
           </select>
-          <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
+          <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-aurora-navy/50">
             <svg className="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/></svg>
           </div>
         </div>
@@ -174,29 +175,29 @@ const FAQPage: React.FC = () => {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         {filteredFaqs.length > 0 ? (
           filteredFaqs.map(faq => (
-            <div 
-              key={faq.id} 
-              className="bg-white p-6 rounded-xl shadow-lg border border-gray-200 hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 cursor-pointer animate-fadeInUp"
+            <div
+              key={faq.id}
+              className="bg-white p-6 rounded-xl shadow-aurora-sm border border-aurora-navy/5 hover:shadow-aurora transition-all duration-300 transform hover:-translate-y-1 cursor-pointer animate-fadeInUp"
               onClick={() => toggleQuestion(faq.id)}
             >
-              <h3 className="text-xl font-semibold text-gray-800 mb-3 flex justify-between items-center">
+              <h3 className="text-xl font-semibold text-aurora-navy mb-3 flex justify-between items-center">
                 {faq.question}
-                <span className="text-blue-500 text-2xl transition-transform duration-300">
+                <span className="text-aurora-terracotta text-2xl transition-transform duration-300">
                   {openQuestion === faq.id ? '−' : '+'}
                 </span>
               </h3>
-              <div 
+              <div
                 className={`overflow-hidden transition-all duration-500 ease-in-out ${
                   openQuestion === faq.id ? 'max-h-screen opacity-100 pt-2' : 'max-h-0 opacity-0'
                 }`}
               >
-                <p className="text-gray-700 leading-relaxed border-t border-gray-200 pt-4">
+                <p className="text-aurora-navy/70 leading-relaxed border-t border-aurora-navy/10 pt-4">
                   {faq.answer}
                 </p>
                 {faq.keywords.length > 0 && (
                   <div className="mt-4 flex flex-wrap gap-2">
                     {faq.keywords.map(keyword => (
-                      <span key={keyword} className="bg-blue-100 text-blue-700 text-xs font-medium px-2.5 py-0.5 rounded-full">
+                      <span key={keyword} className="bg-aurora-gold/15 text-aurora-terracottaDark text-xs font-medium px-2.5 py-0.5 rounded-full">
                         {keyword}
                       </span>
                     ))}
@@ -206,44 +207,43 @@ const FAQPage: React.FC = () => {
             </div>
           ))
         ) : (
-          <div className="lg:col-span-2 text-center py-10 bg-gray-50 rounded-lg shadow-inner animate-fadeIn">
-            <p className="text-gray-500 text-lg">No se encontraron preguntas que coincidan con tu búsqueda o categoría.</p>
-            <p className="text-gray-400 text-sm mt-2">Intenta con otras palabras clave o selecciona otra categoría.</p>
+          <div className="lg:col-span-2 text-center py-10 bg-white rounded-lg shadow-aurora-sm border border-aurora-navy/5 animate-fadeIn">
+            <p className="text-aurora-navy/60 text-lg">No se encontraron preguntas que coincidan con tu búsqueda o categoría.</p>
+            <p className="text-aurora-navy/40 text-sm mt-2">Intentá con otras palabras clave o seleccioná otra categoría.</p>
           </div>
         )}
       </div>
 
-      <div className="mt-16 text-center bg-blue-50 p-8 rounded-xl shadow-md animate-fadeInUp">
-        <h2 className="text-3xl font-bold text-blue-700 mb-4">¿No encontraste tu pregunta?</h2>
-        <p className="text-gray-700 mb-6 max-w-xl mx-auto">
-          Si no encontraste la respuesta que buscabas, no dudes en contactar a nuestro equipo de soporte. Estamos aquí para ayudarte.
+      <div className="mt-16 text-center bg-white p-8 rounded-xl shadow-aurora-sm border border-aurora-navy/5 animate-fadeInUp">
+        <h2 className="font-display text-3xl font-bold text-aurora-navy mb-4">¿No encontraste tu pregunta?</h2>
+        <p className="text-aurora-navy/70 mb-6 max-w-xl mx-auto">
+          Si no encontraste la respuesta que buscabas, no dudes en contactar a nuestro equipo de soporte. Estamos acá para ayudarte.
         </p>
-        <a 
-          href="/contacto" 
-          className="inline-block bg-blue-600 text-white px-8 py-3 rounded-full text-lg font-semibold 
-                     hover:bg-blue-700 transition-all duration-300 transform hover:scale-105 active:scale-95 shadow-lg"
+        <Link
+          to="/contact"
+          className="btn-primary inline-flex"
         >
           Contactar Soporte
-        </a>
+        </Link>
       </div>
 
       <div className="mt-16">
-        <h2 className="text-3xl font-bold text-center text-gray-800 mb-8 animate-fadeIn">Guías y Recursos Útiles</h2>
+        <h2 className="font-display text-3xl font-bold text-center text-aurora-navy mb-8 animate-fadeIn">Seguí Explorando</h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          <div className="bg-white p-6 rounded-xl shadow-lg border border-gray-200 hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 animate-fadeInUp delay-100">
-            <h3 className="text-xl font-semibold text-blue-600 mb-3">Guía para Suscriptores</h3>
-            <p className="text-gray-700 mb-4">Aprende a sacar el máximo provecho de tu experiencia como suscriptor en AuraBox.</p>
-            <Link to="/como-funciona" className="text-blue-500 hover:underline font-medium">Leer más →</Link>
+          <div className="bg-white p-6 rounded-xl shadow-aurora-sm border border-aurora-navy/5 hover:shadow-aurora transition-all duration-300 transform hover:-translate-y-1 animate-fadeInUp">
+            <h3 className="text-xl font-semibold text-aurora-terracotta mb-3">Explorar Clubes</h3>
+            <p className="text-aurora-navy/70 mb-4">Descubrí todos los clubes de suscripción disponibles y encontrá el que más te guste.</p>
+            <Link to="/explore" className="text-aurora-terracotta hover:underline font-medium">Ver clubes →</Link>
           </div>
-          <div className="bg-white p-6 rounded-xl shadow-lg border border-gray-200 hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 animate-fadeInUp delay-200">
-            <h3 className="text-xl font-semibold text-blue-600 mb-3">Guía para Emprendedores</h3>
-            <p className="text-gray-700 mb-4">Descubre cómo AuraBox puede potenciar y profesionalizar tu club de suscripción.</p>
-            <Link to="/emprendedores" className="text-blue-500 hover:underline font-medium">Leer más →</Link>
+          <div className="bg-white p-6 rounded-xl shadow-aurora-sm border border-aurora-navy/5 hover:shadow-aurora transition-all duration-300 transform hover:-translate-y-1 animate-fadeInUp" style={{ animationDelay: '100ms' }}>
+            <h3 className="text-xl font-semibold text-aurora-terracotta mb-3">Registrá tu Club</h3>
+            <p className="text-aurora-navy/70 mb-4">Descubrí cómo AuraBox puede potenciar y profesionalizar tu club de suscripción.</p>
+            <Link to="/register" className="text-aurora-terracotta hover:underline font-medium">Empezar →</Link>
           </div>
-          <div className="bg-white p-6 rounded-xl shadow-lg border border-gray-200 hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 animate-fadeInUp delay-300">
-            <h3 className="text-xl font-semibold text-blue-600 mb-3">Términos y Condiciones</h3>
-            <p className="text-gray-700 mb-4">Conoce nuestras políticas de uso y privacidad para una experiencia segura.</p>
-            <Link to="/terminos-condiciones" className="text-blue-500 hover:underline font-medium">Leer más →</Link>
+          <div className="bg-white p-6 rounded-xl shadow-aurora-sm border border-aurora-navy/5 hover:shadow-aurora transition-all duration-300 transform hover:-translate-y-1 animate-fadeInUp" style={{ animationDelay: '200ms' }}>
+            <h3 className="text-xl font-semibold text-aurora-terracotta mb-3">Sobre Nosotros</h3>
+            <p className="text-aurora-navy/70 mb-4">Conocé nuestra misión, visión y los valores detrás de AuraBox.</p>
+            <Link to="/about-us" className="text-aurora-terracotta hover:underline font-medium">Leer más →</Link>
           </div>
         </div>
       </div>

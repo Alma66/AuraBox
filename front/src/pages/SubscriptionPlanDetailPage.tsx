@@ -13,7 +13,7 @@ const StarsDisplay: React.FC<{ rating: number; size?: string }> = ({ rating, siz
     {[...Array(5)].map((_, i) => (
       <svg
         key={i}
-        className={`${size} ${i < Math.round(rating) ? 'text-yellow-400 fill-current' : 'text-gray-300'}`}
+        className={`${size} ${i < Math.round(rating) ? 'text-aurora-gold fill-current' : 'text-aurora-navy/15'}`}
         fill="currentColor"
         viewBox="0 0 20 20"
       >
@@ -263,16 +263,16 @@ const SubscriptionPlanDetailPage: React.FC = () => {
   };
 
   if (loading) return (
-    <div className="min-h-screen flex items-center justify-center">
-      <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-indigo-600" />
+    <div className="min-h-screen flex items-center justify-center bg-aurora-cream">
+      <div className="animate-spin rounded-full h-10 w-10 border-4 border-aurora-navy/15 border-t-aurora-terracotta" />
     </div>
   );
 
   if (!club || !plan) return (
-    <div className="min-h-screen flex items-center justify-center text-center px-4">
+    <div className="min-h-screen flex items-center justify-center text-center px-4 bg-aurora-cream">
       <div>
-        <p className="text-2xl font-bold text-gray-700 mb-4">Plan no encontrado</p>
-        <Link to={`/club/${clubId}`} className="text-indigo-600 hover:underline text-sm">Volver al club</Link>
+        <p className="text-2xl font-display font-bold text-aurora-navy mb-4">Plan no encontrado</p>
+        <Link to={`/club/${clubId}`} className="text-aurora-terracotta hover:underline text-sm">Volver al club</Link>
       </div>
     </div>
   );
@@ -283,22 +283,22 @@ const SubscriptionPlanDetailPage: React.FC = () => {
   const canShowReviewForm = eligibility?.eligible && !showReviewForm && !reviewSuccess;
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="bg-white border-b">
+    <div className="min-h-screen bg-aurora-cream">
+      <div className="bg-white border-b border-aurora-navy/10">
         <div className="container mx-auto px-4 py-5 flex items-center gap-3">
-          <Link to={`/club/${clubId}`} className="text-gray-400 hover:text-gray-600 transition">
+          <Link to={`/club/${clubId}`} className="text-aurora-navy/40 hover:text-aurora-navy transition">
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 19l-7-7 7-7" />
             </svg>
           </Link>
           <div>
-            <p className="text-xs text-gray-500 uppercase tracking-wide font-medium">{club.name}</p>
-            <h1 className="text-2xl font-bold text-gray-900">{plan.name}</h1>
+            <p className="text-xs text-aurora-navy/50 uppercase tracking-wide font-medium">{club.name}</p>
+            <h1 className="font-display text-2xl font-bold text-aurora-navy">{plan.name}</h1>
           </div>
         </div>
       </div>
       <div className="container mx-auto px-4 py-10 max-w-4xl">
-        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+        <div className="card-surface overflow-hidden">
           <div className="relative">
             <img src={plan.image} alt={plan.name} className="w-full h-72 object-cover" />
             {!plan.activo && (
@@ -307,7 +307,7 @@ const SubscriptionPlanDetailPage: React.FC = () => {
               </div>
             )}
             {descuento > 0 && (
-              <div className="absolute top-4 right-4 bg-red-500 text-white text-sm font-bold px-3 py-1.5 rounded-full">
+              <div className="absolute top-4 right-4 bg-aurora-terracotta text-white text-sm font-bold px-3 py-1.5 rounded-full shadow-aurora-sm">
                 -{descuento}% OFF
               </div>
             )}
@@ -315,41 +315,41 @@ const SubscriptionPlanDetailPage: React.FC = () => {
           <div className="p-8">
             <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4 mb-2">
               <div>
-                <h2 className="text-3xl font-extrabold text-gray-900 mb-1">{plan.name}</h2>
-                <p className="text-sm text-indigo-600 font-medium">{plan.deliveryFrequency}</p>
+                <h2 className="font-display text-3xl font-bold text-aurora-navy mb-1">{plan.name}</h2>
+                <p className="text-sm text-aurora-terracotta font-medium">{plan.deliveryFrequency}</p>
               </div>
               <div className="text-right shrink-0">
                 {descuento > 0 ? (
                   <>
-                    <p className="text-gray-400 line-through text-lg">ARS {plan.price.toLocaleString('es-AR')}</p>
-                    <p className="text-3xl font-extrabold text-green-600">ARS {precioFinal.toLocaleString('es-AR')}</p>
-                    <p className="text-xs text-gray-500">Ahorrás {descuento}%</p>
+                    <p className="text-aurora-navy/40 line-through text-lg">ARS {plan.price.toLocaleString('es-AR')}</p>
+                    <p className="font-display text-3xl font-bold text-green-600">ARS {precioFinal.toLocaleString('es-AR')}</p>
+                    <p className="text-xs text-aurora-navy/50">Ahorrás {descuento}%</p>
                   </>
                 ) : (
-                  <p className="text-3xl font-extrabold text-gray-900">ARS {plan.price.toLocaleString('es-AR')}</p>
+                  <p className="font-display text-3xl font-bold text-aurora-navy">ARS {plan.price.toLocaleString('es-AR')}</p>
                 )}
               </div>
             </div>
             {reviewSummary && reviewSummary.count > 0 && (
               <div className="flex items-center gap-2 mb-6">
                 <StarsDisplay rating={reviewSummary.average} />
-                <span className="text-sm font-semibold text-gray-700">{reviewSummary.average.toFixed(1)}</span>
-                <span className="text-xs text-gray-400">({reviewSummary.count} reseña{reviewSummary.count !== 1 ? 's' : ''})</span>
+                <span className="text-sm font-semibold text-aurora-navy">{reviewSummary.average.toFixed(1)}</span>
+                <span className="text-xs text-aurora-navy/40">({reviewSummary.count} reseña{reviewSummary.count !== 1 ? 's' : ''})</span>
               </div>
             )}
             {plan.description && (
               <div className="mb-6">
-                <h3 className="text-sm font-bold text-gray-500 uppercase tracking-wide mb-2">Descripción</h3>
-                <p className="text-gray-700 leading-relaxed">{plan.description}</p>
+                <h3 className="text-sm font-bold text-aurora-navy/50 uppercase tracking-wide mb-2">Descripción</h3>
+                <p className="text-aurora-navy/75 leading-relaxed">{plan.description}</p>
               </div>
             )}
             {(plan.includes ?? []).length > 0 && (
               <div className="mb-6">
-                <h3 className="text-sm font-bold text-gray-500 uppercase tracking-wide mb-3">¿Qué incluye?</h3>
+                <h3 className="text-sm font-bold text-aurora-navy/50 uppercase tracking-wide mb-3">¿Qué incluye?</h3>
                 <ul className="space-y-2">
                   {plan.includes.map((item, i) => (
-                    <li key={i} className="flex items-center gap-2 text-gray-700 text-sm">
-                      <svg className="w-4 h-4 text-indigo-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <li key={i} className="flex items-center gap-2 text-aurora-navy/75 text-sm">
+                      <svg className="w-4 h-4 text-aurora-terracotta shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
                       </svg>
                       {item}
@@ -360,10 +360,10 @@ const SubscriptionPlanDetailPage: React.FC = () => {
             )}
             {(plan.specifications ?? []).length > 0 && (
               <div className="mb-6">
-                <h3 className="text-sm font-bold text-gray-500 uppercase tracking-wide mb-3">Especificaciones</h3>
+                <h3 className="text-sm font-bold text-aurora-navy/50 uppercase tracking-wide mb-3">Especificaciones</h3>
                 <div className="flex flex-wrap gap-2">
                   {plan.specifications.map((spec, i) => (
-                    <span key={i} className="bg-gray-100 text-gray-700 px-3 py-1 rounded-full text-xs font-medium">
+                    <span key={i} className="bg-aurora-cream text-aurora-navy/75 px-3 py-1 rounded-full text-xs font-medium">
                       {spec.type}: {spec.value}
                     </span>
                   ))}
@@ -372,18 +372,18 @@ const SubscriptionPlanDetailPage: React.FC = () => {
             )}
             {plan.shippingAreas && (
               <div className="mb-6">
-                <h3 className="text-sm font-bold text-gray-500 uppercase tracking-wide mb-2">Zonas de envío</h3>
-                <p className="text-gray-700 text-sm">{plan.shippingAreas}</p>
+                <h3 className="text-sm font-bold text-aurora-navy/50 uppercase tracking-wide mb-2">Zonas de envío</h3>
+                <p className="text-aurora-navy/75 text-sm">{plan.shippingAreas}</p>
               </div>
             )}
             {descuento > 0 && (
-              <div className="bg-indigo-50 rounded-xl p-4 mb-6">
-                <p className="text-sm font-semibold text-indigo-800 mb-1">Descuentos disponibles</p>
+              <div className="bg-aurora-gold/10 rounded-xl p-4 mb-6">
+                <p className="text-sm font-semibold text-aurora-terracottaDark mb-1">Descuentos disponibles</p>
                 {(plan.descuentoTransferencia ?? 0) > 0 && (
-                  <p className="text-sm text-indigo-700">• {plan.descuentoTransferencia}% pagando por transferencia</p>
+                  <p className="text-sm text-aurora-terracottaDark">• {plan.descuentoTransferencia}% pagando por transferencia</p>
                 )}
                 {(plan.descuentoEfectivo ?? 0) > 0 && (
-                  <p className="text-sm text-indigo-700">• {plan.descuentoEfectivo}% pagando en efectivo</p>
+                  <p className="text-sm text-aurora-terracottaDark">• {plan.descuentoEfectivo}% pagando en efectivo</p>
                 )}
               </div>
             )}
@@ -404,23 +404,23 @@ const SubscriptionPlanDetailPage: React.FC = () => {
               </div>
             )}
             {addedToCart && !subscribeSuccess && (
-              <div className="bg-blue-50 border border-blue-200 text-blue-700 text-sm rounded-xl px-4 py-3 mb-4">
+              <div className="bg-aurora-navy/5 border border-aurora-navy/15 text-aurora-navy text-sm rounded-xl px-4 py-3 mb-4">
                 Agregado a tu carrito. Podés seguir explorando o{' '}
                 <Link to="/cart" className="underline font-semibold">ir al carrito</Link>.
               </div>
             )}
 
-            <div className="flex flex-col sm:flex-row gap-3 pt-4 border-t">
+            <div className="flex flex-col sm:flex-row gap-3 pt-4 border-t border-aurora-navy/10">
               <Link
                 to={`/club/${clubId}`}
-                className="flex-1 text-center px-6 py-3 text-sm font-semibold text-gray-700 border border-gray-300 rounded-xl hover:bg-gray-50 transition"
+                className="btn-outline flex-1 !py-3 text-sm"
               >
                 Volver al club
               </Link>
               {subscribeSuccess ? (
                 <Link
                   to="/customer/profile"
-                  className="flex-1 text-center px-6 py-3 text-sm font-semibold text-white bg-emerald-600 rounded-xl hover:bg-emerald-700 transition"
+                  className="flex-1 text-center px-6 py-3 text-sm font-semibold text-white bg-emerald-600 rounded-full hover:bg-emerald-700 transition"
                 >
                   Ver mi perfil
                 </Link>
@@ -429,14 +429,14 @@ const SubscriptionPlanDetailPage: React.FC = () => {
                   <button
                     onClick={handleAddToCart}
                     disabled={addingToCart || subscribing || !canSubscribe}
-                    className="flex-1 px-6 py-3 text-sm font-semibold text-indigo-600 border-2 border-indigo-600 rounded-xl hover:bg-indigo-50 disabled:opacity-50 disabled:cursor-not-allowed transition"
+                    className="flex-1 px-6 py-3 text-sm font-semibold text-aurora-navy border-2 border-aurora-navy/20 rounded-full hover:bg-aurora-cream disabled:opacity-50 disabled:cursor-not-allowed transition"
                   >
                     {addingToCart ? 'Agregando...' : addedToCart ? 'Agregado ✓' : 'Agregar al carrito'}
                   </button>
                   <button
                     onClick={handleSubscribeNow}
                     disabled={subscribing || addingToCart || !canSubscribe}
-                    className="flex-1 px-6 py-3 text-sm font-semibold text-white bg-indigo-600 rounded-xl hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed transition"
+                    className="btn-primary flex-1 !py-3 text-sm disabled:opacity-50 disabled:pointer-events-none"
                   >
                     {!canSubscribe ? 'Plan no disponible' : subscribing ? 'Procesando...' : 'Suscribirme ahora'}
                   </button>
@@ -446,14 +446,14 @@ const SubscriptionPlanDetailPage: React.FC = () => {
           </div>
         </div>
 
-        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 mt-8 p-8">
+        <div className="card-surface mt-8 p-8">
           <div className="flex items-center justify-between mb-6">
-            <h3 className="text-xl font-bold text-gray-900">Reseñas</h3>
+            <h3 className="font-display text-xl font-bold text-aurora-navy">Reseñas</h3>
             {reviewSummary && reviewSummary.count > 0 && (
               <div className="flex items-center gap-2">
                 <StarsDisplay rating={reviewSummary.average} />
-                <span className="text-sm font-semibold text-gray-700">{reviewSummary.average.toFixed(1)}</span>
-                <span className="text-xs text-gray-400">({reviewSummary.count})</span>
+                <span className="text-sm font-semibold text-aurora-navy">{reviewSummary.average.toFixed(1)}</span>
+                <span className="text-xs text-aurora-navy/40">({reviewSummary.count})</span>
               </div>
             )}
           </div>
@@ -465,14 +465,14 @@ const SubscriptionPlanDetailPage: React.FC = () => {
           )}
 
           {eligibility?.alreadyReviewed && !reviewSuccess && (
-            <div className="bg-gray-50 border border-gray-200 text-gray-600 text-sm rounded-xl px-4 py-3 mb-6">
+            <div className="bg-aurora-cream border border-aurora-navy/10 text-aurora-navy/70 text-sm rounded-xl px-4 py-3 mb-6">
               Ya dejaste una reseña para esta suscripción. Podés editarla desde{' '}
               <Link to="/customer/reviews" className="underline font-semibold">Mis Reseñas</Link>.
             </div>
           )}
 
           {isAuthenticated && userRole === 'customer' && eligibility && !eligibility.eligible && !eligibility.alreadyReviewed && (
-            <div className="bg-gray-50 border border-gray-200 text-gray-600 text-sm rounded-xl px-4 py-3 mb-6">
+            <div className="bg-aurora-cream border border-aurora-navy/10 text-aurora-navy/70 text-sm rounded-xl px-4 py-3 mb-6">
               Solo podés dejar una reseña si estás suscripto a este plan, o si cancelaste tu suscripción hace menos de 30 días.
             </div>
           )}
@@ -480,26 +480,26 @@ const SubscriptionPlanDetailPage: React.FC = () => {
           {canShowReviewForm && (
             <button
               onClick={() => setShowReviewForm(true)}
-              className="mb-6 px-5 py-2.5 bg-indigo-600 text-white text-sm font-semibold rounded-xl hover:bg-indigo-700 transition"
+              className="btn-primary !py-2.5 text-sm mb-6"
             >
               Dejar una reseña
             </button>
           )}
 
           {showReviewForm && (
-            <div className="bg-gray-50 rounded-xl border border-gray-200 p-5 mb-6">
+            <div className="bg-aurora-cream rounded-xl border border-aurora-navy/10 p-5 mb-6">
               {reviewError && (
                 <div className="bg-red-50 border border-red-200 text-red-700 text-sm rounded-xl px-4 py-3 mb-4">
                   {reviewError}
                 </div>
               )}
               <div className="mb-4">
-                <label className="block text-sm font-semibold text-gray-700 mb-2">Calificación</label>
+                <label className="block text-sm font-semibold text-aurora-navy mb-2">Calificación</label>
                 <div className="flex gap-1">
                   {[1, 2, 3, 4, 5].map((n) => (
                     <button key={n} type="button" onClick={() => setReviewRating(n)}>
                       <svg
-                        className={`w-8 h-8 ${n <= reviewRating ? 'text-yellow-400 fill-current' : 'text-gray-300'}`}
+                        className={`w-8 h-8 ${n <= reviewRating ? 'text-aurora-gold fill-current' : 'text-aurora-navy/15'}`}
                         fill="currentColor"
                         viewBox="0 0 20 20"
                       >
@@ -510,27 +510,27 @@ const SubscriptionPlanDetailPage: React.FC = () => {
                 </div>
               </div>
               <div className="mb-4">
-                <label className="block text-sm font-semibold text-gray-700 mb-1">Título (opcional)</label>
+                <label className="block text-sm font-semibold text-aurora-navy mb-1">Título (opcional)</label>
                 <input
                   type="text"
                   value={reviewTitle}
                   onChange={(e) => setReviewTitle(e.target.value)}
                   maxLength={120}
-                  className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white"
+                  className="input-aurora bg-white"
                 />
               </div>
               <div className="mb-4">
-                <label className="block text-sm font-semibold text-gray-700 mb-1">Comentario</label>
+                <label className="block text-sm font-semibold text-aurora-navy mb-1">Comentario</label>
                 <textarea
                   value={reviewComment}
                   onChange={(e) => setReviewComment(e.target.value)}
                   maxLength={2000}
                   rows={4}
-                  className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 resize-none bg-white"
-                />
+                  className="input-aurora bg-white resize-none"
+                ></textarea>
               </div>
               <div className="mb-4">
-                <label className="block text-sm font-semibold text-gray-700 mb-2">
+                <label className="block text-sm font-semibold text-aurora-navy mb-2">
                   Fotos y videos ({reviewFiles.length} / {MAX_MEDIA})
                 </label>
                 {reviewFiles.length > 0 && (
@@ -549,21 +549,21 @@ const SubscriptionPlanDetailPage: React.FC = () => {
                   </div>
                 )}
                 {reviewFiles.length < MAX_MEDIA && (
-                  <input type="file" accept="image/*,video/*" multiple onChange={handleReviewFilesSelected} className="text-sm" />
+                  <input type="file" accept="image/*,video/*" multiple onChange={handleReviewFilesSelected} className="text-sm text-aurora-navy/70" />
                 )}
               </div>
               <div className="flex gap-3">
                 <button
                   onClick={() => setShowReviewForm(false)}
                   disabled={submittingReview}
-                  className="flex-1 px-4 py-2.5 rounded-xl border border-gray-200 text-gray-700 text-sm font-medium hover:bg-gray-100 disabled:opacity-50 transition"
+                  className="flex-1 px-4 py-2.5 rounded-full border border-aurora-navy/15 text-aurora-navy/70 text-sm font-medium hover:bg-white disabled:opacity-50 transition"
                 >
                   Cancelar
                 </button>
                 <button
                   onClick={handleSubmitReview}
                   disabled={submittingReview}
-                  className="flex-1 px-4 py-2.5 rounded-xl bg-indigo-600 text-white text-sm font-semibold hover:bg-indigo-700 disabled:opacity-50 transition"
+                  className="btn-primary flex-1 !py-2.5 text-sm disabled:opacity-50 disabled:pointer-events-none"
                 >
                   {submittingReview ? 'Publicando...' : 'Publicar reseña'}
                 </button>
@@ -572,21 +572,21 @@ const SubscriptionPlanDetailPage: React.FC = () => {
           )}
 
           {loadingReviews ? (
-            <div className="text-center py-8 text-gray-400 text-sm">Cargando reseñas...</div>
+            <div className="text-center py-8 text-aurora-navy/40 text-sm">Cargando reseñas...</div>
           ) : reviews.length === 0 ? (
-            <p className="text-gray-500 text-sm">Todavía no hay reseñas para esta suscripción.</p>
+            <p className="text-aurora-navy/50 text-sm">Todavía no hay reseñas para esta suscripción.</p>
           ) : (
             <div className="space-y-5">
               {reviews.map((review) => (
-                <div key={review.id} className="border-b border-gray-100 pb-5 last:border-0">
+                <div key={review.id} className="border-b border-aurora-navy/10 pb-5 last:border-0">
                   <div className="flex items-center justify-between mb-2">
                     <StarsDisplay rating={review.rating} />
-                    <span className="text-xs text-gray-400">
+                    <span className="text-xs text-aurora-navy/40">
                       {new Date(review.reviewDate).toLocaleDateString('es-AR', { year: 'numeric', month: 'long', day: 'numeric' })}
                     </span>
                   </div>
-                  {review.title && <p className="font-semibold text-gray-800 mb-1">{review.title}</p>}
-                  {review.comment && <p className="text-gray-700 text-sm leading-relaxed">{review.comment}</p>}
+                  {review.title && <p className="font-semibold text-aurora-navy mb-1">{review.title}</p>}
+                  {review.comment && <p className="text-aurora-navy/75 text-sm leading-relaxed">{review.comment}</p>}
                   {review.media && review.media.length > 0 && (
                     <div className="flex flex-wrap gap-2 mt-3">
                       {review.media.map((m) => (
@@ -605,7 +605,7 @@ const SubscriptionPlanDetailPage: React.FC = () => {
                   <button
                     onClick={loadMoreReviews}
                     disabled={loadingMoreReviews}
-                    className="px-5 py-2 text-sm font-semibold text-indigo-600 border border-indigo-300 rounded-xl hover:bg-indigo-50 disabled:opacity-50 transition"
+                    className="btn-outline !py-2 text-sm disabled:opacity-50"
                   >
                     {loadingMoreReviews ? 'Cargando...' : 'Ver más reseñas'}
                   </button>
