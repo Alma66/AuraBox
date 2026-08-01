@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import api, { getResponseData } from '../../../../api/config';
 import { useAuth } from '../../../../App';
 import { SupplierItem, SupplyCategory, SupplyOrderItem, ProductInventoryItem } from '../../../../types/inventory';
+import toast from 'react-hot-toast';
 
 const emptyForm = {
   name: '',
@@ -76,32 +77,70 @@ const InventorySuppliersPage: React.FC = () => {
   };
 
   const handleSubmit = async () => {
-    if (!form.name.trim()) {
-      alert('El nombre del proveedor es obligatorio');
-      return;
-    }
-    const payload = {
-      idClub,
-      name: form.name,
-      contactEmail: form.contactEmail || undefined,
-      contactPhone: form.contactPhone || undefined,
-      address: form.address || undefined,
-      notes: form.notes || undefined,
-      categoryIds: form.categoryIds,
-    };
-    try {
-      if (editingId) {
-        await api.put(`/inventory/suppliers/${editingId}`, payload);
-      } else {
-        await api.post('/inventory/suppliers', payload);
-      }
-      resetForm();
-      fetchAll();
-    } catch (err) {
-      console.error(err);
-      alert('Error al guardar el proveedor');
-    }
+  if (!form.name.trim()) {
+    toast.error('El nombre del proveedor es obligatorio');
+    return;
+  }
+  const payload = {
+    idClub,
+    name: form.name,
+    contactEmail: form.contactEmail || undefined,
+    contactPhone: form.contactPhone || undefined,
+    address: form.address || undefined,
+    notes: form.notes || undefined,
+    categoryIds: form.categoryIds,
   };
+  try {
+    if (editingId) {
+      await api.put(`/inventory/suppliers/${editingId}`, payload);
+    } else {
+      await api.post('/inventory/suppliers', payload);
+    }
+    resetForm();
+    fetchAll();
+  } catch (err) {
+    console.error(err);
+    toast.error('Error al guardar el proveedor');
+  }
+};
+
+const removeSupplier = (id: number) => {
+  toast((t) => (
+    <div className="flex flex-col gap-3">
+      <p className="text-sm font-medium">¿Eliminar este proveedor?</p>
+      <div className="flex gap-2 justify-end">
+        <button onClick={() => toast.dismiss(t.id)} className="px-3 py-1 text-sm border border-gray-300 rounded-lg hover:bg-gray-50">
+          Cancelar
+        </button>
+        <button
+          onClick={async () => {
+            toast.dismiss(t.id);
+            try {
+              await api.delete(`/inventory/suppliers/${id}`);
+              fetchAll();
+            } catch (err) {
+              console.error(err);
+              toast.error('Error al eliminar el proveedor');
+            }
+          }}
+          className="px-3 py-1 text-sm bg-red-600 text-white rounded-lg hover:bg-red-700"
+        >
+          Eliminar
+        </button>
+      </div>
+    </div>
+  ), { duration: Infinity });
+};
+
+const toggleActive = async (s: SupplierItem) => {
+  try {
+    await api.put(`/inventory/suppliers/${s.id}`, { active: !s.active });
+    fetchAll();
+  } catch (err) {
+    console.error(err);
+    toast.error('Error al cambiar el estado del proveedor');
+  }
+};
 
   const loadForEdit = (s: SupplierItem) => {
     setForm({
@@ -116,26 +155,6 @@ const InventorySuppliersPage: React.FC = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  const removeSupplier = async (id: number) => {
-    if (!window.confirm('¿Eliminar este proveedor?')) return;
-    try {
-      await api.delete(`/inventory/suppliers/${id}`);
-      fetchAll();
-    } catch (err) {
-      console.error(err);
-      alert('Error al eliminar el proveedor');
-    }
-  };
-
-  const toggleActive = async (s: SupplierItem) => {
-    try {
-      await api.put(`/inventory/suppliers/${s.id}`, { active: !s.active });
-      fetchAll();
-    } catch (err) {
-      console.error(err);
-      alert('Error al cambiar el estado del proveedor');
-    }
-  };
 
   const categoryNames = (ids: number[]) => ids.map((id) => categories.find((c) => c.id === id)?.name).filter(Boolean).join(', ') || 'Sin categoría';
 

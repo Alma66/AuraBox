@@ -6,6 +6,7 @@ import ReviewCard from '../../components/client/ReviewCard';
 import { User } from '../../types/user';
 import { Club } from '../../types/club';
 import { Review } from '../../types/review';
+import toast from 'react-hot-toast';
 
 const MAX_MEDIA = 5;
 
@@ -45,15 +46,34 @@ const MisReviewsPage: React.FC = () => {
     fetchData();
   }, [user, navigate]);
 
-  const handleDelete = async (reviewId: number) => {
-    try {
-      await api.delete(`/reviews/${reviewId}`);
-      setReviews((prev) => prev.filter((r) => r.id !== reviewId));
-    } catch (error) {
-      console.error('Error deleting review:', error);
-      alert('Error al eliminar la reseña.');
-    }
-  };
+  const handleDelete = (reviewId: number) => {
+  toast((t) => (
+    <div className="flex flex-col gap-3">
+      <p className="text-sm font-medium">¿Eliminar esta reseña permanentemente?</p>
+      <div className="flex gap-2 justify-end">
+        <button onClick={() => toast.dismiss(t.id)} className="px-3 py-1 text-sm border border-gray-300 rounded-lg hover:bg-gray-50">
+          Cancelar
+        </button>
+        <button
+          onClick={async () => {
+            toast.dismiss(t.id);
+            try {
+              await api.delete(`/reviews/${reviewId}`);
+              setReviews((prev) => prev.filter((r) => r.id !== reviewId));
+              toast.success('Reseña eliminada');
+            } catch (error) {
+              console.error('Error deleting review:', error);
+              toast.error('Error al eliminar la reseña.');
+            }
+          }}
+          className="px-3 py-1 text-sm bg-red-600 text-white rounded-lg hover:bg-red-700"
+        >
+          Eliminar
+        </button>
+      </div>
+    </div>
+  ), { duration: Infinity });
+};
 
   const getClubName = (idClub: number) => {
     const club = clubs.find((c) => String(c.id) === String(idClub));

@@ -4,6 +4,7 @@ import { useAuth } from '../../../../App';
 import api, { getResponseData } from '../../../../api/config';
 import { RiderProfile, Courier } from '../../../../types/delivery';
 import { Club } from '../../../../types/club';
+import toast from 'react-hot-toast';
 
 const VEHICLE_OPTIONS = ['Moto', 'Auto', 'Bicicleta', 'A_Pie'];
 
@@ -66,64 +67,81 @@ const ManageRidersPage: React.FC = () => {
   };
 
   const saveCouriers = async () => {
-    setSavingCouriers(true);
-    try {
-      await api.put(`/courier/by-club/${clubId}`, { courierIds: enabledCourierIds });
-      await fetchAll();
-      alert('Métodos de envío actualizados.');
-    } catch (err) {
-      console.error(err);
-      alert('No se pudieron guardar los métodos de envío.');
-    } finally {
-      setSavingCouriers(false);
-    }
-  };
+  setSavingCouriers(true);
+  try {
+    await api.put(`/courier/by-club/${clubId}`, { courierIds: enabledCourierIds });
+    await fetchAll();
+    toast.success('Métodos de envío actualizados.');
+  } catch (err) {
+    console.error(err);
+    toast.error('No se pudieron guardar los métodos de envío.');
+  } finally {
+    setSavingCouriers(false);
+  }
+};
 
-  const saveFee = async (courierId: number) => {
-    const value = feeEdits[courierId];
-    if (!value || isNaN(Number(value))) {
-      alert('Ingresá un costo válido');
-      return;
-    }
-    try {
-      await api.put(`/courier/by-club/${clubId}/fee/${courierId}`, { baseFee: Number(value) });
-      await fetchAll();
-      alert('Tarifa actualizada.');
-    } catch (err) {
-      console.error(err);
-      alert('No se pudo actualizar la tarifa.');
-    }
-  };
+const saveFee = async (courierId: number) => {
+  const value = feeEdits[courierId];
+  if (!value || isNaN(Number(value))) {
+    toast.error('Ingresá un costo válido');
+    return;
+  }
+  try {
+    await api.put(`/courier/by-club/${clubId}/fee/${courierId}`, { baseFee: Number(value) });
+    await fetchAll();
+    toast.success('Tarifa actualizada.');
+  } catch (err) {
+    console.error(err);
+    toast.error('No se pudo actualizar la tarifa.');
+  }
+};
 
-  const saveRider = async () => {
-    if (!editingRider) return;
-    try {
-      await api.put(`/rider-profile/${editingRider.id}`, {
-        vehicleType: editingRider.vehicleType,
-        licensePlate: editingRider.licensePlate,
-        availability: editingRider.availability,
-        zonesCovered: editingRider.zonesCovered,
-        isActive: editingRider.isActive,
-        costPerKm: editingRider.costPerKm ? Number(editingRider.costPerKm) : undefined,
-      });
-      await fetchAll();
-      setEditingRider(null);
-    } catch (err) {
-      console.error(err);
-      alert('No se pudo actualizar el rider.');
-    }
-  };
+const saveRider = async () => {
+  if (!editingRider) return;
+  try {
+    await api.put(`/rider-profile/${editingRider.id}`, {
+      vehicleType: editingRider.vehicleType,
+      licensePlate: editingRider.licensePlate,
+      availability: editingRider.availability,
+      zonesCovered: editingRider.zonesCovered,
+      isActive: editingRider.isActive,
+      costPerKm: editingRider.costPerKm ? Number(editingRider.costPerKm) : undefined,
+    });
+    await fetchAll();
+    setEditingRider(null);
+  } catch (err) {
+    console.error(err);
+    toast.error('No se pudo actualizar el rider.');
+  }
+};
 
-  const deactivateRider = async (riderId: number) => {
-    if (!window.confirm('¿Dar de baja a este rider?')) return;
-    try {
-      await api.put(`/rider-profile/${riderId}`, { isActive: false, availability: false });
-      setRiders((prev) => prev.map((r) => (r.id === riderId ? { ...r, isActive: false, availability: false } : r)));
-    } catch (err) {
-      console.error(err);
-      alert('No se pudo dar de baja al rider.');
-    }
-  };
+const deactivateRider = (riderId: number) => {
+  toast((t) => (
+    <div className="flex flex-col gap-3">
+      <p className="text-sm font-medium">¿Dar de baja a este rider?</p>
+      <div className="flex gap-2 justify-end">
+        <button onClick={() => toast.dismiss(t.id)} className="px-3 py-1 text-sm border border-gray-300 rounded-lg hover:bg-gray-50">
+          Cancelar
+        </button>
+        <button
+          onClick={async () => {
+            toast.dismiss(t.id);
+            try {
+              await api.put(`/rider-profile/${riderId}`, { isActive: false, availability: false });
+              setRiders((prev) => prev.map((r) => (r.id === riderId ? { ...r, isActive: false, availability: false } : r)));
+            } catch (err) {
+              console.error(err);
+              toast.error('No se pudo dar de baja al rider.');
+            }
+          }}
+          className="px-3 py-1 text-sm bg-red-600 text-white rounded-lg hover:bg-red-700"
+        >
+          Dar de baja
+        </button>
+      </div>
+    </div>
+  ), { duration: Infinity });
+};
 
   if (authLoading || loading) return <div className="text-center py-16 text-aurora-navy/60">Cargando...</div>;
   if (error || !club) return <div className="text-center py-16 text-red-600">{error || 'Club no encontrado.'}</div>;

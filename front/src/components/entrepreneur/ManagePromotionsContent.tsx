@@ -139,17 +139,34 @@ const ManagePromotionsContent: React.FC<ManagePromotionsContentProps> = ({ activ
     }
   };
 
-  const remove = async (id: number) => {
-    if (!window.confirm('¿Eliminar esta promoción permanentemente?')) return;
-    try {
-      await api.delete(`/promotions/${id}`);
-      toast.success('Promoción eliminada');
-      await fetchData();
-    } catch (err) {
-      console.error(err);
-      toast.error('Error al eliminar la promoción');
-    }
-  };
+  const remove = (id: number) => {
+  toast((t) => (
+    <div className="flex flex-col gap-3">
+      <p className="text-sm font-medium">¿Eliminar esta promoción permanentemente?</p>
+      <div className="flex gap-2 justify-end">
+        <button onClick={() => toast.dismiss(t.id)} className="px-3 py-1 text-sm border border-gray-300 rounded-lg hover:bg-gray-50">
+          Cancelar
+        </button>
+        <button
+          onClick={async () => {
+            toast.dismiss(t.id);
+            try {
+              await api.delete(`/promotions/${id}`);
+              toast.success('Promoción eliminada');
+              await fetchData();
+            } catch (err) {
+              console.error(err);
+              toast.error('Error al eliminar la promoción');
+            }
+          }}
+          className="px-3 py-1 text-sm bg-red-600 text-white rounded-lg hover:bg-red-700"
+        >
+          Eliminar
+        </button>
+      </div>
+    </div>
+  ), { duration: Infinity });
+};
 
   const filteredPromotions = useMemo(() => {
     return promotions.filter((p) => {

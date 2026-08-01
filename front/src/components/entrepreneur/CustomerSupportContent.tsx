@@ -228,16 +228,33 @@ const CustomerSupportContent: React.FC<CustomerSupportContentProps> = ({ activeS
   };
 
   const removeAutoReply = async (id: number) => {
-    if (!window.confirm('¿Eliminar esta regla de mensaje automático?')) return;
-    try {
-      await api.delete(`/support/auto-replies/${id}`);
-      toast.success('Regla eliminada');
-      await fetchAutoReplies();
-    } catch (err) {
-      console.error(err);
-      toast.error('Error al eliminar la regla');
-    }
-  };
+  toast((t) => (
+    <div className="flex flex-col gap-3">
+      <p className="text-sm font-medium">¿Eliminar esta regla de mensaje automático?</p>
+      <div className="flex gap-2 justify-end">
+        <button onClick={() => toast.dismiss(t.id)} className="px-3 py-1 text-sm border border-gray-300 rounded-lg hover:bg-gray-50">
+          Cancelar
+        </button>
+        <button
+          onClick={async () => {
+            toast.dismiss(t.id);
+            try {
+              await api.delete(`/support/auto-replies/${id}`);
+              toast.success('Regla eliminada');
+              await fetchAutoReplies();
+            } catch (err) {
+              console.error(err);
+              toast.error('Error al eliminar la regla');
+            }
+          }}
+          className="px-3 py-1 text-sm bg-red-600 text-white rounded-lg hover:bg-red-700"
+        >
+          Eliminar
+        </button>
+      </div>
+    </div>
+  ), { duration: Infinity });
+};
 
   if (activeSection === 'automaticos') {
     return (

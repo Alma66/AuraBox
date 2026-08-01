@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import api, { getResponseData } from '../../../../api/config';
 import { useAuth } from '../../../../App';
 import { SupplyOrderItem, ProductInventoryItem, SupplierItem, SupplyOrderStatus } from '../../../../types/inventory';
+import toast from 'react-hot-toast';
 
 const STATUS_LABELS: Record<SupplyOrderStatus, string> = {
   Pendiente: 'Pendiente',
@@ -75,48 +76,65 @@ const InventoryOrdersPage: React.FC = () => {
   );
 
   const createOrder = async () => {
-    if (!form.idSupplier || !form.idProductInventory || !form.quantity || !form.totalCost) {
-      alert('Completá proveedor, producto, cantidad y costo total');
-      return;
-    }
-    try {
-      await api.post('/inventory/orders', {
-        idClub,
-        idSupplier: Number(form.idSupplier),
-        idProductInventory: Number(form.idProductInventory),
-        quantity: Number(form.quantity),
-        totalCost: Number(form.totalCost),
-        estimatedArrival: form.estimatedArrival || undefined,
-        notes: form.notes || undefined,
-      });
-      setForm(emptyForm);
-      fetchAll();
-    } catch (err) {
-      console.error(err);
-      alert('Error al crear el pedido');
-    }
-  };
+  if (!form.idSupplier || !form.idProductInventory || !form.quantity || !form.totalCost) {
+    toast.error('Completá proveedor, producto, cantidad y costo total');
+    return;
+  }
+  try {
+    await api.post('/inventory/orders', {
+      idClub,
+      idSupplier: Number(form.idSupplier),
+      idProductInventory: Number(form.idProductInventory),
+      quantity: Number(form.quantity),
+      totalCost: Number(form.totalCost),
+      estimatedArrival: form.estimatedArrival || undefined,
+      notes: form.notes || undefined,
+    });
+    setForm(emptyForm);
+    fetchAll();
+  } catch (err) {
+    console.error(err);
+    toast.error('Error al crear el pedido');
+  }
+};
 
-  const updateStatus = async (id: number, status: SupplyOrderStatus) => {
-    try {
-      await api.put(`/inventory/orders/${id}`, { status });
-      fetchAll();
-    } catch (err) {
-      console.error(err);
-      alert('Error al actualizar el pedido');
-    }
-  };
+const updateStatus = async (id: number, status: SupplyOrderStatus) => {
+  try {
+    await api.put(`/inventory/orders/${id}`, { status });
+    fetchAll();
+  } catch (err) {
+    console.error(err);
+    toast.error('Error al actualizar el pedido');
+  }
+};
 
-  const removeOrder = async (id: number) => {
-    if (!window.confirm('¿Eliminar este pedido?')) return;
-    try {
-      await api.delete(`/inventory/orders/${id}`);
-      fetchAll();
-    } catch (err) {
-      console.error(err);
-      alert('Error al eliminar el pedido');
-    }
-  };
+const removeOrder = (id: number) => {
+  toast((t) => (
+    <div className="flex flex-col gap-3">
+      <p className="text-sm font-medium">¿Eliminar este pedido?</p>
+      <div className="flex gap-2 justify-end">
+        <button onClick={() => toast.dismiss(t.id)} className="px-3 py-1 text-sm border border-gray-300 rounded-lg hover:bg-gray-50">
+          Cancelar
+        </button>
+        <button
+          onClick={async () => {
+            toast.dismiss(t.id);
+            try {
+              await api.delete(`/inventory/orders/${id}`);
+              fetchAll();
+            } catch (err) {
+              console.error(err);
+              toast.error('Error al eliminar el pedido');
+            }
+          }}
+          className="px-3 py-1 text-sm bg-red-600 text-white rounded-lg hover:bg-red-700"
+        >
+          Eliminar
+        </button>
+      </div>
+    </div>
+  ), { duration: Infinity });
+};
 
   const filtered = useMemo(() => {
     return orders.filter((o) => {

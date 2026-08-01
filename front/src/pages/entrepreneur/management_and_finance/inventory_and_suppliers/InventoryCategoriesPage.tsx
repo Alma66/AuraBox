@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import api, { getResponseData } from '../../../../api/config';
 import { useAuth } from '../../../../App';
 import { SupplyCategory, SupplierItem, ProductInventoryItem } from '../../../../types/inventory';
+import toast from 'react-hot-toast';
 
 const InventoryCategoriesPage: React.FC = () => {
   const { user, userRole, loading: authLoading } = useAuth();
@@ -54,40 +55,57 @@ const InventoryCategoriesPage: React.FC = () => {
   };
 
   const handleSubmit = async () => {
-    if (!name.trim()) {
-      alert('El nombre de la categoría es obligatorio');
-      return;
+  if (!name.trim()) {
+    toast.error('El nombre de la categoría es obligatorio');
+    return;
+  }
+  try {
+    if (editingId) {
+      await api.put(`/inventory/categories/${editingId}`, { name, description: description || undefined });
+    } else {
+      await api.post('/inventory/categories', { idClub, name, description: description || undefined });
     }
-    try {
-      if (editingId) {
-        await api.put(`/inventory/categories/${editingId}`, { name, description: description || undefined });
-      } else {
-        await api.post('/inventory/categories', { idClub, name, description: description || undefined });
-      }
-      resetForm();
-      fetchAll();
-    } catch (err) {
-      console.error(err);
-      alert('Error al guardar la categoría');
-    }
-  };
+    resetForm();
+    fetchAll();
+  } catch (err) {
+    console.error(err);
+    toast.error('Error al guardar la categoría');
+  }
+};
+
+const removeCategory = (id: number) => {
+  toast((t) => (
+    <div className="flex flex-col gap-3">
+      <p className="text-sm font-medium">¿Eliminar esta categoría?</p>
+      <div className="flex gap-2 justify-end">
+        <button onClick={() => toast.dismiss(t.id)} className="px-3 py-1 text-sm border border-gray-300 rounded-lg hover:bg-gray-50">
+          Cancelar
+        </button>
+        <button
+          onClick={async () => {
+            toast.dismiss(t.id);
+            try {
+              await api.delete(`/inventory/categories/${id}`);
+              fetchAll();
+            } catch (err: any) {
+              console.error(err);
+              toast.error(err?.response?.data?.message ?? 'Error al eliminar la categoría');
+            }
+          }}
+          className="px-3 py-1 text-sm bg-red-600 text-white rounded-lg hover:bg-red-700"
+        >
+          Eliminar
+        </button>
+      </div>
+    </div>
+  ), { duration: Infinity });
+};
 
   const loadForEdit = (cat: SupplyCategory) => {
     setName(cat.name);
     setDescription(cat.description ?? '');
     setEditingId(cat.id);
     window.scrollTo({ top: 0, behavior: 'smooth' });
-  };
-
-  const removeCategory = async (id: number) => {
-    if (!window.confirm('¿Eliminar esta categoría?')) return;
-    try {
-      await api.delete(`/inventory/categories/${id}`);
-      fetchAll();
-    } catch (err: any) {
-      console.error(err);
-      alert(err?.response?.data?.message ?? 'Error al eliminar la categoría');
-    }
   };
 
   const productsCount = useCallback(

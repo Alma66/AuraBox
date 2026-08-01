@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import EditProfileField from './EditProfileField';
 import api from '../../api/config';
 import { useAuth } from '../../App';
-
+import toast from 'react-hot-toast';
 interface SecuritySectionProps {
   showGenderPublicly: boolean;
   onGenderVisibilityChange: (value: boolean) => void;
@@ -91,21 +91,36 @@ const SecuritySection: React.FC<SecuritySectionProps> = ({ showGenderPublicly, o
     }
   };
 
-  const handleRequestAccountDeletion = async () => {
-    if (!window.confirm('¿Estás seguro de que querés desactivar tu cuenta? Vas a perder el acceso hasta que te pongas en contacto con soporte.')) {
-      return;
-    }
-    try {
-      await api.patch(updateEndpoint, { active: false });
-      setDeletionSuccess('Tu cuenta fue desactivada. Cerrando sesión...');
-      setTimeout(() => {
-        localStorage.removeItem('access_token');
-        window.location.href = '/login';
-      }, 2000);
-    } catch {
-      setDeletionError('No se pudo procesar la solicitud. Intentá de nuevo más tarde.');
-    }
-  };
+  const handleRequestAccountDeletion = () => {
+  toast((t) => (
+    <div className="flex flex-col gap-3">
+      <p className="text-sm font-medium">¿Estás seguro de que querés desactivar tu cuenta? Vas a perder el acceso hasta que te pongas en contacto con soporte.</p>
+      <div className="flex gap-2 justify-end">
+        <button onClick={() => toast.dismiss(t.id)} className="px-3 py-1 text-sm border border-gray-300 rounded-lg hover:bg-gray-50">
+          Cancelar
+        </button>
+        <button
+          onClick={async () => {
+            toast.dismiss(t.id);
+            try {
+              await api.patch(updateEndpoint, { active: false });
+              setDeletionSuccess('Tu cuenta fue desactivada. Cerrando sesión...');
+              setTimeout(() => {
+                localStorage.removeItem('access_token');
+                window.location.href = '/login';
+              }, 2000);
+            } catch {
+              setDeletionError('No se pudo procesar la solicitud. Intentá de nuevo más tarde.');
+            }
+          }}
+          className="px-3 py-1 text-sm bg-red-600 text-white rounded-lg hover:bg-red-700"
+        >
+          Desactivar
+        </button>
+      </div>
+    </div>
+  ), { duration: Infinity });
+};
 
   return (
     <div className="space-y-6">

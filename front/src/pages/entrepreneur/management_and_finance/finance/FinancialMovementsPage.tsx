@@ -109,18 +109,35 @@ const FinancialMovementsPage: React.FC = () => {
     }
   };
 
-  const deleteEntry = async (movementId: string) => {
-    if (!movementId.startsWith('manual-')) return;
-    if (!window.confirm('¿Eliminar este movimiento?')) return;
-    try {
-      await api.delete(`/finance/entries/${movementId.replace('manual-', '')}`);
-      toast.success('Movimiento eliminado');
-      await fetchData();
-    } catch (err) {
-      console.error(err);
-      toast.error('Error al eliminar el movimiento');
-    }
-  };
+  const deleteEntry = (movementId: string) => {
+  if (!movementId.startsWith('manual-')) return;
+  toast((t) => (
+    <div className="flex flex-col gap-3">
+      <p className="text-sm font-medium">¿Eliminar este movimiento?</p>
+      <div className="flex gap-2 justify-end">
+        <button onClick={() => toast.dismiss(t.id)} className="px-3 py-1 text-sm border border-gray-300 rounded-lg hover:bg-gray-50">
+          Cancelar
+        </button>
+        <button
+          onClick={async () => {
+            toast.dismiss(t.id);
+            try {
+              await api.delete(`/finance/entries/${movementId.replace('manual-', '')}`);
+              toast.success('Movimiento eliminado');
+              await fetchData();
+            } catch (err) {
+              console.error(err);
+              toast.error('Error al eliminar el movimiento');
+            }
+          }}
+          className="px-3 py-1 text-sm bg-red-600 text-white rounded-lg hover:bg-red-700"
+        >
+          Eliminar
+        </button>
+      </div>
+    </div>
+  ), { duration: Infinity });
+};
 
   const exportCsv = () => {
     const header = ['Fecha', 'Descripción', 'Categoría', 'Tipo', 'Monto', 'Estado'];

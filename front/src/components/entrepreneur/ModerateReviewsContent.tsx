@@ -112,16 +112,33 @@ const ModerateReviewsContent: React.FC<ModerateReviewsContentProps> = ({ activeS
   };
 
   const deleteReview = async (id: number) => {
-    if (!window.confirm('¿Eliminar esta reseña permanentemente?')) return;
-    try {
-      await api.delete(`/reviews/${id}`);
-      toast.success('Reseña eliminada');
-      await fetchAll();
-    } catch (err) {
-      console.error(err);
-      toast.error('Error al eliminar la reseña');
-    }
-  };
+  toast((t) => (
+    <div className="flex flex-col gap-3">
+      <p className="text-sm font-medium">¿Eliminar esta reseña permanentemente?</p>
+      <div className="flex gap-2 justify-end">
+        <button onClick={() => toast.dismiss(t.id)} className="px-3 py-1 text-sm border border-gray-300 rounded-lg hover:bg-gray-50">
+          Cancelar
+        </button>
+        <button
+          onClick={async () => {
+            toast.dismiss(t.id);
+            try {
+              await api.delete(`/reviews/${id}`);
+              toast.success('Reseña eliminada');
+              await fetchAll();
+            } catch (err) {
+              console.error(err);
+              toast.error('Error al eliminar la reseña');
+            }
+          }}
+          className="px-3 py-1 text-sm bg-red-600 text-white rounded-lg hover:bg-red-700"
+        >
+          Eliminar
+        </button>
+      </div>
+    </div>
+  ), { duration: Infinity });
+};
 
   const addForbiddenWord = async () => {
     if (!newWord.trim()) return;
@@ -147,16 +164,33 @@ const ModerateReviewsContent: React.FC<ModerateReviewsContentProps> = ({ activeS
   };
 
   const removeWord = async (id: number) => {
-    if (!window.confirm('¿Eliminar esta palabra del filtro?')) return;
-    try {
-      await api.delete(`/reviews/forbidden-words/${id}`);
-      toast.success('Palabra eliminada');
-      await fetchAll();
-    } catch (err) {
-      console.error(err);
-      toast.error('Error al eliminar la palabra');
-    }
-  };
+  toast((t) => (
+    <div className="flex flex-col gap-3">
+      <p className="text-sm font-medium">¿Eliminar esta palabra del filtro?</p>
+      <div className="flex gap-2 justify-end">
+        <button onClick={() => toast.dismiss(t.id)} className="px-3 py-1 text-sm border border-gray-300 rounded-lg hover:bg-gray-50">
+          Cancelar
+        </button>
+        <button
+          onClick={async () => {
+            toast.dismiss(t.id);
+            try {
+              await api.delete(`/reviews/forbidden-words/${id}`);
+              toast.success('Palabra eliminada');
+              await fetchAll();
+            } catch (err) {
+              console.error(err);
+              toast.error('Error al eliminar la palabra');
+            }
+          }}
+          className="px-3 py-1 text-sm bg-red-600 text-white rounded-lg hover:bg-red-700"
+        >
+          Eliminar
+        </button>
+      </div>
+    </div>
+  ), { duration: Infinity });
+};
 
   const FiltersBar = () => (
     <div className="flex flex-wrap gap-3 mb-6">

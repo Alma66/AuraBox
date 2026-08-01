@@ -6,6 +6,7 @@ import SalesReportsSidebar from '../../../../components/entrepreneur/SalesReport
 import SalesReportsContent from '../../../../components/entrepreneur/SalesReportsContent';
 import { SalesReportData } from '../../../../types/analystics';
 import { Club } from '../../../../types/club';
+import toast from 'react-hot-toast';
 
 type SalesSection = 'resumen' | 'graficos' | 'pagos' | 'metodos' | 'proyecciones';
 
@@ -82,7 +83,7 @@ const SalesReportsPage: React.FC = () => {
       a.click();
       URL.revokeObjectURL(url);
     } catch {
-      alert('Error al exportar el CSV');
+      toast.error('Error al exportar el CSV');
     }
   };
 

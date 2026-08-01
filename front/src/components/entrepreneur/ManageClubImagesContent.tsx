@@ -121,30 +121,64 @@ const ManageClubImagesContent: React.FC<ManageClubImagesContentProps> = ({ activ
     setSelectedIds((prev) => (prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]));
   };
 
-  const deleteSelected = async () => {
-    if (selectedIds.length === 0) return;
-    if (!window.confirm(`¿Eliminar ${selectedIds.length} imagen(es) seleccionada(s)? Esta acción no se puede deshacer.`)) return;
-    try {
-      await api.delete('/image-club/bulk', { data: { ids: selectedIds } });
-      toast.success('Imágenes eliminadas');
-      await fetchImages();
-    } catch (err) {
-      console.error(err);
-      toast.error('Error al eliminar las imágenes');
-    }
-  };
+ const deleteSelected = () => {
+  if (selectedIds.length === 0) return;
+  toast((t) => (
+    <div className="flex flex-col gap-3">
+      <p className="text-sm font-medium">¿Eliminar {selectedIds.length} imagen(es) seleccionada(s)? Esta acción no se puede deshacer.</p>
+      <div className="flex gap-2 justify-end">
+        <button onClick={() => toast.dismiss(t.id)} className="px-3 py-1 text-sm border border-gray-300 rounded-lg hover:bg-gray-50">
+          Cancelar
+        </button>
+        <button
+          onClick={async () => {
+            toast.dismiss(t.id);
+            try {
+              await api.delete('/image-club/bulk', { data: { ids: selectedIds } });
+              toast.success('Imágenes eliminadas');
+              await fetchImages();
+            } catch (err) {
+              console.error(err);
+              toast.error('Error al eliminar las imágenes');
+            }
+          }}
+          className="px-3 py-1 text-sm bg-red-600 text-white rounded-lg hover:bg-red-700"
+        >
+          Eliminar
+        </button>
+      </div>
+    </div>
+  ), { duration: Infinity });
+};
 
-  const deleteOne = async (id: number) => {
-    if (!window.confirm('¿Eliminar esta imagen?')) return;
-    try {
-      await api.delete(`/image-club/${id}`);
-      toast.success('Imagen eliminada');
-      await fetchImages();
-    } catch (err) {
-      console.error(err);
-      toast.error('Error al eliminar la imagen');
-    }
-  };
+const deleteOne = (id: number) => {
+  toast((t) => (
+    <div className="flex flex-col gap-3">
+      <p className="text-sm font-medium">¿Eliminar esta imagen?</p>
+      <div className="flex gap-2 justify-end">
+        <button onClick={() => toast.dismiss(t.id)} className="px-3 py-1 text-sm border border-gray-300 rounded-lg hover:bg-gray-50">
+          Cancelar
+        </button>
+        <button
+          onClick={async () => {
+            toast.dismiss(t.id);
+            try {
+              await api.delete(`/image-club/${id}`);
+              toast.success('Imagen eliminada');
+              await fetchImages();
+            } catch (err) {
+              console.error(err);
+              toast.error('Error al eliminar la imagen');
+            }
+          }}
+          className="px-3 py-1 text-sm bg-red-600 text-white rounded-lg hover:bg-red-700"
+        >
+          Eliminar
+        </button>
+      </div>
+    </div>
+  ), { duration: Infinity });
+};
 
   const entrepreneurName = (uploadedBy?: number | null) => {
     if (!uploadedBy) return 'Desconocido';

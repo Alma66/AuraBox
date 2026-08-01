@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import api, { getResponseData } from '../../../../api/config';
 import { useAuth } from '../../../../App';
 import { SupplyCategory, SupplierItem, ProductInventoryItem } from '../../../../types/inventory';
+import toast from 'react-hot-toast';
 
 const UNIT_OPTIONS = ['unidad', 'kg', 'gramos', 'litro', 'ml', 'paquete', 'metro', 'cm'];
 
@@ -70,34 +71,62 @@ const InventoryStockPage: React.FC = () => {
   };
 
   const handleSubmit = async () => {
-    if (!form.name.trim() || !form.idSupplyCategory) {
-      alert('Nombre y categoría son obligatorios');
-      return;
-    }
-    const payload = {
-      idClub,
-      idSupplyCategory: Number(form.idSupplyCategory),
-      idSupplier: form.idSupplier ? Number(form.idSupplier) : undefined,
-      name: form.name,
-      description: form.description || undefined,
-      unitType: form.unitType,
-      currentStock: Number(form.currentStock),
-      minStock: Number(form.minStock),
-      costPerUnit: Number(form.costPerUnit),
-    };
-    try {
-      if (editingId) {
-        await api.put(`/inventory/products/${editingId}`, payload);
-      } else {
-        await api.post('/inventory/products', payload);
-      }
-      resetForm();
-      fetchAll();
-    } catch (err) {
-      console.error(err);
-      alert('Error al guardar el producto');
-    }
+  if (!form.name.trim() || !form.idSupplyCategory) {
+    toast.error('Nombre y categoría son obligatorios');
+    return;
+  }
+  const payload = {
+    idClub,
+    idSupplyCategory: Number(form.idSupplyCategory),
+    idSupplier: form.idSupplier ? Number(form.idSupplier) : undefined,
+    name: form.name,
+    description: form.description || undefined,
+    unitType: form.unitType,
+    currentStock: Number(form.currentStock),
+    minStock: Number(form.minStock),
+    costPerUnit: Number(form.costPerUnit),
   };
+  try {
+    if (editingId) {
+      await api.put(`/inventory/products/${editingId}`, payload);
+    } else {
+      await api.post('/inventory/products', payload);
+    }
+    resetForm();
+    fetchAll();
+  } catch (err) {
+    console.error(err);
+    toast.error('Error al guardar el producto');
+  }
+};
+
+const removeProduct = (id: number) => {
+  toast((t) => (
+    <div className="flex flex-col gap-3">
+      <p className="text-sm font-medium">¿Eliminar este insumo del inventario?</p>
+      <div className="flex gap-2 justify-end">
+        <button onClick={() => toast.dismiss(t.id)} className="px-3 py-1 text-sm border border-gray-300 rounded-lg hover:bg-gray-50">
+          Cancelar
+        </button>
+        <button
+          onClick={async () => {
+            toast.dismiss(t.id);
+            try {
+              await api.delete(`/inventory/products/${id}`);
+              fetchAll();
+            } catch (err: any) {
+              console.error(err);
+              toast.error(err?.response?.data?.message ?? 'Error al eliminar el insumo');
+            }
+          }}
+          className="px-3 py-1 text-sm bg-red-600 text-white rounded-lg hover:bg-red-700"
+        >
+          Eliminar
+        </button>
+      </div>
+    </div>
+  ), { duration: Infinity });
+};
 
   const loadForEdit = (p: ProductInventoryItem) => {
     setForm({
@@ -114,16 +143,6 @@ const InventoryStockPage: React.FC = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  const removeProduct = async (id: number) => {
-    if (!window.confirm('¿Eliminar este insumo del inventario?')) return;
-    try {
-      await api.delete(`/inventory/products/${id}`);
-      fetchAll();
-    } catch (err: any) {
-      console.error(err);
-      alert(err?.response?.data?.message ?? 'Error al eliminar el insumo');
-    }
-  };
 
   const categoryName = (id: number) => categories.find((c) => c.id === id)?.name ?? 'Sin categoría';
   const supplierName = (id?: number | null) => suppliers.find((s) => s.id === id)?.name ?? '—';
