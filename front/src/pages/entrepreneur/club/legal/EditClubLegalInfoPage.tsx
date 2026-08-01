@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import toast from 'react-hot-toast';
 import api, { getResponseData } from '../../../../api/config';
 import { useAuth } from '../../../../App';
 import { LegalSection } from '../../../../types/legalSection';
@@ -46,19 +47,19 @@ const SectionEditor: React.FC<SectionEditorProps> = ({ sections, onChange }) => 
   return (
     <div className="space-y-4">
       {sections.map((section, index) => (
-        <div key={section.id} className="border border-gray-200 rounded-xl p-4 bg-gray-50">
+        <div key={section.id} className="border border-aurora-navy/10 rounded-xl p-4 bg-aurora-cream">
           <div className="flex items-center justify-between mb-3">
-            <span className="text-xs font-semibold uppercase tracking-wide text-gray-500">
+            <span className="text-xs font-semibold uppercase tracking-wide text-aurora-navy/50">
               {section.type === 'title' && 'Título'}
               {section.type === 'paragraph' && 'Párrafo'}
               {section.type === 'list' && 'Lista'}
               {section.type === 'image' && 'Imagen (URL)'}
             </span>
             <div className="flex gap-2">
-              <button type="button" onClick={() => moveSection(index, -1)} disabled={index === 0} className="text-gray-400 hover:text-gray-700 disabled:opacity-30">
+              <button type="button" onClick={() => moveSection(index, -1)} disabled={index === 0} className="text-aurora-navy/40 hover:text-aurora-navy disabled:opacity-30">
                 ↑
               </button>
-              <button type="button" onClick={() => moveSection(index, 1)} disabled={index === sections.length - 1} className="text-gray-400 hover:text-gray-700 disabled:opacity-30">
+              <button type="button" onClick={() => moveSection(index, 1)} disabled={index === sections.length - 1} className="text-aurora-navy/40 hover:text-aurora-navy disabled:opacity-30">
                 ↓
               </button>
               <button type="button" onClick={() => removeSection(index)} className="text-red-400 hover:text-red-600">
@@ -68,7 +69,7 @@ const SectionEditor: React.FC<SectionEditorProps> = ({ sections, onChange }) => 
           </div>
           {section.type === 'list' ? (
             <textarea
-              className="w-full border border-gray-200 rounded-lg p-3 text-sm h-28 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full border border-aurora-navy/15 rounded-lg p-3 text-sm h-28 focus:outline-none focus:ring-2 focus:ring-aurora-terracotta/40 bg-white"
               placeholder="Un ítem por línea"
               value={(section.content as string[]).join('\n')}
               onChange={(e) => updateSection(index, { content: e.target.value.split('\n') })}
@@ -76,7 +77,7 @@ const SectionEditor: React.FC<SectionEditorProps> = ({ sections, onChange }) => 
           ) : section.type === 'title' ? (
             <input
               type="text"
-              className="w-full border border-gray-200 rounded-lg p-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full border border-aurora-navy/15 rounded-lg p-3 text-sm focus:outline-none focus:ring-2 focus:ring-aurora-terracotta/40 bg-white"
               placeholder="Texto del título"
               value={section.content as string}
               onChange={(e) => updateSection(index, { content: e.target.value })}
@@ -84,14 +85,14 @@ const SectionEditor: React.FC<SectionEditorProps> = ({ sections, onChange }) => 
           ) : section.type === 'image' ? (
             <input
               type="url"
-              className="w-full border border-gray-200 rounded-lg p-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full border border-aurora-navy/15 rounded-lg p-3 text-sm focus:outline-none focus:ring-2 focus:ring-aurora-terracotta/40 bg-white"
               placeholder="https://..."
               value={section.content as string}
               onChange={(e) => updateSection(index, { content: e.target.value })}
             />
           ) : (
             <textarea
-              className="w-full border border-gray-200 rounded-lg p-3 text-sm h-28 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full border border-aurora-navy/15 rounded-lg p-3 text-sm h-28 focus:outline-none focus:ring-2 focus:ring-aurora-terracotta/40 bg-white"
               placeholder="Texto del párrafo"
               value={section.content as string}
               onChange={(e) => updateSection(index, { content: e.target.value })}
@@ -100,16 +101,16 @@ const SectionEditor: React.FC<SectionEditorProps> = ({ sections, onChange }) => 
         </div>
       ))}
       <div className="flex flex-wrap gap-2">
-        <button type="button" onClick={() => addSection('title')} className="text-sm bg-white border border-gray-300 px-3 py-1.5 rounded-lg hover:bg-gray-100">
+        <button type="button" onClick={() => addSection('title')} className="text-sm bg-white border border-aurora-navy/20 text-aurora-navy px-3 py-1.5 rounded-lg hover:bg-aurora-cream transition">
           + Título
         </button>
-        <button type="button" onClick={() => addSection('paragraph')} className="text-sm bg-white border border-gray-300 px-3 py-1.5 rounded-lg hover:bg-gray-100">
+        <button type="button" onClick={() => addSection('paragraph')} className="text-sm bg-white border border-aurora-navy/20 text-aurora-navy px-3 py-1.5 rounded-lg hover:bg-aurora-cream transition">
           + Párrafo
         </button>
-        <button type="button" onClick={() => addSection('list')} className="text-sm bg-white border border-gray-300 px-3 py-1.5 rounded-lg hover:bg-gray-100">
+        <button type="button" onClick={() => addSection('list')} className="text-sm bg-white border border-aurora-navy/20 text-aurora-navy px-3 py-1.5 rounded-lg hover:bg-aurora-cream transition">
           + Lista
         </button>
-        <button type="button" onClick={() => addSection('image')} className="text-sm bg-white border border-gray-300 px-3 py-1.5 rounded-lg hover:bg-gray-100">
+        <button type="button" onClick={() => addSection('image')} className="text-sm bg-white border border-aurora-navy/20 text-aurora-navy px-3 py-1.5 rounded-lg hover:bg-aurora-cream transition">
           + Imagen
         </button>
       </div>
@@ -124,24 +125,24 @@ interface PreviewModalProps {
 }
 
 const PreviewModal: React.FC<PreviewModalProps> = ({ title, sections, onClose }) => (
-  <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50 p-4">
+  <div className="fixed inset-0 bg-aurora-navyDark/60 flex items-center justify-center z-50 p-4">
     <div className="bg-white rounded-xl shadow-2xl max-w-3xl w-full max-h-[85vh] overflow-y-auto p-8 relative">
       <button
         onClick={onClose}
-        className="absolute top-4 right-4 text-gray-500 hover:text-gray-800 text-2xl leading-none"
+        className="absolute top-4 right-4 text-aurora-navy/40 hover:text-aurora-navy text-2xl leading-none"
       >
         &times;
       </button>
-      <h2 className="text-2xl font-bold text-gray-900 mb-6 text-center">{title}</h2>
+      <h2 className="font-display text-2xl font-bold text-aurora-navy mb-6 text-center">{title}</h2>
       {sections.length > 0 ? (
         <LegalContentRenderer sections={sections} />
       ) : (
-        <p className="text-gray-600 text-center">Todavía no agregaste contenido para mostrar en la vista previa.</p>
+        <p className="text-aurora-navy/50 text-center">Todavía no agregaste contenido para mostrar en la vista previa.</p>
       )}
       <div className="flex justify-center mt-8">
         <button
           onClick={onClose}
-          className="bg-gray-200 text-gray-800 px-6 py-2 rounded-lg font-semibold hover:bg-gray-300 transition-colors duration-200"
+          className="btn-outline"
         >
           Cerrar Vista Previa
         </button>
@@ -159,8 +160,7 @@ const EditClubLegalInfoPage: React.FC = () => {
   const [policySections, setPolicySections] = useState<LegalSection[]>([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [success, setSuccess] = useState<string | null>(null);
+  const [fetchError, setFetchError] = useState<string | null>(null);
   const [showPreview, setShowPreview] = useState(false);
 
   useEffect(() => {
@@ -176,7 +176,7 @@ const EditClubLegalInfoPage: React.FC = () => {
         setPolicySections(data.privacyAndSecurityPolicy ?? []);
       } catch (err) {
         console.error('Error fetching legal content:', err);
-        setError('No se pudo cargar la información legal.');
+        setFetchError('No se pudo cargar la información legal.');
       } finally {
         setLoading(false);
       }
@@ -187,72 +187,75 @@ const EditClubLegalInfoPage: React.FC = () => {
   const handleSave = async () => {
     if (!clubId) return;
     setSaving(true);
-    setError(null);
-    setSuccess(null);
     try {
       await api.put(`/club-legal-content/by-club/${clubId}`, {
         termsAndConditions: termsSections,
         privacyAndSecurityPolicy: policySections,
       });
-      setSuccess('Información legal actualizada con éxito.');
+      toast.success('Información legal actualizada con éxito.');
     } catch (err) {
       console.error('Error saving legal content:', err);
-      setError('Error al guardar la información legal.');
+      toast.error('Error al guardar la información legal.');
     } finally {
       setSaving(false);
     }
   };
 
   if (loading) {
-    return <div className="container mx-auto px-4 py-8 text-center">Cargando editor...</div>;
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-aurora-cream">
+        <div className="animate-spin rounded-full h-10 w-10 border-4 border-aurora-navy/15 border-t-aurora-terracotta" />
+      </div>
+    );
+  }
+
+  if (fetchError) {
+    return (
+      <div className="min-h-screen bg-aurora-cream flex flex-col items-center justify-center text-center gap-3 px-4">
+        <p className="text-red-500 font-medium">{fetchError}</p>
+        <button onClick={() => navigate(`/club/${clubId}`)} className="text-sm text-aurora-terracotta hover:underline">
+          Volver al club
+        </button>
+      </div>
+    );
   }
 
   const currentSections = activeTab === 'terms' ? termsSections : policySections;
   const previewTitle = activeTab === 'terms' ? 'Términos y Condiciones' : 'Política de Seguridad y Devolución';
 
   return (
-    <div className="container mx-auto px-4 py-8 min-h-screen">
+    <div className="container mx-auto px-4 py-8 min-h-screen bg-aurora-cream">
       <button
         onClick={() => navigate(`/club/${clubId}`)}
-        className="mb-6 flex items-center text-blue-600 hover:text-blue-800 transition-colors duration-200"
+        className="mb-6 flex items-center text-aurora-navy hover:text-aurora-terracotta transition-colors duration-200 text-sm font-medium"
       >
         ← Volver al Perfil del Club
       </button>
-      <div className="bg-white rounded-xl shadow-lg p-8 mb-8">
-        <h1 className="text-3xl font-bold text-gray-800 mb-1 text-center">
+      <div className="card-surface p-8 mb-8">
+        <h1 className="font-display text-3xl font-bold text-aurora-navy mb-1 text-center">
           Editar {activeTab === 'terms' ? 'Términos y Condiciones' : 'Política de Seguridad y Devolución'}
         </h1>
-        <p className="text-gray-500 text-sm text-center mb-6">
+        <p className="text-aurora-navy/50 text-sm text-center mb-6">
           Ambos documentos se editan desde esta misma página, cambiando de pestaña.
         </p>
-        {success && (
-          <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative mb-4">
-            {success}
-          </div>
-        )}
-        {error && (
-          <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4">
-            {error}
-          </div>
-        )}
-        <div className="flex flex-wrap items-center justify-between gap-4 mb-6 border-b border-gray-200">
+        <div className="flex flex-wrap items-center justify-between gap-4 mb-6 border-b border-aurora-navy/10">
           <div className="flex gap-2">
             <button
               onClick={() => setActiveTab('terms')}
-              className={`px-4 py-2 text-sm font-semibold border-b-2 transition-colors ${activeTab === 'terms' ? 'border-blue-600 text-blue-600' : 'border-transparent text-gray-500 hover:text-gray-700'}`}
+              className={`px-4 py-2 text-sm font-semibold border-b-2 transition-colors ${activeTab === 'terms' ? 'border-aurora-terracotta text-aurora-terracotta' : 'border-transparent text-aurora-navy/50 hover:text-aurora-navy'}`}
             >
               Términos y Condiciones
             </button>
             <button
               onClick={() => setActiveTab('privacy')}
-              className={`px-4 py-2 text-sm font-semibold border-b-2 transition-colors ${activeTab === 'privacy' ? 'border-blue-600 text-blue-600' : 'border-transparent text-gray-500 hover:text-gray-700'}`}
+              className={`px-4 py-2 text-sm font-semibold border-b-2 transition-colors ${activeTab === 'privacy' ? 'border-aurora-terracotta text-aurora-terracotta' : 'border-transparent text-aurora-navy/50 hover:text-aurora-navy'}`}
             >
               Política de Seguridad y Devolución
             </button>
           </div>
           <button
             onClick={() => setShowPreview(true)}
-            className="text-sm font-semibold text-blue-600 hover:text-blue-800 flex items-center gap-1 pb-2"
+            className="text-sm font-semibold text-aurora-navy hover:text-aurora-terracotta flex items-center gap-1 pb-2"
           >
             👁 Vista Previa
           </button>
@@ -266,7 +269,7 @@ const EditClubLegalInfoPage: React.FC = () => {
           <button
             onClick={handleSave}
             disabled={saving}
-            className={`bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded-lg transition-colors duration-200 ${saving ? 'opacity-50 cursor-not-allowed' : ''}`}
+            className="btn-primary"
           >
             {saving ? 'Guardando...' : 'Guardar Cambios'}
           </button>

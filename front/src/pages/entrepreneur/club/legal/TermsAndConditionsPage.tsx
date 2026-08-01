@@ -32,15 +32,19 @@ const TermsAndConditionsPage: React.FC = () => {
   }, [clubId]);
 
   if (loading) {
-    return <div className="text-center py-20">Cargando términos...</div>;
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-aurora-cream">
+        <div className="animate-spin rounded-full h-10 w-10 border-4 border-aurora-navy/15 border-t-aurora-terracotta" />
+      </div>
+    );
   }
 
   if (notFound) {
     return (
-      <div className="container mx-auto px-4 py-8 text-center">
-        <h1 className="text-4xl font-bold text-red-600 mb-4">Club no encontrado</h1>
-        <p className="text-lg text-gray-700 mb-8">No se pudieron cargar los términos y condiciones.</p>
-        <button onClick={() => navigate('/')} className="bg-blue-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-700">
+      <div className="container mx-auto px-4 py-8 text-center min-h-screen bg-aurora-cream">
+        <h1 className="font-display text-4xl font-bold text-red-500 mb-4">Club no encontrado</h1>
+        <p className="text-lg text-aurora-navy/60 mb-8">No se pudieron cargar los términos y condiciones.</p>
+        <button onClick={() => navigate('/')} className="btn-primary">
           Volver al inicio
         </button>
       </div>
@@ -48,15 +52,15 @@ const TermsAndConditionsPage: React.FC = () => {
   }
 
   return (
-    <div className="container mx-auto px-4 py-8 min-h-screen">
-      <button onClick={() => navigate(-1)} className="mb-6 flex items-center text-blue-600 hover:text-blue-800">
+    <div className="container mx-auto px-4 py-8 min-h-screen bg-aurora-cream">
+      <button onClick={() => navigate(-1)} className="mb-6 flex items-center text-aurora-navy hover:text-aurora-terracotta transition-colors duration-200 text-sm font-medium">
         &larr; Volver al Club
       </button>
-      <h1 className="text-2xl font-bold text-gray-900 mb-6 text-center">Términos y Condiciones de {clubName}</h1>
+      <h1 className="font-display text-2xl font-bold text-aurora-navy mb-6 text-center">Términos y Condiciones de {clubName}</h1>
       {sections.length > 0 ? (
         <LegalContentRenderer sections={sections} />
       ) : (
-        <p className="text-gray-600 text-center">Este club aún no ha proporcionado sus términos y condiciones.</p>
+        <p className="text-aurora-navy/50 text-center">Este club aún no ha proporcionado sus términos y condiciones.</p>
       )}
     </div>
   );
