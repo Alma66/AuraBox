@@ -36,11 +36,12 @@ const Footer: React.FC = () => {
   const [newsletterSent, setNewsletterSent] = useState(false);
 
   const handleNewsletterSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!newsletterEmail.trim()) return;
-    setNewsletterSent(true);
-    setNewsletterEmail('');
-  };
+  e.preventDefault();
+  if (!newsletterEmail.trim()) return;
+  window.location.href = `mailto:info@aurabox.com?subject=${encodeURIComponent('Quiero recibir novedades de AuraBox')}&body=${encodeURIComponent(`Mi email es: ${newsletterEmail}`)}`;
+  setNewsletterSent(true);
+  setNewsletterEmail('');
+};
 
   return (
     <footer className="bg-aurora-navy text-white pt-16 pb-8 mt-12 relative overflow-hidden">
@@ -132,7 +133,9 @@ const Footer: React.FC = () => {
               <p className="text-aurora-gold text-sm font-semibold">¡Gracias! Ya estás suscripto ✨</p>
             ) : (
               <form onSubmit={handleNewsletterSubmit} className="flex gap-2">
+                <label htmlFor="footer-newsletter-email" className="sr-only">Tu email para recibir novedades</label>
                 <input
+                  id="footer-newsletter-email"
                   type="email"
                   required
                   placeholder="tu@email.com"

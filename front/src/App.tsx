@@ -161,8 +161,11 @@ const AppContent: React.FC = () => {
 
   return (
     <>
+      <a href="#main-content" className="sr-only focus:not-sr-only focus:fixed focus:top-2 focus:left-2 focus:z-[100] focus:bg-aurora-terracotta focus:text-white focus:px-4 focus:py-2 focus:rounded-lg">
+        Saltar al contenido
+      </a>
       <Navbar userRole={userRole} isAuthenticated={isAuthenticated} onLogout={logout} />
-      <main className="min-h-[calc(100vh-100px)]">
+      <main id="main-content" className="min-h-[calc(100vh-100px)]">
         <Routes>
           <Route path="/" element={<HomePage />} />
           <Route path="/explore" element={<ExploreClubsPage />} />

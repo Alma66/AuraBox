@@ -105,6 +105,13 @@ const Navbar: React.FC<NavbarProps> = ({ userRole, isAuthenticated, onLogout }) 
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
+  useEffect(() => {
+    const handleEscape = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') closeAllDropdowns();
+    };
+    document.addEventListener('keydown', handleEscape);
+    return () => document.removeEventListener('keydown', handleEscape);
+  }, []);
   const DropdownArrow = ({ isOpen }: { isOpen: boolean }) => (
     <svg
       className={`w-4 h-4 ml-1 transform ${isOpen ? 'rotate-180' : 'rotate-0'} transition-transform duration-200`}
@@ -122,12 +129,12 @@ const Navbar: React.FC<NavbarProps> = ({ userRole, isAuthenticated, onLogout }) 
     if (!(isAuthenticated && userRole === 'customer')) return null;
     return (
       <>
-        <Link to="/customer/wishlist" className="text-aurora-navy/70 hover:text-aurora-terracotta p-2 rounded-full hover:bg-aurora-cream transition-all duration-200" onClick={closeAllDropdowns} title="Mi Lista de Deseos">
+        <Link to="/customer/wishlist" className="text-aurora-navy/70 hover:text-aurora-terracotta p-2 rounded-full hover:bg-aurora-cream transition-all duration-200" onClick={closeAllDropdowns} aria-label="Mi Lista de Deseos">
           <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
           </svg>
         </Link>
-        <Link to="/cart" className="text-aurora-navy/70 hover:text-aurora-terracotta p-2 rounded-full hover:bg-aurora-cream transition-all duration-200" onClick={closeAllDropdowns} title="Mi Carrito">
+        <Link to="/cart" className="text-aurora-navy/70 hover:text-aurora-terracotta p-2 rounded-full hover:bg-aurora-cream transition-all duration-200" onClick={closeAllDropdowns} aria-label="Mi Carrito">
           <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4m0 0L7 13m0 0l-1.5 7.5M7 13l-1.5 7.5M17 13l1.5 7.5M17 13l4-8m-8 4h8M9 4h6m-6 0h6a2 2 0 002-2V2a2 2 0 00-2-2H9a2 2 0 00-2 2v2a2 2 0 002 2z" />
           </svg>
@@ -139,7 +146,7 @@ const Navbar: React.FC<NavbarProps> = ({ userRole, isAuthenticated, onLogout }) 
     if (isAuthenticated) {
       return (
         <div className="relative" ref={userMenuRef}>
-          <button onClick={toggleUserMenu} className="flex items-center gap-2 text-aurora-navy hover:text-aurora-terracotta focus:outline-none pl-1 pr-2 py-1 rounded-full hover:bg-aurora-cream transition-colors duration-200">
+          <button onClick={toggleUserMenu} aria-haspopup="true" aria-expanded={isUserMenuOpen} className="flex items-center gap-2 text-aurora-navy hover:text-aurora-terracotta focus:outline-none pl-1 pr-2 py-1 rounded-full hover:bg-aurora-cream transition-colors duration-200">
             <span className="w-8 h-8 rounded-full bg-aurora-navy text-aurora-cream flex items-center justify-center text-sm font-bold font-display">
               {(user?.firstName?.[0] || 'A').toUpperCase()}
             </span>
@@ -188,7 +195,7 @@ const Navbar: React.FC<NavbarProps> = ({ userRole, isAuthenticated, onLogout }) 
     return (
       <>
         <div className="relative" ref={clubMenuRef}>
-          <button onClick={toggleClubMenu} className={btnClass}>
+          <button onClick={toggleClubMenu} aria-haspopup="true" aria-expanded={isClubMenuOpen} className={btnClass}>
             Club <DropdownArrow isOpen={isClubMenuOpen} />
           </button>
           {isClubMenuOpen && (
@@ -210,7 +217,7 @@ const Navbar: React.FC<NavbarProps> = ({ userRole, isAuthenticated, onLogout }) 
           )}
         </div>
         <div className="relative" ref={gestionMenuRef}>
-          <button onClick={toggleGestionMenu} className={btnClass}>
+          <button onClick={toggleGestionMenu} aria-haspopup="true" aria-expanded={isGestionMenuOpen} className={btnClass}>
             Gestión y Finanzas <DropdownArrow isOpen={isGestionMenuOpen} />
           </button>
           {isGestionMenuOpen && (
@@ -231,7 +238,7 @@ const Navbar: React.FC<NavbarProps> = ({ userRole, isAuthenticated, onLogout }) 
           )}
         </div>
         <div className="relative" ref={operationsMenuRef}>
-          <button onClick={toggleOperationsMenu} className={btnClass}>
+          <button onClick={toggleOperationsMenu} aria-haspopup="true" aria-expanded={isOperationsMenuOpen} className={btnClass}>
             Operaciones <DropdownArrow isOpen={isOperationsMenuOpen} />
           </button>
           {isOperationsMenuOpen && (
@@ -253,7 +260,7 @@ const Navbar: React.FC<NavbarProps> = ({ userRole, isAuthenticated, onLogout }) 
           )}
         </div>
         <div className="relative" ref={marketingCommMenuRef}>
-          <button onClick={toggleMarketingCommMenu} className={btnClass}>
+          <button onClick={toggleMarketingCommMenu} aria-haspopup="true" aria-expanded={isMarketingCommMenuOpen} className={btnClass}>
             Marketing y Comunicación <DropdownArrow isOpen={isMarketingCommMenuOpen} />
           </button>
           {isMarketingCommMenuOpen && (
@@ -273,7 +280,7 @@ const Navbar: React.FC<NavbarProps> = ({ userRole, isAuthenticated, onLogout }) 
           )}
         </div>
         <div className="relative" ref={adminToolsMenuRef}>
-          <button onClick={toggleAdminToolsMenu} className={btnClass}>
+          <button onClick={toggleAdminToolsMenu} aria-haspopup="true" aria-expanded={isAdminToolsMenuOpen} className={btnClass}>
             Administración <DropdownArrow isOpen={isAdminToolsMenuOpen} />
           </button>
           {isAdminToolsMenuOpen && (
@@ -395,7 +402,7 @@ const Navbar: React.FC<NavbarProps> = ({ userRole, isAuthenticated, onLogout }) 
               </Link>
             )}
             <div className="relative" ref={helpMenuRef}>
-              <button onClick={toggleHelpMenu} className={btnClass}>
+              <button onClick={toggleHelpMenu} aria-haspopup="true" aria-expanded={isHelpMenuOpen} className={btnClass}>
                 Ayuda <DropdownArrow isOpen={isHelpMenuOpen} />
               </button>
               {isHelpMenuOpen && (
@@ -421,6 +428,8 @@ const Navbar: React.FC<NavbarProps> = ({ userRole, isAuthenticated, onLogout }) 
             <div className="flex md:hidden">
               <button
                 onClick={toggleMobileMenu}
+                aria-expanded={isMobileMenuOpen}
+                aria-controls="mobile-menu-panel"
                 className="inline-flex items-center justify-center p-2 rounded-md text-aurora-navy hover:bg-aurora-navy/5 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-aurora-terracotta"
               >
                 <span className="sr-only">Open main menu</span>
@@ -439,7 +448,7 @@ const Navbar: React.FC<NavbarProps> = ({ userRole, isAuthenticated, onLogout }) 
         </div>
       </div>
       {isMobileMenuOpen && (
-        <div className="md:hidden absolute top-16 left-0 w-full bg-aurora-cream shadow-aurora py-2 z-40 overflow-y-auto max-h-[calc(100vh-64px)] border-t border-aurora-navy/10">
+        <div id="mobile-menu-panel" className="md:hidden absolute top-16 left-0 w-full bg-aurora-cream shadow-aurora py-2 z-40 overflow-y-auto max-h-[calc(100vh-64px)] border-t border-aurora-navy/10">
           <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3">
             {!isEntrepreneur && (
               <Link to="/explore" className="text-aurora-navy hover:bg-white hover:text-aurora-terracotta block px-3 py-2 rounded-md text-base font-semibold" onClick={closeAllDropdowns}>
