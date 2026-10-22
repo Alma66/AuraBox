@@ -14,6 +14,7 @@ import { Public } from '../../common/decorators/public.decorator';
 import { ShipmentsService } from '../shipments/shipments.service';
 import { RiderProfileService } from '../rider-profile/rider-profile.service';
 import { AssignDeliveryDto } from '../shipments/dto/assign-delivery.dto';
+import { imageUploadOptions } from '../../common/utils/image-upload';
 
 @Controller('clubs')
 export class ClubsController {
@@ -61,12 +62,12 @@ export class ClubsController {
   async getRecommendations(@Request() req: any) {
     return this.clubsService.getRecommendationsForUser(req.user.id);
   }
-  
+
   @Public()
   @UseGuards(JwtAuthGuard)
   @Get(':id')
   async findOne(@Param('id', ParseIntPipe) id: number, @Request() req) {
-    return this.clubsService.findOne(id, req.user?.id);
+    return this.clubsService.findOne(id, req.user);
   }
 
   @UseGuards(JwtAuthGuard, RolesGuard)
@@ -113,7 +114,7 @@ export class ClubsController {
     return this.shipmentsService.assignRiderForClub(shipmentId, id, dto);
   }
 
-@UseGuards(JwtAuthGuard, RolesGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles('entrepreneur', 'admin')
   @Put(':id')
   @UsePipes(new ValidationPipe({ whitelist: true, transform: true }))
@@ -124,7 +125,7 @@ export class ClubsController {
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles('entrepreneur')
   @Patch(':id/logo')
-  @UseInterceptors(FileInterceptor('logo'))
+  @UseInterceptors(FileInterceptor('logo', imageUploadOptions))
   async updateLogo(
     @Param('id', ParseIntPipe) id: number,
     @UploadedFile() file: Express.Multer.File,

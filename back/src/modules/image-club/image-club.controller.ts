@@ -4,13 +4,13 @@ import {
   ValidationPipe, UseInterceptors, UploadedFile, Query,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { memoryStorage } from 'multer';
 import { ImageClubService } from './image-club.service';
 import { CreateImageClubDto } from './dto/create-image-club.dto';
 import { UpdateImageClubDto } from './dto/update-image-club.dto';
 import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
 import { RolesGuard } from '../auth/roles.guard';
 import { Roles } from '../auth/roles.decorator';
+import { imageUploadOptions } from '../../common/utils/image-upload';
 
 @Controller('image-club')
 @UseGuards(JwtAuthGuard)
@@ -20,17 +20,7 @@ export class ImageClubController {
   @UseGuards(RolesGuard)
   @Roles('entrepreneur', 'admin')
   @Post()
-  @UseInterceptors(FileInterceptor('image', {
-    storage: memoryStorage(),
-    limits: { fileSize: 5 * 1024 * 1024 },
-    fileFilter: (req, file, callback) => {
-      if (!file.mimetype.match(/\/(jpg|jpeg|png|gif|webp)$/)) {
-        callback(new Error('Solo se permiten imágenes'), false);
-      } else {
-        callback(null, true);
-      }
-    },
-  }))
+  @UseInterceptors(FileInterceptor('image', imageUploadOptions))
   @UsePipes(new ValidationPipe({ whitelist: true, transform: true }))
   async create(@Body() dto: CreateImageClubDto, @Request() req, @UploadedFile() image?: Express.Multer.File) {
     return this.imageClubService.create(dto, image, req.user);
@@ -65,7 +55,7 @@ export class ImageClubController {
   @Roles('entrepreneur', 'admin')
   @Delete('bulk')
   async removeMany(@Body() body: { ids: number[] }, @Request() req) {
-    return this.imageClubService.removeMany(body.ids, req.user);
+    return this.imageClubService.removeMany(body?.ids, req.user);
   }
 
   @UseGuards(RolesGuard)

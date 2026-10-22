@@ -35,6 +35,15 @@ export class SubscriptionTypesService {
     if (!assoc) throw new ForbiddenException('No sos owner de este club');
   }
 
+  private async deleteAsset(imageUrl?: string | null) {
+    if (!imageUrl) return;
+    const publicId = this.cloudinary.extractPublicId(imageUrl);
+    if (!publicId) return;
+    try {
+      await this.cloudinary.deleteImage(publicId);
+    } catch {}
+  }
+
   async create(dto: CreateSubscriptionTypeDto, requesterId?: number, requesterRole?: string) {
     const club = await this.prisma.club.findUnique({ where: { id: dto.idClub } });
     if (!club) throw new NotFoundException('Club no encontrado');
@@ -124,18 +133,16 @@ export class SubscriptionTypesService {
       await this.assertEntrepreneurOwnsClub(requesterId, existing.idClub);
     }
 
-    if (existing.imageUrl) {
-      try {
-        const publicId = this.cloudinary.extractPublicId(existing.imageUrl);
-        await this.cloudinary.deleteImage(publicId);
-      } catch {}
-    }
-
     const imageUrl = await this.cloudinary.uploadImage(imageFile, 'aurabox/plans/images');
     const updated = await this.prisma.subscription_Types.update({
       where: { id },
       data: { imageUrl },
     });
+
+    if (existing.imageUrl && existing.imageUrl !== imageUrl) {
+      await this.deleteAsset(existing.imageUrl);
+    }
+
     return { imageUrl: updated.imageUrl };
   }
 
@@ -148,6 +155,7 @@ export class SubscriptionTypesService {
     }
 
     await this.prisma.subscription_Types.delete({ where: { id } });
+    await this.deleteAsset(existing.imageUrl);
     return { ok: true };
   }
 }

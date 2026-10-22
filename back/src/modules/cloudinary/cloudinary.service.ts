@@ -1,5 +1,6 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { v2 as cloudinary } from 'cloudinary';
+import { hasValidImageSignature } from '../../common/utils/image-upload';
 
 function ensureConfigured() {
   const cfg = cloudinary.config();
@@ -15,17 +16,16 @@ function ensureConfigured() {
 @Injectable()
 export class CloudinaryService {
   async uploadImage(file: Express.Multer.File, folder: string = 'aurabox'): Promise<string> {
+    if (!file?.buffer || !hasValidImageSignature(file.buffer)) {
+      throw new BadRequestException('El archivo no es una imagen válida');
+    }
     ensureConfigured();
     return new Promise((resolve, reject) => {
       const uploadStream = cloudinary.uploader.upload_stream(
         {
           folder,
           resource_type: 'image',
-          transformation: [
-            { width: 1200, crop: 'limit' },
-            { quality: 'auto' },
-            { fetch_format: 'auto' },
-          ],
+          transformation: [{ width: 1200, crop: 'limit' }, { quality: 'auto' }],
         },
         (error, result) => {
           if (error) reject(error);
@@ -55,15 +55,20 @@ export class CloudinaryService {
   }
 
   async deleteImage(publicId: string, resourceType: 'image' | 'video' | 'raw' = 'image'): Promise<void> {
+    if (!publicId) return;
     ensureConfigured();
     await cloudinary.uploader.destroy(publicId, { resource_type: resourceType });
   }
 
   extractPublicId(url: string): string {
-    const parts = url.split('/');
-    const filename = parts[parts.length - 1].split('.')[0];
-    const folder = parts[parts.length - 2];
-    return `${folder}/${filename}`;
+    const clean = (url || '').split('?')[0];
+    const marker = '/upload/';
+    const index = clean.indexOf(marker);
+    if (index === -1) return '';
+    return clean
+      .slice(index + marker.length)
+      .replace(/^v\d+\//, '')
+      .replace(/\.[^./]+$/, '');
   }
 
   async uploadDocument(file: Express.Multer.File, folder: string = 'aurabox'): Promise<string> {

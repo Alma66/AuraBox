@@ -34,6 +34,7 @@ interface SocialNetworkRaw {
 
 interface ClubData extends Club {
   isOwner?: boolean;
+  categories?: { id: number; name: string }[];
   socialNetworksRaw?: SocialNetworkRaw[];
   bannerImagesRaw?: { id: number; imageUrl: string; description?: string }[];
   historyImageRaw?: { id: number; imageUrl: string }[];
@@ -302,6 +303,7 @@ const ClubDetailPage: React.FC = () => {
         formData.append('idClub', clubId);
         formData.append('contentType', 'Imagen');
         formData.append('section', 'Banner');
+        formData.append('isActive', 'true');
         await api.post(`/image-club`, formData, {
           headers: { 'Content-Type': 'multipart/form-data' },
         });
@@ -312,6 +314,7 @@ const ClubDetailPage: React.FC = () => {
         formData.append('contentType', 'Imagen');
         formData.append('description', 'historia');
         formData.append('section', 'Historia');
+        formData.append('isActive', 'true');
         await api.post(`/image-club`, formData, {
           headers: { 'Content-Type': 'multipart/form-data' },
         });
@@ -725,11 +728,18 @@ const ClubDetailPage: React.FC = () => {
           </div>
         )}
         <div className="bg-white rounded-2xl shadow-aurora-sm border border-aurora-navy/10 p-6 md:p-8 mb-6">
-          <div className="flex justify-between items-center mb-6">
-            <span className="inline-flex items-center bg-aurora-gold/10 text-aurora-navy text-xs font-semibold px-3 py-1.5 rounded-full border border-aurora-gold/30">
-              {club.category}
-            </span>
-          </div>
+                    {(club.categories ?? []).length > 0 && (
+            <div className="flex flex-wrap gap-2 mb-6">
+              {(club.categories ?? []).map((c) => (
+                <span
+                  key={c.id}
+                  className="inline-flex items-center bg-aurora-gold/10 text-aurora-navy text-xs font-semibold px-3 py-1.5 rounded-full border border-aurora-gold/30"
+                >
+                  {c.name}
+                </span>
+              ))}
+            </div>
+          )}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
             <div>
               <div className="flex items-center justify-between mb-3">
@@ -818,14 +828,15 @@ const ClubDetailPage: React.FC = () => {
                   />
                 </div>
               ) : (
-                club.fullHistory && (
-                  <div className="relative group cursor-pointer h-full min-h-[224px]">
-                    <img
-                      src={historyImage || '/assets/default-banner.jpg'}
-                      alt="Nuestra Historia"
-                      className="w-full h-56 object-cover rounded-xl shadow-sm group-hover:brightness-75 transition-all duration-300"
-                    />
-                    <div className="absolute inset-0 flex items-center justify-center rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                (club.history || club.fullHistory || historyImage) && (
+                  <div className="relative h-56 rounded-xl overflow-hidden shadow-sm">
+                    {historyImage ? (
+                      <img src={historyImage} alt="Nuestra Historia" className="w-full h-full object-cover" />
+                    ) : (
+                      <div className="w-full h-full bg-gradient-to-br from-aurora-navy to-aurora-terracotta" />
+                    )}
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
+                    <div className="absolute bottom-4 left-0 w-full flex justify-center">
                       <Link
                         to={`/club/${club.id}/history`}
                         className="text-white text-sm font-semibold px-5 py-2.5 bg-aurora-terracotta rounded-full hover:bg-aurora-terracottaDark transition-colors shadow-lg"

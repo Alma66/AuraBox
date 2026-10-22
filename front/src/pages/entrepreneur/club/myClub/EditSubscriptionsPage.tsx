@@ -232,9 +232,18 @@ const EditSubscriptionsPage: React.FC = () => {
 
   const onCropComplete = useCallback((_: any, croppedPixels: any) => setCroppedArea(croppedPixels), []);
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
+    e.target.value = '';
     if (!file) return;
+    if (!file.type.startsWith('image/')) {
+      toast.error('Solo se permiten imágenes');
+      return;
+    }
+    if (file.size > 8 * 1024 * 1024) {
+      toast.error('La imagen no puede superar los 8MB');
+      return;
+    }
     const reader = new FileReader();
     reader.onload = () => setCropSrc(reader.result as string);
     reader.readAsDataURL(file);
@@ -252,19 +261,21 @@ const EditSubscriptionsPage: React.FC = () => {
         headers: { 'Content-Type': 'multipart/form-data' },
       });
       const updated = getResponseData(res);
-      const imageUrl = updated?.imageUrl ?? updated?.image ?? cropSrc;
+      const imageUrl = updated?.imageUrl;
+      if (!imageUrl) throw new Error('Sin URL de imagen');
       setPlans(p => p.map(x => x.planId === selectedPlan.planId ? { ...x, image: imageUrl } : x));
       setSelectedPlan(prev => prev ? { ...prev, image: imageUrl } : prev);
       setCropSrc(null);
       toast.success('Imagen actualizada.');
-    } catch {
-      toast.error('Error al subir la imagen.');
+    } catch (e: any) {
+      const msg = e?.response?.data?.message;
+      toast.error(Array.isArray(msg) ? msg.join(', ') : (msg ?? 'Error al subir la imagen.'));
     } finally {
       setUploadingImage(false);
     }
   };
 
-  const PlanForm = () => (
+  const renderPlanForm = () => (
     <div className="space-y-5">
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div>
@@ -505,7 +516,7 @@ const EditSubscriptionsPage: React.FC = () => {
             {activeSection === 'create' && formData && (
               <div className="bg-white rounded-xl shadow-aurora-sm border border-aurora-navy/10 p-8 max-w-2xl">
                 <h2 className="font-display text-xl font-bold text-aurora-navy mb-6">Crear nuevo plan</h2>
-                <PlanForm />
+                {renderPlanForm()}
                 <div className="flex justify-end gap-3 mt-8 pt-6 border-t border-aurora-navy/10">
                   <button
                     onClick={() => { setActiveSection('management'); setFormData(null); }}
@@ -591,7 +602,7 @@ const EditSubscriptionsPage: React.FC = () => {
                   </div>
                 </div>
               )}
-              <PlanForm />
+              {renderPlanForm()}
             </div>
             <div className="sticky bottom-0 bg-white border-t border-aurora-navy/10 px-6 py-4 flex items-center justify-between rounded-b-2xl">
               <button

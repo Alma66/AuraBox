@@ -16,6 +16,17 @@ const SECTION_LABELS: Record<string, string> = {
   Historia: 'Historias',
   Equipo: 'Emprendedores',
 };
+const SECTION_HINTS: Record<string, string> = {
+  Logo: 'El logo marcado "En uso" es el que se muestra en el perfil del club.',
+  Banner: 'Las imágenes marcadas "En uso" forman el carrusel del banner.',
+  Historia: 'La imagen "En uso" más reciente se muestra en el perfil del club.',
+  Equipo: 'Fotos del equipo emprendedor.',
+};
+
+const getErrorMessage = (err: any, fallback: string) => {
+  const msg = err?.response?.data?.message;
+  return Array.isArray(msg) ? msg.join(', ') : msg || fallback;
+};
 
 const getExtension = (url: string) => {
   const clean = url.split('?')[0];
@@ -100,7 +111,7 @@ const ManageClubImagesContent: React.FC<ManageClubImagesContentProps> = ({ activ
       await fetchImages();
     } catch (err) {
       console.error(err);
-      toast.error('Error al subir la imagen');
+      toast.error(getErrorMessage(err, 'Error al subir la imagen'));
     } finally {
       setUploading(false);
       e.target.value = '';
@@ -113,7 +124,7 @@ const ManageClubImagesContent: React.FC<ManageClubImagesContentProps> = ({ activ
       await fetchImages();
     } catch (err) {
       console.error(err);
-      toast.error('Error al actualizar el estado de uso');
+      toast.error(getErrorMessage(err, 'Error al actualizar el estado de uso'));
     }
   };
 
@@ -139,7 +150,7 @@ const ManageClubImagesContent: React.FC<ManageClubImagesContentProps> = ({ activ
               await fetchImages();
             } catch (err) {
               console.error(err);
-              toast.error('Error al eliminar las imágenes');
+              toast.error(getErrorMessage(err, 'Error al eliminar las imágenes'));
             }
           }}
           className="px-3 py-1 text-sm bg-red-600 text-white rounded-lg hover:bg-red-700"
@@ -168,7 +179,7 @@ const deleteOne = (id: number) => {
               await fetchImages();
             } catch (err) {
               console.error(err);
-              toast.error('Error al eliminar la imagen');
+              toast.error(getErrorMessage(err, 'Error al eliminar la imagen'));
             }
           }}
           className="px-3 py-1 text-sm bg-red-600 text-white rounded-lg hover:bg-red-700"
@@ -190,9 +201,7 @@ const deleteOne = (id: number) => {
     <div className="animate-fadeInUp">
       <div className="flex items-center justify-between mb-6">
         <h2 className="font-serif text-xl font-bold text-aurora-navy">{SECTION_LABELS[activeSection] ?? activeSection}</h2>
-        {activeSection === 'Banner' && (
-          <span className="text-xs text-aurora-navy/50">Las imágenes marcadas "En uso" forman el carrusel del banner.</span>
-        )}
+        <span className="text-xs text-aurora-navy/50">{SECTION_HINTS[activeSection]}</span>
       </div>
 
       <div className="bg-aurora-cream/50 border border-aurora-navy/10 rounded-xl p-4 mb-6">

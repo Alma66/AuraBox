@@ -96,45 +96,59 @@ let ClubsService = class ClubsService {
         });
         return clubs.map((c) => this.sanitizeClub(c));
     }
-    async findOne(id, requestingUserId) {
-        const club = await this.prisma.club.findUnique({ where: { id } });
-        if (!club)
-            throw new common_1.NotFoundException('Club no encontrado');
-        const entrepreneurClub = await this.prisma.entrepreneur_Club.findMany({
-            where: { idClub: id },
-        });
-        const entrepreneurIds = entrepreneurClub.map((ec) => ec.idEntrepreneurs);
-        let isOwner = false;
-        if (requestingUserId) {
-            isOwner = entrepreneurIds.includes(requestingUserId);
-        }
-        const entrepreneurs = await this.prisma.entrepreneurs.findMany({
-            where: { id: { in: entrepreneurIds } },
-            select: { id: true, firstName: true, lastName: true, bio: true },
-        });
-        const images = await this.prisma.image_Club.findMany({ where: { idClub: id } });
-        const bannerImagesRaw = images.filter((img) => img.description !== 'historia' && !(img.description ?? '').startsWith('team-'));
-        const historyImageRaw = images.filter((img) => img.description === 'historia');
-        const socialNetworksRaw = await this.prisma.club_Social_Networks.findMany({ where: { idClub: id } });
-        const plans = await this.prisma.subscription_Types.findMany({ where: { idClub: id } });
-        const mappedPlans = plans.map((p) => this.mapPlan(p));
-        const categoryLinks = await this.prisma.club_Categories.findMany({ where: { idClub: id } });
-        const categoryIds = categoryLinks.map((l) => l.idCategories);
-        const categories = categoryIds.length > 0
-            ? await this.prisma.categories.findMany({ where: { id: { in: categoryIds } } })
-            : [];
-        return {
-            ...this.sanitizeClub(club),
-            isOwner,
-            entrepreneurs,
-            bannerImagesRaw,
-            historyImageRaw,
-            socialNetworksRaw,
-            subscriptionPlans: mappedPlans,
-            categories: categories.map((c) => ({ id: c.id, name: c.name })),
-        };
+      async findOne(id: number, requester?: number | { id: number; role: string }) {
+    const club = await this.prisma.club.findUnique({ where: { id } });
+    if (!club) throw new NotFoundException('Club no encontrado');
+    const entrepreneurClub = await this.prisma.entrepreneur_Club.findMany({
+      where: { idClub: id },
+    });
+    const entrepreneurIds = entrepreneurClub.map((ec) => ec.idEntrepreneurs);
+    let isOwner = false;
+    if (typeof requester === 'number') {
+      isOwner = entrepreneurIds.includes(requester);
+    } else if (requester && requester.role === 'entrepreneur') {
+      isOwner = entrepreneurIds.includes(requester.id);
     }
-    async update(id, dto, entrepreneurId) {
+    const entrepreneurs = await this.prisma.entrepreneurs.findMany({
+      where: { id: { in: entrepreneurIds } },
+      select: { id: true, firstName: true, lastName: true, bio: true },
+    });
+    const images = await this.prisma.image_Club.findMany({
+      where: { idClub: id },
+      orderBy: { id: 'desc' },
+    });
+    const isTeamImage = (img: { description: string | null }) =>
+      (img.description ?? '').startsWith('team-');
+    const bannerImagesRaw = images.filter(
+      (img) =>
+        img.section === 'Banner' &&
+        img.isActive &&
+        img.description !== 'historia' &&
+        !isTeamImage(img),
+    );
+    const historyImageRaw = images.filter(
+      (img) => img.section === 'Historia' && img.isActive && !isTeamImage(img),
+    );
+    const socialNetworksRaw = await this.prisma.club_Social_Networks.findMany({ where: { idClub: id } });
+    const plans = await this.prisma.subscription_Types.findMany({ where: { idClub: id } });
+    const mappedPlans = plans.map((p) => this.mapPlan(p));
+    const categoryLinks = await this.prisma.club_Categories.findMany({ where: { idClub: id } });
+    const categoryIds = categoryLinks.map((l) => l.idCategories);
+    const categories = categoryIds.length > 0
+      ? await this.prisma.categories.findMany({ where: { id: { in: categoryIds } } })
+      : [];
+    return {
+      ...this.sanitizeClub(club),
+      isOwner,
+      entrepreneurs,
+      bannerImagesRaw,
+      historyImageRaw,
+      socialNetworksRaw,
+      subscriptionPlans: mappedPlans,
+      categories: categories.map((c) => ({ id: c.id, name: c.name })),
+    };
+  }
+      async update(id, dto, entrepreneurId) {
         await this.assertOwnership(id, entrepreneurId);
         const data = {};
         if (dto.name !== undefined)

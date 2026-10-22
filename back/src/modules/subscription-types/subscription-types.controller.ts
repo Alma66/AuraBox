@@ -4,7 +4,6 @@ import {
   ValidationPipe, Query, UseInterceptors, UploadedFile,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { memoryStorage } from 'multer';
 import { SubscriptionTypesService } from './subscription-types.service';
 import { CreateSubscriptionTypeDto } from './dto/create-subscription-types.dto';
 import { UpdateSubscriptionTypeDto } from './dto/update-subscription-types.dto';
@@ -12,6 +11,7 @@ import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
 import { RolesGuard } from '../auth/roles.guard';
 import { Roles } from '../auth/roles.decorator';
 import { Public } from '../../common/decorators/public.decorator';
+import { imageUploadOptions } from '../../common/utils/image-upload';
 
 @Controller('subscription-types')
 @UseGuards(JwtAuthGuard)
@@ -54,17 +54,7 @@ export class SubscriptionTypesController {
   @UseGuards(RolesGuard)
   @Roles('entrepreneur', 'admin')
   @Patch(':id/image')
-  @UseInterceptors(FileInterceptor('file', {
-    storage: memoryStorage(),
-    limits: { fileSize: 5 * 1024 * 1024 },
-    fileFilter: (req, file, callback) => {
-      if (!file.mimetype.match(/\/(jpg|jpeg|png|gif|webp)$/)) {
-        callback(new Error('Solo se permiten imágenes'), false);
-      } else {
-        callback(null, true);
-      }
-    },
-  }))
+  @UseInterceptors(FileInterceptor('file', imageUploadOptions))
   async updateImage(
     @Param('id', ParseIntPipe) id: number,
     @UploadedFile() file: Express.Multer.File,
