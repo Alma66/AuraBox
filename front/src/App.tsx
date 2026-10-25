@@ -1,10 +1,11 @@
 import React, { useState, useEffect, createContext, useContext } from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
 import Navbar from './components/common/Navbar';
 import Footer from './components/common/Footer';
 import FloatingButtons from './components/common/FloatingButtons';
 import PrivateRoute from './components/common/PrivateRoute';
+import EntrepreneurLayout from './components/entrepreneur/layout/EntrepreneurLayout';
 import HomePage from './pages/HomePage';
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
@@ -27,6 +28,7 @@ import SubscriptionDetailForEntrepreneurPage from './pages/entrepreneur/club/myC
 import TermsAndConditionsPage from './pages/entrepreneur/club/legal/TermsAndConditionsPage';
 import PrivacyAndSecurityPolicyPage from './pages/entrepreneur/club/legal/PrivacyAndSecurityPolicyPage';
 import EntrepreneurProfilePage from './pages/entrepreneur/EntrepreneurProfilePage';
+import EntrepreneurDashboardPage from './pages/entrepreneur/EntrepreneurDashboardPage';
 import EditSubscriptionsPage from './pages/entrepreneur/club/myClub/EditSubscriptionsPage';
 import ClubSubscriptionsOverviewPage from './pages/entrepreneur/club/myClub/ClubSubscriptionsOverviewPage';
 import SubscriptionBoxHistoryPage from './pages/entrepreneur/club/myClub/SubscriptionBoxHistoryPage';
@@ -47,6 +49,10 @@ import SalesReportsPage from './pages/entrepreneur/administration_tools/analysis
 import FeedbackTrendsPage from './pages/entrepreneur/administration_tools/analysis_and_reports/FeedbackTrendsPage';
 import FinancialMovementsPage from './pages/entrepreneur/management_and_finance/finance/FinancialMovementsPage';
 import ProfitabilityPage from './pages/entrepreneur/management_and_finance/finance/ProfitabilityPage';
+import InventoryStockPage from './pages/entrepreneur/management_and_finance/inventory_and_suppliers/InventoryStockPage';
+import InventorySuppliersPage from './pages/entrepreneur/management_and_finance/inventory_and_suppliers/InventorySuppliersPage';
+import InventoryOrdersPage from './pages/entrepreneur/management_and_finance/inventory_and_suppliers/InventoryOrdersPage';
+import InventoryCategoriesPage from './pages/entrepreneur/management_and_finance/inventory_and_suppliers/InventoryCategoriesPage';
 import ManageUsersAndRolesPage from './pages/entrepreneur/administration_tools/team/ManageUsersAndRolesPage';
 import GeneralSettingsPage from './pages/entrepreneur/administration_tools/team/GeneralSettingsPage';
 import EditClubLegalInfoPage from './pages/entrepreneur/club/legal/EditClubLegalInfoPage';
@@ -150,8 +156,11 @@ const Logout: React.FC = () => {
   return <Navigate to="/" replace />;
 };
 
+const AUTH_PATHS = ['/login', '/register', '/logout'];
+
 const AppContent: React.FC = () => {
   const { userRole, isAuthenticated, logout, login, loading } = useAuth();
+  const { pathname } = useLocation();
 
   const pr = (roles: UserRole[], element: React.ReactNode) => (
     <PrivateRoute isAuthenticated={isAuthenticated} allowedRoles={roles} userRole={userRole} loading={loading}>
@@ -159,66 +168,101 @@ const AppContent: React.FC = () => {
     </PrivateRoute>
   );
 
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-aurora-cream">
+        <div className="animate-spin rounded-full h-10 w-10 border-4 border-aurora-navy/15 border-t-aurora-terracotta" />
+      </div>
+    );
+  }
+
+  const isPanel =
+    isAuthenticated &&
+    userRole === 'entrepreneur' &&
+    !AUTH_PATHS.some((path) => pathname === path || pathname.startsWith(`${path}/`));
+
+  const routes = (
+    <Routes>
+      <Route path="/" element={isPanel ? <Navigate to="/entrepreneur/dashboard" replace /> : <HomePage />} />
+      <Route path="/explore" element={<ExploreClubsPage />} />
+      <Route path="/faq" element={<FAQPage />} />
+      <Route path="/login" element={<LoginPage onLogin={login} />} />
+      <Route path="/register" element={<RegisterPage />} />
+      <Route path="/register/complete-profile" element={<CompleteProfilePage />} />
+      <Route path="/about-us" element={<AboutUsPage />} />
+      <Route path="/contact" element={<ContactPage />} />
+      <Route path="/logout" element={<Logout />} />
+      <Route path="/club/:clubId" element={<ClubDetailPage />} />
+      <Route path="/club/:clubId/history" element={<HistoryPage />} />
+      <Route path="/club/:clubId/terms-and-conditions" element={<TermsAndConditionsPage />} />
+      <Route path="/club/:clubId/privacy-and-security" element={<PrivacyAndSecurityPolicyPage />} />
+      <Route path="/club/:clubId/plan/:planId" element={<SubscriptionPlanDetailPage />} />
+      <Route path="/entrepreneur/club/:clubId/edit-legal-info/:section" element={pr(['entrepreneur'], <EditClubLegalInfoPage />)} />
+      <Route path="/entrepreneur/club/:clubId/edit-legal-info" element={pr(['entrepreneur'], <EditClubLegalInfoPage />)} />
+      <Route path="/entrepreneur/club/:clubId/legal-compliance" element={pr(['entrepreneur'], <LegalCompliancePage />)} />
+      <Route path="/customer/profile" element={pr(['customer'], <UserProfilePage />)} />
+      <Route path="/customer/subscriptions" element={pr(['customer'], <UserSubscriptionsPage />)} />
+      <Route path="/customer/orders" element={pr(['customer'], <OrderHistoryPage />)} />
+      <Route path="/customer/reviews" element={pr(['customer'], <MisReviewsPage />)} />
+      <Route path="/customer/wishlist" element={pr(['customer'], <WishlistPage />)} />
+      <Route path="/cart" element={pr(['customer'], <CartPage />)} />
+      <Route path="/checkout" element={pr(['customer'], <CheckoutPage />)} />
+
+      <Route path="/entrepreneur/dashboard" element={pr(['entrepreneur'], <EntrepreneurDashboardPage />)} />
+      <Route path="/entrepreneur/profile" element={pr(['entrepreneur'], <EntrepreneurProfilePage />)} />
+      <Route path="/entrepreneur/club/:clubId/edit-subscriptions" element={pr(['entrepreneur'], <EditSubscriptionsPage />)} />
+      <Route path="/entrepreneur/club/:clubId/subscription-boxes" element={pr(['entrepreneur'], <ClubSubscriptionsOverviewPage />)} />
+      <Route path="/entrepreneur/club/:clubId/subscription-boxes/:subscriptionTypeId" element={pr(['entrepreneur'], <SubscriptionBoxHistoryPage />)} />
+      <Route path="/entrepreneur/club/:clubId/inventory/stock" element={pr(['entrepreneur'], <InventoryStockPage />)} />
+      <Route path="/entrepreneur/club/:clubId/inventory/proveedores" element={pr(['entrepreneur'], <InventorySuppliersPage />)} />
+      <Route path="/entrepreneur/club/:clubId/inventory/pedidos" element={pr(['entrepreneur'], <InventoryOrdersPage />)} />
+      <Route path="/entrepreneur/club/:clubId/inventory/categorias" element={pr(['entrepreneur'], <InventoryCategoriesPage />)} />
+      <Route path="/entrepreneur/club/:clubId/finance/movimientos" element={pr(['entrepreneur'], <FinancialMovementsPage />)} />
+      <Route path="/entrepreneur/club/:clubId/finance/rentabilidad" element={pr(['entrepreneur'], <ProfitabilityPage />)} />
+      <Route path="/entrepreneur/club/:clubId/manage-users-roles" element={pr(['entrepreneur'], <ManageUsersAndRolesPage />)} />
+      <Route path="/entrepreneur/club/:clubId/general-settings" element={pr(['entrepreneur'], <GeneralSettingsPage />)} />
+      <Route path="/entrepreneur/club/:clubId/active-subscriptions" element={pr(['entrepreneur'], <ActiveSubscriptionsPage />)} />
+      <Route path="/entrepreneur/club/:clubId/customer-history" element={pr(['entrepreneur'], <CustomerHistoryPage />)} />
+      <Route path="/entrepreneur/club/:clubId/customer-history/:customerId" element={pr(['entrepreneur'], <CustomerHistoryPage />)} />
+      <Route path="/entrepreneur/club/:clubId/manage-customers" element={pr(['entrepreneur'], <ManageCustomersPage />)} />
+      <Route path="/entrepreneur/club/:clubId/stats" element={pr(['entrepreneur'], <ClubStatsPage />)} />
+      <Route path="/entrepreneur/club/:clubId/sales-reports" element={pr(['entrepreneur'], <SalesReportsPage />)} />
+      <Route path="/entrepreneur/club/:clubId/feedback-trends" element={pr(['entrepreneur'], <FeedbackTrendsPage />)} />
+      <Route path="/entrepreneur/club/:clubId/subscription/:subscriptionId" element={pr(['entrepreneur'], <SubscriptionDetailForEntrepreneurPage />)} />
+      <Route path="/entrepreneur/club/:clubId/assign-deliveries" element={pr(['entrepreneur'], <AssignDeliveriesPage />)} />
+      <Route path="/entrepreneur/club/:clubId/view-deliveries" element={pr(['entrepreneur'], <ViewDeliveriesPage />)} />
+      <Route path="/entrepreneur/club/:clubId/delivery-history" element={pr(['entrepreneur'], <DeliveryHistoryPage />)} />
+      <Route path="/entrepreneur/club/:clubId/manage-riders" element={pr(['entrepreneur'], <ManageRidersPage />)} />
+      <Route path="/entrepreneur/club/:clubId/gestionar-imagenes" element={pr(['entrepreneur'], <ManageClubImagesPage />)} />
+      <Route path="/entrepreneur/club/:clubId/administrar-promociones" element={pr(['entrepreneur'], <ManagePromotionsPage />)} />
+      <Route path="/entrepreneur/club/:clubId/enviar-newsletters" element={pr(['entrepreneur'], <SendNewsletterPage />)} />
+      <Route path="/entrepreneur/club/:clubId/moderate-reviews" element={pr(['entrepreneur'], <ModerateReviewsPage />)} />
+      <Route path="/entrepreneur/club/:clubId/customer-support" element={pr(['entrepreneur'], <CustomerSupportPage />)} />
+      <Route path="*" element={<Navigate to="/" replace />} />
+    </Routes>
+  );
+
+  const skipLink = (
+    <a href="#main-content" className="sr-only focus:not-sr-only focus:fixed focus:top-2 focus:left-2 focus:z-[100] focus:bg-aurora-terracotta focus:text-white focus:px-4 focus:py-2 focus:rounded-lg">
+      Saltar al contenido
+    </a>
+  );
+
+  if (isPanel) {
+    return (
+      <>
+        {skipLink}
+        <EntrepreneurLayout onLogout={logout}>{routes}</EntrepreneurLayout>
+      </>
+    );
+  }
+
   return (
     <>
-      <a href="#main-content" className="sr-only focus:not-sr-only focus:fixed focus:top-2 focus:left-2 focus:z-[100] focus:bg-aurora-terracotta focus:text-white focus:px-4 focus:py-2 focus:rounded-lg">
-        Saltar al contenido
-      </a>
+      {skipLink}
       <Navbar userRole={userRole} isAuthenticated={isAuthenticated} onLogout={logout} />
       <main id="main-content" className="min-h-[calc(100vh-100px)]">
-        <Routes>
-          <Route path="/" element={<HomePage />} />
-          <Route path="/explore" element={<ExploreClubsPage />} />
-          <Route path="/faq" element={<FAQPage />} />
-          <Route path="/login" element={<LoginPage onLogin={login} />} />
-          <Route path="/register" element={<RegisterPage />} />
-          <Route path="/register/complete-profile" element={<CompleteProfilePage />} />
-          <Route path="/about-us" element={<AboutUsPage />} />
-          <Route path="/contact" element={<ContactPage />} />
-          <Route path="/logout" element={<Logout />} />
-          <Route path="/club/:clubId" element={<ClubDetailPage />} />
-          <Route path="/club/:clubId/history" element={<HistoryPage />} />
-          <Route path="/club/:clubId/terms-and-conditions" element={<TermsAndConditionsPage />} />
-          <Route path="/club/:clubId/privacy-and-security" element={<PrivacyAndSecurityPolicyPage />} />
-          <Route path="/club/:clubId/plan/:planId" element={<SubscriptionPlanDetailPage />} />
-          <Route path="/entrepreneur/club/:clubId/edit-legal-info/:section" element={pr(['entrepreneur'], <EditClubLegalInfoPage />)} />
-          <Route path="/entrepreneur/club/:clubId/edit-legal-info" element={pr(['entrepreneur'], <EditClubLegalInfoPage />)} />
-          <Route path="/entrepreneur/club/:clubId/legal-compliance" element={pr(['entrepreneur'], <LegalCompliancePage />)} />
-          <Route path="/customer/profile" element={pr(['customer'], <UserProfilePage />)} />
-          <Route path="/customer/subscriptions" element={pr(['customer'], <UserSubscriptionsPage />)} />
-          <Route path="/customer/orders" element={pr(['customer'], <OrderHistoryPage />)} />
-          <Route path="/customer/reviews" element={pr(['customer'], <MisReviewsPage />)} />
-          <Route path="/customer/wishlist" element={pr(['customer'], <WishlistPage />)} />
-          <Route path="/cart" element={pr(['customer'], <CartPage />)} />
-          <Route path="/checkout" element={pr(['customer'], <CheckoutPage />)} />
-
-          <Route path="/entrepreneur/profile" element={pr(['entrepreneur'], <EntrepreneurProfilePage />)} />
-          <Route path="/entrepreneur/club/:clubId/edit-subscriptions" element={pr(['entrepreneur'], <EditSubscriptionsPage />)} />
-          <Route path="/entrepreneur/club/:clubId/subscription-boxes" element={pr(['entrepreneur'], <ClubSubscriptionsOverviewPage />)} />
-          <Route path="/entrepreneur/club/:clubId/subscription-boxes/:subscriptionTypeId" element={pr(['entrepreneur'], <SubscriptionBoxHistoryPage />)} />
-          <Route path="/entrepreneur/club/:clubId/finance/movimientos" element={pr(['entrepreneur'], <FinancialMovementsPage />)} />
-          <Route path="/entrepreneur/club/:clubId/finance/rentabilidad" element={pr(['entrepreneur'], <ProfitabilityPage />)} />
-          <Route path="/entrepreneur/club/:clubId/manage-users-roles" element={pr(['entrepreneur'], <ManageUsersAndRolesPage />)} />
-          <Route path="/entrepreneur/club/:clubId/general-settings" element={pr(['entrepreneur'], <GeneralSettingsPage />)} />
-          <Route path="/entrepreneur/club/:clubId/active-subscriptions" element={pr(['entrepreneur'], <ActiveSubscriptionsPage />)} />
-          <Route path="/entrepreneur/club/:clubId/customer-history" element={pr(['entrepreneur'], <CustomerHistoryPage />)} />
-          <Route path="/entrepreneur/club/:clubId/customer-history/:customerId" element={pr(['entrepreneur'], <CustomerHistoryPage />)} />
-          <Route path="/entrepreneur/club/:clubId/manage-customers" element={pr(['entrepreneur'], <ManageCustomersPage />)} />
-          <Route path="/entrepreneur/club/:clubId/stats" element={pr(['entrepreneur'], <ClubStatsPage />)} />
-          <Route path="/entrepreneur/club/:clubId/sales-reports" element={pr(['entrepreneur'], <SalesReportsPage />)} />
-          <Route path="/entrepreneur/club/:clubId/feedback-trends" element={pr(['entrepreneur'], <FeedbackTrendsPage />)} />
-          <Route path="/entrepreneur/club/:clubId/subscription/:subscriptionId" element={pr(['entrepreneur'], <SubscriptionDetailForEntrepreneurPage />)} />
-          <Route path="/entrepreneur/club/:clubId/assign-deliveries" element={pr(['entrepreneur'], <AssignDeliveriesPage />)} />
-          <Route path="/entrepreneur/club/:clubId/view-deliveries" element={pr(['entrepreneur'], <ViewDeliveriesPage />)} />
-          <Route path="/entrepreneur/club/:clubId/delivery-history" element={pr(['entrepreneur'], <DeliveryHistoryPage />)} />
-          <Route path="/entrepreneur/club/:clubId/manage-riders" element={pr(['entrepreneur'], <ManageRidersPage />)} />
-          <Route path="/entrepreneur/club/:clubId/gestionar-imagenes" element={pr(['entrepreneur'], <ManageClubImagesPage />)} />
-          <Route path="/entrepreneur/club/:clubId/administrar-promociones" element={pr(['entrepreneur'], <ManagePromotionsPage />)} />
-          <Route path="/entrepreneur/club/:clubId/enviar-newsletters" element={pr(['entrepreneur'], <SendNewsletterPage />)} />
-          <Route path="/entrepreneur/club/:clubId/moderate-reviews" element={pr(['entrepreneur'], <ModerateReviewsPage />)} />
-          <Route path="/entrepreneur/club/:clubId/customer-support" element={pr(['entrepreneur'], <CustomerSupportPage />)} />
-          <Route path="*" element={<Navigate to="/" replace />} />
-        </Routes>
+        {routes}
       </main>
       <Footer />
       <FloatingButtons />

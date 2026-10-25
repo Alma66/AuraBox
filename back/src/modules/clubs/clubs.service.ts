@@ -192,7 +192,7 @@ export class ClubsService {
     return [...sameCategoryBucket.slice(0, 2), ...otherBucket].slice(0, 10);
   }
 
-  async findOne(id: number, requestingUserId?: number) {
+  async findOne(id: number, requester?: number | { id: number; role: string }) {
     const club = await this.prisma.club.findUnique({ where: { id } });
     if (!club) throw new NotFoundException('Club no encontrado');
     const entrepreneurClub = await this.prisma.entrepreneur_Club.findMany({
@@ -200,8 +200,10 @@ export class ClubsService {
     });
     const entrepreneurIds = entrepreneurClub.map((ec) => ec.idEntrepreneurs);
     let isOwner = false;
-    if (requestingUserId) {
-      isOwner = entrepreneurIds.includes(requestingUserId);
+    if (typeof requester === 'number') {
+      isOwner = entrepreneurIds.includes(requester);
+    } else if (requester && requester.role === 'entrepreneur') {
+      isOwner = entrepreneurIds.includes(requester.id);
     }
     const entrepreneurs = await this.prisma.entrepreneurs.findMany({
       where: { id: { in: entrepreneurIds } },
@@ -211,10 +213,18 @@ export class ClubsService {
       where: { idClub: id },
       orderBy: { id: 'desc' },
     });
+    const isTeamImage = (img: { description: string | null }) =>
+      (img.description ?? '').startsWith('team-');
     const bannerImagesRaw = images.filter(
-      (img) => img.section === 'Banner' && img.description !== 'historia' && !(img.description ?? '').startsWith('team-'),
+      (img) =>
+        img.section === 'Banner' &&
+        img.isActive &&
+        img.description !== 'historia' &&
+        !isTeamImage(img),
     );
-    const historyImageRaw = images.filter((img) => img.section === 'Historia' && img.description === 'historia');
+    const historyImageRaw = images.filter(
+      (img) => img.section === 'Historia' && img.isActive && !isTeamImage(img),
+    );
     const socialNetworksRaw = await this.prisma.club_Social_Networks.findMany({ where: { idClub: id } });
     const plans = await this.prisma.subscription_Types.findMany({ where: { idClub: id } });
     const mappedPlans = plans.map((p) => this.mapPlan(p));
