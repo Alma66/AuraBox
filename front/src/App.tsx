@@ -1,5 +1,5 @@
 import React, { useState, useEffect, createContext, useContext } from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate, useLocation, useParams } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
 import Navbar from './components/common/Navbar';
 import Footer from './components/common/Footer';
@@ -35,10 +35,7 @@ import SubscriptionBoxHistoryPage from './pages/entrepreneur/club/myClub/Subscri
 import ActiveSubscriptionsPage from './pages/entrepreneur/operations/clients/ActiveSubscriptionsPage';
 import CustomerHistoryPage from './pages/entrepreneur/operations/clients/CustomerHistoryPage';
 import ManageCustomersPage from './pages/entrepreneur/operations/clients/ManageCustomersPage';
-import AssignDeliveriesPage from './pages/entrepreneur/operations/logistics/AssignDeliveriesPage';
-import ViewDeliveriesPage from './pages/entrepreneur/operations/logistics/ViewDeliveriesPage';
-import DeliveryHistoryPage from './pages/entrepreneur/operations/logistics/DeliveryHistoryPage';
-import ManageRidersPage from './pages/entrepreneur/operations/logistics/ManageRidersPage';
+import ShipmentsPage from './pages/entrepreneur/operations/logistics/ShipmentsPage';
 import ModerateReviewsPage from './pages/entrepreneur/marketing_and_communication/community/ModerateReviewsPage';
 import CustomerSupportPage from './pages/entrepreneur/marketing_and_communication/community/CustomerSupportPage';
 import ManageClubImagesPage from './pages/entrepreneur/marketing_and_communication/marketing/ManageClubImagesPage';
@@ -156,6 +153,11 @@ const Logout: React.FC = () => {
   return <Navigate to="/" replace />;
 };
 
+const ShipmentsRedirect: React.FC<{ search: string }> = ({ search }) => {
+  const { clubId } = useParams<{ clubId: string }>();
+  return <Navigate to={`/entrepreneur/club/${clubId}/shipments${search}`} replace />;
+};
+
 const AUTH_PATHS = ['/login', '/register', '/logout'];
 
 const AppContent: React.FC = () => {
@@ -229,10 +231,11 @@ const AppContent: React.FC = () => {
       <Route path="/entrepreneur/club/:clubId/sales-reports" element={pr(['entrepreneur'], <SalesReportsPage />)} />
       <Route path="/entrepreneur/club/:clubId/feedback-trends" element={pr(['entrepreneur'], <FeedbackTrendsPage />)} />
       <Route path="/entrepreneur/club/:clubId/subscription/:subscriptionId" element={pr(['entrepreneur'], <SubscriptionDetailForEntrepreneurPage />)} />
-      <Route path="/entrepreneur/club/:clubId/assign-deliveries" element={pr(['entrepreneur'], <AssignDeliveriesPage />)} />
-      <Route path="/entrepreneur/club/:clubId/view-deliveries" element={pr(['entrepreneur'], <ViewDeliveriesPage />)} />
-      <Route path="/entrepreneur/club/:clubId/delivery-history" element={pr(['entrepreneur'], <DeliveryHistoryPage />)} />
-      <Route path="/entrepreneur/club/:clubId/manage-riders" element={pr(['entrepreneur'], <ManageRidersPage />)} />
+            <Route path="/entrepreneur/club/:clubId/shipments" element={pr(['entrepreneur'], <ShipmentsPage />)} />
+      <Route path="/entrepreneur/club/:clubId/assign-deliveries" element={pr(['entrepreneur'], <ShipmentsRedirect search="?tab=assign" />)} />
+      <Route path="/entrepreneur/club/:clubId/view-deliveries" element={pr(['entrepreneur'], <ShipmentsRedirect search="?tab=list&view=recent" />)} />
+      <Route path="/entrepreneur/club/:clubId/delivery-history" element={pr(['entrepreneur'], <ShipmentsRedirect search="?tab=list&view=history" />)} />
+      <Route path="/entrepreneur/club/:clubId/manage-riders" element={pr(['entrepreneur'], <ShipmentsRedirect search="?riders=1" />)} />
       <Route path="/entrepreneur/club/:clubId/gestionar-imagenes" element={pr(['entrepreneur'], <ManageClubImagesPage />)} />
       <Route path="/entrepreneur/club/:clubId/administrar-promociones" element={pr(['entrepreneur'], <ManagePromotionsPage />)} />
       <Route path="/entrepreneur/club/:clubId/enviar-newsletters" element={pr(['entrepreneur'], <SendNewsletterPage />)} />

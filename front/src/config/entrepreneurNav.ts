@@ -65,17 +65,12 @@ export const ENTREPRENEUR_SECTIONS: NavSection[] = [
       { id: 'history', label: 'Historial', to: (c) => `${club(c)}/customer-history` },
     ],
   },
-  {
+    {
     id: 'shipments',
     label: 'Envíos',
     icon: 'truck',
     mobilePrimary: true,
-    tabs: [
-      { id: 'today', label: 'Del día', to: (c) => `${club(c)}/view-deliveries` },
-      { id: 'assign', label: 'Asignar', to: (c) => `${club(c)}/assign-deliveries` },
-      { id: 'history', label: 'Historial', to: (c) => `${club(c)}/delivery-history` },
-      { id: 'riders', label: 'Riders', to: (c) => `${club(c)}/manage-riders` },
-    ],
+    tabs: [{ id: 'shipments', label: 'Envíos', to: (c) => `${club(c)}/shipments` }],
   },
   {
     id: 'inventory',
