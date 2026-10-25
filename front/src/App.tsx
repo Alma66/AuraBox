@@ -32,9 +32,7 @@ import EntrepreneurDashboardPage from './pages/entrepreneur/EntrepreneurDashboar
 import EditSubscriptionsPage from './pages/entrepreneur/club/myClub/EditSubscriptionsPage';
 import ClubSubscriptionsOverviewPage from './pages/entrepreneur/club/myClub/ClubSubscriptionsOverviewPage';
 import SubscriptionBoxHistoryPage from './pages/entrepreneur/club/myClub/SubscriptionBoxHistoryPage';
-import ActiveSubscriptionsPage from './pages/entrepreneur/operations/clients/ActiveSubscriptionsPage';
-import CustomerHistoryPage from './pages/entrepreneur/operations/clients/CustomerHistoryPage';
-import ManageCustomersPage from './pages/entrepreneur/operations/clients/ManageCustomersPage';
+import CustomersPage from './pages/entrepreneur/operations/clients/CustomersPage';
 import ShipmentsPage from './pages/entrepreneur/operations/logistics/ShipmentsPage';
 import ModerateReviewsPage from './pages/entrepreneur/marketing_and_communication/community/ModerateReviewsPage';
 import CustomerSupportPage from './pages/entrepreneur/marketing_and_communication/community/CustomerSupportPage';
@@ -158,6 +156,15 @@ const ShipmentsRedirect: React.FC<{ search: string }> = ({ search }) => {
   return <Navigate to={`/entrepreneur/club/${clubId}/shipments${search}`} replace />;
 };
 
+const CustomersRedirect: React.FC<{ tab: 'subscriptions' | 'directory' }> = ({ tab }) => {
+  const { clubId, customerId } = useParams<{ clubId: string; customerId?: string }>();
+  const { search } = useLocation();
+  const params = new URLSearchParams(search);
+  params.set('tab', tab);
+  if (customerId) params.set('customerId', customerId);
+  return <Navigate to={`/entrepreneur/club/${clubId}/customers?${params.toString()}`} replace />;
+};
+
 const AUTH_PATHS = ['/login', '/register', '/logout'];
 
 const AppContent: React.FC = () => {
@@ -223,10 +230,11 @@ const AppContent: React.FC = () => {
       <Route path="/entrepreneur/club/:clubId/finance/rentabilidad" element={pr(['entrepreneur'], <ProfitabilityPage />)} />
       <Route path="/entrepreneur/club/:clubId/manage-users-roles" element={pr(['entrepreneur'], <ManageUsersAndRolesPage />)} />
       <Route path="/entrepreneur/club/:clubId/general-settings" element={pr(['entrepreneur'], <GeneralSettingsPage />)} />
-      <Route path="/entrepreneur/club/:clubId/active-subscriptions" element={pr(['entrepreneur'], <ActiveSubscriptionsPage />)} />
-      <Route path="/entrepreneur/club/:clubId/customer-history" element={pr(['entrepreneur'], <CustomerHistoryPage />)} />
-      <Route path="/entrepreneur/club/:clubId/customer-history/:customerId" element={pr(['entrepreneur'], <CustomerHistoryPage />)} />
-      <Route path="/entrepreneur/club/:clubId/manage-customers" element={pr(['entrepreneur'], <ManageCustomersPage />)} />
+            <Route path="/entrepreneur/club/:clubId/customers" element={pr(['entrepreneur'], <CustomersPage />)} />
+      <Route path="/entrepreneur/club/:clubId/active-subscriptions" element={pr(['entrepreneur'], <CustomersRedirect tab="subscriptions" />)} />
+      <Route path="/entrepreneur/club/:clubId/manage-customers" element={pr(['entrepreneur'], <CustomersRedirect tab="directory" />)} />
+      <Route path="/entrepreneur/club/:clubId/customer-history" element={pr(['entrepreneur'], <CustomersRedirect tab="directory" />)} />
+      <Route path="/entrepreneur/club/:clubId/customer-history/:customerId" element={pr(['entrepreneur'], <CustomersRedirect tab="directory" />)} />
       <Route path="/entrepreneur/club/:clubId/stats" element={pr(['entrepreneur'], <ClubStatsPage />)} />
       <Route path="/entrepreneur/club/:clubId/sales-reports" element={pr(['entrepreneur'], <SalesReportsPage />)} />
       <Route path="/entrepreneur/club/:clubId/feedback-trends" element={pr(['entrepreneur'], <FeedbackTrendsPage />)} />

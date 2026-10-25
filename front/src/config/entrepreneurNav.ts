@@ -49,20 +49,18 @@ export const ENTREPRENEUR_SECTIONS: NavSection[] = [
       { id: 'boxes', label: 'Contenido de cajas', to: (c) => `${club(c)}/subscription-boxes` },
     ],
   },
-  {
+    {
     id: 'customers',
     label: 'Clientes',
     icon: 'users',
     mobilePrimary: true,
     tabs: [
       {
-        id: 'active',
-        label: 'Suscripciones activas',
-        to: (c) => `${club(c)}/active-subscriptions`,
+        id: 'customers',
+        label: 'Clientes',
+        to: (c) => `${club(c)}/customers`,
         alsoMatches: (c) => [`${club(c)}/subscription`],
       },
-      { id: 'manage', label: 'Clientes', to: (c) => `${club(c)}/manage-customers` },
-      { id: 'history', label: 'Historial', to: (c) => `${club(c)}/customer-history` },
     ],
   },
     {
