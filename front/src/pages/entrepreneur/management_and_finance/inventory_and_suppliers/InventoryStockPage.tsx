@@ -195,7 +195,7 @@ const removeProduct = (id: number) => {
   }
 
   return (
-    <div className="container mx-auto px-4 py-10 max-w-7xl">
+    <div className="px-4 py-6 lg:px-8">
       <h1 className="text-2xl font-bold text-gray-900 mb-2">Stock e Insumos</h1>
       <p className="text-sm text-gray-500 mb-8">Controlá el inventario de materia prima y packaging de tu club.</p>
 

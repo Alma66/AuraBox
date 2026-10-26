@@ -35,15 +35,9 @@ import CustomersPage from './pages/entrepreneur/operations/clients/CustomersPage
 import ShipmentsPage from './pages/entrepreneur/operations/logistics/ShipmentsPage';
 import MarketingPage from './pages/entrepreneur/marketing_and_communication/MarketingPage';
 import CommunityPage from './pages/entrepreneur/marketing_and_communication/CommunityPage';
-import ClubStatsPage from './pages/entrepreneur/administration_tools/analysis_and_reports/ClubStatsPage';
-import SalesReportsPage from './pages/entrepreneur/administration_tools/analysis_and_reports/SalesReportsPage';
-import FeedbackTrendsPage from './pages/entrepreneur/administration_tools/analysis_and_reports/FeedbackTrendsPage';
-import FinancialMovementsPage from './pages/entrepreneur/management_and_finance/finance/FinancialMovementsPage';
-import ProfitabilityPage from './pages/entrepreneur/management_and_finance/finance/ProfitabilityPage';
-import InventoryStockPage from './pages/entrepreneur/management_and_finance/inventory_and_suppliers/InventoryStockPage';
-import InventorySuppliersPage from './pages/entrepreneur/management_and_finance/inventory_and_suppliers/InventorySuppliersPage';
-import InventoryOrdersPage from './pages/entrepreneur/management_and_finance/inventory_and_suppliers/InventoryOrdersPage';
-import InventoryCategoriesPage from './pages/entrepreneur/management_and_finance/inventory_and_suppliers/InventoryCategoriesPage';
+import AnalyticsPage from './pages/entrepreneur/administration_tools/analysis_and_reports/AnalyticsPage';
+import FinancePage from './pages/entrepreneur/management_and_finance/FinancePage';
+import InventoryPage from './pages/entrepreneur/management_and_finance/InventoryPage';
 import ManageUsersAndRolesPage from './pages/entrepreneur/administration_tools/team/ManageUsersAndRolesPage';
 import GeneralSettingsPage from './pages/entrepreneur/administration_tools/team/GeneralSettingsPage';
 import EditClubLegalInfoPage from './pages/entrepreneur/club/legal/EditClubLegalInfoPage';
@@ -233,12 +227,18 @@ const AppContent: React.FC = () => {
       <Route path="/entrepreneur/dashboard" element={pr(['entrepreneur'], <EntrepreneurDashboardPage />)} />
       <Route path="/entrepreneur/profile" element={pr(['entrepreneur'], <EntrepreneurProfilePage />)} />
             <Route path="/entrepreneur/club/:clubId/gestionar-imagenes" element={pr(['entrepreneur'], <MyClubRedirect tab="media" />)} />
-      <Route path="/entrepreneur/club/:clubId/inventory/stock" element={pr(['entrepreneur'], <InventoryStockPage />)} />
-      <Route path="/entrepreneur/club/:clubId/inventory/proveedores" element={pr(['entrepreneur'], <InventorySuppliersPage />)} />
-      <Route path="/entrepreneur/club/:clubId/inventory/pedidos" element={pr(['entrepreneur'], <InventoryOrdersPage />)} />
-      <Route path="/entrepreneur/club/:clubId/inventory/categorias" element={pr(['entrepreneur'], <InventoryCategoriesPage />)} />
-      <Route path="/entrepreneur/club/:clubId/finance/movimientos" element={pr(['entrepreneur'], <FinancialMovementsPage />)} />
-      <Route path="/entrepreneur/club/:clubId/finance/rentabilidad" element={pr(['entrepreneur'], <ProfitabilityPage />)} />
+           <Route path="/entrepreneur/club/:clubId/inventory" element={pr(['entrepreneur'], <InventoryPage />)} />
+      <Route path="/entrepreneur/club/:clubId/inventory/stock" element={pr(['entrepreneur'], <ClubRedirect to="inventory" search="?tab=stock" />)} />
+      <Route path="/entrepreneur/club/:clubId/inventory/proveedores" element={pr(['entrepreneur'], <ClubRedirect to="inventory" search="?tab=suppliers" />)} />
+      <Route path="/entrepreneur/club/:clubId/inventory/pedidos" element={pr(['entrepreneur'], <ClubRedirect to="inventory" search="?tab=orders" />)} />
+      <Route path="/entrepreneur/club/:clubId/inventory/categorias" element={pr(['entrepreneur'], <ClubRedirect to="inventory" search="?tab=categories" />)} />
+      <Route path="/entrepreneur/club/:clubId/finance" element={pr(['entrepreneur'], <FinancePage />)} />
+      <Route path="/entrepreneur/club/:clubId/finance/movimientos" element={pr(['entrepreneur'], <ClubRedirect to="finance" search="?tab=movements" />)} />
+      <Route path="/entrepreneur/club/:clubId/finance/rentabilidad" element={pr(['entrepreneur'], <ClubRedirect to="finance" search="?tab=profitability" />)} />
+      <Route path="/entrepreneur/club/:clubId/analytics" element={pr(['entrepreneur'], <AnalyticsPage />)} />
+      <Route path="/entrepreneur/club/:clubId/stats" element={pr(['entrepreneur'], <ClubRedirect to="analytics" search="?group=stats" />)} />
+      <Route path="/entrepreneur/club/:clubId/sales-reports" element={pr(['entrepreneur'], <ClubRedirect to="analytics" search="?group=sales" />)} />
+      <Route path="/entrepreneur/club/:clubId/feedback-trends" element={pr(['entrepreneur'], <ClubRedirect to="analytics" search="?group=feedback" />)} />
       <Route path="/entrepreneur/club/:clubId/manage-users-roles" element={pr(['entrepreneur'], <ManageUsersAndRolesPage />)} />
       <Route path="/entrepreneur/club/:clubId/general-settings" element={pr(['entrepreneur'], <GeneralSettingsPage />)} />
       <Route path="/entrepreneur/club/:clubId/customers" element={pr(['entrepreneur'], <CustomersPage />)} />
@@ -246,9 +246,6 @@ const AppContent: React.FC = () => {
       <Route path="/entrepreneur/club/:clubId/manage-customers" element={pr(['entrepreneur'], <CustomersRedirect tab="directory" />)} />
       <Route path="/entrepreneur/club/:clubId/customer-history" element={pr(['entrepreneur'], <CustomersRedirect tab="directory" />)} />
       <Route path="/entrepreneur/club/:clubId/customer-history/:customerId" element={pr(['entrepreneur'], <CustomersRedirect tab="directory" />)} />
-      <Route path="/entrepreneur/club/:clubId/stats" element={pr(['entrepreneur'], <ClubStatsPage />)} />
-      <Route path="/entrepreneur/club/:clubId/sales-reports" element={pr(['entrepreneur'], <SalesReportsPage />)} />
-      <Route path="/entrepreneur/club/:clubId/feedback-trends" element={pr(['entrepreneur'], <FeedbackTrendsPage />)} />
       <Route path="/entrepreneur/club/:clubId/subscription/:subscriptionId" element={pr(['entrepreneur'], <SubscriptionDetailForEntrepreneurPage />)} />
             <Route path="/entrepreneur/club/:clubId/shipments" element={pr(['entrepreneur'], <ShipmentsPage />)} />
       <Route path="/entrepreneur/club/:clubId/assign-deliveries" element={pr(['entrepreneur'], <ShipmentsRedirect search="?tab=assign" />)} />

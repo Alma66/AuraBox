@@ -70,25 +70,17 @@ export const ENTREPRENEUR_SECTIONS: NavSection[] = [
     mobilePrimary: true,
     tabs: [{ id: 'shipments', label: 'Envíos', to: (c) => `${club(c)}/shipments` }],
   },
-  {
+   {
     id: 'inventory',
     label: 'Inventario',
     icon: 'inventory',
-    tabs: [
-      { id: 'stock', label: 'Stock e insumos', to: (c) => `${club(c)}/inventory/stock` },
-      { id: 'suppliers', label: 'Proveedores', to: (c) => `${club(c)}/inventory/proveedores` },
-      { id: 'orders', label: 'Pedidos', to: (c) => `${club(c)}/inventory/pedidos` },
-      { id: 'categories', label: 'Categorías', to: (c) => `${club(c)}/inventory/categorias` },
-    ],
+    tabs: [{ id: 'inventory', label: 'Inventario', to: (c) => `${club(c)}/inventory` }],
   },
   {
     id: 'finance',
     label: 'Finanzas',
     icon: 'finance',
-    tabs: [
-      { id: 'movements', label: 'Caja y movimientos', to: (c) => `${club(c)}/finance/movimientos` },
-      { id: 'profitability', label: 'Costos y rentabilidad', to: (c) => `${club(c)}/finance/rentabilidad` },
-    ],
+    tabs: [{ id: 'finance', label: 'Finanzas', to: (c) => `${club(c)}/finance` }],
   },
     {
     id: 'marketing',
@@ -107,11 +99,7 @@ export const ENTREPRENEUR_SECTIONS: NavSection[] = [
     id: 'analytics',
     label: 'Analítica',
     icon: 'analytics',
-    tabs: [
-      { id: 'stats', label: 'Estadísticas', to: (c) => `${club(c)}/stats` },
-      { id: 'sales', label: 'Reportes de ventas', to: (c) => `${club(c)}/sales-reports` },
-      { id: 'feedback', label: 'Feedback y tendencias', to: (c) => `${club(c)}/feedback-trends` },
-    ],
+    tabs: [{ id: 'analytics', label: 'Analítica', to: (c) => `${club(c)}/analytics` }],
   },
   {
     id: 'settings',

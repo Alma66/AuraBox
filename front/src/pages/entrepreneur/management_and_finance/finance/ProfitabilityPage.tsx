@@ -61,7 +61,7 @@ const ProfitabilityPage: React.FC = () => {
   }
 
   return (
-    <div className="container mx-auto px-4 py-10 max-w-7xl">
+    <div className="px-4 py-6 lg:px-8">
       <h1 className="text-2xl font-serif font-bold text-aurora-navy mb-2">Costos y Rentabilidad — {clubName}</h1>
       <p className="text-sm text-aurora-navy/60 mb-8">Margen real por suscripción: ingresos menos comisión AuraBox, costo de envío y una porción proporcional del gasto en insumos.</p>
 
