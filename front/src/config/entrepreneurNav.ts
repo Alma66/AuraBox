@@ -101,16 +101,11 @@ export const ENTREPRENEUR_SECTIONS: NavSection[] = [
     icon: 'analytics',
     tabs: [{ id: 'analytics', label: 'Analítica', to: (c) => `${club(c)}/analytics` }],
   },
-  {
+   {
     id: 'settings',
     label: 'Configuración',
     icon: 'settings',
-    tabs: [
-      { id: 'general', label: 'Ajustes generales', to: (c) => `${club(c)}/general-settings` },
-      { id: 'terms', label: 'Términos y condiciones', to: (c) => `${club(c)}/edit-legal-info/terms` },
-      { id: 'privacy', label: 'Política de seguridad', to: (c) => `${club(c)}/edit-legal-info/privacy` },
-      { id: 'compliance', label: 'Cumplimiento legal', to: (c) => `${club(c)}/legal-compliance` },
-    ],
+    tabs: [{ id: 'settings', label: 'Configuración', to: (c) => `${club(c)}/settings` }],
   },
 ];
 

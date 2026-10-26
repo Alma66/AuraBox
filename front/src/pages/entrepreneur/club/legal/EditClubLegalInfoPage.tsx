@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, useSearchParams} from 'react-router-dom';
 import toast from 'react-hot-toast';
 import api, { getResponseData } from '../../../../api/config';
 import { useAuth } from '../../../../App';
@@ -153,9 +153,11 @@ const PreviewModal: React.FC<PreviewModalProps> = ({ title, sections, onClose })
 
 const EditClubLegalInfoPage: React.FC = () => {
   const { clubId, section } = useParams<{ clubId: string; section?: string }>();
+  const [searchParams] = useSearchParams();
+  const initialSection = section ?? searchParams.get('doc');
   const navigate = useNavigate();
   const { user, userRole } = useAuth();
-  const [activeTab, setActiveTab] = useState<'terms' | 'privacy'>(section === 'privacy' ? 'privacy' : 'terms');
+  const [activeTab, setActiveTab] = useState<'terms' | 'privacy'>(initialSection === 'privacy' ? 'privacy' : 'terms');
   const [termsSections, setTermsSections] = useState<LegalSection[]>([]);
   const [policySections, setPolicySections] = useState<LegalSection[]>([]);
   const [loading, setLoading] = useState(true);
@@ -203,7 +205,7 @@ const EditClubLegalInfoPage: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-aurora-cream">
+      <div className="  flex items-center justify-center py-20.">
         <div className="animate-spin rounded-full h-10 w-10 border-4 border-aurora-navy/15 border-t-aurora-terracotta" />
       </div>
     );
@@ -224,14 +226,8 @@ const EditClubLegalInfoPage: React.FC = () => {
   const previewTitle = activeTab === 'terms' ? 'Términos y Condiciones' : 'Política de Seguridad y Devolución';
 
   return (
-    <div className="container mx-auto px-4 py-8 min-h-screen bg-aurora-cream">
-      <button
-        onClick={() => navigate(`/club/${clubId}`)}
-        className="mb-6 flex items-center text-aurora-navy hover:text-aurora-terracotta transition-colors duration-200 text-sm font-medium"
-      >
-        ← Volver al Perfil del Club
-      </button>
-      <div className="card-surface p-8 mb-8">
+    <div className="px-4 py-6 lg:px-8">
+      <div className="card-surface p-4 sm:p-8 mb-8">
         <h1 className="font-display text-3xl font-bold text-aurora-navy mb-1 text-center">
           Editar {activeTab === 'terms' ? 'Términos y Condiciones' : 'Política de Seguridad y Devolución'}
         </h1>
@@ -266,6 +262,7 @@ const EditClubLegalInfoPage: React.FC = () => {
           <SectionEditor sections={policySections} onChange={setPolicySections} />
         )}
         <div className="flex justify-end mt-6">
+                  <p className="mr-4 self-center text-xs text-aurora-navy/50">Se guardan ambos documentos a la vez.</p>
           <button
             onClick={handleSave}
             disabled={saving}

@@ -35,13 +35,10 @@ import CustomersPage from './pages/entrepreneur/operations/clients/CustomersPage
 import ShipmentsPage from './pages/entrepreneur/operations/logistics/ShipmentsPage';
 import MarketingPage from './pages/entrepreneur/marketing_and_communication/MarketingPage';
 import CommunityPage from './pages/entrepreneur/marketing_and_communication/CommunityPage';
-import AnalyticsPage from './pages/entrepreneur/administration_tools/analysis_and_reports/AnalyticsPage';
+import AnalyticsPage from './pages/entrepreneur/administration_tools/AnalyticsPage';
 import FinancePage from './pages/entrepreneur/management_and_finance/FinancePage';
 import InventoryPage from './pages/entrepreneur/management_and_finance/InventoryPage';
-import ManageUsersAndRolesPage from './pages/entrepreneur/administration_tools/team/ManageUsersAndRolesPage';
-import GeneralSettingsPage from './pages/entrepreneur/administration_tools/team/GeneralSettingsPage';
-import EditClubLegalInfoPage from './pages/entrepreneur/club/legal/EditClubLegalInfoPage';
-import LegalCompliancePage from './pages/entrepreneur/club/legal/LegalCompliancePage';
+import SettingsPage from './pages/entrepreneur/administration_tools/SettingsPage';
 import api from './api/config';
 import { User, UserRole } from './types/user';
 
@@ -172,6 +169,11 @@ const ClubRedirect: React.FC<{ to: string; search: string }> = ({ to, search }) 
   return <Navigate to={`/entrepreneur/club/${clubId}/${to}${search}`} replace />;
 };
 
+const LegalSectionRedirect: React.FC = () => {
+  const { clubId, section } = useParams<{ clubId: string; section: string }>();
+  return <Navigate to={`/entrepreneur/club/${clubId}/settings?tab=legal&doc=${section ?? 'terms'}`} replace />;
+};
+
 const AUTH_PATHS = ['/login', '/register', '/logout'];
 
 const AppContent: React.FC = () => {
@@ -213,9 +215,12 @@ const AppContent: React.FC = () => {
       <Route path="/club/:clubId/terms-and-conditions" element={<TermsAndConditionsPage />} />
       <Route path="/club/:clubId/privacy-and-security" element={<PrivacyAndSecurityPolicyPage />} />
       <Route path="/club/:clubId/plan/:planId" element={<SubscriptionPlanDetailPage />} />
-      <Route path="/entrepreneur/club/:clubId/edit-legal-info/:section" element={pr(['entrepreneur'], <EditClubLegalInfoPage />)} />
-      <Route path="/entrepreneur/club/:clubId/edit-legal-info" element={pr(['entrepreneur'], <EditClubLegalInfoPage />)} />
-      <Route path="/entrepreneur/club/:clubId/legal-compliance" element={pr(['entrepreneur'], <LegalCompliancePage />)} />
+      <Route path="/entrepreneur/club/:clubId/settings" element={pr(['entrepreneur'], <SettingsPage />)} />
+      <Route path="/entrepreneur/club/:clubId/general-settings" element={pr(['entrepreneur'], <ClubRedirect to="settings" search="?tab=general" />)} />
+      <Route path="/entrepreneur/club/:clubId/edit-legal-info" element={pr(['entrepreneur'], <ClubRedirect to="settings" search="?tab=legal" />)} />
+      <Route path="/entrepreneur/club/:clubId/edit-legal-info/:section" element={pr(['entrepreneur'], <LegalSectionRedirect />)} />
+      <Route path="/entrepreneur/club/:clubId/legal-compliance" element={pr(['entrepreneur'], <ClubRedirect to="settings" search="?tab=compliance" />)} />
+      <Route path="/entrepreneur/club/:clubId/manage-users-roles" element={pr(['entrepreneur'], <ClubRedirect to="settings" search="?tab=team" />)} />
       <Route path="/customer/profile" element={pr(['customer'], <UserProfilePage />)} />
       <Route path="/customer/subscriptions" element={pr(['customer'], <UserSubscriptionsPage />)} />
       <Route path="/customer/orders" element={pr(['customer'], <OrderHistoryPage />)} />
@@ -239,8 +244,6 @@ const AppContent: React.FC = () => {
       <Route path="/entrepreneur/club/:clubId/stats" element={pr(['entrepreneur'], <ClubRedirect to="analytics" search="?group=stats" />)} />
       <Route path="/entrepreneur/club/:clubId/sales-reports" element={pr(['entrepreneur'], <ClubRedirect to="analytics" search="?group=sales" />)} />
       <Route path="/entrepreneur/club/:clubId/feedback-trends" element={pr(['entrepreneur'], <ClubRedirect to="analytics" search="?group=feedback" />)} />
-      <Route path="/entrepreneur/club/:clubId/manage-users-roles" element={pr(['entrepreneur'], <ManageUsersAndRolesPage />)} />
-      <Route path="/entrepreneur/club/:clubId/general-settings" element={pr(['entrepreneur'], <GeneralSettingsPage />)} />
       <Route path="/entrepreneur/club/:clubId/customers" element={pr(['entrepreneur'], <CustomersPage />)} />
       <Route path="/entrepreneur/club/:clubId/active-subscriptions" element={pr(['entrepreneur'], <CustomersRedirect tab="subscriptions" />)} />
       <Route path="/entrepreneur/club/:clubId/manage-customers" element={pr(['entrepreneur'], <CustomersRedirect tab="directory" />)} />

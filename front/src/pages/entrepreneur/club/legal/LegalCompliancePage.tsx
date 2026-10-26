@@ -61,6 +61,11 @@ const LegalCompliancePage: React.FC = () => {
   }, [clubId, user, userRole, navigate, fetchLicenses]);
 
   const handleFileChange = (idLicenseTypes: number, file: File | null) => {
+       if (file && file.size > 8 * 1024 * 1024) {
+      toast.error('El archivo no puede superar los 8MB.');
+      setSelectedFiles((prev) => ({ ...prev, [idLicenseTypes]: null }));
+      return;
+    }
     setSelectedFiles((prev) => ({ ...prev, [idLicenseTypes]: file }));
   };
 
@@ -90,21 +95,15 @@ const LegalCompliancePage: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-aurora-cream">
+      <div className="flex items-center justify-center py-20">
         <div className="animate-spin rounded-full h-10 w-10 border-4 border-aurora-navy/15 border-t-aurora-terracotta" />
       </div>
     );
   }
 
   return (
-    <div className="container mx-auto px-4 py-8 min-h-screen bg-aurora-cream">
-      <button
-        onClick={() => navigate(`/club/${clubId}`)}
-        className="mb-6 flex items-center text-aurora-navy hover:text-aurora-terracotta transition-colors duration-200 text-sm font-medium"
-      >
-        ← Volver al Perfil del Club
-      </button>
-      <div className="card-surface p-8">
+    <div className="px-4 py-6 lg:px-8">
+      <div className="card-surface p-4 sm:p-8">
         <h1 className="font-display text-3xl font-bold text-aurora-navy mb-2 text-center">Cumplimiento Legal</h1>
         <p className="text-aurora-navy/60 text-center mb-8">
           Subí las habilitaciones, licencias y permisos que tu club necesita según su rubro para operar de forma vigente en Argentina.

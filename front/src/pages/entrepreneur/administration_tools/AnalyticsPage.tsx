@@ -1,12 +1,12 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import toast from 'react-hot-toast';
-import api, { getResponseData } from '../../../../api/config';
-import SectionedContentPage, { GroupDef } from '../../../../components/entrepreneur/layout/SectionedContentPage';
-import ClubStatsContent from '../../../../components/entrepreneur/ClubStatsContent';
-import SalesReportsContent from '../../../../components/entrepreneur/SalesReportsContent';
-import FeedbackTrendsContent from '../../../../components/entrepreneur/FeedbackTrendsContent';
-import { ClubStatsData, FeedbackTrendsData, SalesReportData } from '../../../../types/analystics';
+import api, { getResponseData } from '../../../api/config';
+import SectionedContentPage, { GroupDef } from '../../../components/entrepreneur/layout/SectionedContentPage';
+import ClubStatsContent from '../../../components/entrepreneur/ClubStatsContent';
+import SalesReportsContent from '../../../components/entrepreneur/SalesReportsContent';
+import FeedbackTrendsContent from '../../../components/entrepreneur/FeedbackTrendsContent';
+import { ClubStatsData, FeedbackTrendsData, SalesReportData } from '../../../types/analystics';
 
 const PAGE_SIZE = 20;
 
