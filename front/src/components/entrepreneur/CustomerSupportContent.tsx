@@ -331,7 +331,7 @@ const CustomerSupportContent: React.FC<CustomerSupportContentProps> = ({ activeS
   const selectedConv = conversations.find((c) => c.id === selectedId) ?? null;
 
   return (
-    <div className="animate-fadeInUp flex flex-col lg:flex-row gap-4 h-[700px]">
+    <div className="animate-fadeInUp flex flex-col lg:flex-row gap-4 lg:h-[calc(100vh-300px)] lg:min-h-[480px]">
       <div className="lg:w-2/5 flex flex-col border border-aurora-navy/10 rounded-xl overflow-hidden">
         <div className="p-3 border-b border-aurora-navy/10 flex flex-wrap gap-2">
           <select value={filterSub} onChange={(e) => setFilterSub(e.target.value)} className="px-2 py-1 border border-aurora-navy/15 rounded text-xs flex-1 min-w-[100px]">

@@ -8,6 +8,7 @@ import { Promotion, PromotionType } from '../../types/promotion';
 interface ManagePromotionsContentProps {
   activeSection: string;
   club: Club;
+  onNavigate?: (section: string) => void;
 }
 
 interface SubscriptionTypeOption {
@@ -39,7 +40,7 @@ const emptyForm = {
   endDate: '',
 };
 
-const ManagePromotionsContent: React.FC<ManagePromotionsContentProps> = ({ activeSection, club }) => {
+const ManagePromotionsContent: React.FC<ManagePromotionsContentProps> = ({ activeSection, club, onNavigate }) => {
   const idClub = Number(club.id);
   const [promotions, setPromotions] = useState<Promotion[]>([]);
   const [subscriptionTypes, setSubscriptionTypes] = useState<SubscriptionTypeOption[]>([]);
@@ -105,6 +106,7 @@ const ManagePromotionsContent: React.FC<ManagePromotionsContentProps> = ({ activ
       resetForm();
       await fetchData();
       toast.success('Promoción guardada correctamente');
+      onNavigate?.('activas');
     } catch (err) {
       console.error(err);
       toast.error('Error al guardar la promoción');
@@ -126,7 +128,8 @@ const ManagePromotionsContent: React.FC<ManagePromotionsContentProps> = ({ activ
       startDate: promo.startDate ? promo.startDate.slice(0, 10) : '',
       endDate: promo.endDate ? promo.endDate.slice(0, 10) : '',
     });
-    setEditingId(promo.id);
+          setEditingId(promo.id);
+    onNavigate?.('nueva');
   };
 
   const toggleActive = async (promo: Promotion) => {

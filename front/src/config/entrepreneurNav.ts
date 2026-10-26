@@ -90,24 +90,18 @@ export const ENTREPRENEUR_SECTIONS: NavSection[] = [
       { id: 'profitability', label: 'Costos y rentabilidad', to: (c) => `${club(c)}/finance/rentabilidad` },
     ],
   },
-  {
+    {
     id: 'marketing',
     label: 'Marketing',
     icon: 'marketing',
-    tabs: [
-      { id: 'promotions', label: 'Promociones', to: (c) => `${club(c)}/administrar-promociones` },
-      { id: 'newsletters', label: 'Newsletters', to: (c) => `${club(c)}/enviar-newsletters` },
-    ],
+    tabs: [{ id: 'marketing', label: 'Marketing', to: (c) => `${club(c)}/marketing` }],
   },
   {
     id: 'community',
     label: 'Comunidad',
     icon: 'community',
     mobilePrimary: true,
-    tabs: [
-      { id: 'support', label: 'Atención post-venta', to: (c) => `${club(c)}/customer-support` },
-      { id: 'reviews', label: 'Reseñas', to: (c) => `${club(c)}/moderate-reviews` },
-    ],
+    tabs: [{ id: 'community', label: 'Comunidad', to: (c) => `${club(c)}/community` }],
   },
   {
     id: 'analytics',

@@ -33,10 +33,8 @@ import MyClubPage from './pages/entrepreneur/club/myClub/MyClubPage';
 import PlansAndBoxesPage from './pages/entrepreneur/club/myClub/PlansAndBoxesPage';
 import CustomersPage from './pages/entrepreneur/operations/clients/CustomersPage';
 import ShipmentsPage from './pages/entrepreneur/operations/logistics/ShipmentsPage';
-import ModerateReviewsPage from './pages/entrepreneur/marketing_and_communication/community/ModerateReviewsPage';
-import CustomerSupportPage from './pages/entrepreneur/marketing_and_communication/community/CustomerSupportPage';
-import ManagePromotionsPage from './pages/entrepreneur/marketing_and_communication/marketing/ManagePromotionsPage';
-import SendNewsletterPage from './pages/entrepreneur/marketing_and_communication/marketing/SendNewsletterPage';
+import MarketingPage from './pages/entrepreneur/marketing_and_communication/MarketingPage';
+import CommunityPage from './pages/entrepreneur/marketing_and_communication/CommunityPage';
 import ClubStatsPage from './pages/entrepreneur/administration_tools/analysis_and_reports/ClubStatsPage';
 import SalesReportsPage from './pages/entrepreneur/administration_tools/analysis_and_reports/SalesReportsPage';
 import FeedbackTrendsPage from './pages/entrepreneur/administration_tools/analysis_and_reports/FeedbackTrendsPage';
@@ -175,6 +173,11 @@ const MyClubRedirect: React.FC<{ tab: 'profile' | 'history' | 'media' }> = ({ ta
   return <Navigate to={`/entrepreneur/club/${clubId}/my-club?tab=${tab}`} replace />;
 };
 
+const ClubRedirect: React.FC<{ to: string; search: string }> = ({ to, search }) => {
+  const { clubId } = useParams<{ clubId: string }>();
+  return <Navigate to={`/entrepreneur/club/${clubId}/${to}${search}`} replace />;
+};
+
 const AUTH_PATHS = ['/login', '/register', '/logout'];
 
 const AppContent: React.FC = () => {
@@ -252,10 +255,12 @@ const AppContent: React.FC = () => {
       <Route path="/entrepreneur/club/:clubId/view-deliveries" element={pr(['entrepreneur'], <ShipmentsRedirect search="?tab=list&view=recent" />)} />
       <Route path="/entrepreneur/club/:clubId/delivery-history" element={pr(['entrepreneur'], <ShipmentsRedirect search="?tab=list&view=history" />)} />
       <Route path="/entrepreneur/club/:clubId/manage-riders" element={pr(['entrepreneur'], <ShipmentsRedirect search="?riders=1" />)} />
-      <Route path="/entrepreneur/club/:clubId/administrar-promociones" element={pr(['entrepreneur'], <ManagePromotionsPage />)} />
-      <Route path="/entrepreneur/club/:clubId/enviar-newsletters" element={pr(['entrepreneur'], <SendNewsletterPage />)} />
-      <Route path="/entrepreneur/club/:clubId/moderate-reviews" element={pr(['entrepreneur'], <ModerateReviewsPage />)} />
-      <Route path="/entrepreneur/club/:clubId/customer-support" element={pr(['entrepreneur'], <CustomerSupportPage />)} />
+            <Route path="/entrepreneur/club/:clubId/marketing" element={pr(['entrepreneur'], <MarketingPage />)} />
+      <Route path="/entrepreneur/club/:clubId/community" element={pr(['entrepreneur'], <CommunityPage />)} />
+      <Route path="/entrepreneur/club/:clubId/administrar-promociones" element={pr(['entrepreneur'], <ClubRedirect to="marketing" search="?group=promotions" />)} />
+      <Route path="/entrepreneur/club/:clubId/enviar-newsletters" element={pr(['entrepreneur'], <ClubRedirect to="marketing" search="?group=newsletters" />)} />
+      <Route path="/entrepreneur/club/:clubId/moderate-reviews" element={pr(['entrepreneur'], <ClubRedirect to="community" search="?group=reviews" />)} />
+      <Route path="/entrepreneur/club/:clubId/customer-support" element={pr(['entrepreneur'], <ClubRedirect to="community" search="?group=support" />)} />
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   );

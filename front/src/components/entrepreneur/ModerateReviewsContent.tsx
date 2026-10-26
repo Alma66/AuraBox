@@ -192,7 +192,7 @@ const ModerateReviewsContent: React.FC<ModerateReviewsContentProps> = ({ activeS
   ), { duration: Infinity });
 };
 
-  const FiltersBar = () => (
+  const renderFilters = () => (
     <div className="flex flex-wrap gap-3 mb-6">
       <select value={filterUser} onChange={(e) => setFilterUser(e.target.value)} className="px-3 py-2 border border-aurora-navy/15 rounded-lg text-sm">
         <option value="all">Todos los usuarios</option>
@@ -317,7 +317,7 @@ const ModerateReviewsContent: React.FC<ModerateReviewsContentProps> = ({ activeS
   return (
     <div className="animate-fadeInUp">
       <h2 className="text-xl font-serif font-bold text-aurora-navy mb-6">{activeSection === 'ocultas' ? 'Reseñas Ocultas' : 'Reseñas Visibles'}</h2>
-      <FiltersBar />
+      {renderFilters()}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {list.map((r) => (
           <ReviewCard key={r.id} review={r} isHiddenView={activeSection === 'ocultas'} />
