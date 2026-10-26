@@ -236,8 +236,16 @@ const ProductFields: React.FC<ProductFieldsProps> = ({ value, onChange, allowIma
   );
 };
 
-const SubscriptionBoxHistoryPage: React.FC = () => {
-  const { clubId, subscriptionTypeId } = useParams<{ clubId: string; subscriptionTypeId: string }>();
+interface SubscriptionBoxHistoryPageProps {
+  clubId?: string;
+  subscriptionTypeId?: string;
+  onBack?: () => void;
+}
+
+const SubscriptionBoxHistoryPage: React.FC<SubscriptionBoxHistoryPageProps> = (props) => {
+  const params = useParams<{ clubId: string; subscriptionTypeId: string }>();
+  const clubId = props.clubId ?? params.clubId;
+  const subscriptionTypeId = props.subscriptionTypeId ?? params.subscriptionTypeId;
   const navigate = useNavigate();
   const { user, userRole } = useAuth();
 
@@ -423,7 +431,7 @@ const SubscriptionBoxHistoryPage: React.FC = () => {
   return (
     <div className="container mx-auto px-4 py-8 min-h-screen">
       <button
-        onClick={() => navigate(`/entrepreneur/club/${clubId}/subscription-boxes`)}
+        onClick={() => (props.onBack ? props.onBack() : navigate(`/entrepreneur/club/${clubId}/plans?tab=boxes`))}
         className="mb-6 flex items-center text-blue-600 hover:text-blue-800 transition-colors duration-200"
       >
         ← Volver a mis suscripciones

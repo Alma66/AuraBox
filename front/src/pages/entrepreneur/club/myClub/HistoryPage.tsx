@@ -6,6 +6,12 @@ import { Club, Milestone } from '../../../../types/club';
 import { useAuth } from '../../../../App';
 import ClubSocialMedia from '../../../../components/club/ClubSocialMedia';
 
+const DEFAULT_AVATAR =
+  'data:image/svg+xml;utf8,' +
+  encodeURIComponent(
+    '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120"><rect width="120" height="120" fill="#F3E7D5"/><circle cx="60" cy="46" r="20" fill="#1F3350" opacity="0.35"/><path d="M20 112a40 40 0 0180 0z" fill="#1F3350" opacity="0.35"/></svg>',
+  );
+
 const AnimatedSection: React.FC<{ children: React.ReactNode; delay?: string }> = ({ children, delay = '0s' }) => (
   <div className="opacity-0 animate-fadeInUp" style={{ animationDelay: delay }}>
     {children}
@@ -343,7 +349,7 @@ const HistoryPage: React.FC = () => {
       formData.append('description', `team-${cropState.entrepreneurId}`);
       formData.append('section', 'Equipo');
       formData.append('uploadedBy', String(cropState.entrepreneurId));
-      const existingImage = (club.historyImageRaw as any[])?.find((img) => img.description === `team-${cropState.entrepreneurId}`);
+      const existingImage = (club.teamImagesRaw ?? []).find((img) => img.description === `team-${cropState.entrepreneurId}`);
       if (existingImage) {
         await api.delete(`/image-club/${existingImage.id}`);
       }
@@ -351,10 +357,10 @@ const HistoryPage: React.FC = () => {
       const newImage = getResponseData(response);
       setClub((prev) => {
         if (!prev) return prev;
-        const filtered = ((prev.historyImageRaw as any[]) || []).filter((img) => img.description !== `team-${cropState.entrepreneurId}`);
+        const filtered = (prev.teamImagesRaw ?? []).filter((img) => img.description !== `team-${cropState.entrepreneurId}`);
         return {
           ...prev,
-          historyImageRaw: [...filtered, { id: newImage.id, imageUrl: newImage.imageUrl, description: `team-${cropState.entrepreneurId}` }],
+          teamImagesRaw: [{ id: newImage.id, imageUrl: newImage.imageUrl, description: `team-${cropState.entrepreneurId}` }, ...filtered],
         };
       });
       setCropState(null);
@@ -366,9 +372,9 @@ const HistoryPage: React.FC = () => {
     }
   };
 
-  const getTeamPhoto = (entrepreneurId: number): string => {
-    const img = (club?.historyImageRaw as any[])?.find((i) => i.description === `team-${entrepreneurId}`);
-    return img?.imageUrl || '/assets/default-avatar.jpg';
+    const getTeamPhoto = (entrepreneurId: number): string => {
+    const img = (club?.teamImagesRaw ?? []).find((i) => i.description === `team-${entrepreneurId}`);
+    return img?.imageUrl || DEFAULT_AVATAR;
   };
 
   if (loading) {
@@ -422,7 +428,14 @@ const HistoryPage: React.FC = () => {
         : 'grid grid-cols-1 md:grid-cols-3 gap-8';
 
   const reviews = (club as any).featuredReviews || [];
-
+  
+  const socialMediaLinks = ((club as any).socialNetworksRaw ?? []).reduce(
+    (acc: Record<string, string>, sn: { networkType: string; profileUrl: string }) => ({
+      ...acc,
+      [sn.networkType.toLowerCase()]: sn.profileUrl,
+    }),
+    {} as Record<string, string>,
+  );
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-blue-100">
       {toast && (
@@ -844,7 +857,7 @@ const HistoryPage: React.FC = () => {
             ) : (
               <>
                 <p className="text-center text-gray-700 max-w-3xl mx-auto mb-8 text-lg">{communityTextToDisplay}</p>
-                {club.socialMedia && <ClubSocialMedia socialMedia={club.socialMedia} />}
+                {Object.keys(socialMediaLinks).length > 0 && <ClubSocialMedia socialMedia={socialMediaLinks} />}
               </>
             )}
           </section>

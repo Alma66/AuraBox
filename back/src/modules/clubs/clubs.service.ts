@@ -225,6 +225,7 @@ export class ClubsService {
     const historyImageRaw = images.filter(
       (img) => img.section === 'Historia' && img.isActive && !isTeamImage(img),
     );
+    const teamImagesRaw = images.filter((img) => img.section === 'Equipo' && isTeamImage(img));
     const socialNetworksRaw = await this.prisma.club_Social_Networks.findMany({ where: { idClub: id } });
     const plans = await this.prisma.subscription_Types.findMany({ where: { idClub: id } });
     const mappedPlans = plans.map((p) => this.mapPlan(p));

@@ -30,24 +30,24 @@ export const ENTREPRENEUR_SECTIONS: NavSection[] = [
     mobilePrimary: true,
     tabs: [{ id: 'overview', label: 'Resumen', to: () => '/entrepreneur/dashboard' }],
   },
-  {
+    {
     id: 'my-club',
     label: 'Mi club',
     icon: 'club',
     tabs: [
-      { id: 'profile', label: 'Perfil público', to: (c) => `/club/${c}` },
-      { id: 'history', label: 'Historia', to: (c) => `/club/${c}/history` },
-      { id: 'images', label: 'Imágenes', to: (c) => `${club(c)}/gestionar-imagenes` },
+      {
+        id: 'my-club',
+        label: 'Mi club',
+        to: (c) => `${club(c)}/my-club`,
+        alsoMatches: (c) => [`/club/${c}`],
+      },
     ],
   },
   {
     id: 'plans',
     label: 'Planes y cajas',
     icon: 'plans',
-    tabs: [
-      { id: 'plans', label: 'Planes', to: (c) => `${club(c)}/edit-subscriptions` },
-      { id: 'boxes', label: 'Contenido de cajas', to: (c) => `${club(c)}/subscription-boxes` },
-    ],
+    tabs: [{ id: 'plans', label: 'Planes y cajas', to: (c) => `${club(c)}/plans` }],
   },
     {
     id: 'customers',

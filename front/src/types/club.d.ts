@@ -98,6 +98,7 @@ export interface Club {
   bannerImages?: string[];
   bannerImagesRaw?: { id: number; imageUrl: string; description?: string }[];
   historyImageRaw?: { id: number; imageUrl: string }[];
+  teamImagesRaw?: { id: number; imageUrl: string; description?: string }[];
   fullHistory?: string;
   historyBanner?: string;
   socialMedia?: SocialMediaLinks;

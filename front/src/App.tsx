@@ -29,14 +29,12 @@ import TermsAndConditionsPage from './pages/entrepreneur/club/legal/TermsAndCond
 import PrivacyAndSecurityPolicyPage from './pages/entrepreneur/club/legal/PrivacyAndSecurityPolicyPage';
 import EntrepreneurProfilePage from './pages/entrepreneur/EntrepreneurProfilePage';
 import EntrepreneurDashboardPage from './pages/entrepreneur/EntrepreneurDashboardPage';
-import EditSubscriptionsPage from './pages/entrepreneur/club/myClub/EditSubscriptionsPage';
-import ClubSubscriptionsOverviewPage from './pages/entrepreneur/club/myClub/ClubSubscriptionsOverviewPage';
-import SubscriptionBoxHistoryPage from './pages/entrepreneur/club/myClub/SubscriptionBoxHistoryPage';
+import MyClubPage from './pages/entrepreneur/club/myClub/MyClubPage';
+import PlansAndBoxesPage from './pages/entrepreneur/club/myClub/PlansAndBoxesPage';
 import CustomersPage from './pages/entrepreneur/operations/clients/CustomersPage';
 import ShipmentsPage from './pages/entrepreneur/operations/logistics/ShipmentsPage';
 import ModerateReviewsPage from './pages/entrepreneur/marketing_and_communication/community/ModerateReviewsPage';
 import CustomerSupportPage from './pages/entrepreneur/marketing_and_communication/community/CustomerSupportPage';
-import ManageClubImagesPage from './pages/entrepreneur/marketing_and_communication/marketing/ManageClubImagesPage';
 import ManagePromotionsPage from './pages/entrepreneur/marketing_and_communication/marketing/ManagePromotionsPage';
 import SendNewsletterPage from './pages/entrepreneur/marketing_and_communication/marketing/SendNewsletterPage';
 import ClubStatsPage from './pages/entrepreneur/administration_tools/analysis_and_reports/ClubStatsPage';
@@ -165,6 +163,18 @@ const CustomersRedirect: React.FC<{ tab: 'subscriptions' | 'directory' }> = ({ t
   return <Navigate to={`/entrepreneur/club/${clubId}/customers?${params.toString()}`} replace />;
 };
 
+const PlansRedirect: React.FC<{ tab: 'plans' | 'boxes' }> = ({ tab }) => {
+  const { clubId, subscriptionTypeId } = useParams<{ clubId: string; subscriptionTypeId?: string }>();
+  const params = new URLSearchParams({ tab });
+  if (subscriptionTypeId) params.set('plan', subscriptionTypeId);
+  return <Navigate to={`/entrepreneur/club/${clubId}/plans?${params.toString()}`} replace />;
+};
+
+const MyClubRedirect: React.FC<{ tab: 'profile' | 'history' | 'media' }> = ({ tab }) => {
+  const { clubId } = useParams<{ clubId: string }>();
+  return <Navigate to={`/entrepreneur/club/${clubId}/my-club?tab=${tab}`} replace />;
+};
+
 const AUTH_PATHS = ['/login', '/register', '/logout'];
 
 const AppContent: React.FC = () => {
@@ -219,9 +229,7 @@ const AppContent: React.FC = () => {
 
       <Route path="/entrepreneur/dashboard" element={pr(['entrepreneur'], <EntrepreneurDashboardPage />)} />
       <Route path="/entrepreneur/profile" element={pr(['entrepreneur'], <EntrepreneurProfilePage />)} />
-      <Route path="/entrepreneur/club/:clubId/edit-subscriptions" element={pr(['entrepreneur'], <EditSubscriptionsPage />)} />
-      <Route path="/entrepreneur/club/:clubId/subscription-boxes" element={pr(['entrepreneur'], <ClubSubscriptionsOverviewPage />)} />
-      <Route path="/entrepreneur/club/:clubId/subscription-boxes/:subscriptionTypeId" element={pr(['entrepreneur'], <SubscriptionBoxHistoryPage />)} />
+            <Route path="/entrepreneur/club/:clubId/gestionar-imagenes" element={pr(['entrepreneur'], <MyClubRedirect tab="media" />)} />
       <Route path="/entrepreneur/club/:clubId/inventory/stock" element={pr(['entrepreneur'], <InventoryStockPage />)} />
       <Route path="/entrepreneur/club/:clubId/inventory/proveedores" element={pr(['entrepreneur'], <InventorySuppliersPage />)} />
       <Route path="/entrepreneur/club/:clubId/inventory/pedidos" element={pr(['entrepreneur'], <InventoryOrdersPage />)} />
@@ -230,7 +238,7 @@ const AppContent: React.FC = () => {
       <Route path="/entrepreneur/club/:clubId/finance/rentabilidad" element={pr(['entrepreneur'], <ProfitabilityPage />)} />
       <Route path="/entrepreneur/club/:clubId/manage-users-roles" element={pr(['entrepreneur'], <ManageUsersAndRolesPage />)} />
       <Route path="/entrepreneur/club/:clubId/general-settings" element={pr(['entrepreneur'], <GeneralSettingsPage />)} />
-            <Route path="/entrepreneur/club/:clubId/customers" element={pr(['entrepreneur'], <CustomersPage />)} />
+      <Route path="/entrepreneur/club/:clubId/customers" element={pr(['entrepreneur'], <CustomersPage />)} />
       <Route path="/entrepreneur/club/:clubId/active-subscriptions" element={pr(['entrepreneur'], <CustomersRedirect tab="subscriptions" />)} />
       <Route path="/entrepreneur/club/:clubId/manage-customers" element={pr(['entrepreneur'], <CustomersRedirect tab="directory" />)} />
       <Route path="/entrepreneur/club/:clubId/customer-history" element={pr(['entrepreneur'], <CustomersRedirect tab="directory" />)} />
@@ -244,7 +252,6 @@ const AppContent: React.FC = () => {
       <Route path="/entrepreneur/club/:clubId/view-deliveries" element={pr(['entrepreneur'], <ShipmentsRedirect search="?tab=list&view=recent" />)} />
       <Route path="/entrepreneur/club/:clubId/delivery-history" element={pr(['entrepreneur'], <ShipmentsRedirect search="?tab=list&view=history" />)} />
       <Route path="/entrepreneur/club/:clubId/manage-riders" element={pr(['entrepreneur'], <ShipmentsRedirect search="?riders=1" />)} />
-      <Route path="/entrepreneur/club/:clubId/gestionar-imagenes" element={pr(['entrepreneur'], <ManageClubImagesPage />)} />
       <Route path="/entrepreneur/club/:clubId/administrar-promociones" element={pr(['entrepreneur'], <ManagePromotionsPage />)} />
       <Route path="/entrepreneur/club/:clubId/enviar-newsletters" element={pr(['entrepreneur'], <SendNewsletterPage />)} />
       <Route path="/entrepreneur/club/:clubId/moderate-reviews" element={pr(['entrepreneur'], <ModerateReviewsPage />)} />
