@@ -228,11 +228,15 @@ const AppContent: React.FC = () => {
       <Route path="/customer/wishlist" element={pr(['customer'], <WishlistPage />)} />
       <Route path="/cart" element={pr(['customer'], <CartPage />)} />
       <Route path="/checkout" element={pr(['customer'], <CheckoutPage />)} />
-
+      <Route path="/entrepreneur/club/:clubId/my-club" element={pr(['entrepreneur'], <MyClubPage />)} />
+<Route path="/entrepreneur/club/:clubId/plans" element={pr(['entrepreneur'], <PlansAndBoxesPage />)} />
+<Route path="/entrepreneur/club/:clubId/edit-subscriptions" element={pr(['entrepreneur'], <PlansRedirect tab="plans" />)} />
+<Route path="/entrepreneur/club/:clubId/subscription-boxes" element={pr(['entrepreneur'], <PlansRedirect tab="boxes" />)} />
+<Route path="/entrepreneur/club/:clubId/subscription-boxes/:subscriptionTypeId" element={pr(['entrepreneur'], <PlansRedirect tab="boxes" />)} />
       <Route path="/entrepreneur/dashboard" element={pr(['entrepreneur'], <EntrepreneurDashboardPage />)} />
       <Route path="/entrepreneur/profile" element={pr(['entrepreneur'], <EntrepreneurProfilePage />)} />
-            <Route path="/entrepreneur/club/:clubId/gestionar-imagenes" element={pr(['entrepreneur'], <MyClubRedirect tab="media" />)} />
-           <Route path="/entrepreneur/club/:clubId/inventory" element={pr(['entrepreneur'], <InventoryPage />)} />
+      <Route path="/entrepreneur/club/:clubId/gestionar-imagenes" element={pr(['entrepreneur'], <MyClubRedirect tab="media" />)} />
+      <Route path="/entrepreneur/club/:clubId/inventory" element={pr(['entrepreneur'], <InventoryPage />)} />
       <Route path="/entrepreneur/club/:clubId/inventory/stock" element={pr(['entrepreneur'], <ClubRedirect to="inventory" search="?tab=stock" />)} />
       <Route path="/entrepreneur/club/:clubId/inventory/proveedores" element={pr(['entrepreneur'], <ClubRedirect to="inventory" search="?tab=suppliers" />)} />
       <Route path="/entrepreneur/club/:clubId/inventory/pedidos" element={pr(['entrepreneur'], <ClubRedirect to="inventory" search="?tab=orders" />)} />
