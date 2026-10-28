@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
-import { useParams, Link, useNavigate } from 'react-router-dom';
+import { useParams, Link, useNavigate, useLocation } from 'react-router-dom';
 import Cropper from 'react-easy-crop';
 import api, { getResponseData } from '../../../../api/config';
 import { Club, Milestone } from '../../../../types/club';
@@ -91,6 +91,8 @@ async function getCroppedBlob(imageSrc: string, croppedAreaPixels: any): Promise
 const HistoryPage: React.FC = () => {
   const { clubId } = useParams<{ clubId: string }>();
   const navigate = useNavigate();
+    const { pathname } = useLocation();
+  const insidePanel = pathname.endsWith('/my-club');
   const { user, userRole } = useAuth();
 
   const [club, setClub] = useState<Club | null>(null);
@@ -903,15 +905,17 @@ const HistoryPage: React.FC = () => {
         </AnimatedSection>
 
         <div className="text-center mt-16">
-          <button
-            onClick={() => navigate(`/club/${club.id}`)}
-            className="inline-flex items-center px-8 py-4 border border-transparent text-base font-medium rounded-full shadow-sm text-white bg-gray-700 hover:bg-gray-800 transition-colors duration-200"
-          >
-            <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
-            </svg>
-            Volver a la página del Club
-          </button>
+          {!insidePanel && (
+            <button
+              onClick={() => navigate(`/club/${club.id}`)}
+              className="inline-flex items-center px-8 py-4 border border-transparent text-base font-medium rounded-full shadow-sm text-white bg-gray-700 hover:bg-gray-800 transition-colors duration-200"
+            >
+              <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+              </svg>
+              Volver a la página del Club
+            </button>
+          )}
         </div>
       </div>
     </div>

@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
-import { useParams, useNavigate, Link } from 'react-router-dom';
+import { useParams, useNavigate, useLocation, Link } from 'react-router-dom';
 import Slider from 'react-slick';
 import Cropper from 'react-easy-crop';
 import api, { getResponseData } from '../../../../api/config';
@@ -152,6 +152,8 @@ async function getCroppedBlob(imageSrc: string, croppedAreaPixels: any): Promise
 const ClubDetailPage: React.FC = () => {
   const { clubId } = useParams<{ clubId: string }>();
   const navigate = useNavigate();
+    const { pathname } = useLocation();
+  const insidePanel = pathname.endsWith('/my-club');
   const { userRole } = useAuth();
   const [club, setClub] = useState<ClubData | null>(null);
   const [loading, setLoading] = useState(true);
@@ -695,12 +697,14 @@ const ClubDetailPage: React.FC = () => {
         </div>
       </div>
       <div className="container mx-auto px-4 pt-20 pb-8">
-        <button onClick={() => navigate(-1)} className="mb-6 flex items-center text-aurora-terracotta hover:text-aurora-terracottaDark transition-colors text-sm font-medium">
-          <svg className="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-          </svg>
-          Volver
-        </button>
+        {!insidePanel && (
+          <button onClick={() => navigate(-1)} className="mb-6 flex items-center text-aurora-terracotta hover:text-aurora-terracottaDark transition-colors text-sm font-medium">
+            <svg className="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+            </svg>
+            Volver
+          </button>
+        )}
         {isOwner && club.bannerImagesRaw && club.bannerImagesRaw.length > 0 && (
           <div className="bg-white rounded-2xl shadow-aurora-sm border border-aurora-navy/10 p-5 mb-6">
             <div className="flex items-center gap-2 mb-4">
