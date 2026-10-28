@@ -387,8 +387,8 @@ const HistoryPage: React.FC = () => {
     return (
       <div className="container mx-auto px-4 py-8 text-center">
         <h1 className="text-4xl font-bold text-red-600 mb-4">Club no encontrado</h1>
-        <p className="text-lg text-gray-700 mb-8">El club que buscás no existe o fue eliminado.</p>
-        <button onClick={() => navigate(-1)} className="bg-blue-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-700 transition-colors duration-200">
+        <p className="text-lg text-aurora-navy/80 mb-8">El club que buscás no existe o fue eliminado.</p>
+        <button onClick={() => navigate(-1)} className="bg-aurora-terracotta text-white px-6 py-3 rounded-lg font-semibold hover:bg-aurora-terracottaDark transition-colors duration-200">
           Volver
         </button>
       </div>
@@ -452,18 +452,18 @@ const HistoryPage: React.FC = () => {
       {cropState && (
         <div className="fixed inset-0 z-50 bg-black/80 flex flex-col items-center justify-center p-4">
           <div className="bg-white rounded-2xl shadow-2xl w-full max-w-2xl overflow-hidden">
-            <div className="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
+            <div className="px-6 py-4 border-b border-aurora-navy/10 flex items-center justify-between">
               <div>
-                <h3 className="text-lg font-semibold text-gray-900">Ajustar foto del equipo</h3>
-                <p className="text-sm text-gray-500 mt-0.5">Mové y hacé zoom para encuadrar la imagen</p>
+                <h3 className="text-lg font-semibold text-aurora-navy">Ajustar foto del equipo</h3>
+                <p className="text-sm text-aurora-navy/60 mt-0.5">Mové y hacé zoom para encuadrar la imagen</p>
               </div>
-              <button onClick={() => setCropState(null)} className="text-gray-400 hover:text-gray-600 transition-colors" aria-label="Cerrar">
+              <button onClick={() => setCropState(null)} className="text-aurora-navy/40 hover:text-aurora-navy/70 transition-colors" aria-label="Cerrar">
                 <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
                 </svg>
               </button>
             </div>
-            <div className="relative bg-gray-900" style={{ height: '320px' }}>
+            <div className="relative bg-aurora-navy" style={{ height: '320px' }}>
               <Cropper
                 image={cropState.imageSrc}
                 crop={cropState.crop}
@@ -476,9 +476,9 @@ const HistoryPage: React.FC = () => {
                 onCropComplete={(_, croppedAreaPixels) => setCropState((prev) => prev ? { ...prev, croppedAreaPixels } : null)}
               />
             </div>
-            <div className="px-6 py-4 bg-gray-50">
+            <div className="px-6 py-4 bg-aurora-cream">
               <div className="flex items-center gap-3 mb-4">
-                <svg className="w-4 h-4 text-gray-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-4 h-4 text-aurora-navy/40 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7" />
                 </svg>
                 <input
@@ -496,14 +496,14 @@ const HistoryPage: React.FC = () => {
                 <button
                   onClick={() => setCropState(null)}
                   disabled={uploading}
-                  className="flex-1 px-4 py-2.5 rounded-xl border border-gray-200 text-gray-700 text-sm font-medium hover:bg-gray-100 disabled:opacity-50 transition-colors"
+                  className="flex-1 px-4 py-2.5 rounded-xl border border-aurora-navy/10 text-aurora-navy/80 text-sm font-medium hover:bg-aurora-cream disabled:opacity-50 transition-colors"
                 >
                   Cancelar
                 </button>
                 <button
                   onClick={handleCropConfirm}
                   disabled={uploading}
-                  className="flex-1 px-4 py-2.5 rounded-xl bg-blue-600 text-white text-sm font-semibold hover:bg-blue-700 disabled:opacity-50 transition-colors"
+                  className="flex-1 px-4 py-2.5 rounded-xl bg-aurora-terracotta text-white text-sm font-semibold hover:bg-aurora-terracottaDark disabled:opacity-50 transition-colors"
                 >
                   {uploading ? 'Guardando...' : 'Guardar imagen'}
                 </button>
@@ -523,21 +523,21 @@ const HistoryPage: React.FC = () => {
         />
         <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent flex items-center justify-center px-4">
           <h1 className="text-white text-4xl md:text-6xl font-extrabold drop-shadow-2xl text-center animate-fadeInDown">
-            La Historia de <span className="text-blue-300">{club.name}</span>
+            La Historia de <span className="text-aurora-terracotta">{club.name}</span>
           </h1>
         </div>
       </div>
 
       <div className="container mx-auto px-4 py-16 max-w-6xl">
         <AnimatedSection delay="0.2s">
-          <div className="flex flex-col md:flex-row items-center justify-center md:justify-start space-y-6 md:space-y-0 md:space-x-8 mb-16 p-8 bg-white rounded-3xl shadow-2xl border border-blue-200 transform hover:scale-[1.01] transition-transform duration-300">
+          <div className="flex flex-col md:flex-row items-center justify-center md:justify-start space-y-6 md:space-y-0 md:space-x-8 mb-16 p-8 bg-white rounded-3xl shadow-2xl border border-aurora-terracotta/30 transform hover:scale-[1.01] transition-transform duration-300">
             {club.logoUrl && (
-              <img src={club.logoUrl} alt={`${club.name} logo`} className="w-32 h-32 md:w-40 md:h-40 rounded-full border-4 border-blue-600 shadow-xl object-cover" />
+              <img src={club.logoUrl} alt={`${club.name} logo`} className="w-32 h-32 md:w-40 md:h-40 rounded-full border-4 border-aurora-terracottaDark shadow-xl object-cover" />
             )}
             <div className="text-center md:text-left">
-              <h2 className="text-4xl font-bold text-gray-900 mb-2">{club.name}</h2>
-              {club.slogan && <p className="text-2xl text-gray-700 mt-1 italic font-light">{club.slogan}</p>}
-              {club.shortDescription && <p className="text-gray-600 mt-2">{club.shortDescription}</p>}
+              <h2 className="text-4xl font-bold text-aurora-navy mb-2">{club.name}</h2>
+              {club.slogan && <p className="text-2xl text-aurora-navy/80 mt-1 italic font-light">{club.slogan}</p>}
+              {club.shortDescription && <p className="text-aurora-navy/70 mt-2">{club.shortDescription}</p>}
             </div>
           </div>
         </AnimatedSection>
@@ -549,7 +549,7 @@ const HistoryPage: React.FC = () => {
               {isOwner && !isEditingOrigins && (
                 <button
                   onClick={() => { setTempHistory(club.history || ''); setOriginsError(''); setIsEditingOrigins(true); }}
-                  className="ml-4 px-4 py-2 bg-blue-600 text-white rounded-full text-sm font-semibold hover:bg-blue-700 transition-colors duration-200 shadow-md"
+                  className="ml-4 px-4 py-2 bg-aurora-terracotta text-white rounded-full text-sm font-semibold hover:bg-aurora-terracottaDark transition-colors duration-200 shadow-md"
                 >
                   Editar
                 </button>
@@ -558,18 +558,18 @@ const HistoryPage: React.FC = () => {
             {isEditingOrigins ? (
               <div>
                 <textarea
-                  className={`w-full border rounded-lg p-3 text-gray-700 text-base leading-relaxed focus:outline-none focus:ring-2 h-56 resize-none ${originsError ? 'border-red-300 focus:ring-red-400' : 'border-gray-300 focus:ring-purple-400'}`}
+                  className={`w-full border rounded-lg p-3 text-aurora-navy/80 text-base leading-relaxed focus:outline-none focus:ring-2 h-56 resize-none ${originsError ? 'border-red-300 focus:ring-red-400' : 'border-aurora-navy/20 focus:ring-purple-400'}`}
                   value={tempHistory}
                   onChange={(e) => { if (e.target.value.length <= MAX_HISTORY_LENGTH) setTempHistory(e.target.value); if (originsError) setOriginsError(''); }}
                   maxLength={MAX_HISTORY_LENGTH}
                 />
                 <div className="flex items-center justify-between mt-2">
-                  <span className={`text-xs ${originsError ? 'text-red-600' : 'text-gray-400'}`}>
+                  <span className={`text-xs ${originsError ? 'text-red-600' : 'text-aurora-navy/40'}`}>
                     {originsError || `${tempHistory.length} / ${MAX_HISTORY_LENGTH} caracteres`}
                   </span>
                 </div>
                 <div className="flex justify-end gap-3 mt-3">
-                  <button onClick={() => { setIsEditingOrigins(false); setOriginsError(''); }} className="px-5 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-100 transition-colors duration-200">
+                  <button onClick={() => { setIsEditingOrigins(false); setOriginsError(''); }} className="px-5 py-2 border border-aurora-navy/20 rounded-lg text-aurora-navy/80 hover:bg-aurora-cream transition-colors duration-200">
                     Cancelar
                   </button>
                   <button onClick={handleSaveOrigins} disabled={savingOrigins} className="px-5 py-2 bg-green-600 text-white rounded-lg font-semibold hover:bg-green-700 transition-colors duration-200 disabled:opacity-60">
@@ -578,15 +578,15 @@ const HistoryPage: React.FC = () => {
                 </div>
               </div>
             ) : (
-              <div className="text-gray-800 leading-relaxed text-lg space-y-6">
+              <div className="text-aurora-navy leading-relaxed text-lg space-y-6">
                 {historyParagraphs.length > 0 ? (
                   historyParagraphs.map((para, idx) => (
                     <p key={idx} className="text-justify">{para}</p>
                   ))
                 ) : (
-                  <p className="text-center italic text-gray-500">No hay una historia detallada disponible para este club.</p>
+                  <p className="text-center italic text-aurora-navy/60">No hay una historia detallada disponible para este club.</p>
                 )}
-                <blockquote className="border-l-4 border-blue-500 pl-4 italic text-gray-600 mt-8">
+                <blockquote className="border-l-4 border-aurora-terracotta pl-4 italic text-aurora-navy/70 mt-8">
                   "Cada caja es una promesa, cada entrega una conexión."
                 </blockquote>
               </div>
@@ -601,7 +601,7 @@ const HistoryPage: React.FC = () => {
               {isOwner && !isEditingMilestones && (
                 <button
                   onClick={() => { setTempMilestones(club.milestones || []); setMilestonesError(''); setIsEditingMilestones(true); }}
-                  className="ml-4 px-4 py-2 bg-blue-600 text-white rounded-full text-sm font-semibold hover:bg-blue-700 transition-colors duration-200 shadow-md"
+                  className="ml-4 px-4 py-2 bg-aurora-terracotta text-white rounded-full text-sm font-semibold hover:bg-aurora-terracottaDark transition-colors duration-200 shadow-md"
                 >
                   Editar
                 </button>
@@ -620,7 +620,7 @@ const HistoryPage: React.FC = () => {
                 {tempMilestones.map((milestone, index) => {
                   const fieldError = validateMilestone(milestone);
                   return (
-                    <div key={index} className="mb-4 p-4 border border-gray-200 rounded-lg bg-gray-50 flex gap-3">
+                    <div key={index} className="mb-4 p-4 border border-aurora-navy/10 rounded-lg bg-aurora-cream flex gap-3">
                       <div className="flex flex-col gap-2 flex-1">
                         <div>
                           <input
@@ -629,20 +629,20 @@ const HistoryPage: React.FC = () => {
                             min={MIN_MILESTONE_YEAR}
                             max={MAX_MILESTONE_YEAR}
                             step={1}
-                            className={`border rounded-lg px-3 py-2 w-28 text-gray-700 focus:outline-none focus:ring-2 ${fieldError && !Number.isNaN(milestone.year) ? 'border-red-300 focus:ring-red-400' : 'border-gray-300 focus:ring-orange-400'}`}
+                            className={`border rounded-lg px-3 py-2 w-28 text-aurora-navy/80 focus:outline-none focus:ring-2 ${fieldError && !Number.isNaN(milestone.year) ? 'border-red-300 focus:ring-red-400' : 'border-aurora-navy/20 focus:ring-orange-400'}`}
                             value={Number.isNaN(milestone.year) ? '' : milestone.year}
                             onChange={(e) => handleMilestoneYearChange(index, e.target.value)}
                             placeholder="Año"
                           />
                         </div>
                         <textarea
-                          className="border border-gray-300 rounded-lg px-3 py-2 text-gray-700 focus:outline-none focus:ring-2 focus:ring-orange-400 h-20 resize-none"
+                          className="border border-aurora-navy/20 rounded-lg px-3 py-2 text-aurora-navy/80 focus:outline-none focus:ring-2 focus:ring-orange-400 h-20 resize-none"
                           value={milestone.description}
                           onChange={(e) => handleMilestoneDescriptionChange(index, e.target.value)}
                           placeholder="Descripción"
                           maxLength={MAX_MILESTONE_DESCRIPTION_LENGTH}
                         />
-                        <span className="text-xs text-gray-400 self-end">{milestone.description.length} / {MAX_MILESTONE_DESCRIPTION_LENGTH}</span>
+                        <span className="text-xs text-aurora-navy/40 self-end">{milestone.description.length} / {MAX_MILESTONE_DESCRIPTION_LENGTH}</span>
                       </div>
                       <button onClick={() => handleRemoveMilestone(index)} className="self-start text-red-500 hover:text-red-700 text-xl font-bold px-2" aria-label="Eliminar hito">
                         ×
@@ -658,7 +658,7 @@ const HistoryPage: React.FC = () => {
                   + Agregar hito ({tempMilestones.length}/{MAX_MILESTONES})
                 </button>
                 <div className="flex justify-end gap-3 mt-2">
-                  <button onClick={() => { setIsEditingMilestones(false); setMilestonesError(''); }} className="px-5 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-100 transition-colors duration-200">
+                  <button onClick={() => { setIsEditingMilestones(false); setMilestonesError(''); }} className="px-5 py-2 border border-aurora-navy/20 rounded-lg text-aurora-navy/80 hover:bg-aurora-cream transition-colors duration-200">
                     Cancelar
                   </button>
                   <button onClick={handleSaveMilestones} disabled={savingMilestones} className="px-5 py-2 bg-green-600 text-white rounded-lg font-semibold hover:bg-green-700 transition-colors duration-200 disabled:opacity-60">
@@ -675,33 +675,33 @@ const HistoryPage: React.FC = () => {
                         {milestone.year}
                       </div>
                       <div className="bg-orange-50 p-6 rounded-lg shadow-md">
-                        <p className="text-gray-800 text-lg">{milestone.description}</p>
+                        <p className="text-aurora-navy text-lg">{milestone.description}</p>
                       </div>
                     </div>
                   ))}
                 </div>
               ) : (
-                <p className="text-center italic text-gray-500">No hay hitos cargados aún.</p>
+                <p className="text-center italic text-aurora-navy/60">No hay hitos cargados aún.</p>
               )
             )}
           </section>
         </AnimatedSection>
 
         <AnimatedSection delay="1.0s">
-          <section className="mb-20 p-8 bg-white rounded-3xl shadow-2xl border border-blue-200">
-            <h3 className="text-3xl font-bold text-blue-800 mb-10">Cifras que Nos Impulsan</h3>
+          <section className="mb-20 p-8 bg-white rounded-3xl shadow-2xl border border-aurora-terracotta/30">
+            <h3 className="text-3xl font-bold text-aurora-terracottaDark mb-10">Cifras que Nos Impulsan</h3>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
-              <div className="bg-blue-50 p-6 rounded-lg shadow-md border border-blue-200">
-                <h4 className="text-xl font-semibold mb-2 text-blue-700">Rating Promedio</h4>
-                <p className="text-3xl font-extrabold text-blue-600">{club.averageRating ? `${club.averageRating} / 5` : 'Sin reseñas aún'}</p>
+              <div className="bg-aurora-terracotta/10 p-6 rounded-lg shadow-md border border-aurora-terracotta/30">
+                <h4 className="text-xl font-semibold mb-2 text-aurora-terracottaDark">Rating Promedio</h4>
+                <p className="text-3xl font-extrabold text-aurora-terracotta">{club.averageRating ? `${club.averageRating} / 5` : 'Sin reseñas aún'}</p>
               </div>
-              <div className="bg-blue-50 p-6 rounded-lg shadow-md border border-blue-200">
-                <h4 className="text-xl font-semibold mb-2 text-blue-700">Total de Reseñas</h4>
-                <p className="text-3xl font-extrabold text-blue-600">{club.totalReviews || 0}</p>
+              <div className="bg-aurora-terracotta/10 p-6 rounded-lg shadow-md border border-aurora-terracotta/30">
+                <h4 className="text-xl font-semibold mb-2 text-aurora-terracottaDark">Total de Reseñas</h4>
+                <p className="text-3xl font-extrabold text-aurora-terracotta">{club.totalReviews || 0}</p>
               </div>
-              <div className="bg-blue-50 p-6 rounded-lg shadow-md border border-blue-200">
-                <h4 className="text-xl font-semibold mb-2 text-blue-700">Fecha de Creación</h4>
-                <p className="text-3xl font-extrabold text-blue-600">{creationDateFormatted}</p>
+              <div className="bg-aurora-terracotta/10 p-6 rounded-lg shadow-md border border-aurora-terracotta/30">
+                <h4 className="text-xl font-semibold mb-2 text-aurora-terracottaDark">Fecha de Creación</h4>
+                <p className="text-3xl font-extrabold text-aurora-terracotta">{creationDateFormatted}</p>
               </div>
             </div>
           </section>
@@ -738,7 +738,7 @@ const HistoryPage: React.FC = () => {
                             isSelected
                               ? 'bg-red-600 text-white border-red-600'
                               : isDisabled
-                                ? 'bg-gray-100 text-gray-400 border-gray-200 cursor-not-allowed'
+                                ? 'bg-aurora-cream text-aurora-navy/40 border-aurora-navy/10 cursor-not-allowed'
                                 : 'bg-white text-red-700 border-red-300 hover:bg-red-50'
                           }`}
                         >
@@ -762,7 +762,7 @@ const HistoryPage: React.FC = () => {
                       {isOwner && (
                         <button
                           onClick={() => handlePhotoClick(member.id)}
-                          className="absolute bottom-0 right-0 bg-blue-600 text-white rounded-full w-8 h-8 flex items-center justify-center shadow-md hover:bg-blue-700 transition-colors duration-200"
+                          className="absolute bottom-0 right-0 bg-aurora-terracotta text-white rounded-full w-8 h-8 flex items-center justify-center shadow-md hover:bg-aurora-terracottaDark transition-colors duration-200"
                           title="Cambiar foto (JPG, PNG o WEBP, máx. 8MB)"
                         >
                           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -777,15 +777,15 @@ const HistoryPage: React.FC = () => {
                     {editingBioId === member.id ? (
                       <div className="w-full">
                         <textarea
-                          className="w-full border border-gray-300 rounded-lg px-3 py-2 text-gray-700 text-sm focus:outline-none focus:ring-2 focus:ring-red-400 h-24 resize-none"
+                          className="w-full border border-aurora-navy/20 rounded-lg px-3 py-2 text-aurora-navy/80 text-sm focus:outline-none focus:ring-2 focus:ring-red-400 h-24 resize-none"
                           value={tempBio}
                           onChange={(e) => { if (e.target.value.length <= MAX_BIO_LENGTH) setTempBio(e.target.value); }}
                           placeholder="Escribí una bio..."
                           maxLength={MAX_BIO_LENGTH}
                         />
-                        <p className="text-xs text-gray-400 text-right mt-1">{tempBio.length} / {MAX_BIO_LENGTH}</p>
+                        <p className="text-xs text-aurora-navy/40 text-right mt-1">{tempBio.length} / {MAX_BIO_LENGTH}</p>
                         <div className="flex justify-center gap-2 mt-2">
-                          <button onClick={() => setEditingBioId(null)} className="px-3 py-1 border border-gray-300 rounded-lg text-gray-600 text-sm hover:bg-gray-100 transition-colors duration-200">
+                          <button onClick={() => setEditingBioId(null)} className="px-3 py-1 border border-aurora-navy/20 rounded-lg text-aurora-navy/70 text-sm hover:bg-aurora-cream transition-colors duration-200">
                             Cancelar
                           </button>
                           <button
@@ -800,14 +800,14 @@ const HistoryPage: React.FC = () => {
                     ) : (
                       <div className="w-full">
                         {member.bio ? (
-                          <p className="text-gray-700 text-sm leading-relaxed">{member.bio}</p>
+                          <p className="text-aurora-navy/80 text-sm leading-relaxed">{member.bio}</p>
                         ) : (
-                          <p className="italic text-gray-400 text-sm">Sin bio aún.</p>
+                          <p className="italic text-aurora-navy/40 text-sm">Sin bio aún.</p>
                         )}
                         {isOwner && isSelf(member.id) && (
                           <button
                             onClick={() => { setEditingBioId(member.id); setTempBio(member.bio || ''); }}
-                            className="mt-3 px-3 py-1 bg-blue-600 text-white rounded-full text-xs font-semibold hover:bg-blue-700 transition-colors duration-200"
+                            className="mt-3 px-3 py-1 bg-aurora-terracotta text-white rounded-full text-xs font-semibold hover:bg-aurora-terracottaDark transition-colors duration-200"
                           >
                             Editar bio
                           </button>
@@ -828,7 +828,7 @@ const HistoryPage: React.FC = () => {
               {isOwner && !isEditingCommunity && (
                 <button
                   onClick={() => { setTempCommunityText(club.communityText || ''); setCommunityError(''); setIsEditingCommunity(true); }}
-                  className="ml-4 px-4 py-2 bg-blue-600 text-white rounded-full text-sm font-semibold hover:bg-blue-700 transition-colors duration-200 shadow-md"
+                  className="ml-4 px-4 py-2 bg-aurora-terracotta text-white rounded-full text-sm font-semibold hover:bg-aurora-terracottaDark transition-colors duration-200 shadow-md"
                 >
                   Editar
                 </button>
@@ -837,18 +837,18 @@ const HistoryPage: React.FC = () => {
             {isEditingCommunity ? (
               <div>
                 <textarea
-                  className={`w-full border rounded-lg p-3 text-gray-700 text-base focus:outline-none focus:ring-2 h-32 resize-none ${communityError ? 'border-red-300 focus:ring-red-400' : 'border-gray-300 focus:ring-green-400'}`}
+                  className={`w-full border rounded-lg p-3 text-aurora-navy/80 text-base focus:outline-none focus:ring-2 h-32 resize-none ${communityError ? 'border-red-300 focus:ring-red-400' : 'border-aurora-navy/20 focus:ring-green-400'}`}
                   value={tempCommunityText}
                   onChange={(e) => { if (e.target.value.length <= MAX_COMMUNITY_LENGTH) setTempCommunityText(e.target.value); if (communityError) setCommunityError(''); }}
                   maxLength={MAX_COMMUNITY_LENGTH}
                 />
                 <div className="flex items-center justify-between mt-2">
-                  <span className={`text-xs ${communityError ? 'text-red-600' : 'text-gray-400'}`}>
+                  <span className={`text-xs ${communityError ? 'text-red-600' : 'text-aurora-navy/40'}`}>
                     {communityError || `${tempCommunityText.length} / ${MAX_COMMUNITY_LENGTH} caracteres`}
                   </span>
                 </div>
                 <div className="flex justify-end gap-3 mt-3">
-                  <button onClick={() => { setIsEditingCommunity(false); setCommunityError(''); }} className="px-5 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-100 transition-colors duration-200">
+                  <button onClick={() => { setIsEditingCommunity(false); setCommunityError(''); }} className="px-5 py-2 border border-aurora-navy/20 rounded-lg text-aurora-navy/80 hover:bg-aurora-cream transition-colors duration-200">
                     Cancelar
                   </button>
                   <button onClick={handleSaveCommunity} disabled={savingCommunity} className="px-5 py-2 bg-green-600 text-white rounded-lg font-semibold hover:bg-green-700 transition-colors duration-200 disabled:opacity-60">
@@ -858,7 +858,7 @@ const HistoryPage: React.FC = () => {
               </div>
             ) : (
               <>
-                <p className="text-center text-gray-700 max-w-3xl mx-auto mb-8 text-lg">{communityTextToDisplay}</p>
+                <p className="text-center text-aurora-navy/80 max-w-3xl mx-auto mb-8 text-lg">{communityTextToDisplay}</p>
                 {Object.keys(socialMediaLinks).length > 0 && <ClubSocialMedia socialMedia={socialMediaLinks} />}
               </>
             )}
@@ -874,14 +874,14 @@ const HistoryPage: React.FC = () => {
                   <div key={review.id || idx} className="bg-yellow-50 p-6 rounded-xl shadow-md border border-yellow-200 flex flex-col gap-3">
                     <div className="flex items-center gap-1">
                       {Array.from({ length: 5 }).map((_, i) => (
-                        <svg key={i} className={`w-5 h-5 ${i < review.rating ? 'text-yellow-400' : 'text-gray-200'}`} fill="currentColor" viewBox="0 0 20 20">
+                        <svg key={i} className={`w-5 h-5 ${i < review.rating ? 'text-yellow-400' : 'text-aurora-navy/30'}`} fill="currentColor" viewBox="0 0 20 20">
                           <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
                         </svg>
                       ))}
                     </div>
-                    {review.title && <h4 className="font-bold text-gray-800 text-base">{review.title}</h4>}
-                    {review.comment && <p className="text-gray-600 text-sm leading-relaxed">{review.comment}</p>}
-                    <p className="text-xs text-gray-400 mt-auto">{review.userName || 'Usuario'}</p>
+                    {review.title && <h4 className="font-bold text-aurora-navy text-base">{review.title}</h4>}
+                    {review.comment && <p className="text-aurora-navy/70 text-sm leading-relaxed">{review.comment}</p>}
+                    <p className="text-xs text-aurora-navy/40 mt-auto">{review.userName || 'Usuario'}</p>
                   </div>
                 ))}
               </div>
@@ -897,7 +897,7 @@ const HistoryPage: React.FC = () => {
             </p>
             <Link
               to={`/club/${club.id}`}
-              className="inline-block bg-white text-blue-600 px-12 py-5 rounded-full font-bold text-xl hover:bg-blue-100 transition-all duration-300 shadow-lg"
+              className="inline-block bg-white text-aurora-terracotta px-12 py-5 rounded-full font-bold text-xl hover:bg-aurora-terracotta/10 transition-all duration-300 shadow-lg"
             >
               ¡Suscribite Ahora!
             </Link>
@@ -908,7 +908,7 @@ const HistoryPage: React.FC = () => {
           {!insidePanel && (
             <button
               onClick={() => navigate(`/club/${club.id}`)}
-              className="inline-flex items-center px-8 py-4 border border-transparent text-base font-medium rounded-full shadow-sm text-white bg-gray-700 hover:bg-gray-800 transition-colors duration-200"
+              className="inline-flex items-center px-8 py-4 border border-transparent text-base font-medium rounded-full shadow-sm text-white bg-aurora-navy/80 hover:bg-aurora-navy transition-colors duration-200"
             >
               <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>

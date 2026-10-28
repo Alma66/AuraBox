@@ -37,7 +37,7 @@ const PAYMENT_STATUS_COLORS: Record<PaymentEntry['paymentStatus'], string> = {
   Exitoso: 'bg-green-100 text-green-700',
   Pendiente: 'bg-yellow-100 text-yellow-700',
   Rechazado: 'bg-red-100 text-red-700',
-  Reembolsado: 'bg-blue-100 text-blue-700',
+  Reembolsado: 'bg-aurora-terracotta/10 text-aurora-terracottaDark',
 };
 
 const PAYMENT_STATUS_LABELS: Record<PaymentEntry['paymentStatus'], string> = {
@@ -48,9 +48,9 @@ const PAYMENT_STATUS_LABELS: Record<PaymentEntry['paymentStatus'], string> = {
 };
 
 const SHIPMENT_STATUS_COLORS: Record<ShipmentEntry['shipmentStatus'], string> = {
-  Pendiente: 'bg-gray-200 text-gray-700',
-  Asignado: 'bg-blue-100 text-blue-700',
-  En_Camino: 'bg-indigo-100 text-indigo-700',
+  Pendiente: 'bg-aurora-navy/10 text-aurora-navy/80',
+  Asignado: 'bg-aurora-terracotta/10 text-aurora-terracottaDark',
+  En_Camino: 'bg-aurora-terracotta/10 text-aurora-terracottaDark',
   Entregado: 'bg-green-100 text-green-700',
   Problema: 'bg-red-100 text-red-700',
   Devuelto: 'bg-orange-100 text-orange-700',
@@ -135,10 +135,10 @@ const OrderHistoryPage: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 py-12 px-4">
+      <div className="min-h-screen bg-aurora-cream py-12 px-4">
         <div className="max-w-5xl mx-auto text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">Cargando tu historial...</p>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-aurora-terracottaDark mx-auto mb-4"></div>
+          <p className="text-aurora-navy/70">Cargando tu historial...</p>
         </div>
       </div>
     );
@@ -148,8 +148,8 @@ const OrderHistoryPage: React.FC = () => {
     <div className="min-h-screen bg-gradient-to-br from-green-50 via-white to-blue-50 py-8 px-4">
       <div className="max-w-5xl mx-auto">
         <div className="text-center mb-8">
-          <h1 className="text-4xl font-bold text-gray-800 mb-2">Historial de Compras</h1>
-          <p className="text-gray-600">
+          <h1 className="text-4xl font-bold text-aurora-navy mb-2">Historial de Compras</h1>
+          <p className="text-aurora-navy/70">
             {user ? `Hola, ${user.firstName}! ` : ''}Revisá tus pagos y el estado de tus envíos.
           </p>
         </div>
@@ -164,7 +164,7 @@ const OrderHistoryPage: React.FC = () => {
           <button
             onClick={() => setTab('payments')}
             className={`px-6 py-2 rounded-full text-sm font-semibold transition-colors ${
-              tab === 'payments' ? 'bg-blue-600 text-white' : 'bg-white text-gray-600 hover:bg-gray-100 border border-gray-200'
+              tab === 'payments' ? 'bg-aurora-terracotta text-white' : 'bg-white text-aurora-navy/70 hover:bg-aurora-cream border border-aurora-navy/10'
             }`}
           >
             Pagos ({payments.length})
@@ -172,7 +172,7 @@ const OrderHistoryPage: React.FC = () => {
           <button
             onClick={() => setTab('shipments')}
             className={`px-6 py-2 rounded-full text-sm font-semibold transition-colors ${
-              tab === 'shipments' ? 'bg-blue-600 text-white' : 'bg-white text-gray-600 hover:bg-gray-100 border border-gray-200'
+              tab === 'shipments' ? 'bg-aurora-terracotta text-white' : 'bg-white text-aurora-navy/70 hover:bg-aurora-cream border border-aurora-navy/10'
             }`}
           >
             Envíos ({shipments.length})
@@ -182,11 +182,11 @@ const OrderHistoryPage: React.FC = () => {
         {tab === 'payments' && (
           sortedPayments.length === 0 ? (
             <div className="text-center py-16 bg-white rounded-xl shadow-inner">
-              <p className="text-lg text-gray-600 font-medium">Todavía no tenés pagos registrados.</p>
+              <p className="text-lg text-aurora-navy/70 font-medium">Todavía no tenés pagos registrados.</p>
             </div>
           ) : (
             <div className="bg-white rounded-2xl shadow-md overflow-hidden">
-              <div className="divide-y divide-gray-100">
+              <div className="divide-y divide-aurora-navy/10">
                 {sortedPayments.map((payment) => {
                   const club = clubs[payment.idClub];
                   const pmName = payment.idPaymentMethods ? paymentMethods[payment.idPaymentMethods] : undefined;
@@ -195,14 +195,14 @@ const OrderHistoryPage: React.FC = () => {
                       <img
                         src={club?.logoUrl || '/assets/default-club.jpg'}
                         alt={club?.name || 'Club'}
-                        className="w-12 h-12 rounded-full object-cover border border-gray-100 flex-shrink-0"
+                        className="w-12 h-12 rounded-full object-cover border border-aurora-navy/10 flex-shrink-0"
                       />
                       <div className="flex-grow min-w-0">
-                        <p className="font-semibold text-gray-900 truncate">{club?.name || 'Club'}</p>
-                        <p className="text-xs text-gray-500">{formatDate(payment.paymentDate)} · {pmName || 'Método no especificado'}</p>
+                        <p className="font-semibold text-aurora-navy truncate">{club?.name || 'Club'}</p>
+                        <p className="text-xs text-aurora-navy/60">{formatDate(payment.paymentDate)} · {pmName || 'Método no especificado'}</p>
                       </div>
                       <div className="text-right flex-shrink-0">
-                        <p className="font-bold text-gray-900">{formatPrice(payment.totalAmountPaid)}</p>
+                        <p className="font-bold text-aurora-navy">{formatPrice(payment.totalAmountPaid)}</p>
                         <span className={`inline-block text-xs font-semibold px-2 py-0.5 rounded-full ${PAYMENT_STATUS_COLORS[payment.paymentStatus]}`}>
                           {PAYMENT_STATUS_LABELS[payment.paymentStatus]}
                         </span>
@@ -218,11 +218,11 @@ const OrderHistoryPage: React.FC = () => {
         {tab === 'shipments' && (
           sortedShipments.length === 0 ? (
             <div className="text-center py-16 bg-white rounded-xl shadow-inner">
-              <p className="text-lg text-gray-600 font-medium">Todavía no tenés envíos registrados.</p>
+              <p className="text-lg text-aurora-navy/70 font-medium">Todavía no tenés envíos registrados.</p>
             </div>
           ) : (
             <div className="bg-white rounded-2xl shadow-md overflow-hidden">
-              <div className="divide-y divide-gray-100">
+              <div className="divide-y divide-aurora-navy/10">
                 {sortedShipments.map((shipment) => {
                   const club = shipment.idClub ? clubs[shipment.idClub] : undefined;
                   return (
@@ -230,16 +230,16 @@ const OrderHistoryPage: React.FC = () => {
                       <img
                         src={club?.logoUrl || '/assets/default-club.jpg'}
                         alt={club?.name || 'Club'}
-                        className="w-12 h-12 rounded-full object-cover border border-gray-100 flex-shrink-0"
+                        className="w-12 h-12 rounded-full object-cover border border-aurora-navy/10 flex-shrink-0"
                       />
                       <div className="flex-grow min-w-0">
-                        <p className="font-semibold text-gray-900 truncate">{club?.name || 'Club'}</p>
-                        <p className="text-xs text-gray-500">
+                        <p className="font-semibold text-aurora-navy truncate">{club?.name || 'Club'}</p>
+                        <p className="text-xs text-aurora-navy/60">
                           Caja {shipment.boxMonthYear}
                           {shipment.trackingNumber && ` · Seguimiento: ${shipment.trackingNumber}`}
                         </p>
                         {(shipment.estimatedDeliveryStartDate || shipment.actualDeliveryDate) && (
-                          <p className="text-xs text-gray-400 mt-0.5">
+                          <p className="text-xs text-aurora-navy/40 mt-0.5">
                             {shipment.actualDeliveryDate
                               ? `Entregado el ${formatDate(shipment.actualDeliveryDate)}`
                               : `Estimado: ${formatDate(shipment.estimatedDeliveryStartDate)} - ${formatDate(shipment.estimatedDeliveryEndDate)}`}
