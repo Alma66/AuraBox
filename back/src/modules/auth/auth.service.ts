@@ -185,10 +185,13 @@ export class AuthService {
     return { ...safe, role: 'entrepreneur', entrepreneurToken };
   }
 
-  async registerEntrepreneurClub(dto: any) {
+   async registerEntrepreneurClub(dto: any) {
     const { entrepreneurToken, name, logoUrl, shortDescription, contactEmail, slogan, history, whatsappContact } = dto;
 
     if (!entrepreneurToken) throw new BadRequestException('entrepreneurToken es requerido');
+    if (!name?.trim() || !shortDescription?.trim() || !contactEmail?.trim()) {
+      throw new BadRequestException('Nombre, descripción y email de contacto son obligatorios');
+    }
 
     const entrepreneurId = this.verifyRegistrationToken(entrepreneurToken, 'entrepreneur-club');
 
@@ -197,26 +200,33 @@ export class AuthService {
     });
     if (!entrepreneur) throw new BadRequestException('Emprendedor no encontrado');
 
-    const club = await this.prisma.club.create({
-      data: {
-        name,
-        logoUrl: logoUrl ?? '',
-        slogan: slogan ?? null,
-        history: history ?? null,
-        shortDescription,
-        contactEmail,
-        whatsappContact: whatsappContact ?? null,
-        clubStatus: 'PENDIENTE_APROBACION',
-      },
+    const existing = await this.prisma.entrepreneur_Club.findFirst({
+      where: { idEntrepreneurs: entrepreneurId },
     });
+    if (existing) throw new BadRequestException('Este emprendedor ya tiene un club registrado');
 
-    await this.prisma.entrepreneur_Club.create({
-      data: {
-        idEntrepreneurs: entrepreneurId,
-        idClub: club.id,
-      },
+    return this.prisma.$transaction(async (tx) => {
+      const club = await tx.club.create({
+        data: {
+          name: name.trim(),
+          logoUrl: logoUrl ?? '',
+          slogan: slogan ?? null,
+          history: history ?? null,
+          shortDescription: shortDescription.trim(),
+          contactEmail: contactEmail.trim(),
+          whatsappContact: whatsappContact ?? null,
+          clubStatus: 'PENDIENTE_APROBACION',
+        },
+      });
+
+      await tx.entrepreneur_Club.create({
+        data: {
+          idEntrepreneurs: entrepreneurId,
+          idClub: club.id,
+        },
+      });
+
+      return club;
     });
-
-    return club;
   }
 }

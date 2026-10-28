@@ -1,8 +1,24 @@
 import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import api from '../api/config';
+import { PROVINCES } from '../constants/provinces';
+
+type AccountType = 'customer' | 'entrepreneur';
+
+const MIN_AGE: Record<AccountType, number> = { customer: 16, entrepreneur: 18 };
+
+const ACCOUNT_OPTIONS: { id: AccountType; title: string; hint: string }[] = [
+  { id: 'customer', title: 'Soy cliente', hint: 'Quiero suscribirme a clubes' },
+  { id: 'entrepreneur', title: 'Soy emprendedor', hint: 'Quiero registrar mi club' },
+];
+
+const MAX_PHONE = 2147483647;
 
 const RegisterPage: React.FC = () => {
+  const [searchParams] = useSearchParams();
+  const [accountType, setAccountType] = useState<AccountType>(
+    searchParams.get('role') === 'entrepreneur' ? 'entrepreneur' : 'customer',
+  );
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
   const [email, setEmail] = useState('');
@@ -12,6 +28,8 @@ const RegisterPage: React.FC = () => {
   const [documentNumber, setDocumentNumber] = useState('');
   const [phoneNumber, setPhoneNumber] = useState('');
   const [birthDate, setBirthDate] = useState('');
+  const [city, setCity] = useState('');
+  const [province, setProvince] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const [step, setStep] = useState(1);
@@ -35,8 +53,12 @@ const RegisterPage: React.FC = () => {
     let age = today.getFullYear() - birth.getFullYear();
     const monthDiff = today.getMonth() - birth.getMonth();
     if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birth.getDate())) age--;
-    if (age < 16) {
-      setError('Debés tener al menos 16 años para registrarte.');
+    if (age < MIN_AGE[accountType]) {
+      setError(
+        accountType === 'entrepreneur'
+          ? 'Debés ser mayor de 18 años para registrarte como emprendedor.'
+          : 'Debés tener al menos 16 años para registrarte.',
+      );
       return false;
     }
     setError('');
@@ -62,22 +84,39 @@ const RegisterPage: React.FC = () => {
       setError('La contraseña debe tener al menos 8 caracteres, una mayúscula, una minúscula y un número.');
       return;
     }
+    const phoneDigits = phoneNumber.replace(/\D/g, '');
+    if (phoneDigits && Number(phoneDigits) > MAX_PHONE) {
+      setError('Ese teléfono todavía no se puede guardar. Dejalo vacío por ahora.');
+      return;
+    }
     setLoading(true);
     try {
-      const dto = {
+      const dto: Record<string, unknown> = {
         firstName,
         lastName,
         email,
         password,
         documentType,
         documentNumber,
-        phoneNumber: phoneNumber || null,
+        phoneNumber: phoneDigits || null,
         birthDate,
       };
-      const response = await api.post('/auth/register/customer', dto);
+      if (accountType === 'entrepreneur') {
+        dto.city = city || null;
+        dto.province = province || null;
+      }
+      const endpoint = accountType === 'entrepreneur' ? '/auth/register/entrepreneur' : '/auth/register/customer';
+      const response = await api.post(endpoint, dto);
       const data = response.data?.data ?? response.data;
-      localStorage.setItem('pending_profile_token', data.profileToken);
-      navigate('/register/complete-profile');
+      if (accountType === 'entrepreneur') {
+        localStorage.removeItem('pending_profile_token');
+        localStorage.setItem('pending_entrepreneur_token', data.entrepreneurToken);
+        navigate('/register/complete-club');
+      } else {
+        localStorage.removeItem('pending_entrepreneur_token');
+        localStorage.setItem('pending_profile_token', data.profileToken);
+        navigate('/register/complete-profile');
+      }
     } catch (err: any) {
       setError(err.response?.data?.message || 'Error al registrarse. Intentá de nuevo.');
     } finally {
@@ -115,6 +154,25 @@ const RegisterPage: React.FC = () => {
         <form className="space-y-4" onSubmit={handleSubmit}>
           {step === 1 && (
             <>
+              <div role="group" aria-label="Tipo de cuenta" className="grid grid-cols-2 gap-2">
+                {ACCOUNT_OPTIONS.map((option) => (
+                  <button
+                    key={option.id}
+                    type="button"
+                    aria-pressed={accountType === option.id}
+                    onClick={() => setAccountType(option.id)}
+                    className={`min-h-[64px] rounded-xl border px-3 py-2 text-left transition-colors ${
+                      accountType === option.id
+                        ? 'border-aurora-terracotta bg-aurora-terracotta/10'
+                        : 'border-aurora-navy/15 bg-white hover:border-aurora-navy/30'
+                    }`}
+                  >
+                    <span className="block text-sm font-semibold text-aurora-navy">{option.title}</span>
+                    <span className="block text-xs text-aurora-navy/60">{option.hint}</span>
+                  </button>
+                ))}
+              </div>
+
               <div className="grid grid-cols-2 gap-3">
                 <div>
                   <label htmlFor="first-name" className="block text-xs font-medium text-aurora-navy/70 mb-1">Nombre</label>
@@ -161,8 +219,25 @@ const RegisterPage: React.FC = () => {
               </div>
               <div>
                 <label htmlFor="phone-number" className="block text-xs font-medium text-aurora-navy/70 mb-1">Teléfono (opcional)</label>
-                <input id="phone-number" type="tel" className="input-aurora" placeholder="+54 11 1234-5678" value={phoneNumber} onChange={(e) => setPhoneNumber(e.target.value)} />
+                <input id="phone-number" type="tel" className="input-aurora" placeholder="11 1234-5678" value={phoneNumber} onChange={(e) => setPhoneNumber(e.target.value)} />
               </div>
+
+              {accountType === 'entrepreneur' && (
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label htmlFor="city" className="block text-xs font-medium text-aurora-navy/70 mb-1">Ciudad (opcional)</label>
+                    <input id="city" type="text" className="input-aurora" placeholder="Ej: Rosario" value={city} onChange={(e) => setCity(e.target.value)} />
+                  </div>
+                  <div>
+                    <label htmlFor="province" className="block text-xs font-medium text-aurora-navy/70 mb-1">Provincia</label>
+                    <select id="province" className="input-aurora" value={province} onChange={(e) => setProvince(e.target.value)}>
+                      <option value="">Elegí una</option>
+                      {PROVINCES.map((p) => (<option key={p} value={p}>{p}</option>))}
+                    </select>
+                  </div>
+                </div>
+              )}
+
               <div>
                 <label htmlFor="password" className="block text-xs font-medium text-aurora-navy/70 mb-1">Contraseña</label>
                 <input id="password" type="password" autoComplete="new-password" required className="input-aurora" placeholder="Mínimo 8 caracteres" value={password} onChange={(e) => setPassword(e.target.value)} />

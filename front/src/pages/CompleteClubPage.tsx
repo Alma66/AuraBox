@@ -1,18 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import api from '../api/config';
 
-const PROVINCES = [
-  'Buenos Aires', 'CABA', 'Catamarca', 'Chaco', 'Chubut', 'Córdoba',
-  'Corrientes', 'Entre Ríos', 'Formosa', 'Jujuy', 'La Pampa', 'La Rioja',
-  'Mendoza', 'Misiones', 'Neuquén', 'Río Negro', 'Salta', 'San Juan',
-  'San Luis', 'Santa Cruz', 'Santa Fe', 'Santiago del Estero',
-  'Tierra del Fuego', 'Tucumán',
-];
-
 const CompleteClubPage: React.FC = () => {
-  const [city, setCity] = useState('');
-  const [province, setProvince] = useState('');
   const [clubName, setClubName] = useState('');
   const [shortDescription, setShortDescription] = useState('');
   const [contactEmail, setContactEmail] = useState('');
@@ -20,41 +10,31 @@ const CompleteClubPage: React.FC = () => {
   const [whatsappContact, setWhatsappContact] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [done, setDone] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
-    const userId = localStorage.getItem('pending_user_id');
-    const userType = localStorage.getItem('pending_user_type');
-    if (!userId || userType !== 'entrepreneur') {
-      navigate('/register');
+    if (!done && !localStorage.getItem('pending_entrepreneur_token')) {
+      navigate('/register?role=entrepreneur');
     }
-  }, [navigate]);
+  }, [navigate, done]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
     setLoading(true);
 
-    const entrepreneurId = localStorage.getItem('pending_user_id');
-
     try {
-      if (city || province) {
-        await api.patch(`/entrepreneurs/${entrepreneurId}`, { city: city || null, province: province || null });
-      }
-
       await api.post('/auth/register/entrepreneur/club', {
-        entrepreneurId,
-        name: clubName,
-        shortDescription,
-        contactEmail,
-        slogan: slogan || null,
-        whatsappContact: whatsappContact || null,
-        logoUrl: '',
+        entrepreneurToken: localStorage.getItem('pending_entrepreneur_token'),
+        name: clubName.trim(),
+        shortDescription: shortDescription.trim(),
+        contactEmail: contactEmail.trim(),
+        slogan: slogan.trim() || null,
+        whatsappContact: whatsappContact.trim() || null,
       });
-
-      localStorage.removeItem('pending_user_id');
-      localStorage.removeItem('pending_user_type');
-      navigate('/login');
+      localStorage.removeItem('pending_entrepreneur_token');
+      setDone(true);
     } catch (err: any) {
       setError(err.response?.data?.message || 'Error al crear el club. Intentá de nuevo.');
     } finally {
@@ -62,11 +42,23 @@ const CompleteClubPage: React.FC = () => {
     }
   };
 
-  const handleSkip = () => {
-    localStorage.removeItem('pending_user_id');
-    localStorage.removeItem('pending_user_type');
-    navigate('/login');
-  };
+  if (done) {
+    return (
+      <div className="min-h-[calc(100vh-64px)] flex items-center justify-center bg-aurora-cream py-12 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-md w-full space-y-4 p-10 card-surface shadow-aurora text-center animate-fadeInUp" role="status">
+          <span className="section-eyebrow block">¡Listo!</span>
+          <h2 className="font-display text-3xl font-bold text-aurora-navy">Tu club está en revisión</h2>
+          <p className="text-sm text-aurora-navy/60">
+            El equipo de AuraBox va a revisar tu club y, cuando lo apruebe, vas a poder publicarlo. Mientras tanto ya podés
+            iniciar sesión y empezar a configurarlo.
+          </p>
+          <Link to="/login" className="btn-primary inline-flex w-full justify-center">
+            Iniciar sesión
+          </Link>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-[calc(100vh-64px)] flex items-center justify-center bg-aurora-cream py-12 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
@@ -77,7 +69,7 @@ const CompleteClubPage: React.FC = () => {
           <span className="section-eyebrow block text-center">Último paso</span>
           <h2 className="text-center font-display text-3xl font-bold text-aurora-navy">Registrá tu club</h2>
           <p className="mt-2 text-center text-sm text-aurora-navy/60">
-            Contanos sobre tu emprendimiento. Podés completar los detalles ahora o terminar de configurarlo desde tu perfil.
+            Contanos sobre tu emprendimiento. Después vas a poder completar el resto desde tu panel.
           </p>
         </div>
 
@@ -104,36 +96,14 @@ const CompleteClubPage: React.FC = () => {
 
           <div>
             <label htmlFor="whatsapp" className="block text-sm font-medium text-aurora-navy/70 mb-1">WhatsApp de contacto (opcional)</label>
-            <input id="whatsapp" type="text" className="input-aurora" placeholder="+54 11 1234-5678" value={whatsappContact} onChange={(e) => setWhatsappContact(e.target.value)} />
+            <input id="whatsapp" type="tel" className="input-aurora" placeholder="+54 11 1234-5678" value={whatsappContact} onChange={(e) => setWhatsappContact(e.target.value)} />
           </div>
 
-          <hr className="border-aurora-navy/10" />
+          {error && <p role="alert" className="text-red-600 text-sm text-center bg-red-50 border border-red-100 rounded-lg py-2 px-3">{error}</p>}
 
-          <p className="text-sm font-medium text-aurora-navy/70">Tu ubicación (opcional)</p>
-
-          <div>
-            <label htmlFor="city" className="block text-sm font-medium text-aurora-navy/70 mb-1">Ciudad</label>
-            <input id="city" type="text" className="input-aurora" placeholder="Ej: Buenos Aires" value={city} onChange={(e) => setCity(e.target.value)} />
-          </div>
-
-          <div>
-            <label htmlFor="province" className="block text-sm font-medium text-aurora-navy/70 mb-1">Provincia</label>
-            <select id="province" className="input-aurora" value={province} onChange={(e) => setProvince(e.target.value)}>
-              <option value="">Seleccioná una provincia</option>
-              {PROVINCES.map((p) => (<option key={p} value={p}>{p}</option>))}
-            </select>
-          </div>
-
-          {error && <p className="text-red-600 text-sm text-center bg-red-50 border border-red-100 rounded-lg py-2 px-3">{error}</p>}
-
-          <div className="flex flex-col space-y-3 pt-2">
-            <button type="submit" disabled={loading} className="btn-primary w-full">
-              {loading ? 'Creando club...' : 'Crear mi club'}
-            </button>
-            <button type="button" onClick={handleSkip} className="btn-outline w-full">
-              Completar más tarde
-            </button>
-          </div>
+          <button type="submit" disabled={loading} className="btn-primary w-full">
+            {loading ? 'Creando club...' : 'Crear mi club'}
+          </button>
         </form>
       </div>
     </div>
