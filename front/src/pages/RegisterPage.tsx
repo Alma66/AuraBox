@@ -76,8 +76,7 @@ const RegisterPage: React.FC = () => {
       };
       const response = await api.post('/auth/register/customer', dto);
       const data = response.data?.data ?? response.data;
-      localStorage.setItem('pending_user_id', data.id.toString());
-      localStorage.setItem('pending_user_type', 'customer');
+      localStorage.setItem('pending_profile_token', data.profileToken);
       navigate('/register/complete-profile');
     } catch (err: any) {
       setError(err.response?.data?.message || 'Error al registrarse. Intentá de nuevo.');

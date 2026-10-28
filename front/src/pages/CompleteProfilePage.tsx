@@ -22,17 +22,14 @@ const CompleteProfilePage: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
-  useEffect(() => {
-    const userId = localStorage.getItem('pending_user_id');
-    const userType = localStorage.getItem('pending_user_type');
-    if (!userId || userType !== 'customer') {
+    useEffect(() => {
+    if (!localStorage.getItem('pending_profile_token')) {
       navigate('/register');
     }
   }, [navigate]);
 
   const handleSkip = () => {
-    localStorage.removeItem('pending_user_id');
-    localStorage.removeItem('pending_user_type');
+    localStorage.removeItem('pending_profile_token');
     navigate('/login');
   };
 
@@ -41,11 +38,11 @@ const CompleteProfilePage: React.FC = () => {
     setError('');
     setLoading(true);
 
-    const userId = localStorage.getItem('pending_user_id');
+        const profileToken = localStorage.getItem('pending_profile_token');
 
     try {
       await api.post('/auth/register/customer/complete-profile', {
-        userId,
+        profileToken,
         streetAddress: streetAddress || null,
         addressNumber: addressNumber || null,
         floorNumber: floorNumber || null,
@@ -55,8 +52,7 @@ const CompleteProfilePage: React.FC = () => {
         postalCode: postalCode || null,
       });
 
-      localStorage.removeItem('pending_user_id');
-      localStorage.removeItem('pending_user_type');
+    localStorage.removeItem('pending_profile_token');
       navigate('/login');
     } catch (err: any) {
       setError(err.response?.data?.message || 'Error al guardar los datos. Intentá de nuevo.');

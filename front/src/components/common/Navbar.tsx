@@ -145,6 +145,9 @@ const Navbar: React.FC<NavbarProps> = ({ userRole, isAuthenticated, onLogout }) 
                   <Link to="/entrepreneur/profile" className={linkClass} onClick={closeAllDropdowns}>Mi Perfil</Link>
                 </>
               )}
+              {userRole === 'admin' && (
+                <Link to="/admin/dashboard" className={linkClass} onClick={closeAllDropdowns}>Panel de administración</Link>
+              )}
               <div className="my-1 border-t border-aurora-navy/5" />
               <button
                 onClick={handleLogoutClick}
@@ -273,6 +276,9 @@ const Navbar: React.FC<NavbarProps> = ({ userRole, isAuthenticated, onLogout }) 
                     <Link to="/entrepreneur/dashboard" className={mobileLinkClass} onClick={closeAllDropdowns}>Ir a mi panel</Link>
                     <Link to="/entrepreneur/profile" className={mobileLinkClass} onClick={closeAllDropdowns}>Mi Perfil</Link>
                   </>
+                )}
+               {userRole === 'admin' && (
+                  <Link to="/admin/dashboard" className={mobileLinkClass} onClick={closeAllDropdowns}>Panel de administración</Link>
                 )}
                 <button
                   onClick={handleLogoutClick}

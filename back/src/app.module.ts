@@ -5,7 +5,7 @@ import { ThrottlerModule, ThrottlerGuard } from '@nestjs/throttler';
 import { ValidationPipe } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-
+import { AdminPanelModule } from './modules/admin-panel/admin-panel.module';
 import { ConfigModule } from '@nestjs/config';
 import { CloudinaryModule } from './modules/cloudinary/cloudinary.module';
 import { PrismaModule } from './prisma/prisma.module';
@@ -74,6 +74,7 @@ if (!jwtSecret) {
 
     AnalyticsModule,
     AdminOrEntrepreneurRoleModule,
+    AdminPanelModule,
     AdminsModule,
     AuthModule,
     BoxContentHistoryModule,

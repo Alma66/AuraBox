@@ -6,6 +6,9 @@ import Footer from './components/common/Footer';
 import FloatingButtons from './components/common/FloatingButtons';
 import PrivateRoute from './components/common/PrivateRoute';
 import EntrepreneurLayout from './components/entrepreneur/layout/EntrepreneurLayout';
+import AdminLayout from './components/admin/layout/AdminLayout';
+import AdminDashboardPage from './pages/admin/AdminDashboardPage';
+import AdminClubsPage from './pages/admin/AdminClubsPage';
 import HomePage from './pages/HomePage';
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
@@ -199,6 +202,8 @@ const AppContent: React.FC = () => {
     userRole === 'entrepreneur' &&
     !AUTH_PATHS.some((path) => pathname === path || pathname.startsWith(`${path}/`));
 
+  const isAdminPanel = isAuthenticated && userRole === 'admin' && pathname.startsWith('/admin');
+
   const routes = (
     <Routes>
       <Route path="/" element={isPanel ? <Navigate to="/entrepreneur/dashboard" replace /> : <HomePage />} />
@@ -254,17 +259,20 @@ const AppContent: React.FC = () => {
       <Route path="/entrepreneur/club/:clubId/customer-history" element={pr(['entrepreneur'], <CustomersRedirect tab="directory" />)} />
       <Route path="/entrepreneur/club/:clubId/customer-history/:customerId" element={pr(['entrepreneur'], <CustomersRedirect tab="directory" />)} />
       <Route path="/entrepreneur/club/:clubId/subscription/:subscriptionId" element={pr(['entrepreneur'], <SubscriptionDetailForEntrepreneurPage />)} />
-            <Route path="/entrepreneur/club/:clubId/shipments" element={pr(['entrepreneur'], <ShipmentsPage />)} />
+      <Route path="/entrepreneur/club/:clubId/shipments" element={pr(['entrepreneur'], <ShipmentsPage />)} />
       <Route path="/entrepreneur/club/:clubId/assign-deliveries" element={pr(['entrepreneur'], <ShipmentsRedirect search="?tab=assign" />)} />
       <Route path="/entrepreneur/club/:clubId/view-deliveries" element={pr(['entrepreneur'], <ShipmentsRedirect search="?tab=list&view=recent" />)} />
       <Route path="/entrepreneur/club/:clubId/delivery-history" element={pr(['entrepreneur'], <ShipmentsRedirect search="?tab=list&view=history" />)} />
       <Route path="/entrepreneur/club/:clubId/manage-riders" element={pr(['entrepreneur'], <ShipmentsRedirect search="?riders=1" />)} />
-            <Route path="/entrepreneur/club/:clubId/marketing" element={pr(['entrepreneur'], <MarketingPage />)} />
+      <Route path="/entrepreneur/club/:clubId/marketing" element={pr(['entrepreneur'], <MarketingPage />)} />
       <Route path="/entrepreneur/club/:clubId/community" element={pr(['entrepreneur'], <CommunityPage />)} />
       <Route path="/entrepreneur/club/:clubId/administrar-promociones" element={pr(['entrepreneur'], <ClubRedirect to="marketing" search="?group=promotions" />)} />
       <Route path="/entrepreneur/club/:clubId/enviar-newsletters" element={pr(['entrepreneur'], <ClubRedirect to="marketing" search="?group=newsletters" />)} />
       <Route path="/entrepreneur/club/:clubId/moderate-reviews" element={pr(['entrepreneur'], <ClubRedirect to="community" search="?group=reviews" />)} />
       <Route path="/entrepreneur/club/:clubId/customer-support" element={pr(['entrepreneur'], <ClubRedirect to="community" search="?group=support" />)} />
+      <Route path="/admin" element={<Navigate to="/admin/dashboard" replace />} />
+      <Route path="/admin/dashboard" element={pr(['admin'], <AdminDashboardPage />)} />
+      <Route path="/admin/clubs" element={pr(['admin'], <AdminClubsPage />)} />
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   );
@@ -283,7 +291,15 @@ const AppContent: React.FC = () => {
       </>
     );
   }
-
+  
+  if (isAdminPanel) {
+    return (
+      <>
+        {skipLink}
+        <AdminLayout onLogout={logout}>{routes}</AdminLayout>
+      </>
+    );
+  }
   return (
     <>
       {skipLink}
