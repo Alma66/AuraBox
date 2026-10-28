@@ -70,61 +70,62 @@ const EntrepreneurProfilePage: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-aurora-cream flex items-center justify-center">
+      <div className="flex items-center justify-center px-4 py-24" aria-busy="true">
         <div className="flex flex-col items-center gap-4">
-          <div className="w-12 h-12 border-4 border-aurora-navy/20 border-t-aurora-navy rounded-full animate-spin" />
+          <div className="h-12 w-12 animate-spin rounded-full border-4 border-aurora-navy/20 border-t-aurora-navy" />
           <p className="font-display text-aurora-navy/70">Cargando tu perfil...</p>
         </div>
       </div>
     );
   }
-  if (!loggedInUser) return <div className="min-h-screen bg-aurora-cream flex items-center justify-center text-aurora-navy/70">Redirigiendo...</div>;
+
+  if (!loggedInUser) {
+    return <div className="px-4 py-24 text-center text-aurora-navy/70">Redirigiendo...</div>;
+  }
 
   return (
-    <div className="min-h-screen bg-aurora-cream">
-      <div className="container mx-auto px-4 py-10 md:py-14">
-        <div className="text-center mb-6">
-          <span className="section-eyebrow block">Panel de emprendedor</span>
-          <h1 className="font-display text-4xl md:text-5xl font-bold text-aurora-navy">Mi Perfil de Emprendedor</h1>
-        </div>
-        {managedClub && (
-          <div className="mb-10 flex justify-center">
-            <Link
-              to={`/club/${managedClub.id}`}
-              className="flex items-center gap-3 bg-white border border-aurora-navy/10 rounded-2xl px-6 py-3
-                         shadow-aurora-sm hover:shadow-aurora hover:-translate-y-0.5 transition-all duration-200 group"
+    <div className="px-4 py-6 lg:px-8">
+      {managedClub && (
+        <div className="mb-6">
+          <Link
+            to={`/entrepreneur/club/${managedClub.id}/my-club`}
+            className="group inline-flex items-center gap-3 rounded-2xl border border-aurora-navy/10 bg-white px-5 py-3 shadow-aurora-sm transition-all duration-200 hover:-translate-y-0.5 hover:shadow-aurora"
+          >
+            {managedClub.logoUrl && (
+              <img
+                src={managedClub.logoUrl}
+                alt={managedClub.name}
+                className="h-11 w-11 rounded-full border-2 border-aurora-gold/60 object-cover"
+              />
+            )}
+            <div className="text-left">
+              <p className="text-xs font-semibold uppercase tracking-wide text-aurora-terracotta">Mi Club</p>
+              <p className="font-display font-bold text-aurora-navy transition-colors group-hover:text-aurora-terracotta">
+                {managedClub.name}
+              </p>
+            </div>
+            <svg
+              className="ml-1 h-5 w-5 text-aurora-navy/40 transition-all group-hover:translate-x-1 group-hover:text-aurora-terracotta"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
             >
-              {managedClub.logoUrl && (
-                <img
-                  src={managedClub.logoUrl}
-                  alt={managedClub.name}
-                  className="w-11 h-11 rounded-full object-cover border-2 border-aurora-gold/60"
-                />
-              )}
-              <div className="text-left">
-                <p className="text-xs text-aurora-terracotta font-semibold uppercase tracking-wide">Mi Club</p>
-                <p className="text-aurora-navy font-bold font-display group-hover:text-aurora-terracotta transition-colors">
-                  {managedClub.name}
-                </p>
-              </div>
-              <svg className="w-5 h-5 text-aurora-navy/40 ml-1 group-hover:translate-x-1 group-hover:text-aurora-terracotta transition-all" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" />
-              </svg>
-            </Link>
-          </div>
-        )}
-        <div className="flex flex-col lg:flex-row gap-6 lg:gap-8">
-          <div className="lg:w-1/4">
-            <EntrepreneurProfileSidebar activeSection={activeSection} setActiveSection={setActiveSection} />
-          </div>
-          <div className="lg:w-3/4 bg-white rounded-2xl shadow-aurora-sm border border-aurora-navy/5 p-6 md:p-10">
-            <EntrepreneurProfileContent
-              activeSection={activeSection}
-              user={loggedInUser}
-              managedClub={managedClub}
-              onUserUpdate={fetchEntrepreneur}
-            />
-          </div>
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" />
+            </svg>
+          </Link>
+        </div>
+      )}
+      <div className="flex flex-col gap-6 lg:flex-row lg:gap-8">
+        <div className="lg:w-1/4">
+          <EntrepreneurProfileSidebar activeSection={activeSection} setActiveSection={setActiveSection} />
+        </div>
+        <div className="rounded-2xl border border-aurora-navy/5 bg-white p-6 shadow-aurora-sm md:p-10 lg:w-3/4">
+          <EntrepreneurProfileContent
+            activeSection={activeSection}
+            user={loggedInUser}
+            managedClub={managedClub}
+            onUserUpdate={fetchEntrepreneur}
+          />
         </div>
       </div>
     </div>
