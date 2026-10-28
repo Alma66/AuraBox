@@ -128,7 +128,7 @@ const SalesPanel: React.FC<{ section: string; clubId: string }> = ({ section, cl
       const body = rows
         .map((r) => Object.values(r).map((v) => `"${String(v ?? '').replace(/"/g, '""')}"`).join(','))
         .join('\n');
-      const blob = new Blob(['\uFEFF' + `${headers}\n${body}`], { type: 'text/csv;charset=utf-8;' });
+      const blob = new Blob([`\uFEFF${headers}\n${body}`], { type: 'text/csv;charset=utf-8;' });
       const url = URL.createObjectURL(blob);
       const link = document.createElement('a');
       link.href = url;

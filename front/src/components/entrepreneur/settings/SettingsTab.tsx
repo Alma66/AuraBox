@@ -80,7 +80,7 @@ const SettingsTab: React.FC = () => {
     load();
   }, [load]);
 
-  const entries = settings[section] ?? [];
+  const entries = useMemo(() => settings[section] ?? [], [settings, section]);
 
   const dirty = useMemo(
     () => entries.some((entry) => drafts[`${section}.${entry.key}`] !== toDraft(entry.value)),
