@@ -3,7 +3,7 @@ import { Subscription, NormalizedStatus, normalizeStatus } from '../../../types/
 import { User } from '../../../types/user';
 import { SubscriptionPlan } from '../../../types/club';
 import Icon from '../layout/Icon';
-import { STATUS_LABEL, STATUS_COLOR, formatDate, formatMoney, initialOf } from './customerUtils';
+import { STATUS_LABEL, STATUS_COLOR, formatDate, formatMoney, initialOf, normalizeText } from './customerUtils';
 
 type SortField = 'customer' | 'plan' | 'status' | 'startDate' | 'nextPayment';
 
@@ -61,8 +61,7 @@ const SubscriptionsMonitor: React.FC<SubscriptionsMonitorProps> = ({ subscriptio
         const overdue =
           !!sub.nextPaymentDate &&
           new Date(sub.nextPaymentDate).getTime() < Date.now() &&
-          status !== 'cancelled' &&
-          status !== 'finished';
+          (status === 'active' || status === 'pending');
         return { sub, customer, plan, status, name, overdue };
       }),
     [subscriptions, customerMap, planMap],
@@ -83,20 +82,20 @@ const SubscriptionsMonitor: React.FC<SubscriptionsMonitorProps> = ({ subscriptio
   }, [enriched]);
 
   const rows = useMemo(() => {
-    const term = search.trim().toLowerCase();
+    const term = normalizeText(search.trim());
     return enriched
       .filter((row) => {
         const matchSearch =
           !term ||
-          row.name.toLowerCase().includes(term) ||
-          (row.customer?.email ?? '').toLowerCase().includes(term) ||
-          (row.plan?.name ?? '').toLowerCase().includes(term);
+          normalizeText(row.name).includes(term) ||
+          normalizeText(row.customer?.email ?? '').includes(term) ||
+          normalizeText(row.plan?.name ?? '').includes(term);
         const matchStatus = statusFilter === 'all' || row.status === statusFilter;
         const matchPlan = planFilter === 'all' || row.sub.idSubscriptionTypes === Number(planFilter);
         return matchSearch && matchStatus && matchPlan;
       })
       .sort((a, b) => {
-        const result = sortValue(a, sortField).localeCompare(sortValue(b, sortField));
+                const result = sortValue(a, sortField).localeCompare(sortValue(b, sortField), 'es');
         return sortDir === 'asc' ? result : -result;
       });
   }, [enriched, search, statusFilter, planFilter, sortField, sortDir]);

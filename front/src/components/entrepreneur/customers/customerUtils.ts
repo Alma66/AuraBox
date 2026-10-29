@@ -13,7 +13,7 @@ export const STATUS_COLOR: Record<NormalizedStatus, string> = {
   paused: 'bg-yellow-100 text-yellow-800',
   cancelled: 'bg-red-100 text-red-800',
   pending: 'bg-orange-100 text-orange-800',
-  finished: 'bg-gray-100 text-gray-700',
+  finished: 'bg-aurora-navy/10 text-aurora-navy/70',
 };
 
 export const STATUS_DOT: Record<NormalizedStatus, string> = {
@@ -21,7 +21,7 @@ export const STATUS_DOT: Record<NormalizedStatus, string> = {
   paused: 'bg-yellow-400',
   cancelled: 'bg-red-400',
   pending: 'bg-orange-400',
-  finished: 'bg-gray-400',
+  finished: 'bg-aurora-navy/40',
 };
 
 export interface StatusAction {
@@ -45,6 +45,12 @@ export const formatDate = (value?: string | null) =>
 export const formatMoney = (value: number) => `$${value.toLocaleString('es-AR')}`;
 
 export const initialOf = (firstName?: string | null) => (firstName?.[0] ?? '?').toUpperCase();
+
+export const normalizeText = (value: string) =>
+  value
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase();
 
 export const getErrorMessage = (err: any, fallback: string) => {
   const msg = err?.response?.data?.message;

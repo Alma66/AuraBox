@@ -1,6 +1,6 @@
-import { Injectable, BadRequestException, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
 import { CreateUserDto } from './dto/create-user.dto';
+import { Injectable, BadRequestException, NotFoundException, UnauthorizedException, ForbiddenException } from '@nestjs/common';
 import { UpdateUserDto } from './dto/update-user.dto';
 import * as bcrypt from 'bcryptjs';
 import { Prisma, DocumentType } from '@prisma/client';
@@ -173,5 +173,14 @@ export class UsersService {
       select: USER_SELECT,
     });
     return users.map(sanitizeUser);
+  }
+    async findNewsletterRecipients(idClub: number, requester: { id: number; role: string }) {
+    if (requester.role !== 'admin') {
+      const link = await this.prisma.entrepreneur_Club.findFirst({
+        where: { idClub, idEntrepreneurs: requester.id },
+      });
+      if (!link) throw new ForbiddenException('No tenés acceso a este club');
+    }
+    return this.findSubscribersByClub(idClub);
   }
 }

@@ -41,7 +41,9 @@ const CustomerDrawer: React.FC<CustomerDrawerProps> = ({
   const [expandedId, setExpandedId] = useState<number | null>(focusSubId);
   const [confirm, setConfirm] = useState<PendingConfirm | null>(null);
   const closeRef = useRef<HTMLButtonElement>(null);
-
+  const panelRef = useRef<HTMLElement>(null);
+  const onCloseRef = useRef(onClose);
+  onCloseRef.current = onClose;
   const ordered = useMemo(
     () => [...subscriptions].sort((a, b) => new Date(b.startDate).getTime() - new Date(a.startDate).getTime()),
     [subscriptions],
@@ -58,17 +60,38 @@ const CustomerDrawer: React.FC<CustomerDrawerProps> = ({
     setConfirm(null);
   }, [focusSubId, customer.id]);
 
-  useEffect(() => {
+    useEffect(() => {
+    const previous = document.activeElement as HTMLElement | null;
     const timer = window.setTimeout(() => closeRef.current?.focus(), 50);
     const handleKey = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') onClose();
+      if (event.key === 'Escape') {
+        onCloseRef.current();
+        return;
+      }
+      if (event.key !== 'Tab' || !panelRef.current) return;
+      const focusable = panelRef.current.querySelectorAll<HTMLElement>(
+        'button:not([disabled]), a[href], input:not([disabled]), select:not([disabled]), textarea:not([disabled])',
+      );
+      if (focusable.length === 0) return;
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+      if (event.shiftKey && document.activeElement === first) {
+        event.preventDefault();
+        last.focus();
+      } else if (!event.shiftKey && document.activeElement === last) {
+        event.preventDefault();
+        first.focus();
+      }
     };
     document.addEventListener('keydown', handleKey);
+    document.body.style.overflow = 'hidden';
     return () => {
       window.clearTimeout(timer);
       document.removeEventListener('keydown', handleKey);
+      document.body.style.overflow = '';
+      previous?.focus();
     };
-  }, [onClose]);
+  }, []);
 
   const handleAction = async (sub: Subscription, action: StatusAction) => {
     const confirmed = confirm !== null && confirm.id === sub.id && confirm.status === action.status;
@@ -114,7 +137,8 @@ const CustomerDrawer: React.FC<CustomerDrawerProps> = ({
         if (event.target === event.currentTarget) onClose();
       }}
     >
-      <aside
+    <aside
+        ref={panelRef}
         role="dialog"
         aria-modal="true"
         aria-label={`Ficha de ${customer.firstName} ${customer.lastName}`}

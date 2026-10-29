@@ -47,9 +47,29 @@ const CustomersPage: React.FC = () => {
     }
   }, [clubId]);
 
+  const reloadSubscriptions = useCallback(async () => {
+    if (!clubId) return;
+    try {
+      const res = await api.get(`/clubs/${clubId}/user-subscriptions`);
+      setSubscriptions(getResponseData(res) || []);
+    } catch {
+      return;
+    }
+  }, [clubId]);
+
   useEffect(() => {
     load();
   }, [load]);
+
+  useEffect(() => {
+    if (loading || !customerParam) return;
+    if (!customers.some((c) => String(c.id) === customerParam)) {
+      toast.error('No encontramos a ese cliente en tu club.');
+      const params = new URLSearchParams();
+      params.set('tab', tab);
+      setSearchParams(params, { replace: true });
+    }
+  }, [loading, customerParam, customers, tab, setSearchParams]);
 
   const pendingCount = useMemo(
     () => subscriptions.filter((s) => normalizeStatus(s.subscriptionStatus) === 'pending').length,
@@ -91,11 +111,13 @@ const CustomersPage: React.FC = () => {
   }, [tab, setSearchParams]);
 
   const changeStatus = async (sub: Subscription, status: SubscriptionStatus) => {
+    if (updatingId !== null) return;
     setUpdatingId(sub.id);
     try {
       await api.patch(`/user-subscriptions/${sub.id}`, { subscriptionStatus: status });
       setSubscriptions((prev) => prev.map((s) => (s.id === sub.id ? { ...s, subscriptionStatus: status } : s)));
       toast.success('Estado actualizado correctamente.');
+      await reloadSubscriptions();
     } catch (err) {
       toast.error(getErrorMessage(err, 'Error al actualizar el estado.'));
     } finally {

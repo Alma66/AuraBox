@@ -42,8 +42,12 @@ export class UsersController {
   @Get('newsletter-subscribers/:idClub')
   @UseGuards(RolesGuard)
   @Roles('entrepreneur', 'admin')
-  async getNewsletterSubscribers(@Param('idClub', ParseIntPipe) idClub: number) {
-    return this.usersService.findSubscribersByClub(idClub);
+  
+  @Get('newsletter-subscribers/:idClub')
+  @UseGuards(RolesGuard)
+  @Roles('entrepreneur', 'admin')
+  async getNewsletterSubscribers(@Param('idClub', ParseIntPipe) idClub: number, @Request() req: any) {
+    return this.usersService.findNewsletterRecipients(idClub, req.user);
   }
 
   @Get()

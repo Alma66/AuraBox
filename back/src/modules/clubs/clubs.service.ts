@@ -334,7 +334,7 @@ export class ClubsService {
     return subs.map((s) => this.sanitizeSubscription(s));
   }
 
-  async findCustomersByClub(clubId: number, entrepreneurId: number) {
+    async findCustomersByClub(clubId: number, entrepreneurId: number) {
     await this.assertOwnership(clubId, entrepreneurId);
     const plans = await this.prisma.subscription_Types.findMany({
       where: { idClub: clubId },
@@ -342,13 +342,19 @@ export class ClubsService {
     });
     const planIds = plans.map((p) => p.id);
     if (planIds.length === 0) return [];
+
     const subs = await this.prisma.user_Subscriptions.findMany({
       where: { idSubscriptionTypes: { in: planIds } },
-      select: { idUser: true },
-      distinct: ['idUser'],
+      select: { idUser: true, subscriptionStatus: true },
     });
-    const userIds = subs.map((s) => s.idUser);
-    if (userIds.length === 0) return [];
+    if (subs.length === 0) return [];
+
+    const currentStatuses: string[] = ['Activa', 'Pausada', 'Pendiente_Pago'];
+    const currentUserIds = new Set(
+      subs.filter((s) => currentStatuses.includes(s.subscriptionStatus)).map((s) => s.idUser),
+    );
+    const userIds = Array.from(new Set(subs.map((s) => s.idUser)));
+
     const users = await this.prisma.user.findMany({
       where: { id: { in: userIds } },
       select: {
@@ -366,14 +372,28 @@ export class ClubsService {
         postalCode: true,
         active: true,
         registrationDate: true,
-        birthDate: true,
       },
     });
-    return users.map((u) => ({
-      ...u,
-      registrationDate: u.registrationDate.toISOString(),
-      birthDate: u.birthDate ? u.birthDate.toISOString() : null,
-    }));
+
+    return users.map((u) => {
+      const current = currentUserIds.has(u.id);
+      return {
+        id: u.id,
+        firstName: u.firstName,
+        lastName: u.lastName,
+        email: u.email,
+        active: u.active,
+        registrationDate: u.registrationDate.toISOString(),
+        phoneNumber: current ? u.phoneNumber : null,
+        streetAddress: current ? u.streetAddress : null,
+        addressNumber: current ? u.addressNumber : null,
+        floorNumber: current ? u.floorNumber : null,
+        addressDetails: current ? u.addressDetails : null,
+        city: u.city,
+        province: u.province,
+        postalCode: current ? u.postalCode : null,
+      };
+    });
   }
 
   async findClubByEntrepreneur(entrepreneurId: number) {

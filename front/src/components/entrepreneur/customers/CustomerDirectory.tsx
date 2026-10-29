@@ -2,7 +2,7 @@ import React, { useMemo, useState } from 'react';
 import { Subscription, normalizeStatus } from '../../../types/subscription';
 import { User } from '../../../types/user';
 import Icon from '../layout/Icon';
-import { initialOf } from './customerUtils';
+import { initialOf, normalizeText } from './customerUtils';
 
 interface CustomerDirectoryProps {
   customers: User[];
@@ -14,29 +14,31 @@ const CustomerDirectory: React.FC<CustomerDirectoryProps> = ({ customers, subscr
   const [search, setSearch] = useState('');
 
   const counts = useMemo(() => {
-    const map = new Map<string, { total: number; active: number }>();
+    const map = new Map<string, { total: number; active: number; pending: number }>();
     subscriptions.forEach((sub) => {
       const key = String(sub.idUser);
-      const current = map.get(key) ?? { total: 0, active: 0 };
+      const current = map.get(key) ?? { total: 0, active: 0, pending: 0 };
+      const status = normalizeStatus(sub.subscriptionStatus);
       current.total += 1;
-      if (normalizeStatus(sub.subscriptionStatus) === 'active') current.active += 1;
+      if (status === 'active') current.active += 1;
+      if (status === 'pending') current.pending += 1;
       map.set(key, current);
     });
     return map;
   }, [subscriptions]);
 
   const list = useMemo(() => {
-    const term = search.trim().toLowerCase();
+    const term = normalizeText(search.trim());
     return customers
       .filter((c) => {
         if (!term) return true;
         return (
-          `${c.firstName} ${c.lastName}`.toLowerCase().includes(term) ||
-          (c.email ?? '').toLowerCase().includes(term) ||
-          (c.city ?? '').toLowerCase().includes(term)
+          normalizeText(`${c.firstName} ${c.lastName}`).includes(term) ||
+          normalizeText(c.email ?? '').includes(term) ||
+          normalizeText(c.city ?? '').includes(term)
         );
       })
-      .sort((a, b) => `${a.firstName} ${a.lastName}`.localeCompare(`${b.firstName} ${b.lastName}`));
+      .sort((a, b) => `${a.firstName} ${a.lastName}`.localeCompare(`${b.firstName} ${b.lastName}`, 'es'));
   }, [customers, search]);
 
   return (
@@ -68,7 +70,7 @@ const CustomerDirectory: React.FC<CustomerDirectoryProps> = ({ customers, subscr
       ) : (
         <ul className="divide-y divide-aurora-navy/10 overflow-hidden rounded-xl border border-aurora-navy/10 bg-white shadow-aurora-sm">
           {list.map((customer) => {
-            const stat = counts.get(String(customer.id)) ?? { total: 0, active: 0 };
+            const stat = counts.get(String(customer.id)) ?? { total: 0, active: 0, pending: 0 };
             const place = [customer.city, customer.province].filter(Boolean).join(', ');
             return (
               <li key={customer.id}>
@@ -88,6 +90,11 @@ const CustomerDirectory: React.FC<CustomerDirectoryProps> = ({ customers, subscr
                   </span>
                   {place && <span className="hidden truncate text-xs text-aurora-navy/50 md:block md:max-w-[200px]">{place}</span>}
                   <span className="flex flex-shrink-0 items-center gap-2">
+                    {stat.pending > 0 && (
+                      <span className="rounded-full bg-orange-100 px-2 py-0.5 text-xs font-semibold text-orange-800">
+                        {stat.pending} pago{stat.pending !== 1 ? 's' : ''} pend.
+                      </span>
+                    )}
                     {stat.active > 0 && (
                       <span className="rounded-full bg-green-100 px-2 py-0.5 text-xs font-semibold text-green-700">
                         {stat.active} activa{stat.active !== 1 ? 's' : ''}
