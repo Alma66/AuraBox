@@ -43,7 +43,7 @@ export class AuthService {
     const ok = await bcrypt.compare(pass, user.passwordHash);
     if (!ok) return null;
 
-    if (role === 'customer' && user.active === false) {
+    if (user.active === false) {
       throw new UnauthorizedException('Cuenta deshabilitada');
     }
 

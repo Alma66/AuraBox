@@ -2,8 +2,18 @@ import { BadRequestException, Injectable, NotFoundException } from '@nestjs/comm
 import { ClubStatus } from '@prisma/client';
 import { PrismaService } from '../../prisma/prisma.service';
 import { ChangeClubStatusDto } from './dto/change-club-status.dto';
+import { SetReviewVisibilityDto } from './dto/set-review-visibility.dto';
 
 const monthKey = (date: Date) => `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
+
+const ACCOUNT_SELECT = {
+  id: true,
+  firstName: true,
+  lastName: true,
+  email: true,
+  active: true,
+  registrationDate: true,
+};
 
 @Injectable()
 export class AdminPanelService {
@@ -153,5 +163,120 @@ export class AdminPanelService {
       changeDate: entry.changeDate.toISOString(),
       admin: nameById.get(entry.idAdmins) ?? null,
     }));
+  }
+
+  async findAccounts(type: string, search?: string) {
+    if (type !== 'customer' && type !== 'entrepreneur') {
+      throw new BadRequestException('Tipo de cuenta inválido');
+    }
+
+    const term = search?.trim();
+    const where = term
+      ? {
+          OR: [
+            { firstName: { contains: term, mode: 'insensitive' as const } },
+            { lastName: { contains: term, mode: 'insensitive' as const } },
+            { email: { contains: term, mode: 'insensitive' as const } },
+          ],
+        }
+      : {};
+
+    if (type === 'customer') {
+      const users = await this.prisma.user.findMany({
+        where,
+        orderBy: { registrationDate: 'desc' },
+        take: 200,
+        select: ACCOUNT_SELECT,
+      });
+      return users.map((user) => ({
+        ...user,
+        registrationDate: user.registrationDate.toISOString(),
+        club: null,
+      }));
+    }
+
+    const entrepreneurs = await this.prisma.entrepreneurs.findMany({
+      where,
+      orderBy: { registrationDate: 'desc' },
+      take: 200,
+      select: ACCOUNT_SELECT,
+    });
+    const links = await this.prisma.entrepreneur_Club.findMany({
+      where: { idEntrepreneurs: { in: entrepreneurs.map((item) => item.id) } },
+    });
+    const clubs = await this.prisma.club.findMany({
+      where: { id: { in: links.map((link) => link.idClub) } },
+      select: { id: true, name: true, clubStatus: true },
+    });
+    const clubById = new Map(clubs.map((club) => [club.id, club] as [number, typeof club]));
+
+    return entrepreneurs.map((item) => {
+      const link = links.find((entry) => entry.idEntrepreneurs === item.id);
+      return {
+        ...item,
+        registrationDate: item.registrationDate.toISOString(),
+        club: link ? clubById.get(link.idClub) ?? null : null,
+      };
+    });
+  }
+
+  async setAccountActive(type: string, id: number, active: boolean) {
+    if (type !== 'customer' && type !== 'entrepreneur') {
+      throw new BadRequestException('Tipo de cuenta inválido');
+    }
+
+    const result =
+      type === 'customer'
+        ? await this.prisma.user.updateMany({ where: { id }, data: { active } })
+        : await this.prisma.entrepreneurs.updateMany({ where: { id }, data: { active } });
+
+    if (result.count === 0) throw new NotFoundException('Cuenta no encontrada');
+    return { id, active };
+  }
+
+  async findReviews(filter?: string) {
+    const reviews = await this.prisma.reviews.findMany({
+      where: filter === 'hidden' ? { isHidden: true } : {},
+      orderBy: { reviewDate: 'desc' },
+      take: 200,
+      include: { media: true },
+    });
+
+    const users = await this.prisma.user.findMany({
+      where: { id: { in: Array.from(new Set(reviews.map((review) => review.idUser))) } },
+      select: { id: true, firstName: true, lastName: true },
+    });
+    const clubs = await this.prisma.club.findMany({
+      where: { id: { in: Array.from(new Set(reviews.map((review) => review.idClub))) } },
+      select: { id: true, name: true },
+    });
+    const userById = new Map(users.map((user) => [user.id, `${user.firstName} ${user.lastName}`] as [number, string]));
+    const clubById = new Map(clubs.map((club) => [club.id, club.name] as [number, string]));
+
+    return reviews.map((review) => ({
+      id: review.id,
+      rating: review.rating,
+      title: review.title,
+      comment: review.comment,
+      reviewDate: review.reviewDate.toISOString(),
+      isHidden: review.isHidden,
+      hiddenReason: review.hiddenReason,
+      mediaCount: review.media.length,
+      customer: userById.get(review.idUser) ?? null,
+      club: clubById.get(review.idClub) ?? null,
+    }));
+  }
+
+  async setReviewVisibility(id: number, dto: SetReviewVisibilityDto) {
+    const reason = dto.reason?.trim() || null;
+    if (dto.isHidden && !reason) throw new BadRequestException('Indicá el motivo para ocultar la reseña');
+
+    const result = await this.prisma.reviews.updateMany({
+      where: { id },
+      data: { isHidden: dto.isHidden, hiddenReason: dto.isHidden ? reason : null },
+    });
+
+    if (result.count === 0) throw new NotFoundException('Reseña no encontrada');
+    return { id, isHidden: dto.isHidden };
   }
 }

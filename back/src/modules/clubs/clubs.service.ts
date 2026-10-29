@@ -209,6 +209,10 @@ export class ClubsService {
       where: { id: { in: entrepreneurIds } },
       select: { id: true, firstName: true, lastName: true, bio: true },
     });
+        const isAdmin = typeof requester === 'object' && requester !== null && requester.role === 'admin';
+    if (club.clubStatus !== 'APROBADO' && !isOwner && !isAdmin) {
+      throw new NotFoundException('Club no encontrado');
+    }
     const images = await this.prisma.image_Club.findMany({
       where: { idClub: id },
       orderBy: { id: 'desc' },

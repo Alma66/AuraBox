@@ -43,6 +43,8 @@ import AnalyticsPage from './pages/entrepreneur/administration_tools/AnalyticsPa
 import FinancePage from './pages/entrepreneur/management_and_finance/FinancePage';
 import InventoryPage from './pages/entrepreneur/management_and_finance/InventoryPage';
 import SettingsPage from './pages/entrepreneur/administration_tools/SettingsPage';
+import AdminUsersPage from './pages/admin/AdminUsersPage';
+import AdminReviewsPage from './pages/admin/AdminReviewsPage';
 import api from './api/config';
 import { User, UserRole } from './types/user';
 
@@ -236,10 +238,12 @@ const AppContent: React.FC = () => {
       <Route path="/cart" element={pr(['customer'], <CartPage />)} />
       <Route path="/checkout" element={pr(['customer'], <CheckoutPage />)} />
       <Route path="/entrepreneur/club/:clubId/my-club" element={pr(['entrepreneur'], <MyClubPage />)} />
-<Route path="/entrepreneur/club/:clubId/plans" element={pr(['entrepreneur'], <PlansAndBoxesPage />)} />
-<Route path="/entrepreneur/club/:clubId/edit-subscriptions" element={pr(['entrepreneur'], <PlansRedirect tab="plans" />)} />
-<Route path="/entrepreneur/club/:clubId/subscription-boxes" element={pr(['entrepreneur'], <PlansRedirect tab="boxes" />)} />
-<Route path="/entrepreneur/club/:clubId/subscription-boxes/:subscriptionTypeId" element={pr(['entrepreneur'], <PlansRedirect tab="boxes" />)} />
+      <Route path="/entrepreneur/club/:clubId/plans" element={pr(['entrepreneur'], <PlansAndBoxesPage />)} />
+      <Route path="/entrepreneur/club/:clubId/edit-subscriptions" element={pr(['entrepreneur'], <PlansRedirect tab="plans" />)} />
+      <Route path="/entrepreneur/club/:clubId/subscription-boxes" element={pr(['entrepreneur'], <PlansRedirect tab="boxes" />)} />
+      <Route path="/entrepreneur/club/:clubId/subscription-boxes/:subscriptionTypeId" element={pr(['entrepreneur'], <PlansRedirect tab="boxes" />)} />
+            <Route path="/admin/users" element={pr(['admin'], <AdminUsersPage />)} />
+      <Route path="/admin/reviews" element={pr(['admin'], <AdminReviewsPage />)} />
       <Route path="/entrepreneur/dashboard" element={pr(['entrepreneur'], <EntrepreneurDashboardPage />)} />
       <Route path="/entrepreneur/profile" element={pr(['entrepreneur'], <EntrepreneurProfilePage />)} />
       <Route path="/entrepreneur/club/:clubId/gestionar-imagenes" element={pr(['entrepreneur'], <MyClubRedirect tab="media" />)} />
