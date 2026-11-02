@@ -48,6 +48,7 @@ const CheckoutPage: React.FC = () => {
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [postalError, setPostalError] = useState<string | null>(null);
+  const [pendingPayment, setPendingPayment] = useState(false);
 
   const [address, setAddress] = useState({
     street: '',
@@ -124,7 +125,7 @@ const CheckoutPage: React.FC = () => {
     setError(null);
     setPostalError(null);
     try {
-      await api.post('/cart-items/checkout', {
+       const res = await api.post('/cart-items/checkout', {
         paymentMethod: selectedPaymentMethod,
         address: {
           street: address.street.trim(),
@@ -136,6 +137,7 @@ const CheckoutPage: React.FC = () => {
           instructions: address.instructions.trim(),
         },
       });
+      setPendingPayment(Boolean(getResponseData(res)?.pendingPayment));
       setSuccess(true);
     } catch (err: any) {
       console.error('Error processing payment:', err);
@@ -182,9 +184,13 @@ const CheckoutPage: React.FC = () => {
       <div className="min-h-screen bg-aurora-cream py-8 px-4">
         <div className="max-w-4xl mx-auto text-center py-12">
           <div className="text-5xl mb-4">🎉</div>
-          <h1 className="text-4xl font-serif font-bold text-aurora-navy mb-4">¡Pago Realizado Exitosamente!</h1>
+           <h1 className="text-4xl font-serif font-bold text-aurora-navy mb-4">
+            {pendingPayment ? '¡Suscripción registrada!' : '¡Pago Realizado Exitosamente!'}
+          </h1>
           <p className="text-aurora-navy/70 mb-8 max-w-md mx-auto">
-            Tu orden ha sido procesada. Podés seguir el estado de tus suscripciones desde tu cuenta. ¡Gracias por tu compra en AuraBox!
+            {pendingPayment
+              ? 'Tu suscripción queda pendiente de pago hasta que el club confirme tu transferencia. Podés ver el estado en Mis Suscripciones.'
+              : 'Tu orden ha sido procesada. Podés seguir el estado de tus suscripciones desde tu cuenta. ¡Gracias por tu compra en AuraBox!'}
           </p>
           <div className="space-x-4">
             <button onClick={() => navigate('/')} className="bg-aurora-terracotta text-white px-6 py-3 rounded-xl hover:bg-aurora-terracottaDark transition-colors font-semibold">

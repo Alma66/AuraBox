@@ -1,0 +1,1 @@
+export const AURABOX_COMMISSION = 200;

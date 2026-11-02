@@ -3,6 +3,7 @@ import { PrismaService } from '../../prisma/prisma.service';
 import { CreateUserSubscriptionDto } from './dto/create-user-subscription.dto';
 import { UpdateUserSubscriptionDto } from './dto/update-user-subscription.dto';
 import { Prisma } from '@prisma/client';
+import { nextPaymentFrom } from '../../common/utils/billing';
 
 type RequestUser = { id: number; role: string };
 
@@ -153,7 +154,7 @@ export class UserSubscriptionsService {
     return this.update(id, dto);
   }
 
-  async update(id: number, dto: UpdateUserSubscriptionDto) {
+    async update(id: number, dto: UpdateUserSubscriptionDto) {
     const existing = await this.prisma.user_Subscriptions.findUnique({ where: { id } });
     if (!existing) throw new NotFoundException('Suscripción no encontrada');
 
@@ -166,17 +167,58 @@ export class UserSubscriptionsService {
     if (dto.cancellationDate !== undefined) data.cancellationDate = dto.cancellationDate as any;
 
     const next = dto.subscriptionStatus;
+    const wasPending = existing.subscriptionStatus === 'Pendiente_Pago';
+    const now = new Date();
+    let paymentUpdate: Prisma.PrismaPromise<unknown> | null = null;
+
     if (next === 'Cancelada' && existing.subscriptionStatus !== 'Cancelada') {
-      data.cancellationDate = dto.cancellationDate ?? new Date();
+      data.cancellationDate = dto.cancellationDate ?? now;
     } else if (next !== undefined && next !== 'Cancelada' && existing.subscriptionStatus === 'Cancelada') {
       data.cancellationDate = null;
       data.cancellationReason = null;
     }
 
-    const updated = await this.prisma.user_Subscriptions.update({
-      where: { id },
-      data,
-    });
+    if (wasPending && (next === 'Activa' || next === 'Cancelada')) {
+      const pendingPayment = await this.prisma.payment.findFirst({
+        where: { idUserSubscription: id, paymentStatus: 'Pendiente' as any },
+        orderBy: { paymentDate: 'desc' },
+      });
+
+      if (pendingPayment) {
+        if (next === 'Activa') {
+          paymentUpdate = this.prisma.payment.update({
+            where: { id: pendingPayment.id },
+            data: { paymentStatus: 'Exitoso' as any, paymentDate: now },
+          });
+          if (data.monthlyAmountPaid === undefined) {
+            data.monthlyAmountPaid = pendingPayment.totalAmountPaid.toString();
+          }
+        } else {
+          paymentUpdate = this.prisma.payment.update({
+            where: { id: pendingPayment.id },
+            data: { paymentStatus: 'Rechazado' as any },
+          });
+        }
+      }
+
+      if (next === 'Activa') {
+        const plan = await this.prisma.subscription_Types.findUnique({ where: { id: existing.idSubscriptionTypes } });
+        if (data.lastPaymentDate === undefined) data.lastPaymentDate = now;
+        if (data.nextPaymentDate === undefined && plan) {
+          const upcoming = nextPaymentFrom(now, plan.frequency);
+          if (upcoming) data.nextPaymentDate = upcoming;
+        }
+      }
+    }
+
+    const subscriptionUpdate = this.prisma.user_Subscriptions.update({ where: { id }, data });
+
+    if (paymentUpdate) {
+      const [updated] = await this.prisma.$transaction([subscriptionUpdate, paymentUpdate]);
+      return sanitize(updated);
+    }
+
+    const updated = await subscriptionUpdate;
     return sanitize(updated);
   }
 

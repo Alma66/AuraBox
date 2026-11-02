@@ -2,8 +2,8 @@ import { Injectable, NotFoundException, ForbiddenException, BadRequestException 
 import { PrismaService } from '../../prisma/prisma.service';
 import { CreatePaymentDto } from './dto/create-payment.dto';
 import { UpdatePaymentDto } from './dto/update-payment.dto';
+import { AURABOX_COMMISSION } from './payments.constants';
 
-const AURABOX_COMMISSION = 200;
 
 function sanitize(payment: any) {
   if (!payment) return payment;
