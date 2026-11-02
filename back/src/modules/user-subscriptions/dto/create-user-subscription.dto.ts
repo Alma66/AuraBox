@@ -1,10 +1,5 @@
-import { 
-  IsInt, 
-  IsOptional, 
-  IsString, 
-  IsDateString,
- } from 'class-validator';
-import { Transform } from 'class-transformer';
+import { IsInt, IsOptional, IsString, IsDate, IsNumberString, MaxLength } from 'class-validator';
+import { Transform, Type } from 'class-transformer';
 
 export class CreateUserSubscriptionDto {
   @IsOptional()
@@ -19,25 +14,27 @@ export class CreateUserSubscriptionDto {
   idPaymentMethods?: number;
 
   @IsOptional()
-  @IsDateString()
-  @Transform(({ value }) => (value ? new Date(value) : undefined))
+  @Type(() => Date)
+  @IsDate()
   startDate?: Date;
 
   @IsOptional()
-  @IsDateString()
-  @Transform(({ value }) => (value ? new Date(value) : undefined))
+  @Type(() => Date)
+  @IsDate()
   expectedEndDate?: Date;
 
   @IsOptional()
   @Transform(({ value }) => (value === null || value === undefined ? value : String(value)))
+  @IsNumberString()
   monthlyAmountPaid?: string;
 
   @IsOptional()
   @IsString()
+  @MaxLength(500)
   cancellationReason?: string;
 
   @IsOptional()
-  @IsDateString()
-  @Transform(({ value }) => (value ? new Date(value) : undefined))
+  @Type(() => Date)
+  @IsDate()
   cancellationDate?: Date;
 }

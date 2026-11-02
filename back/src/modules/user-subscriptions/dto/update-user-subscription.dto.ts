@@ -1,5 +1,5 @@
-import { IsOptional, IsEnum, IsString, IsDateString } from 'class-validator';
-import { Transform } from 'class-transformer';
+import { IsOptional, IsEnum, IsString, IsDate, IsNumberString, MaxLength } from 'class-validator';
+import { Transform, Type } from 'class-transformer';
 import { SubscriptionStatus } from '@prisma/client';
 
 export class UpdateUserSubscriptionDto {
@@ -8,25 +8,27 @@ export class UpdateUserSubscriptionDto {
   subscriptionStatus?: SubscriptionStatus;
 
   @IsOptional()
-  @IsDateString()
-  @Transform(({ value }) => (value ? new Date(value) : undefined))
+  @Type(() => Date)
+  @IsDate()
   lastPaymentDate?: Date;
 
   @IsOptional()
-  @IsDateString()
-  @Transform(({ value }) => (value ? new Date(value) : undefined))
+  @Type(() => Date)
+  @IsDate()
   nextPaymentDate?: Date;
 
   @IsOptional()
   @Transform(({ value }) => (value === null || value === undefined ? value : String(value)))
+  @IsNumberString()
   monthlyAmountPaid?: string;
 
   @IsOptional()
   @IsString()
+  @MaxLength(500)
   cancellationReason?: string;
 
   @IsOptional()
-  @IsDateString()
-  @Transform(({ value }) => (value ? new Date(value) : undefined))
+  @Type(() => Date)
+  @IsDate()
   cancellationDate?: Date;
 }

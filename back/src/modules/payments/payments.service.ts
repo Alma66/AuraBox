@@ -44,12 +44,20 @@ export class PaymentsService {
     const club = await this.prisma.club.findUnique({ where: { id: dto.idClub } });
     if (!club) throw new NotFoundException('Club no encontrado');
 
+    const subType = await this.prisma.subscription_Types.findUnique({ where: { id: sub.idSubscriptionTypes } });
+    if (!subType || subType.idClub !== dto.idClub) {
+      throw new BadRequestException('El club no coincide con el de la suscripción');
+    }
+
     if (dto.idPaymentMethods) {
       const pm = await this.prisma.payment_Methods.findUnique({ where: { id: dto.idPaymentMethods } });
       if (!pm) throw new NotFoundException('Método de pago no encontrado');
     }
 
-    const totalAmountPaid = dto.totalAmountPaid !== undefined && dto.totalAmountPaid !== null ? Number(dto.totalAmountPaid) : 0;
+    const totalAmountPaid = Number(dto.totalAmountPaid);
+    if (!Number.isFinite(totalAmountPaid) || totalAmountPaid <= AURABOX_COMMISSION) {
+      throw new BadRequestException('El monto debe ser mayor a la comisión de la plataforma');
+    }
     const commissionAmount = AURABOX_COMMISSION;
     const clubAmount = totalAmountPaid - commissionAmount;
 

@@ -56,3 +56,14 @@ export const getErrorMessage = (err: any, fallback: string) => {
   const msg = err?.response?.data?.message;
   return Array.isArray(msg) ? msg.join(', ') : msg || fallback;
 };
+
+export const ALLOWED_TRANSITIONS: Record<string, SubscriptionStatus[]> = {
+  Activa: ['Pausada', 'Pendiente_Pago', 'Cancelada', 'Finalizada'],
+  Pausada: ['Activa', 'Cancelada', 'Finalizada'],
+  Pendiente_Pago: ['Activa', 'Cancelada'],
+  Cancelada: [],
+  Finalizada: [],
+};
+
+export const canTransition = (from: string, to: SubscriptionStatus) =>
+  (ALLOWED_TRANSITIONS[from] ?? []).includes(to);

@@ -110,11 +110,14 @@ const CustomersPage: React.FC = () => {
     setSearchParams(params, { replace: true });
   }, [tab, setSearchParams]);
 
-  const changeStatus = async (sub: Subscription, status: SubscriptionStatus) => {
+  const changeStatus = async (sub: Subscription, status: SubscriptionStatus, reason?: string) => {
     if (updatingId !== null) return;
     setUpdatingId(sub.id);
     try {
-      await api.patch(`/user-subscriptions/${sub.id}`, { subscriptionStatus: status });
+      await api.patch(`/user-subscriptions/${sub.id}`, {
+        subscriptionStatus: status,
+        ...(reason ? { cancellationReason: reason } : {}),
+      });
       setSubscriptions((prev) => prev.map((s) => (s.id === sub.id ? { ...s, subscriptionStatus: status } : s)));
       toast.success('Estado actualizado correctamente.');
       await reloadSubscriptions();

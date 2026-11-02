@@ -6,6 +6,22 @@ import { Prisma } from '@prisma/client';
 
 type RequestUser = { id: number; role: string };
 
+const ALLOWED_TRANSITIONS: Record<string, string[]> = {
+  Activa: ['Pausada', 'Pendiente_Pago', 'Cancelada', 'Finalizada'],
+  Pausada: ['Activa', 'Cancelada', 'Finalizada'],
+  Pendiente_Pago: ['Activa', 'Cancelada'],
+  Cancelada: [],
+  Finalizada: [],
+};
+
+const CLOSED_STATUSES = ['Cancelada', 'Finalizada'];
+const MAX_REASON_LENGTH = 500;
+
+const cleanReason = (value: unknown) =>
+  typeof value === 'string' && value.trim() ? value.trim().slice(0, MAX_REASON_LENGTH) : undefined;
+
+const statusLabel = (value: string) => value.replace('_', ' ');
+
 function sanitize(sub: any) {
   if (!sub) return sub;
   if (sub.monthlyAmountPaid !== undefined && sub.monthlyAmountPaid !== null) {
@@ -41,6 +57,12 @@ export class UserSubscriptionsService {
     const sType = await this.prisma.subscription_Types.findUnique({ where: { id: dto.idSubscriptionTypes } });
     if (!sType) throw new NotFoundException('Tipo de suscripción no encontrado');
 
+    if (actingUser.role !== 'admin') {
+      if (!sType.active) throw new BadRequestException('Este plan ya no está disponible');
+      const club = await this.prisma.club.findUnique({ where: { id: sType.idClub } });
+      if (!club || club.clubStatus !== 'APROBADO') throw new BadRequestException('Este club no está disponible');
+    }
+
     if (dto.idPaymentMethods) {
       const pm = await this.prisma.payment_Methods.findUnique({ where: { id: dto.idPaymentMethods } });
       if (!pm) throw new NotFoundException('Método de pago no encontrado');
@@ -50,7 +72,7 @@ export class UserSubscriptionsService {
       where: {
         idUser: userId,
         idSubscriptionTypes: dto.idSubscriptionTypes,
-        subscriptionStatus: { not: 'Cancelada' as any },
+        subscriptionStatus: { notIn: CLOSED_STATUSES as any },
       },
     });
     if (existing) throw new BadRequestException('Ya tienes una suscripción activa a este tipo');
@@ -111,6 +133,21 @@ export class UserSubscriptionsService {
 
     if (user.role === 'entrepreneur') {
       await this.assertEntrepreneurOwnsSubscription(existing.idSubscriptionTypes, user.id);
+
+      const next = dto.subscriptionStatus;
+      if (next !== undefined && next !== existing.subscriptionStatus) {
+        const allowed = ALLOWED_TRANSITIONS[existing.subscriptionStatus] ?? [];
+        if (!allowed.includes(next)) {
+          throw new BadRequestException(
+            `No se puede pasar una suscripción de ${statusLabel(existing.subscriptionStatus)} a ${statusLabel(next)}`,
+          );
+        }
+      }
+
+      return this.update(id, {
+        subscriptionStatus: dto.subscriptionStatus,
+        cancellationReason: cleanReason(dto.cancellationReason),
+      });
     }
 
     return this.update(id, dto);
@@ -128,6 +165,14 @@ export class UserSubscriptionsService {
     if (dto.cancellationReason !== undefined) data.cancellationReason = dto.cancellationReason;
     if (dto.cancellationDate !== undefined) data.cancellationDate = dto.cancellationDate as any;
 
+    const next = dto.subscriptionStatus;
+    if (next === 'Cancelada' && existing.subscriptionStatus !== 'Cancelada') {
+      data.cancellationDate = dto.cancellationDate ?? new Date();
+    } else if (next !== undefined && next !== 'Cancelada' && existing.subscriptionStatus === 'Cancelada') {
+      data.cancellationDate = null;
+      data.cancellationReason = null;
+    }
+
     const updated = await this.prisma.user_Subscriptions.update({
       where: { id },
       data,
@@ -135,15 +180,18 @@ export class UserSubscriptionsService {
     return sanitize(updated);
   }
 
-  async cancel(id: number, reason?: string) {
+  async cancel(id: number, reason?: unknown) {
     const existing = await this.prisma.user_Subscriptions.findUnique({ where: { id } });
     if (!existing) throw new NotFoundException('Suscripción no encontrada');
+    if (CLOSED_STATUSES.includes(existing.subscriptionStatus)) {
+      throw new BadRequestException('Esta suscripción ya está cerrada');
+    }
 
     const updated = await this.prisma.user_Subscriptions.update({
       where: { id },
       data: {
         subscriptionStatus: 'Cancelada' as any,
-        cancellationReason: reason ?? undefined,
+        cancellationReason: cleanReason(reason),
         cancellationDate: new Date(),
       },
     });
@@ -151,7 +199,14 @@ export class UserSubscriptionsService {
   }
 
   async remove(id: number) {
-    await this.prisma.user_Subscriptions.delete({ where: { id } });
-    return { ok: true };
+    try {
+      await this.prisma.user_Subscriptions.delete({ where: { id } });
+      return { ok: true };
+    } catch (err: any) {
+      if (err instanceof Prisma.PrismaClientKnownRequestError && err.code === 'P2025') {
+        throw new NotFoundException('Suscripción no encontrada');
+      }
+      throw err;
+    }
   }
 }

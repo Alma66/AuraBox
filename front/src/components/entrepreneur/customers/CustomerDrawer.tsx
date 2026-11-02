@@ -9,10 +9,11 @@ import {
   STATUS_DOT,
   STATUS_LABEL,
   StatusAction,
+  canTransition,
   formatDate,
   formatMoney,
   initialOf,
-} from './customerUtils';
+  } from './customerUtils';
 
 interface CustomerDrawerProps {
   customer: User;
@@ -21,7 +22,7 @@ interface CustomerDrawerProps {
   focusSubId: number | null;
   updatingId: number | null;
   onClose: () => void;
-  onStatusChange: (sub: Subscription, status: SubscriptionStatus) => Promise<void>;
+  onStatusChange: (sub: Subscription, status: SubscriptionStatus, reason?: string) => Promise<void>;
 }
 
 interface PendingConfirm {
@@ -40,6 +41,7 @@ const CustomerDrawer: React.FC<CustomerDrawerProps> = ({
 }) => {
   const [expandedId, setExpandedId] = useState<number | null>(focusSubId);
   const [confirm, setConfirm] = useState<PendingConfirm | null>(null);
+    const [reason, setReason] = useState('');
   const closeRef = useRef<HTMLButtonElement>(null);
   const panelRef = useRef<HTMLElement>(null);
   const onCloseRef = useRef(onClose);
@@ -93,14 +95,17 @@ const CustomerDrawer: React.FC<CustomerDrawerProps> = ({
     };
   }, []);
 
-  const handleAction = async (sub: Subscription, action: StatusAction) => {
+   const handleAction = async (sub: Subscription, action: StatusAction) => {
     const confirmed = confirm !== null && confirm.id === sub.id && confirm.status === action.status;
     if (action.needsConfirm && !confirmed) {
+      setReason('');
       setConfirm({ id: sub.id, status: action.status });
       return;
     }
     setConfirm(null);
-    await onStatusChange(sub, action.status);
+    const note = action.status === 'Cancelada' ? reason.trim() : '';
+    setReason('');
+    await onStatusChange(sub, action.status, note || undefined);
   };
 
   const contactRows: [string, string | null][] = [
@@ -310,13 +315,17 @@ const CustomerDrawer: React.FC<CustomerDrawerProps> = ({
 
                         {expanded && (
                           <div className="mt-2 space-y-3">
+                             {(status === 'cancelled' || status === 'finished') && (
+                              <p className="text-xs text-aurora-navy/60">
+                                Esta suscripción está cerrada. Si el cliente quiere volver, tiene que suscribirse de nuevo desde la ficha de tu club.
+                              </p>
+                            )}
                             <div className="grid grid-cols-2 gap-2">
                               {STATUS_ACTIONS.map((action) => (
                                 <button
                                   key={action.status}
                                   type="button"
-                                  disabled={busy || sub.subscriptionStatus === action.status}
-                                  onClick={() => handleAction(sub, action)}
+                                  disabled={busy || !canTransition(sub.subscriptionStatus, action.status)}                                  onClick={() => handleAction(sub, action)}
                                   className={`min-h-[44px] rounded-lg border text-sm font-semibold transition-colors disabled:cursor-not-allowed disabled:opacity-40 ${action.tone}`}
                                 >
                                   {busy ? '...' : action.label}
@@ -329,6 +338,21 @@ const CustomerDrawer: React.FC<CustomerDrawerProps> = ({
                                   ¿Confirmás pasar esta suscripción a{' '}
                                   <strong>{STATUS_ACTIONS.find((a) => a.status === confirm.status)?.label.toLowerCase()}</strong>?
                                 </p>
+                                                                {confirm.status === 'Cancelada' && (
+                                  <div className="mt-2">
+                                    <label htmlFor={`cancel-reason-${sub.id}`} className="mb-1 block text-xs font-semibold">
+                                      Motivo (opcional)
+                                    </label>
+                                    <textarea
+                                      id={`cancel-reason-${sub.id}`}
+                                      rows={2}
+                                      maxLength={500}
+                                      value={reason}
+                                      onChange={(e) => setReason(e.target.value)}
+                                      className="w-full rounded-lg border border-red-200 bg-white px-3 py-2 text-sm text-aurora-navy focus:outline-none focus:ring-2 focus:ring-red-300"
+                                    />
+                                  </div>
+                                )}
                                 <div className="mt-2 flex gap-2">
                                   <button
                                     type="button"

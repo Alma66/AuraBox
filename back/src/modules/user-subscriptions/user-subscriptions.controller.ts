@@ -1,6 +1,6 @@
 import {
   Body, Controller, Delete, Get, Param, ParseIntPipe,
-  Post, Put, UseGuards, Request, UsePipes, ValidationPipe,
+  Post, Put, Patch, UseGuards, Request, UsePipes, ValidationPipe,
   Query, ForbiddenException,
 } from '@nestjs/common';
 import { UserSubscriptionsService } from './user-subscriptions.service';
@@ -15,6 +15,8 @@ import { Roles } from '../auth/roles.decorator';
 export class UserSubscriptionsController {
   constructor(private readonly svc: UserSubscriptionsService) {}
 
+  @UseGuards(RolesGuard)
+  @Roles('customer', 'admin')
   @Post()
   @UsePipes(new ValidationPipe({ whitelist: true, transform: true }))
   async create(@Body() dto: CreateUserSubscriptionDto, @Request() req) {
@@ -46,6 +48,14 @@ export class UserSubscriptionsController {
   @Put(':id')
   @UsePipes(new ValidationPipe({ whitelist: true, transform: true }))
   async update(@Param('id', ParseIntPipe) id: number, @Body() dto: UpdateUserSubscriptionDto, @Request() req) {
+    return this.svc.updateForRequester(id, dto, req.user);
+  }
+
+  @UseGuards(RolesGuard)
+  @Roles('admin', 'entrepreneur')
+  @Patch(':id')
+  @UsePipes(new ValidationPipe({ whitelist: true, transform: true }))
+  async patch(@Param('id', ParseIntPipe) id: number, @Body() dto: UpdateUserSubscriptionDto, @Request() req) {
     return this.svc.updateForRequester(id, dto, req.user);
   }
 
