@@ -59,12 +59,14 @@ export class AuthService {
 
   async buildToken(user: any) {
     let managedClubId: number | null = null;
-
+    
     if (user.role === 'entrepreneur') {
+       
       const association = await this.prisma.entrepreneur_Club.findFirst({
         where: { idEntrepreneurs: user.id },
-        orderBy: { associationDate: 'desc' },
+        orderBy: { associationDate: 'asc' },
       });
+      
       if (association) managedClubId = association.idClub;
     }
 

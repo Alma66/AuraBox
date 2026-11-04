@@ -64,6 +64,10 @@ export class FavoritesService {
       await this.prisma.favorites.delete({ where: { id: existing.id } });
       return { isFavorite: false };
     }
+    const club = await this.prisma.club.findUnique({ where: { id: plan.idClub } });
+    if (!plan.active || !club || club.clubStatus !== 'APROBADO') {
+      throw new BadRequestException('Este plan no está disponible');
+    }
     await this.prisma.favorites.create({ data: { idUser, idSubscriptionTypes, dateAdded: new Date() } });
     return { isFavorite: true };
   }
@@ -105,6 +109,7 @@ export class FavoritesService {
         if (!plan) return null;
         const club = clubsById.get(plan.idClub);
         if (!club) return null;
+        if (!plan.active || club.clubStatus !== 'APROBADO') return null;
         return {
           favoriteId: fav.id,
           idSubscriptionTypes: fav.idSubscriptionTypes,
