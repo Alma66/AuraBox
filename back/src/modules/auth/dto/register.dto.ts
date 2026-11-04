@@ -1,6 +1,6 @@
 import { Transform } from 'class-transformer';
 import {
-  IsDateString, IsEmail, IsIn, IsInt, IsNotEmpty, IsOptional, IsString, IsUrl,
+  ArrayMaxSize, IsArray, IsDateString, IsEmail, IsIn, IsInt, IsNotEmpty, IsOptional, IsString, IsUrl,
   Matches, Max, MaxLength, Min, MinLength,
 } from 'class-validator';
 
@@ -66,6 +66,14 @@ export class RegisterCustomerDto {
 
   @IsDateString({}, { message: 'La fecha de nacimiento no es válida' })
   birthDate!: string;
+
+  @IsOptional()
+  @Transform(({ value }) => (Array.isArray(value) ? value.map((item) => Number(item)) : value))
+  @IsArray()
+  @ArrayMaxSize(20)
+  @IsInt({ each: true })
+  @Min(1, { each: true })
+  acceptedRuleIds?: number[];
 }
 
 export class RegisterEntrepreneurDto extends RegisterCustomerDto {

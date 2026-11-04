@@ -22,6 +22,11 @@ const PlatformRulesPage: React.FC = () => {
       .catch(() => setError('No se pudieron cargar los términos.'))
       .finally(() => setLoading(false));
   }, []);
+  
+    useEffect(() => {
+    if (loading || !window.location.hash) return;
+    document.getElementById(window.location.hash.slice(1))?.scrollIntoView();
+  }, [loading]);
 
   if (loading) {
     return (

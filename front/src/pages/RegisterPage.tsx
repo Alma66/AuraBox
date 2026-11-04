@@ -1,9 +1,18 @@
-import React, { useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
-import api from '../api/config';
+import api, { getResponseData } from '../api/config';
 import { PROVINCES } from '../constants/provinces';
 
 type AccountType = 'customer' | 'entrepreneur';
+
+interface LegalRule {
+  id: number;
+  title: string;
+  version: string;
+  ruleType: string;
+}
+
+type RulesStatus = 'loading' | 'ready' | 'error';
 
 const MIN_AGE: Record<AccountType, number> = { customer: 16, entrepreneur: 18 };
 
@@ -33,7 +42,27 @@ const RegisterPage: React.FC = () => {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const [step, setStep] = useState(1);
+  const [rules, setRules] = useState<LegalRule[]>([]);
+  const [rulesStatus, setRulesStatus] = useState<RulesStatus>('loading');
+  const [acceptedTerms, setAcceptedTerms] = useState(false);
   const navigate = useNavigate();
+
+  const loadRules = useCallback(async () => {
+    setRulesStatus('loading');
+    setAcceptedTerms(false);
+    try {
+      const response = await api.get(`/platform-rules/required/${accountType}`);
+      setRules(getResponseData(response) || []);
+      setRulesStatus('ready');
+    } catch {
+      setRules([]);
+      setRulesStatus('error');
+    }
+  }, [accountType]);
+
+  useEffect(() => {
+    loadRules();
+  }, [loadRules]);
 
   const passwordChecks = {
     length: password.length >= 8,
@@ -89,6 +118,14 @@ const RegisterPage: React.FC = () => {
       setError('Ese teléfono todavía no se puede guardar. Dejalo vacío por ahora.');
       return;
     }
+    if (rulesStatus === 'error') {
+      setError('No pudimos cargar los términos de uso. Recargá la página e intentá de nuevo.');
+      return;
+    }
+    if (rules.length > 0 && !acceptedTerms) {
+      setError('Tenés que aceptar los términos para crear tu cuenta.');
+      return;
+    }
     setLoading(true);
     try {
       const dto: Record<string, unknown> = {
@@ -100,6 +137,7 @@ const RegisterPage: React.FC = () => {
         documentNumber,
         phoneNumber: phoneDigits || null,
         birthDate,
+        acceptedRuleIds: rules.map((rule) => rule.id),
       };
       if (accountType === 'entrepreneur') {
         dto.city = city || null;
@@ -119,11 +157,17 @@ const RegisterPage: React.FC = () => {
       }
     } catch (err: any) {
       const msg = err.response?.data?.message;
-      setError(Array.isArray(msg) ? msg.join('. ') : msg || 'Error al registrarse. Intentá de nuevo.');
-        } finally {
+      const text = Array.isArray(msg) ? msg.join('. ') : msg || 'Error al registrarse. Intentá de nuevo.';
+      setError(text);
+      if (typeof text === 'string' && text.includes('Falta tu aceptación')) {
+        loadRules();
+      }
+    } finally {
       setLoading(false);
     }
   };
+
+  const submitDisabled = loading || rulesStatus === 'loading' || (rules.length > 0 && !acceptedTerms);
 
   return (
     <div className="min-h-[calc(100vh-64px)] flex items-center justify-center bg-aurora-cream py-12 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
@@ -260,13 +304,51 @@ const RegisterPage: React.FC = () => {
                 <input id="confirm-password" type="password" autoComplete="new-password" required className="input-aurora" placeholder="Repetí tu contraseña" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} />
               </div>
 
+              {rulesStatus === 'error' && (
+                <div className="rounded-lg border border-red-100 bg-red-50 px-3 py-2 text-sm text-red-600">
+                  No pudimos cargar los términos de uso.{' '}
+                  <button type="button" onClick={loadRules} className="font-semibold underline">
+                    Reintentar
+                  </button>
+                </div>
+              )}
+
+              {rulesStatus === 'ready' && rules.length > 0 && (
+                <div className="flex items-start gap-3 rounded-xl bg-aurora-cream p-3">
+                  <input
+                    id="accept-terms"
+                    type="checkbox"
+                    checked={acceptedTerms}
+                    onChange={(e) => setAcceptedTerms(e.target.checked)}
+                    className="mt-1 h-5 w-5 flex-shrink-0 rounded border-aurora-navy/30 accent-aurora-terracotta"
+                  />
+                  <label htmlFor="accept-terms" className="text-sm text-aurora-navy/80">
+                    Leí y acepto{' '}
+                    {rules.map((rule, index) => (
+                      <React.Fragment key={rule.id}>
+                        {index > 0 && (index === rules.length - 1 ? ' y ' : ', ')}
+                        <Link
+                          to={`/platform-rules#rule-${rule.id}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="font-semibold text-aurora-terracotta underline hover:text-aurora-terracottaDark"
+                        >
+                          {rule.title} (v{rule.version})
+                        </Link>
+                      </React.Fragment>
+                    ))}
+                    .
+                  </label>
+                </div>
+              )}
+
               {error && <p className="text-red-600 text-sm text-center bg-red-50 border border-red-100 rounded-lg py-2 px-3">{error}</p>}
 
               <div className="flex gap-3">
                 <button type="button" onClick={() => setStep(1)} className="btn-outline flex-1">
                   Atrás
                 </button>
-                <button type="submit" disabled={loading} className="btn-primary flex-1">
+                <button type="submit" disabled={submitDisabled} className="btn-primary flex-1 disabled:opacity-50">
                   {loading ? 'Registrando...' : 'Crear cuenta'}
                 </button>
               </div>

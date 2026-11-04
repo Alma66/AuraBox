@@ -1,4 +1,5 @@
 import { Injectable, UnauthorizedException, BadRequestException } from '@nestjs/common';
+import { RuleAcceptanceScope } from '@prisma/client';
 import { UsersService } from '../users/users.service';
 import * as bcrypt from 'bcryptjs';
 import { JwtService } from '@nestjs/jwt';
@@ -9,6 +10,8 @@ import {
   RegisterCustomerDto,
   RegisterEntrepreneurDto,
 } from './dto/register.dto';
+
+type AccountAudience = 'customer' | 'entrepreneur';
 
 const ageOn = (birth: Date, today: Date = new Date()) => {
   let age = today.getUTCFullYear() - birth.getUTCFullYear();
@@ -124,6 +127,28 @@ export class AuthService {
     return !!(customer || entrepreneur || admin);
   }
 
+  private async resolveRequiredRules(audience: AccountAudience, acceptedRuleIds: number[] = []) {
+    const scopes: RuleAcceptanceScope[] = [
+      RuleAcceptanceScope.TODOS,
+      audience === 'customer' ? RuleAcceptanceScope.CLIENTES : RuleAcceptanceScope.EMPRENDEDORES,
+    ];
+
+    const required = await this.prisma.platform_Rules.findMany({
+      where: { active: true, acceptanceScope: { in: scopes } },
+      select: { id: true, title: true, version: true },
+    });
+
+    const accepted = new Set(acceptedRuleIds);
+    const missing = required.filter((rule) => !accepted.has(rule.id));
+    if (missing.length > 0) {
+      throw new BadRequestException(
+        `Falta tu aceptación de: ${missing.map((rule) => rule.title).join(', ')}. Si los documentos cambiaron, recargá la página y volvé a aceptarlos.`,
+      );
+    }
+
+    return required;
+  }
+
   async registerCustomer(dto: RegisterCustomerDto) {
     if (await this.emailInUse(dto.email)) throw new BadRequestException('Ese email ya está registrado');
 
@@ -136,19 +161,36 @@ export class AuthService {
       throw new BadRequestException('Debes tener al menos 16 años para registrarte como cliente.');
     }
 
+    const requiredRules = await this.resolveRequiredRules('customer', dto.acceptedRuleIds);
+
     const hashed = await bcrypt.hash(dto.password, 10);
 
-    const user = await this.prisma.user.create({
-      data: {
-        firstName: dto.firstName,
-        lastName: dto.lastName,
-        email: dto.email,
-        passwordHash: hashed,
-        documentType: dto.documentType as any,
-        documentNumber,
-        phoneNumber: dto.phoneNumber ?? null,
-        birthDate,
-      },
+    const user = await this.prisma.$transaction(async (tx) => {
+      const created = await tx.user.create({
+        data: {
+          firstName: dto.firstName,
+          lastName: dto.lastName,
+          email: dto.email,
+          passwordHash: hashed,
+          documentType: dto.documentType as any,
+          documentNumber,
+          phoneNumber: dto.phoneNumber ?? null,
+          birthDate,
+        },
+      });
+
+      if (requiredRules.length > 0) {
+        await tx.terms_Acceptance.createMany({
+          data: requiredRules.map((rule) => ({
+            accountType: 'customer',
+            idAccount: created.id,
+            idPlatformRule: rule.id,
+            ruleVersion: rule.version,
+          })),
+        });
+      }
+
+      return created;
     });
 
     const { passwordHash, ...safe } = user as any;
@@ -188,21 +230,38 @@ export class AuthService {
       throw new BadRequestException('Debes tener al menos 18 años para registrarte como emprendedor.');
     }
 
+    const requiredRules = await this.resolveRequiredRules('entrepreneur', dto.acceptedRuleIds);
+
     const hashed = await bcrypt.hash(dto.password, 10);
 
-    const entrepreneur = await this.prisma.entrepreneurs.create({
-      data: {
-        firstName: dto.firstName,
-        lastName: dto.lastName,
-        email: dto.email,
-        passwordHash: hashed,
-        documentType: dto.documentType as any,
-        documentNumber,
-        phoneNumber: dto.phoneNumber ?? null,
-        birthDate,
-        city: dto.city ?? null,
-        province: dto.province ?? null,
-      },
+    const entrepreneur = await this.prisma.$transaction(async (tx) => {
+      const created = await tx.entrepreneurs.create({
+        data: {
+          firstName: dto.firstName,
+          lastName: dto.lastName,
+          email: dto.email,
+          passwordHash: hashed,
+          documentType: dto.documentType as any,
+          documentNumber,
+          phoneNumber: dto.phoneNumber ?? null,
+          birthDate,
+          city: dto.city ?? null,
+          province: dto.province ?? null,
+        },
+      });
+
+      if (requiredRules.length > 0) {
+        await tx.terms_Acceptance.createMany({
+          data: requiredRules.map((rule) => ({
+            accountType: 'entrepreneur',
+            idAccount: created.id,
+            idPlatformRule: rule.id,
+            ruleVersion: rule.version,
+          })),
+        });
+      }
+
+      return created;
     });
 
     const { passwordHash, ...safe } = entrepreneur as any;
