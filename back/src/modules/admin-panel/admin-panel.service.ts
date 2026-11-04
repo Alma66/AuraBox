@@ -1,5 +1,5 @@
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
-import { ClubStatus } from '@prisma/client';
+import { ClubStatus, Prisma } from '@prisma/client';
 import { PrismaService } from '../../prisma/prisma.service';
 import { ChangeClubStatusDto } from './dto/change-club-status.dto';
 import { SetReviewVisibilityDto } from './dto/set-review-visibility.dto';
@@ -234,6 +234,93 @@ export class AdminPanelService {
     return { id, active };
   }
 
+    async findPayments(clubIdRaw?: string, month?: string) {
+    const where: Prisma.PaymentWhereInput = {};
+
+    if (clubIdRaw) {
+      const clubId = Number(clubIdRaw);
+      if (!Number.isInteger(clubId) || clubId <= 0) throw new BadRequestException('Club inválido');
+      where.idClub = clubId;
+    }
+
+    if (month) {
+      const match = /^(\d{4})-(0[1-9]|1[0-2])$/.exec(month);
+      if (!match) throw new BadRequestException('Mes inválido');
+      const year = Number(match[1]);
+      const monthIndex = Number(match[2]) - 1;
+      where.paymentDate = {
+        gte: new Date(year, monthIndex, 1),
+        lt: new Date(year, monthIndex + 1, 1),
+      };
+    }
+
+    const successful: Prisma.PaymentWhereInput = { ...where, paymentStatus: 'Exitoso' };
+
+    const [rows, totalRows, totals, perClub] = await Promise.all([
+      this.prisma.payment.findMany({ where, orderBy: { paymentDate: 'desc' }, take: 200 }),
+      this.prisma.payment.count({ where }),
+      this.prisma.payment.aggregate({
+        where: successful,
+        _sum: { totalAmountPaid: true, clubAmount: true, commissionAmount: true },
+        _count: { _all: true },
+      }),
+      this.prisma.payment.groupBy({
+        by: ['idClub'],
+        where: successful,
+        _sum: { totalAmountPaid: true, clubAmount: true, commissionAmount: true },
+        _count: { _all: true },
+      }),
+    ]);
+
+    const clubIds = Array.from(new Set([...rows.map((row) => row.idClub), ...perClub.map((row) => row.idClub)]));
+    const userIds = Array.from(new Set(rows.map((row) => row.idUser)));
+    const methodIds = Array.from(
+      new Set(rows.map((row) => row.idPaymentMethods).filter((id): id is number => typeof id === 'number')),
+    );
+
+    const [clubs, users, methods] = await Promise.all([
+      this.prisma.club.findMany({ where: { id: { in: clubIds } }, select: { id: true, name: true } }),
+      this.prisma.user.findMany({ where: { id: { in: userIds } }, select: { id: true, firstName: true, lastName: true } }),
+      this.prisma.payment_Methods.findMany({ where: { id: { in: methodIds } }, select: { id: true, method: true } }),
+    ]);
+
+    const clubById = new Map(clubs.map((club) => [club.id, club.name] as [number, string]));
+    const userById = new Map(users.map((user) => [user.id, `${user.firstName} ${user.lastName}`] as [number, string]));
+    const methodById = new Map(methods.map((item) => [item.id, item.method] as [number, string]));
+
+    return {
+      totals: {
+        count: totals._count._all,
+        total: Number(totals._sum.totalAmountPaid ?? 0),
+        clubAmount: Number(totals._sum.clubAmount ?? 0),
+        commission: Number(totals._sum.commissionAmount ?? 0),
+      },
+      perClub: perClub
+        .map((row) => ({
+          idClub: row.idClub,
+          club: clubById.get(row.idClub) ?? `Club #${row.idClub}`,
+          count: row._count._all,
+          total: Number(row._sum.totalAmountPaid ?? 0),
+          clubAmount: Number(row._sum.clubAmount ?? 0),
+          commission: Number(row._sum.commissionAmount ?? 0),
+        }))
+        .sort((a, b) => b.total - a.total),
+      payments: rows.map((row) => ({
+        id: row.id,
+        paymentDate: row.paymentDate.toISOString(),
+        paymentStatus: row.paymentStatus,
+        total: Number(row.totalAmountPaid ?? 0),
+        clubAmount: Number(row.clubAmount ?? 0),
+        commission: Number(row.commissionAmount ?? 0),
+        club: clubById.get(row.idClub) ?? `Club #${row.idClub}`,
+        customer: userById.get(row.idUser) ?? null,
+        method: row.idPaymentMethods ? methodById.get(row.idPaymentMethods) ?? null : null,
+        gatewayTransaction: row.idGatewayTransaction ?? null,
+      })),
+      truncated: totalRows > rows.length,
+    };
+  }
+  
   async findReviews(filter?: string) {
     const reviews = await this.prisma.reviews.findMany({
       where: filter === 'hidden' ? { isHidden: true } : {},

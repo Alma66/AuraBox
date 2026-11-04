@@ -56,6 +56,11 @@ export class AdminPanelController {
     return this.service.setAccountActive(type, id, dto.active);
   }
 
+  @Get('payments')
+  async findPayments(@Query('clubId') clubId?: string, @Query('month') month?: string) {
+    return this.service.findPayments(clubId, month);
+  }
+
   @Get('reviews')
   async findReviews(@Query('filter') filter?: string) {
     return this.service.findReviews(filter);
