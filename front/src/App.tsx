@@ -36,6 +36,7 @@ import EntrepreneurDashboardPage from './pages/entrepreneur/EntrepreneurDashboar
 import MyClubPage from './pages/entrepreneur/club/myClub/MyClubPage';
 import PlansAndBoxesPage from './pages/entrepreneur/club/myClub/PlansAndBoxesPage';
 import CustomersPage from './pages/entrepreneur/operations/clients/CustomersPage';
+import AdminAdminsPage from './pages/admin/AdminAdminsPage';
 import ShipmentsPage from './pages/entrepreneur/operations/logistics/ShipmentsPage';
 import MarketingPage from './pages/entrepreneur/marketing_and_communication/MarketingPage';
 import CommunityPage from './pages/entrepreneur/marketing_and_communication/CommunityPage';
@@ -255,6 +256,7 @@ const AppContent: React.FC = () => {
       <Route path="/entrepreneur/club/:clubId/inventory/pedidos" element={pr(['entrepreneur'], <ClubRedirect to="inventory" search="?tab=orders" />)} />
       <Route path="/entrepreneur/club/:clubId/inventory/categorias" element={pr(['entrepreneur'], <ClubRedirect to="inventory" search="?tab=categories" />)} />
       <Route path="/entrepreneur/club/:clubId/finance" element={pr(['entrepreneur'], <FinancePage />)} />
+      <Route path="/admin/admins" element={<AdminAdminsPage />} />
       <Route path="/entrepreneur/club/:clubId/finance/movimientos" element={pr(['entrepreneur'], <ClubRedirect to="finance" search="?tab=movements" />)} />
       <Route path="/entrepreneur/club/:clubId/finance/rentabilidad" element={pr(['entrepreneur'], <ClubRedirect to="finance" search="?tab=profitability" />)} />
       <Route path="/entrepreneur/club/:clubId/analytics" element={pr(['entrepreneur'], <AnalyticsPage />)} />

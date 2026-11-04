@@ -1,59 +1,59 @@
 import {
-  Body, Controller, Get, Post, Put, Delete,
-  Param, ParseIntPipe, UseGuards, UsePipes, ValidationPipe,
+  Body, Controller, Get, Post, Put, Patch,
+  Param, ParseIntPipe, UseGuards, UsePipes, ValidationPipe, Request,
 } from '@nestjs/common';
 import { AdminsService } from './admins.service';
 import { CreateAdminDto } from './dto/create-admin.dto';
 import { UpdateAdminDto } from './dto/update-admin.dto';
+import { SetAdminActiveDto } from './dto/set-admin-active.dto';
+import { SetAdminPasswordDto } from './dto/set-admin-password.dto';
 import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
 import { RolesGuard } from '../auth/roles.guard';
 import { Roles } from '../auth/roles.decorator';
 
 @Controller('admins')
-@UseGuards(JwtAuthGuard)
+@UseGuards(JwtAuthGuard, RolesGuard)
+@Roles('admin')
+@UsePipes(new ValidationPipe({ whitelist: true, transform: true }))
 export class AdminsController {
   constructor(private readonly svc: AdminsService) {}
 
-  @UseGuards(RolesGuard)
-  @Roles('admin')
   @Post()
-  @UsePipes(new ValidationPipe({ whitelist: true, transform: true }))
   async create(@Body() dto: CreateAdminDto) {
     return this.svc.create(dto);
   }
 
-  @UseGuards(RolesGuard)
-  @Roles('admin')
   @Get()
   async findAll() {
     return this.svc.findAll();
   }
 
-  @UseGuards(RolesGuard)
-  @Roles('admin')
   @Get('by-email/:email')
   async findByEmail(@Param('email') email: string) {
     return this.svc.findByEmail(email);
   }
 
-  @UseGuards(RolesGuard)
-  @Roles('admin')
   @Get(':id')
   async findOne(@Param('id', ParseIntPipe) id: number) {
     return this.svc.findOne(id);
   }
 
-  @UseGuards(RolesGuard)
-  @Roles('admin')
   @Put(':id')
   async update(@Param('id', ParseIntPipe) id: number, @Body() dto: UpdateAdminDto) {
     return this.svc.update(id, dto);
   }
 
-  @UseGuards(RolesGuard)
-  @Roles('admin')
-  @Delete(':id')
-  async remove(@Param('id', ParseIntPipe) id: number) {
-    return this.svc.remove(id);
+  @Patch(':id/active')
+  async setActive(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() dto: SetAdminActiveDto,
+    @Request() req,
+  ) {
+    return this.svc.setActive(id, dto.active, req.user.id);
+  }
+
+  @Patch(':id/password')
+  async setPassword(@Param('id', ParseIntPipe) id: number, @Body() dto: SetAdminPasswordDto) {
+    return this.svc.setPassword(id, dto.password);
   }
 }
