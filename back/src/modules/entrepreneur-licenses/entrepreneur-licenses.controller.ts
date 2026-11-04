@@ -1,13 +1,14 @@
 import {
-  Body, Controller, Get, Post, Put, Delete, Patch,
-  Param, ParseIntPipe, UseGuards, Request, UsePipes,
-  ValidationPipe, ForbiddenException, UseInterceptors, UploadedFile,
+  Body, Controller, Get, Post, Delete, Patch,
+  Param, ParseIntPipe, UseGuards, Request, UsePipes, Query,
+  ValidationPipe, ForbiddenException, BadRequestException, UseInterceptors, UploadedFile,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { memoryStorage } from 'multer';
 import { EntrepreneurLicensesService } from './entrepreneur-licenses.service';
 import { CreateEntrepreneurLicenseDto } from './dto/create-entrepreneur-licenses.dto';
 import { UpdateEntrepreneurLicenseDto } from './dto/update-entrepreneur-licenses.dto';
+import { VerifyLicenseDto } from './dto/verify-license.dto';
 import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
 import { RolesGuard } from '../auth/roles.guard';
 import { Roles } from '../auth/roles.decorator';
@@ -16,8 +17,8 @@ const licenseFileOptions = {
   storage: memoryStorage(),
   limits: { fileSize: 10 * 1024 * 1024 },
   fileFilter: (req, file, callback) => {
-    if (!file.mimetype.match(/\/(pdf|jpg|jpeg|png)$/)) {
-      callback(new Error('Solo se permiten PDF o imágenes'), false);
+    if (!file.mimetype.match(/^(application\/pdf|image\/(jpg|jpeg|png))$/)) {
+      callback(new BadRequestException('Solo se permiten PDF o imágenes JPG y PNG'), false);
     } else {
       callback(null, true);
     }
@@ -33,17 +34,24 @@ export class EntrepreneurLicensesController {
   @Post()
   @UseInterceptors(FileInterceptor('document', licenseFileOptions))
   @UsePipes(new ValidationPipe({ whitelist: true, transform: true }))
-  async create(@Body() dto: CreateEntrepreneurLicenseDto, @Request() req, @UploadedFile() document?: Express.Multer.File) {
-    if (req.user.role !== 'admin' && req.user.id !== dto.idEntrepreneurs) {
-      throw new ForbiddenException('No autorizado para crear esta licencia');
-    }
-    return this.service.create(dto, document);
+  async create(
+    @Body() dto: CreateEntrepreneurLicenseDto,
+    @Request() req,
+    @UploadedFile() document?: Express.Multer.File,
+  ) {
+    return this.service.create(dto, req.user, document);
+  }
+
+  @Roles('entrepreneur')
+  @Get('my-compliance')
+  async getMyCompliance(@Request() req) {
+    return this.service.getMyCompliance(req.user);
   }
 
   @Roles('admin')
-  @Get()
-  async findAll() {
-    return this.service.findAll();
+  @Get('admin/list')
+  async adminList(@Query('status') status?: string) {
+    return this.service.adminList(status);
   }
 
   @Get('by-entrepreneur/:idEntrepreneur')
@@ -68,6 +76,7 @@ export class EntrepreneurLicensesController {
     return item;
   }
 
+  @Roles('entrepreneur')
   @Patch(':id')
   @UseInterceptors(FileInterceptor('document', licenseFileOptions))
   @UsePipes(new ValidationPipe({ whitelist: true, transform: true }))
@@ -77,18 +86,14 @@ export class EntrepreneurLicensesController {
     @Request() req,
     @UploadedFile() document?: Express.Multer.File,
   ) {
-    const existing = await this.service.findOne(id);
-    if (req.user.id !== existing.idEntrepreneurs && req.user.role !== 'admin') {
-      throw new ForbiddenException('No autorizado para actualizar esta licencia');
-    }
-    return this.service.update(id, dto, document);
+    return this.service.update(id, dto, req.user, document);
   }
 
   @Roles('admin')
-  @Put(':id/verify')
+  @Patch(':id/verify')
   @UsePipes(new ValidationPipe({ whitelist: true, transform: true }))
-  async verify(@Param('id', ParseIntPipe) id: number, @Body() body: { verificationStatus: string; verificationNotes?: string }) {
-    return this.service.verify(id, body.verificationStatus, body.verificationNotes);
+  async verify(@Param('id', ParseIntPipe) id: number, @Body() dto: VerifyLicenseDto) {
+    return this.service.verify(id, dto);
   }
 
   @Roles('admin')

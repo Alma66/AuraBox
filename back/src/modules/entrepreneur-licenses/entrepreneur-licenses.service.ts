@@ -2,8 +2,14 @@ import { Injectable, NotFoundException, BadRequestException, ForbiddenException,
 import { PrismaService } from '../../prisma/prisma.service';
 import { CreateEntrepreneurLicenseDto } from './dto/create-entrepreneur-licenses.dto';
 import { UpdateEntrepreneurLicenseDto } from './dto/update-entrepreneur-licenses.dto';
+import { VerifyLicenseDto } from './dto/verify-license.dto';
 import { VerificationStatus } from '@prisma/client';
 import { CloudinaryService } from '../cloudinary/cloudinary.service';
+import { getLicenseRequirements, summarizeRequirements } from '../../common/utils/license-requirements';
+
+type RequestUser = { id: number; role: string };
+
+const DAY_MS = 24 * 60 * 60 * 1000;
 
 function sanitize(license: any) {
   if (!license) return license;
@@ -20,46 +26,117 @@ export class EntrepreneurLicensesService {
     private readonly cloudinary: CloudinaryService,
   ) {}
 
-  async create(dto: CreateEntrepreneurLicenseDto, documentFile?: Express.Multer.File) {
-    const entrepreneur = await this.prisma.entrepreneurs.findUnique({
-      where: { id: dto.idEntrepreneurs },
-    });
+  private assertDates(issueDate: Date | null, expirationDate: Date | null, requireFutureExpiry: boolean) {
+    if (issueDate && expirationDate && expirationDate.getTime() <= issueDate.getTime()) {
+      throw new BadRequestException('El vencimiento debe ser posterior a la fecha de emisión');
+    }
+    if (requireFutureExpiry && expirationDate && expirationDate.getTime() < Date.now()) {
+      throw new BadRequestException('La matrícula que intentás cargar ya está vencida');
+    }
+  }
+
+  async create(dto: CreateEntrepreneurLicenseDto, user: RequestUser, documentFile?: Express.Multer.File) {
+    let idEntrepreneurs: number;
+    if (user.role === 'admin') {
+      if (!dto.idEntrepreneurs) throw new BadRequestException('Indicá el emprendedor');
+      idEntrepreneurs = dto.idEntrepreneurs;
+    } else {
+      if (dto.idEntrepreneurs && dto.idEntrepreneurs !== user.id) {
+        throw new ForbiddenException('No autorizado para crear esta licencia');
+      }
+      idEntrepreneurs = user.id;
+    }
+
+    if (!documentFile) throw new BadRequestException('Adjuntá el documento de la matrícula');
+
+    const entrepreneur = await this.prisma.entrepreneurs.findUnique({ where: { id: idEntrepreneurs } });
     if (!entrepreneur) throw new NotFoundException('Emprendedor no encontrado');
 
-    const licenseType = await this.prisma.license_Types.findUnique({
-      where: { id: dto.idLicenseTypes },
-    });
+    const licenseType = await this.prisma.license_Types.findUnique({ where: { id: dto.idLicenseTypes } });
     if (!licenseType) throw new NotFoundException('Tipo de licencia no encontrado');
 
     const duplicate = await this.prisma.entrepreneur_Licenses.findFirst({
-      where: { idEntrepreneurs: dto.idEntrepreneurs, idLicenseTypes: dto.idLicenseTypes },
+      where: { idEntrepreneurs, idLicenseTypes: dto.idLicenseTypes },
     });
-    if (duplicate) throw new ConflictException('Ya existe una licencia de este tipo para este emprendedor');
-
-    let documentUrl = dto.documentUrl ?? null;
-    if (documentFile) {
-      documentUrl = await this.cloudinary.uploadDocument(documentFile, 'aurabox/licenses');
+    if (duplicate) {
+      throw new ConflictException('Ya cargaste esta matrícula. Si querés renovarla, reemplazá el documento.');
     }
+
+    const issueDate = dto.issueDate ? new Date(dto.issueDate) : null;
+    const expirationDate = dto.expirationDate ? new Date(dto.expirationDate) : null;
+    this.assertDates(issueDate, expirationDate, true);
+
+    const documentUrl = await this.cloudinary.uploadDocument(documentFile, 'aurabox/licenses');
 
     const created = await this.prisma.entrepreneur_Licenses.create({
       data: {
-        idEntrepreneurs: dto.idEntrepreneurs,
+        idEntrepreneurs,
         idLicenseTypes: dto.idLicenseTypes,
-        issueDate: dto.issueDate ? new Date(dto.issueDate) : null,
-        expirationDate: dto.expirationDate ? new Date(dto.expirationDate) : null,
+        issueDate,
+        expirationDate,
         documentUrl,
-        verificationNotes: dto.verificationNotes ?? null,
         verificationStatus: VerificationStatus.PENDIENTE,
       },
     });
     return sanitize(created);
   }
 
-  async findAll() {
+  async adminList(status?: string) {
+    const validStatus = Object.values(VerificationStatus).includes(status as VerificationStatus)
+      ? (status as VerificationStatus)
+      : undefined;
+
     const licenses = await this.prisma.entrepreneur_Licenses.findMany({
+      where: validStatus ? { verificationStatus: validStatus } : {},
       orderBy: { id: 'asc' },
+      take: 300,
     });
-    return licenses.map(sanitize);
+
+    const entrepreneurIds = Array.from(new Set(licenses.map((row) => row.idEntrepreneurs)));
+    const typeIds = Array.from(new Set(licenses.map((row) => row.idLicenseTypes)));
+
+    const [entrepreneurs, types, links] = await Promise.all([
+      this.prisma.entrepreneurs.findMany({
+        where: { id: { in: entrepreneurIds } },
+        select: { id: true, firstName: true, lastName: true, email: true },
+      }),
+      this.prisma.license_Types.findMany({ where: { id: { in: typeIds } }, select: { id: true, name: true } }),
+      this.prisma.entrepreneur_Club.findMany({ where: { idEntrepreneurs: { in: entrepreneurIds } } }),
+    ]);
+
+    const clubs = await this.prisma.club.findMany({
+      where: { id: { in: Array.from(new Set(links.map((row) => row.idClub))) } },
+      select: { id: true, name: true, clubStatus: true },
+    });
+
+    const now = Date.now();
+
+    return licenses.map((license) => {
+      const entrepreneur = entrepreneurs.find((row) => row.id === license.idEntrepreneurs);
+      const type = types.find((row) => row.id === license.idLicenseTypes);
+      const entrepreneurClubs = links
+        .filter((row) => row.idEntrepreneurs === license.idEntrepreneurs)
+        .map((row) => clubs.find((club) => club.id === row.idClub))
+        .filter((club): club is NonNullable<typeof club> => !!club);
+
+      return {
+        id: license.id,
+        verificationStatus: license.verificationStatus,
+        documentUrl: license.documentUrl,
+        issueDate: license.issueDate ? license.issueDate.toISOString() : null,
+        expirationDate: license.expirationDate ? license.expirationDate.toISOString() : null,
+        verificationDate: license.verificationDate ? license.verificationDate.toISOString() : null,
+        verificationNotes: license.verificationNotes,
+        daysToExpire: license.expirationDate
+          ? Math.ceil((license.expirationDate.getTime() - now) / DAY_MS)
+          : null,
+        licenseType: type?.name ?? `Tipo #${license.idLicenseTypes}`,
+        entrepreneur: entrepreneur
+          ? { id: entrepreneur.id, name: `${entrepreneur.firstName} ${entrepreneur.lastName}`, email: entrepreneur.email }
+          : null,
+        clubs: entrepreneurClubs,
+      };
+    });
   }
 
   async findByEntrepreneur(idEntrepreneur: number) {
@@ -76,55 +153,63 @@ export class EntrepreneurLicensesService {
     return sanitize(item);
   }
 
-  async update(id: number, dto: UpdateEntrepreneurLicenseDto, documentFile?: Express.Multer.File) {
+  async update(id: number, dto: UpdateEntrepreneurLicenseDto, user: RequestUser, documentFile?: Express.Multer.File) {
     const existing = await this.prisma.entrepreneur_Licenses.findUnique({ where: { id } });
     if (!existing) throw new NotFoundException('Licencia no encontrada');
+    if (existing.idEntrepreneurs !== user.id) {
+      throw new ForbiddenException('No autorizado para actualizar esta licencia');
+    }
 
-    let documentUrl = dto.documentUrl ?? existing.documentUrl;
-    let verificationStatus = existing.verificationStatus;
-    let verificationDate = existing.verificationDate;
-    let verificationNotes = dto.verificationNotes ?? existing.verificationNotes;
+    if (!documentFile && dto.issueDate === undefined && dto.expirationDate === undefined) {
+      throw new BadRequestException('No hay cambios para guardar');
+    }
 
+    const issueDate = dto.issueDate ? new Date(dto.issueDate) : existing.issueDate;
+    const expirationDate = dto.expirationDate ? new Date(dto.expirationDate) : existing.expirationDate;
+    this.assertDates(issueDate, expirationDate, dto.expirationDate !== undefined);
+
+    let documentUrl = existing.documentUrl;
     if (documentFile) {
+      const newUrl = await this.cloudinary.uploadDocument(documentFile, 'aurabox/licenses');
       if (existing.documentUrl) {
-        const publicId = this.cloudinary.extractPublicId(existing.documentUrl);
-        await this.cloudinary.deleteImage(publicId);
+        try {
+          const publicId = this.cloudinary.extractPublicId(existing.documentUrl);
+          await this.cloudinary.deleteImage(publicId);
+        } catch {}
       }
-      documentUrl = await this.cloudinary.uploadDocument(documentFile, 'aurabox/licenses');
-      verificationStatus = VerificationStatus.PENDIENTE;
-      verificationDate = null;
-      verificationNotes = null;
+      documentUrl = newUrl;
     }
 
     const updated = await this.prisma.entrepreneur_Licenses.update({
       where: { id },
       data: {
-        issueDate: dto.issueDate ? new Date(dto.issueDate) : existing.issueDate,
-        expirationDate: dto.expirationDate ? new Date(dto.expirationDate) : existing.expirationDate,
+        issueDate,
+        expirationDate,
         documentUrl,
-        verificationStatus,
-        verificationDate,
-        verificationNotes,
+        verificationStatus: VerificationStatus.PENDIENTE,
+        verificationDate: null,
+        verificationNotes: null,
       },
     });
     return sanitize(updated);
   }
 
-  async verify(id: number, verificationStatus: string, verificationNotes?: string) {
+  async verify(id: number, dto: VerifyLicenseDto) {
     const existing = await this.prisma.entrepreneur_Licenses.findUnique({ where: { id } });
     if (!existing) throw new NotFoundException('Licencia no encontrada');
+    if (!existing.documentUrl) throw new BadRequestException('La licencia no tiene documento para revisar');
 
-    const allowed = Object.values(VerificationStatus);
-    if (!allowed.includes(verificationStatus as VerificationStatus)) {
-      throw new BadRequestException(`verificationStatus inválido. Valores permitidos: ${allowed.join(', ')}`);
+    const notes = dto.verificationNotes?.trim() || null;
+    if (dto.verificationStatus === 'RECHAZADO' && !notes) {
+      throw new BadRequestException('Indicá el motivo del rechazo');
     }
 
     const updated = await this.prisma.entrepreneur_Licenses.update({
       where: { id },
       data: {
-        verificationStatus: verificationStatus as VerificationStatus,
+        verificationStatus: dto.verificationStatus as VerificationStatus,
         verificationDate: new Date(),
-        verificationNotes: verificationNotes ?? existing.verificationNotes,
+        verificationNotes: notes,
       },
     });
     return sanitize(updated);
@@ -139,44 +224,61 @@ export class EntrepreneurLicensesService {
       });
       if (!association) throw new ForbiddenException('No autorizado para ver estos requisitos');
     }
-    const clubCategories = await this.prisma.club_Categories.findMany({ where: { idClub } });
-    const categoryIds = clubCategories.map((c) => c.idCategories);
-    const requiredLinks = categoryIds.length > 0
-      ? await this.prisma.category_License_Type.findMany({ where: { idCategories: { in: categoryIds } } })
-      : [];
-    const requiredLicenseTypeIds = Array.from(new Set(requiredLinks.map((l) => l.idLicenseTypes)));
-    const licenseTypes = requiredLicenseTypeIds.length > 0
-      ? await this.prisma.license_Types.findMany({ where: { id: { in: requiredLicenseTypeIds } } })
-      : [];
-    const entrepreneurClub = await this.prisma.entrepreneur_Club.findFirst({ where: { idClub } });
-    const idEntrepreneurs = entrepreneurClub?.idEntrepreneurs ?? null;
-    const uploadedLicenses = idEntrepreneurs
-      ? await this.prisma.entrepreneur_Licenses.findMany({
-          where: { idEntrepreneurs, idLicenseTypes: { in: requiredLicenseTypeIds } },
-        })
-      : [];
-    return licenseTypes.map((licenseType) => {
-      const uploaded = uploadedLicenses.find((u) => u.idLicenseTypes === licenseType.id);
-      return {
-        idLicenseTypes: licenseType.id,
-        name: licenseType.name,
-        description: licenseType.description,
-        entrepreneurLicenseId: uploaded?.id ?? null,
-        verificationStatus: uploaded?.verificationStatus ?? null,
-        documentUrl: uploaded?.documentUrl ?? null,
-        issueDate: uploaded?.issueDate ? uploaded.issueDate.toISOString() : null,
-        expirationDate: uploaded?.expirationDate ? uploaded.expirationDate.toISOString() : null,
-        verificationNotes: uploaded?.verificationNotes ?? null,
-      };
+
+    const { items } = await getLicenseRequirements(this.prisma, idClub);
+    return items.map((item) => ({
+      idLicenseTypes: item.idLicenseTypes,
+      name: item.name,
+      description: item.description,
+      entrepreneurLicenseId: item.entrepreneurLicenseId,
+      verificationStatus: item.verificationStatus,
+      documentUrl: item.documentUrl,
+      issueDate: item.issueDate,
+      expirationDate: item.expirationDate,
+      verificationNotes: item.verificationNotes,
+    }));
+  }
+
+  async getMyCompliance(user: RequestUser) {
+    const association = await this.prisma.entrepreneur_Club.findFirst({
+      where: { idEntrepreneurs: user.id },
+      orderBy: { associationDate: 'asc' },
     });
+    if (!association) return { hasClub: false };
+
+    const club = await this.prisma.club.findUnique({
+      where: { id: association.idClub },
+      select: { id: true, name: true, clubStatus: true },
+    });
+    if (!club) return { hasClub: false };
+
+    const lastChange = await this.prisma.club_Status_History.findFirst({
+      where: { idClub: club.id },
+      orderBy: { changeDate: 'desc' },
+    });
+
+    const { idEntrepreneur, items } = await getLicenseRequirements(this.prisma, club.id);
+    const summary = summarizeRequirements(items);
+
+    return {
+      hasClub: true,
+      isOwner: idEntrepreneur === user.id,
+      club,
+      statusReason: lastChange?.changeReason ?? null,
+      statusChangedAt: lastChange ? lastChange.changeDate.toISOString() : null,
+      requirements: items,
+      summary,
+    };
   }
 
   async remove(id: number) {
     const existing = await this.prisma.entrepreneur_Licenses.findUnique({ where: { id } });
     if (!existing) throw new NotFoundException('Licencia no encontrada');
     if (existing.documentUrl) {
-      const publicId = this.cloudinary.extractPublicId(existing.documentUrl);
-      await this.cloudinary.deleteImage(publicId);
+      try {
+        const publicId = this.cloudinary.extractPublicId(existing.documentUrl);
+        await this.cloudinary.deleteImage(publicId);
+      } catch {}
     }
     await this.prisma.entrepreneur_Licenses.delete({ where: { id } });
     return { message: 'Licencia eliminada correctamente' };

@@ -1,9 +1,4 @@
-import {
-  IsOptional,
-  IsDateString,
-  IsString,
-  IsUrl,
-} from 'class-validator';
+import { IsDateString, IsOptional } from 'class-validator';
 
 export class UpdateEntrepreneurLicenseDto {
   @IsOptional()
@@ -13,12 +8,4 @@ export class UpdateEntrepreneurLicenseDto {
   @IsOptional()
   @IsDateString()
   expirationDate?: string;
-
-  @IsOptional()
-  @IsUrl()
-  documentUrl?: string;
-
-  @IsOptional()
-  @IsString()
-  verificationNotes?: string;
 }

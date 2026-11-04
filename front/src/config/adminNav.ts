@@ -10,6 +10,7 @@ export interface AdminSection {
 export const ADMIN_SECTIONS: AdminSection[] = [
   { id: 'dashboard', label: 'Resumen', icon: 'dashboard', to: '/admin/dashboard' },
   { id: 'clubs', label: 'Clubes', icon: 'club', to: '/admin/clubs' },
+  { id: 'licenses', label: 'Matrículas', icon: 'inventory', to: '/admin/licenses' },
   { id: 'users', label: 'Usuarios', icon: 'users', to: '/admin/users' },
   { id: 'payments', label: 'Pagos', icon: 'finance', to: '/admin/payments' },
   { id: 'reviews', label: 'Reseñas', icon: 'community', to: '/admin/reviews' },

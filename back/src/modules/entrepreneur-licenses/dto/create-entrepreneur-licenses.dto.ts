@@ -1,16 +1,16 @@
-import {
-  IsInt,
-  IsOptional,
-  IsDateString,
-  IsString,
-  IsUrl,
-} from 'class-validator';
+import { Type } from 'class-transformer';
+import { IsDateString, IsInt, IsOptional, Min } from 'class-validator';
 
 export class CreateEntrepreneurLicenseDto {
+  @IsOptional()
+  @Type(() => Number)
   @IsInt()
-  idEntrepreneurs!: number;
+  @Min(1)
+  idEntrepreneurs?: number;
 
+  @Type(() => Number)
   @IsInt()
+  @Min(1)
   idLicenseTypes!: number;
 
   @IsOptional()
@@ -20,12 +20,4 @@ export class CreateEntrepreneurLicenseDto {
   @IsOptional()
   @IsDateString()
   expirationDate?: string;
-
-  @IsOptional()
-  @IsUrl()
-  documentUrl?: string;
-
-  @IsOptional()
-  @IsString()
-  verificationNotes?: string;
 }

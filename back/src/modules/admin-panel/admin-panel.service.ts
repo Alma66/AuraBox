@@ -3,6 +3,10 @@ import { ClubStatus, Prisma } from '@prisma/client';
 import { PrismaService } from '../../prisma/prisma.service';
 import { ChangeClubStatusDto } from './dto/change-club-status.dto';
 import { SetReviewVisibilityDto } from './dto/set-review-visibility.dto';
+import {
+  getLicenseRequirements,
+  REQUIREMENT_STATE_LABELS,
+} from '../../common/utils/license-requirements';
 
 const monthKey = (date: Date) => `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
 
@@ -123,7 +127,16 @@ export class AdminPanelService {
     const club = await this.prisma.club.findUnique({ where: { id: clubId } });
     if (!club) throw new NotFoundException('Club no encontrado');
     if (club.clubStatus === dto.status) throw new BadRequestException('El club ya tiene ese estado');
-
+    if (dto.status === 'APROBADO') {
+      const { items } = await getLicenseRequirements(this.prisma, clubId);
+      const blocking = items.filter((item) => !item.valid);
+      if (blocking.length > 0) {
+        const detail = blocking
+          .map((item) => `${item.name} (${REQUIREMENT_STATE_LABELS[item.state]})`)
+          .join(', ');
+        throw new BadRequestException(`No se puede aprobar el club. Matrículas sin aprobar: ${detail}`);
+      }
+    }
     const reason = dto.reason?.trim() || null;
     const needsReason = dto.status === 'SUSPENDIDO' || dto.status === 'INACTIVO';
     if (needsReason && !reason) throw new BadRequestException('Indicá el motivo del cambio');
@@ -320,7 +333,7 @@ export class AdminPanelService {
       truncated: totalRows > rows.length,
     };
   }
-  
+
   async findReviews(filter?: string) {
     const reviews = await this.prisma.reviews.findMany({
       where: filter === 'hidden' ? { isHidden: true } : {},
