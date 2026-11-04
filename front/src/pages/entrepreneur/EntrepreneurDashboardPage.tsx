@@ -4,6 +4,7 @@ import api, { getResponseData } from '../../api/config';
 import { useAuth } from '../../App';
 import Icon from '../../components/entrepreneur/layout/Icon';
 import { ENTREPRENEUR_SECTIONS, sectionHref } from '../../config/entrepreneurNav';
+import ComplianceBanner from '../../components/entrepreneur/ComplianceBanner';
 
 interface DashboardData {
   club: any | null;
@@ -151,6 +152,8 @@ const EntrepreneurDashboardPage: React.FC = () => {
   const today = new Date().toLocaleDateString('es-AR', { weekday: 'long', day: 'numeric', month: 'long' });
   const rating = data?.club?.averageRating ? Number(data.club.averageRating).toFixed(1) : '—';
   const reviews = data?.club?.totalReviews ?? 0;
+  const settingsSection = ENTREPRENEUR_SECTIONS.find((section) => section.label === 'Configuración');
+  const complianceTo = settingsSection ? `${sectionHref(settingsSection, clubId)}?tab=compliance` : undefined;
 
   if (!clubId) {
     return (
@@ -183,7 +186,7 @@ const EntrepreneurDashboardPage: React.FC = () => {
         </h1>
         {data?.club?.name && <p className="text-sm text-aurora-navy/60">Así viene {data.club.name} hoy.</p>}
       </div>
-
+            <ComplianceBanner to={complianceTo} />
       {failed && (
         <div role="alert" className="rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-700">
           No pudimos cargar los datos del club. Probá recargar la página.

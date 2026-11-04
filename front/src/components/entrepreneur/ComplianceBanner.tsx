@@ -65,7 +65,7 @@ const buildMessage = (data: BannerData): BannerMessage | null => {
   return null;
 };
 
-const ComplianceBanner: React.FC<{ to: string }> = ({ to }) => {
+const ComplianceBanner: React.FC<{ to?: string }> = ({ to }) => {
   const [message, setMessage] = useState<BannerMessage | null>(null);
 
   useEffect(() => {
@@ -85,12 +85,14 @@ const ComplianceBanner: React.FC<{ to: string }> = ({ to }) => {
 
   if (!message) return null;
 
-  return (
-    <div role="status" className={`mb-6 flex flex-wrap items-center justify-between gap-3 rounded-xl border px-4 py-3 text-sm ${message.tone}`}>
+    return (
+    <div role="status" className={`flex flex-wrap items-center justify-between gap-3 rounded-xl border px-4 py-3 text-sm ${message.tone}`}>
       <p>{message.text}</p>
-      <Link to={to} className="font-semibold underline">
-        Ver detalle
-      </Link>
+      {to && (
+        <Link to={to} className="font-semibold underline">
+          Ver detalle
+        </Link>
+      )}
     </div>
   );
 };

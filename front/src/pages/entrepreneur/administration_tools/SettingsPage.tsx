@@ -17,7 +17,7 @@ const SettingsPage: React.FC = () => (
       { id: 'general', label: 'Ajustes', element: <Padded><SettingsTab /></Padded> },
       { id: 'billing', label: 'Cobros', element: <Padded><BillingTab /></Padded> },
       { id: 'legal', label: 'Legal', element: <EditClubLegalInfoPage /> },
-      { id: 'compliance', label: 'Cumplimiento', element: <LegalCompliancePage /> },
+      { id: 'compliance', label: 'Cumplimiento', element: <Padded><LegalCompliancePage /></Padded> },
       { id: 'team', label: 'Equipo', element: <Padded><TeamTab /></Padded> },
     ]}
   />
