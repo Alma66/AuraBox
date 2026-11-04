@@ -2,6 +2,7 @@ import { Injectable, NotFoundException, ForbiddenException } from '@nestjs/commo
 import { PrismaService } from '../../prisma/prisma.service';
 import { CreateClubLegalContentDto } from './dto/create-club-legal-content.dto';
 import { UpdateClubLegalContentDto } from './dto/update-club-legal-content.dto';
+import { OptionalRequestUser, assertClubVisible } from '../../common/utils/club-visibility';
 
 @Injectable()
 export class ClubLegalContentService {
@@ -14,7 +15,8 @@ export class ClubLegalContentService {
     if (!association) throw new ForbiddenException('No tenés acceso a este club');
   }
 
-  async findByClub(idClub: number) {
+  async findByClub(idClub: number, user: OptionalRequestUser) {
+    await assertClubVisible(this.prisma, idClub, user);
     const content = await this.prisma.club_Legal_Content.findUnique({ where: { idClub } });
     if (!content) {
       return { idClub, termsAndConditions: [], privacyAndSecurityPolicy: [] };

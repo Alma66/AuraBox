@@ -100,11 +100,13 @@ export class ReviewsController {
   @Get('by-subscription-type/:id')
   async findBySubscriptionType(
     @Param('id', ParseIntPipe) id: number,
+    @Request() req,
     @Query('limit') limit?: string,
     @Query('offset') offset?: string,
   ) {
     return this.reviewsService.findBySubscriptionType(
       id,
+      req.user,
       limit ? Number(limit) : 10,
       offset ? Number(offset) : 0,
     );
@@ -112,14 +114,14 @@ export class ReviewsController {
 
   @Public()
   @Get('summary/by-club/:idClub')
-  async getSummaryByClub(@Param('idClub', ParseIntPipe) idClub: number) {
-    return this.reviewsService.getSummaryByClub(idClub);
+  async getSummaryByClub(@Param('idClub', ParseIntPipe) idClub: number, @Request() req) {
+    return this.reviewsService.getSummaryByClub(idClub, req.user);
   }
 
   @Public()
   @Get('summary/by-subscription-type/:id')
-  async getSummaryBySubscriptionType(@Param('id', ParseIntPipe) id: number) {
-    return this.reviewsService.getSummaryBySubscriptionType(id);
+  async getSummaryBySubscriptionType(@Param('id', ParseIntPipe) id: number, @Request() req) {
+    return this.reviewsService.getSummaryBySubscriptionType(id, req.user);
   }
 
   @UseGuards(RolesGuard)

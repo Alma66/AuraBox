@@ -106,7 +106,9 @@ export class BoxContentHistoryService {
     const histories = await this.prisma.boxContentHistory.findMany({
       where: {
         idSubscriptionTypes,
-        ...(onlyPublished ? { publicationDate: { lte: new Date() } } : {}),
+        ...(onlyPublished
+          ? { OR: [{ publicationDate: null }, { publicationDate: { lte: new Date() } }] }
+          : {}),
       },
       orderBy: { publicationDate: 'desc' },
     });
@@ -125,8 +127,8 @@ export class BoxContentHistoryService {
     const item = await this.prisma.boxContentHistory.findUnique({ where: { id } });
     if (!item) throw new NotFoundException('Historial de caja no encontrado');
 
-    const { onlyPublished } = await this.assertReadAccess(item.idSubscriptionTypes, user);
-    if (onlyPublished && item.publicationDate > new Date()) {
+        const { onlyPublished } = await this.assertReadAccess(item.idSubscriptionTypes, user);
+    if (onlyPublished && item.publicationDate && item.publicationDate > new Date()) {
       throw new NotFoundException('Historial de caja no encontrado');
     }
     return sanitize(item);

@@ -5,9 +5,11 @@ import { UpdateReviewDto } from './dto/update-review.dto';
 import { CreateForbiddenWordDto } from './dto/create-forbidden-word.dto';
 import { CloudinaryService } from '../cloudinary/cloudinary.service';
 import { ContentType } from '@prisma/client';
+import { OptionalRequestUser, assertClubVisible, canViewClub } from '../../common/utils/club-visibility';
 
 const MAX_MEDIA_PER_REVIEW = 5;
 const REVIEW_WINDOW_AFTER_CANCEL_DAYS = 30;
+const MAX_PAGE_SIZE = 50;
 
 type RequestUser = { id: number; role: string };
 
@@ -192,9 +194,16 @@ export class ReviewsService {
 
   async findOneForRequester(id: number, user: RequestUser) {
     const review = await this.findOne(id);
+    const isOwner = user.role === 'customer' && review.idUser === user.id;
+
+    if (!isOwner) {
+      const visible = await canViewClub(this.prisma, review.idClub, user);
+      if (!visible) throw new NotFoundException('Reseña no encontrada');
+    }
+
     if (!review.isHidden) return review;
     if (user.role === 'admin') return review;
-    if (user.role === 'customer' && review.idUser === user.id) return review;
+    if (isOwner) return review;
     if (user.role === 'entrepreneur') {
       await this.assertClubAccess(review.idClub, user);
       return review;
@@ -220,14 +229,26 @@ export class ReviewsService {
     return this.attachCustomerNames(reviews);
   }
 
-  async findBySubscriptionType(idSubscriptionTypes: number, limit = 10, offset = 0) {
+  async findBySubscriptionType(
+    idSubscriptionTypes: number,
+    user: OptionalRequestUser,
+    limit = 10,
+    offset = 0,
+  ) {
+    const subType = await this.prisma.subscription_Types.findUnique({ where: { id: idSubscriptionTypes } });
+    if (!subType) throw new NotFoundException('Tipo de suscripción no encontrado');
+    await assertClubVisible(this.prisma, subType.idClub, user);
+
+    const take = Number.isFinite(limit) ? Math.min(Math.max(Math.floor(limit), 1), MAX_PAGE_SIZE) : 10;
+    const skip = Number.isFinite(offset) ? Math.max(Math.floor(offset), 0) : 0;
+
     const [reviews, total] = await Promise.all([
       this.prisma.reviews.findMany({
         where: { idSubscriptionTypes, isHidden: false },
         orderBy: { reviewDate: 'desc' },
         include: { media: true },
-        take: limit,
-        skip: offset,
+        take,
+        skip,
       }),
       this.prisma.reviews.count({ where: { idSubscriptionTypes, isHidden: false } }),
     ]);
@@ -243,7 +264,8 @@ export class ReviewsService {
     return this.attachCustomerNames(reviews);
   }
 
-  async getSummaryByClub(idClub: number) {
+  async getSummaryByClub(idClub: number, user: OptionalRequestUser) {
+    await assertClubVisible(this.prisma, idClub, user);
     const agg = await this.prisma.reviews.aggregate({
       where: { idClub, isHidden: false, active: true },
       _avg: { rating: true },
@@ -252,7 +274,11 @@ export class ReviewsService {
     return { average: agg._avg.rating ?? 0, count: agg._count.rating };
   }
 
-  async getSummaryBySubscriptionType(idSubscriptionTypes: number) {
+  async getSummaryBySubscriptionType(idSubscriptionTypes: number, user: OptionalRequestUser) {
+    const subType = await this.prisma.subscription_Types.findUnique({ where: { id: idSubscriptionTypes } });
+    if (!subType) throw new NotFoundException('Tipo de suscripción no encontrado');
+    await assertClubVisible(this.prisma, subType.idClub, user);
+
     const agg = await this.prisma.reviews.aggregate({
       where: { idSubscriptionTypes, isHidden: false, active: true },
       _avg: { rating: true },

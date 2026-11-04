@@ -7,16 +7,17 @@ import { Roles } from '../auth/roles.decorator';
 import { Public } from '../../common/decorators/public.decorator';
 
 @Controller('club-legal-content')
+@UseGuards(JwtAuthGuard)
 export class ClubLegalContentController {
   constructor(private readonly service: ClubLegalContentService) {}
 
   @Public()
   @Get('by-club/:idClub')
-  async findByClub(@Param('idClub', ParseIntPipe) idClub: number) {
-    return this.service.findByClub(idClub);
+  async findByClub(@Param('idClub', ParseIntPipe) idClub: number, @Request() req) {
+    return this.service.findByClub(idClub, req.user);
   }
 
-  @UseGuards(JwtAuthGuard, RolesGuard)
+  @UseGuards(RolesGuard)
   @Roles('entrepreneur')
   @Put('by-club/:idClub')
   @UsePipes(new ValidationPipe({ whitelist: true, transform: true }))
