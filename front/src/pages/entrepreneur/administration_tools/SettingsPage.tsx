@@ -1,6 +1,7 @@
 import React from 'react';
 import SimpleTabsPage from '../../../components/entrepreneur/layout/SimpleTabsPage';
 import SettingsTab from '../../../components/entrepreneur/settings/SettingsTab';
+import BillingTab from '../../../components/entrepreneur/settings/BillingTab';
 import TeamTab from '../../../components/entrepreneur/settings/TeamTab';
 import EditClubLegalInfoPage from '../club/legal/EditClubLegalInfoPage';
 import LegalCompliancePage from '../club/legal/LegalCompliancePage';
@@ -14,6 +15,7 @@ const SettingsPage: React.FC = () => (
     label="Configuración"
     tabs={[
       { id: 'general', label: 'Ajustes', element: <Padded><SettingsTab /></Padded> },
+      { id: 'billing', label: 'Cobros', element: <Padded><BillingTab /></Padded> },
       { id: 'legal', label: 'Legal', element: <EditClubLegalInfoPage /> },
       { id: 'compliance', label: 'Cumplimiento', element: <LegalCompliancePage /> },
       { id: 'team', label: 'Equipo', element: <Padded><TeamTab /></Padded> },

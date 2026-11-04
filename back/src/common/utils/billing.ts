@@ -22,3 +22,19 @@ export const nextPaymentFrom = (from: Date, frequency: string): Date | null => {
   const months = FREQUENCY_MONTHS[frequency];
   return months ? addMonths(from, months) : null;
 };
+
+export const nextFutureDate = (from: Date, frequency: string, now: Date): Date | null => {
+  const months = FREQUENCY_MONTHS[frequency];
+  if (!months) return null;
+  for (let step = 1; step <= 600; step += 1) {
+    const candidate = addMonths(from, months * step);
+    if (candidate.getTime() > now.getTime()) return candidate;
+  }
+  return null;
+};
+
+export const priceFor = (basePrice: unknown, transferDiscount: unknown, isTransfer: boolean) => {
+  const base = Number(basePrice);
+  const discount = isTransfer ? Number(transferDiscount ?? 0) : 0;
+  return Math.round(base * (1 - discount / 100) * 100) / 100;
+};

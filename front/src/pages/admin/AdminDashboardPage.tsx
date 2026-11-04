@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import api, { getResponseData } from '../../api/config';
-
+import toast from 'react-hot-toast';
 interface Stats {
   clubs: { total: number; pending: number; approved: number; suspended: number; inactive: number };
   customers: number;
@@ -43,6 +43,7 @@ const AdminDashboardPage: React.FC = () => {
   const [stats, setStats] = useState<Stats | null>(null);
   const [loading, setLoading] = useState(true);
   const [failed, setFailed] = useState(false);
+  const [running, setRunning] = useState(false);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -60,6 +61,20 @@ const AdminDashboardPage: React.FC = () => {
   useEffect(() => {
     load();
   }, [load]);
+
+   const runRenewals = async () => {
+    setRunning(true);
+    try {
+      const res = await api.post('/admin/billing/run-renewals');
+      const result = getResponseData(res);
+      toast.success(`Cobros procesados: ${result.renewed} renovados y ${result.scheduled} programados.`);
+      load();
+    } catch (err: any) {
+      toast.error(err.response?.data?.message || 'No se pudieron procesar los cobros.');
+    } finally {
+      setRunning(false);
+    }
+  };
 
   if (loading) {
     return (
@@ -90,12 +105,22 @@ const AdminDashboardPage: React.FC = () => {
       </div>
     );
   }
-
+  
   const maxValue = Math.max(...stats.monthly.map((item) => item.total), 0);
 
   return (
     <div className="space-y-6 px-4 py-6 lg:px-8">
       <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
+              <div className="flex justify-end">
+        <button
+          type="button"
+          onClick={runRenewals}
+          disabled={running}
+          className="min-h-[44px] rounded-lg border border-aurora-navy/15 bg-white px-4 text-sm font-semibold text-aurora-navy hover:bg-aurora-cream disabled:opacity-50"
+        >
+          {running ? 'Procesando...' : 'Ejecutar cobros ahora'}
+        </button>
+      </div>
         <Kpi
           label="Clubes pendientes"
           value={stats.clubs.pending}

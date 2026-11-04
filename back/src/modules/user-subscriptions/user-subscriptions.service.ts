@@ -154,7 +154,7 @@ export class UserSubscriptionsService {
     return this.update(id, dto);
   }
 
-    async update(id: number, dto: UpdateUserSubscriptionDto) {
+      async update(id: number, dto: UpdateUserSubscriptionDto) {
     const existing = await this.prisma.user_Subscriptions.findUnique({ where: { id } });
     if (!existing) throw new NotFoundException('Suscripción no encontrada');
 
@@ -167,8 +167,9 @@ export class UserSubscriptionsService {
     if (dto.cancellationDate !== undefined) data.cancellationDate = dto.cancellationDate as any;
 
     const next = dto.subscriptionStatus;
-    const wasPending = existing.subscriptionStatus === 'Pendiente_Pago';
     const now = new Date();
+    const wasPending = existing.subscriptionStatus === 'Pendiente_Pago';
+    const wasPaused = existing.subscriptionStatus === 'Pausada';
     let paymentUpdate: Prisma.PrismaPromise<unknown> | null = null;
 
     if (next === 'Cancelada' && existing.subscriptionStatus !== 'Cancelada') {
@@ -177,6 +178,11 @@ export class UserSubscriptionsService {
       data.cancellationDate = null;
       data.cancellationReason = null;
     }
+
+    const plan =
+      next === 'Activa' && (wasPending || wasPaused)
+        ? await this.prisma.subscription_Types.findUnique({ where: { id: existing.idSubscriptionTypes } })
+        : null;
 
     if (wasPending && (next === 'Activa' || next === 'Cancelada')) {
       const pendingPayment = await this.prisma.payment.findFirst({
@@ -202,12 +208,19 @@ export class UserSubscriptionsService {
       }
 
       if (next === 'Activa') {
-        const plan = await this.prisma.subscription_Types.findUnique({ where: { id: existing.idSubscriptionTypes } });
         if (data.lastPaymentDate === undefined) data.lastPaymentDate = now;
         if (data.nextPaymentDate === undefined && plan) {
           const upcoming = nextPaymentFrom(now, plan.frequency);
           if (upcoming) data.nextPaymentDate = upcoming;
         }
+      }
+    }
+
+    if (wasPaused && next === 'Activa' && plan && data.nextPaymentDate === undefined) {
+      const stillFuture = !!existing.nextPaymentDate && existing.nextPaymentDate.getTime() > now.getTime();
+      if (!stillFuture) {
+        const upcoming = nextPaymentFrom(now, plan.frequency);
+        if (upcoming) data.nextPaymentDate = upcoming;
       }
     }
 

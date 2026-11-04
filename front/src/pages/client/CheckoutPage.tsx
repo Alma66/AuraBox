@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import toast from 'react-hot-toast';
 import { useAuth } from '../../App';
 import api, { getResponseData } from '../../api/config';
 import { User } from '../../types/user';
@@ -23,6 +24,20 @@ interface CartEntry {
   club: { id: number; name: string };
 }
 
+interface BankInfo {
+  clubId: number;
+  clubName: string;
+  holder: string | null;
+  cbu: string | null;
+  alias: string | null;
+}
+
+interface PaymentOptions {
+  methods: string[];
+  banks: BankInfo[];
+  transferBlockedBy: string[];
+}
+
 const POSTAL_CODE_PATTERN = /^(\d{4}|[A-Za-z]\d{4}[A-Za-z]{3})$/;
 
 const PAYMENT_METHODS = [
@@ -39,16 +54,43 @@ const discountFor = (plan: CartPlan, method: string) =>
 
 const money = (value: number) => `$${(Math.round(value * 100) / 100).toLocaleString('es-AR')} ARS`;
 
+const CopyRow: React.FC<{ label: string; value: string }> = ({ label, value }) => {
+  const copy = async () => {
+    try {
+      await navigator.clipboard.writeText(value);
+      toast.success(`${label} copiado.`);
+    } catch {
+      toast.error('No se pudo copiar.');
+    }
+  };
+  return (
+    <div className="flex items-center justify-between gap-3">
+      <div className="min-w-0">
+        <p className="text-xs text-aurora-navy/50">{label}</p>
+        <p className="break-all text-sm font-semibold text-aurora-navy">{value}</p>
+      </div>
+      <button
+        type="button"
+        onClick={copy}
+        className="min-h-[44px] flex-shrink-0 rounded-lg border border-aurora-navy/15 px-3 text-xs font-semibold text-aurora-navy hover:bg-white"
+      >
+        Copiar
+      </button>
+    </div>
+  );
+};
+
 const CheckoutPage: React.FC = () => {
   const { user } = useAuth() as { user: User | null };
   const navigate = useNavigate();
   const [cartItems, setCartItems] = useState<CartEntry[]>([]);
+  const [options, setOptions] = useState<PaymentOptions>({ methods: [], banks: [], transferBlockedBy: [] });
   const [loading, setLoading] = useState(true);
   const [isProcessing, setIsProcessing] = useState(false);
   const [success, setSuccess] = useState(false);
+  const [pendingPayment, setPendingPayment] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [postalError, setPostalError] = useState<string | null>(null);
-  const [pendingPayment, setPendingPayment] = useState(false);
 
   const [address, setAddress] = useState({
     street: '',
@@ -86,6 +128,12 @@ const CheckoutPage: React.FC = () => {
         const cartData = getResponseData(cartResponse);
         if (Array.isArray(cartData) && cartData.length > 0) {
           setCartItems(cartData);
+          const optionsResponse = await api.get('/cart-items/payment-options');
+          const optionsData: PaymentOptions = getResponseData(optionsResponse);
+          setOptions(optionsData);
+          setSelectedPaymentMethod((current) =>
+            optionsData.methods.includes(current) ? current : optionsData.methods[0] ?? '',
+          );
         } else {
           setError('Tu carrito está vacío. Agregá planes primero.');
         }
@@ -112,6 +160,10 @@ const CheckoutPage: React.FC = () => {
       setError('Carrito vacío.');
       return;
     }
+    if (!selectedPaymentMethod) {
+      setError('Elegí un medio de pago.');
+      return;
+    }
     const requiredFields = [address.street, address.streetNumber, address.locality, address.city, address.province];
     if (requiredFields.some((value) => !value.trim())) {
       setError('Completá todos los campos de la dirección.');
@@ -125,7 +177,7 @@ const CheckoutPage: React.FC = () => {
     setError(null);
     setPostalError(null);
     try {
-       const res = await api.post('/cart-items/checkout', {
+      const res = await api.post('/cart-items/checkout', {
         paymentMethod: selectedPaymentMethod,
         address: {
           street: address.street.trim(),
@@ -152,7 +204,9 @@ const CheckoutPage: React.FC = () => {
   const subtotal = cartItems.reduce((sum, item) => sum + priceOf(item), 0);
   const originalTotal = cartItems.reduce((sum, item) => sum + item.plan.price, 0);
   const savings = originalTotal - subtotal;
+  const availableMethods = PAYMENT_METHODS.filter((method) => options.methods.includes(method.id));
   const transferHasDiscount = cartItems.some((item) => (item.plan.transferDiscount ?? 0) > 0);
+  const isTransfer = selectedPaymentMethod === 'transferencia';
 
   if (loading) {
     return (
@@ -184,7 +238,7 @@ const CheckoutPage: React.FC = () => {
       <div className="min-h-screen bg-aurora-cream py-8 px-4">
         <div className="max-w-4xl mx-auto text-center py-12">
           <div className="text-5xl mb-4">🎉</div>
-           <h1 className="text-4xl font-serif font-bold text-aurora-navy mb-4">
+          <h1 className="text-4xl font-serif font-bold text-aurora-navy mb-4">
             {pendingPayment ? '¡Suscripción registrada!' : '¡Pago Realizado Exitosamente!'}
           </h1>
           <p className="text-aurora-navy/70 mb-8 max-w-md mx-auto">
@@ -210,7 +264,7 @@ const CheckoutPage: React.FC = () => {
       <div className="max-w-6xl mx-auto">
         <div className="text-center mb-8">
           <h1 className="text-4xl font-serif font-bold text-aurora-navy mb-2">Finalizar Compra</h1>
-          <p className="text-aurora-navy/70">Revisá tu información y realizá el pago seguro.</p>
+          <p className="text-aurora-navy/70">Revisá tu información y realizá el pago.</p>
         </div>
 
         <form id="checkout-form" onSubmit={handlePaymentSubmit} className="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -258,31 +312,72 @@ const CheckoutPage: React.FC = () => {
 
             <div className="bg-white rounded-xl shadow-aurora-sm border border-aurora-navy/10 p-6">
               <h3 className="text-lg font-serif font-bold text-aurora-navy mb-4">Método de Pago</h3>
-              <div className="space-y-3">
-                {PAYMENT_METHODS.map((method) => (
-                  <label key={method.id} className={`flex items-center p-3 border rounded-xl cursor-pointer transition-colors ${
-                    selectedPaymentMethod === method.id ? 'border-aurora-terracotta bg-aurora-terracotta/5' : 'border-aurora-navy/15 hover:border-aurora-terracotta/40'
-                  }`}>
-                    <input
-                      type="radio"
-                      name="paymentMethod"
-                      value={method.id}
-                      checked={selectedPaymentMethod === method.id}
-                      onChange={(e) => setSelectedPaymentMethod(e.target.value)}
-                      className="mr-3 text-aurora-terracotta focus:ring-aurora-terracotta"
-                    />
-                    <div>
-                      <span className="text-sm font-semibold text-aurora-navy">{method.icon} {method.label}</span>
-                      <p className="text-xs text-aurora-navy/50">
-                        {method.id === 'transferencia' && transferHasDiscount
-                          ? 'Con descuento en los planes que lo incluyen'
-                          : 'Procesado de forma segura'}
-                      </p>
-                    </div>
-                  </label>
-                ))}
-              </div>
+              {availableMethods.length === 0 ? (
+                <p role="alert" className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+                  Los planes de tu carrito no comparten un medio de pago. Quitá alguno del carrito para continuar.
+                </p>
+              ) : (
+                <div className="space-y-3">
+                  {availableMethods.map((method) => (
+                    <label key={method.id} className={`flex items-center p-3 border rounded-xl cursor-pointer transition-colors ${
+                      selectedPaymentMethod === method.id ? 'border-aurora-terracotta bg-aurora-terracotta/5' : 'border-aurora-navy/15 hover:border-aurora-terracotta/40'
+                    }`}>
+                      <input
+                        type="radio"
+                        name="paymentMethod"
+                        value={method.id}
+                        checked={selectedPaymentMethod === method.id}
+                        onChange={(e) => setSelectedPaymentMethod(e.target.value)}
+                        className="mr-3 text-aurora-terracotta focus:ring-aurora-terracotta"
+                      />
+                      <div>
+                        <span className="text-sm font-semibold text-aurora-navy">{method.icon} {method.label}</span>
+                        <p className="text-xs text-aurora-navy/50">
+                          {method.id === 'transferencia'
+                            ? transferHasDiscount
+                              ? 'Con descuento en los planes que lo incluyen'
+                              : 'Transferís a la cuenta del club'
+                            : 'Pago simulado de demostración'}
+                        </p>
+                      </div>
+                    </label>
+                  ))}
+                </div>
+              )}
+              {options.transferBlockedBy.length > 0 && (
+                <p className="mt-3 text-xs text-aurora-navy/60">
+                  La transferencia no está disponible porque {options.transferBlockedBy.join(', ')} todavía no cargó sus datos bancarios.
+                </p>
+              )}
+              <p className="mt-4 rounded-lg bg-aurora-gold/10 px-3 py-2 text-xs text-aurora-navy/70">
+                Entorno de demostración: el pago es simulado y no se realiza ningún cobro real.
+              </p>
             </div>
+
+            {isTransfer && (
+              <div className="bg-white rounded-xl shadow-aurora-sm border border-aurora-navy/10 p-6 space-y-4">
+                <h3 className="text-lg font-serif font-bold text-aurora-navy">Datos para transferir</h3>
+                <p className="text-xs text-aurora-navy/60">
+                  Transferí el importe de cada club a su cuenta y después confirmá. En esta demostración, la confirmación simula que la transferencia llegó.
+                </p>
+                {options.banks.map((bank) => {
+                  const amount = cartItems
+                    .filter((item) => item.club.id === bank.clubId)
+                    .reduce((sum, item) => sum + priceOf(item), 0);
+                  return (
+                    <div key={bank.clubId} className="space-y-3 rounded-xl bg-aurora-cream p-4">
+                      <div className="flex items-center justify-between gap-3">
+                        <p className="font-semibold text-aurora-navy">{bank.clubName}</p>
+                        <p className="text-sm font-bold text-aurora-terracotta">{money(amount)}</p>
+                      </div>
+                      {bank.holder && <CopyRow label="Titular" value={bank.holder} />}
+                      {bank.cbu && <CopyRow label="CBU" value={bank.cbu} />}
+                      {bank.alias && <CopyRow label="Alias" value={bank.alias} />}
+                    </div>
+                  );
+                })}
+              </div>
+            )}
           </div>
 
           <div className="lg:col-span-2">
@@ -332,14 +427,18 @@ const CheckoutPage: React.FC = () => {
             <button
               type="submit"
               form="checkout-form"
-              disabled={isProcessing || cartItems.length === 0}
+              disabled={isProcessing || cartItems.length === 0 || !selectedPaymentMethod}
               className={`px-8 py-4 rounded-xl font-bold text-lg transition-all duration-200 ${
-                isProcessing || cartItems.length === 0
+                isProcessing || cartItems.length === 0 || !selectedPaymentMethod
                   ? 'bg-aurora-navy/30 cursor-not-allowed text-white'
                   : 'bg-aurora-terracotta hover:bg-aurora-terracottaDark text-white shadow-lg hover:shadow-xl'
               }`}
             >
-              {isProcessing ? 'Procesando Pago...' : `Pagar ${money(subtotal)}`}
+              {isProcessing
+                ? 'Procesando Pago...'
+                : isTransfer
+                  ? `Ya realicé la transferencia · ${money(subtotal)}`
+                  : `Pagar ${money(subtotal)}`}
             </button>
             <div className="mt-4 space-x-4">
               <button type="button" onClick={() => navigate('/cart')} className="text-aurora-navy hover:underline font-semibold">← Volver al Carrito</button>

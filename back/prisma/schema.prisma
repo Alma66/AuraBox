@@ -117,6 +117,9 @@ model Club {
   milestones       String?    @map("Milestones")
   shippingWindowStartDay Int? @map("Shipping_Window_Start_Day") 
   shippingWindowEndDay   Int? @map("Shipping_Window_End_Day")   
+  bankHolder String? @map("Bank_Holder")
+  bankCbu    String? @map("Bank_CBU")
+  bankAlias  String? @map("Bank_Alias")
 
   @@map("Club")
 }

@@ -2,16 +2,11 @@ import { Injectable, NotFoundException, BadRequestException } from '@nestjs/comm
 import { PrismaService } from '../../prisma/prisma.service';
 import { CreateCartItemDto } from './dto/create-cart-item.dto';
 import { CheckoutCartDto } from './dto/checkout-cart.dto';
-import { AURABOX_COMMISSION } from '../payments/payments.constants';
-import { nextPaymentFrom } from '../../common/utils/billing';
+import { AURABOX_COMMISSION, AUTO_CONFIRM_TRANSFERS, PAYMENT_METHOD_CODES } from '../payments/payments.constants';
+import { nextPaymentFrom, priceFor } from '../../common/utils/billing';
+import { findOrCreateMethod, getAcceptedCodes } from '../../common/utils/payment-methods';
 
 const CLOSED_STATUSES = ['Cancelada', 'Finalizada'];
-
-const METHOD_KEYWORDS: Record<string, string> = {
-  mercadopago: 'mercado',
-  tarjeta: 'tarjeta',
-  transferencia: 'transfer',
-};
 
 function mapPlan(p: any) {
   let includes: string[] = [];
@@ -47,12 +42,33 @@ export class CartItemService {
     return plan;
   }
 
-  private async resolvePaymentMethod(code: string) {
-    const keyword = METHOD_KEYWORDS[code];
-    if (!keyword) return null;
-    return this.prisma.payment_Methods.findFirst({
-      where: { method: { contains: keyword, mode: 'insensitive' }, active: true },
-    });
+  private async buildPaymentOptions(planIds: number[]) {
+    const plans = await this.prisma.subscription_Types.findMany({ where: { id: { in: planIds } } });
+    const clubIds = Array.from(new Set(plans.map((p) => p.idClub)));
+    const clubs = await this.prisma.club.findMany({ where: { id: { in: clubIds } } });
+
+    let methods: string[] = [...PAYMENT_METHOD_CODES];
+    for (const club of clubs) {
+      const accepted: string[] = await getAcceptedCodes(this.prisma, club.id);
+      methods = methods.filter((code) => accepted.includes(code));
+    }
+
+    const transferBlockedBy = clubs
+      .filter((club) => !club.bankHolder || (!club.bankCbu && !club.bankAlias))
+      .map((club) => club.name);
+    if (transferBlockedBy.length > 0) {
+      methods = methods.filter((code) => code !== 'transferencia');
+    }
+
+    const banks = clubs.map((club) => ({
+      clubId: club.id,
+      clubName: club.name,
+      holder: club.bankHolder,
+      cbu: club.bankCbu,
+      alias: club.bankAlias,
+    }));
+
+    return { methods, banks, transferBlockedBy, plans, clubs };
   }
 
   async addToCart(idUser: number, dto: CreateCartItemDto) {
@@ -114,6 +130,15 @@ export class CartItemService {
       .filter((i): i is NonNullable<typeof i> => i !== null);
   }
 
+  async getPaymentOptions(idUser: number) {
+    const items = await this.prisma.cart_Item.findMany({ where: { idUser } });
+    if (items.length === 0) return { methods: [], banks: [], transferBlockedBy: [] };
+    const { methods, banks, transferBlockedBy } = await this.buildPaymentOptions(
+      items.map((item) => item.idSubscriptionTypes),
+    );
+    return { methods, banks, transferBlockedBy };
+  }
+
   async remove(idUser: number, idSubscriptionTypes: number) {
     const item = await this.prisma.cart_Item.findFirst({ where: { idUser, idSubscriptionTypes } });
     if (!item) throw new NotFoundException('El plan no está en tu carrito');
@@ -131,10 +156,16 @@ export class CartItemService {
     if (items.length === 0) throw new BadRequestException('Tu carrito está vacío');
 
     const planIds = items.map((i) => i.idSubscriptionTypes);
-    const plans = await this.prisma.subscription_Types.findMany({ where: { id: { in: planIds } } });
-    const clubs = await this.prisma.club.findMany({
-      where: { id: { in: Array.from(new Set(plans.map((p) => p.idClub))) } },
-    });
+    const options = await this.buildPaymentOptions(planIds);
+    if (!options.methods.includes(dto.paymentMethod)) {
+      throw new BadRequestException(
+        options.methods.length === 0
+          ? 'Los planes de tu carrito no comparten un medio de pago. Quitá alguno para continuar.'
+          : 'Ese medio de pago no está disponible para los planes de tu carrito',
+      );
+    }
+
+    const { plans, clubs } = options;
     const planById = new Map(plans.map((p) => [p.id, p] as [number, typeof p]));
     const clubById = new Map(clubs.map((c) => [c.id, c] as [number, typeof c]));
 
@@ -155,6 +186,7 @@ export class CartItemService {
     }
 
     const isTransfer = dto.paymentMethod === 'transferencia';
+    const confirmNow = !isTransfer || AUTO_CONFIRM_TRANSFERS;
     const toCreate: { plan: (typeof plans)[number]; amount: number }[] = [];
 
     for (const item of items) {
@@ -165,8 +197,7 @@ export class CartItemService {
       if (!plan.active || club.clubStatus !== 'APROBADO') {
         throw new BadRequestException(`"${plan.name}" ya no está disponible. Quitalo del carrito para continuar.`);
       }
-      const discount = isTransfer ? Number(plan.transferDiscount ?? 0) : 0;
-      const amount = Math.round(Number(plan.basePrice) * (1 - discount / 100) * 100) / 100;
+      const amount = priceFor(plan.basePrice, plan.transferDiscount, isTransfer);
       if (!Number.isFinite(amount) || amount <= AURABOX_COMMISSION) {
         throw new BadRequestException(`El precio de "${plan.name}" no es válido`);
       }
@@ -177,10 +208,10 @@ export class CartItemService {
       throw new BadRequestException('Ya tenés una suscripción vigente a los planes de tu carrito');
     }
 
-    const method = await this.resolvePaymentMethod(dto.paymentMethod);
+    const method = await findOrCreateMethod(this.prisma, dto.paymentMethod as any);
     const now = new Date();
-    const subscriptionStatus = isTransfer ? 'Pendiente_Pago' : 'Activa';
-    const paymentStatus = isTransfer ? 'Pendiente' : 'Exitoso';
+    const subscriptionStatus = confirmNow ? 'Activa' : 'Pendiente_Pago';
+    const paymentStatus = confirmNow ? 'Exitoso' : 'Pendiente';
     const streetNumber = parseInt(dto.address.streetNumber, 10);
 
     const created = await this.prisma.$transaction(async (tx) => {
@@ -191,12 +222,12 @@ export class CartItemService {
           data: {
             idUser,
             idSubscriptionTypes: plan.id,
-            idPaymentMethods: method?.id,
+            idPaymentMethods: method.id,
             startDate: now,
             subscriptionStatus: subscriptionStatus as any,
-            lastPaymentDate: isTransfer ? undefined : now,
-            nextPaymentDate: isTransfer ? undefined : (nextPaymentFrom(now, plan.frequency) ?? undefined),
-            monthlyAmountPaid: isTransfer ? undefined : String(amount),
+            lastPaymentDate: confirmNow ? now : undefined,
+            nextPaymentDate: confirmNow ? (nextPaymentFrom(now, plan.frequency) ?? undefined) : undefined,
+            monthlyAmountPaid: confirmNow ? String(amount) : undefined,
           },
         });
 
@@ -205,8 +236,8 @@ export class CartItemService {
             idUserSubscription: sub.id,
             idUser,
             idClub: plan.idClub,
-            idPaymentMethods: method?.id,
-            idGatewayTransaction: isTransfer ? null : `SIM-${now.getTime()}-${sub.id}`,
+            idPaymentMethods: method.id,
+            idGatewayTransaction: confirmNow ? `SIM-${now.getTime()}-${sub.id}` : null,
             totalAmountPaid: String(amount),
             clubAmount: String(amount - AURABOX_COMMISSION),
             commissionAmount: String(AURABOX_COMMISSION),
@@ -236,7 +267,7 @@ export class CartItemService {
 
     return {
       createdCount: created.length,
-      pendingPayment: isTransfer,
+      pendingPayment: !confirmNow,
       total: toCreate.reduce((sum, entry) => sum + entry.amount, 0),
       subscriptions: created,
     };

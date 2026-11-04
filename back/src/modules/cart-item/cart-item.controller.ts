@@ -26,6 +26,11 @@ export class CartItemController {
     return this.cartItemService.findByUserEnriched(req.user.id);
   }
 
+  @Get('payment-options')
+  async paymentOptions(@Request() req) {
+    return this.cartItemService.getPaymentOptions(req.user.id);
+  }
+
   @Post('checkout')
   @UsePipes(new ValidationPipe({ whitelist: true, transform: true }))
   async checkout(@Body() dto: CheckoutCartDto, @Request() req) {

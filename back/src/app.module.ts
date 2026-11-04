@@ -17,6 +17,8 @@ import { AdminOrEntrepreneurRoleModule } from './modules/admin-or-entrepreneur-r
 import { AdminsModule } from './modules/admins/admins.module';
 import { AuthModule } from './modules/auth/auth.module';
 import { BoxContentHistoryModule } from './modules/box-content-history/box-content-history.module';
+import { ClubBillingModule } from './modules/club-billing/club-billing.module';
+import { BillingModule } from './modules/billing/billing.module';
 import { CategoriesModule } from './modules/categories/categories.module';
 import { ClubCategoriesModule } from './modules/club-categories/club-categories.module';
 import { ClubPaymentMethodModule } from './modules/club-payment-method/club-payment-method.module';
@@ -78,6 +80,8 @@ if (!jwtSecret) {
     AdminsModule,
     AuthModule,
     BoxContentHistoryModule,
+    BillingModule,
+    ClubBillingModule,
     CategoriesModule,
     ClubCategoriesModule,
     ClubPaymentMethodModule,
