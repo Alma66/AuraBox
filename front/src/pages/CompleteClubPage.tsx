@@ -1,6 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import api from '../api/config';
+import { useAuth } from '../App';
+import { userFromToken } from '../utils/session';
+
+const extractMessage = (err: any, fallback: string): string => {
+  const message = err.response?.data?.message;
+  if (Array.isArray(message)) return message.join('. ');
+  return message || fallback;
+};
 
 const CompleteClubPage: React.FC = () => {
   const [clubName, setClubName] = useState('');
@@ -12,31 +20,51 @@ const CompleteClubPage: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [done, setDone] = useState(false);
   const navigate = useNavigate();
+  const { user, isAuthenticated, userRole, login } = useAuth();
+
+  const sessionMode = isAuthenticated && userRole === 'entrepreneur' && !user?.managedClubId;
+  const hasPendingToken = !!localStorage.getItem('pending_entrepreneur_token');
 
   useEffect(() => {
-    if (!done && !localStorage.getItem('pending_entrepreneur_token')) {
-      navigate('/register?role=entrepreneur');
+    if (done || sessionMode || hasPendingToken) return;
+    if (isAuthenticated && userRole === 'entrepreneur') {
+      navigate('/entrepreneur/dashboard', { replace: true });
+      return;
     }
-  }, [navigate, done]);
+    navigate('/register?role=entrepreneur', { replace: true });
+  }, [done, sessionMode, hasPendingToken, isAuthenticated, userRole, navigate]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
     setLoading(true);
 
+    const payload = {
+      name: clubName.trim(),
+      shortDescription: shortDescription.trim(),
+      contactEmail: contactEmail.trim(),
+      slogan: slogan.trim() || null,
+      whatsappContact: whatsappContact.trim() || null,
+    };
+
     try {
+      if (sessionMode) {
+        const response = await api.post('/auth/entrepreneur/club', payload);
+        const data = response.data?.data ?? response.data;
+        localStorage.setItem('access_token', data.access_token);
+        await login(userFromToken(data.access_token));
+        navigate('/entrepreneur/dashboard', { replace: true });
+        return;
+      }
+
       await api.post('/auth/register/entrepreneur/club', {
+        ...payload,
         entrepreneurToken: localStorage.getItem('pending_entrepreneur_token'),
-        name: clubName.trim(),
-        shortDescription: shortDescription.trim(),
-        contactEmail: contactEmail.trim(),
-        slogan: slogan.trim() || null,
-        whatsappContact: whatsappContact.trim() || null,
       });
       localStorage.removeItem('pending_entrepreneur_token');
       setDone(true);
     } catch (err: any) {
-      setError(err.response?.data?.message || 'Error al crear el club. Intentá de nuevo.');
+      setError(extractMessage(err, 'Error al crear el club. Intentá de nuevo.'));
     } finally {
       setLoading(false);
     }
@@ -66,10 +94,12 @@ const CompleteClubPage: React.FC = () => {
 
       <div className="max-w-md w-full space-y-6 p-10 card-surface shadow-aurora relative animate-fadeInUp">
         <div>
-          <span className="section-eyebrow block text-center">Último paso</span>
+          <span className="section-eyebrow block text-center">{sessionMode ? 'Te falta un paso' : 'Último paso'}</span>
           <h2 className="text-center font-display text-3xl font-bold text-aurora-navy">Registrá tu club</h2>
           <p className="mt-2 text-center text-sm text-aurora-navy/60">
-            Contanos sobre tu emprendimiento. Después vas a poder completar el resto desde tu panel.
+            {sessionMode
+              ? 'Tu cuenta ya está creada, pero todavía no tenés un club. Completá estos datos para acceder a tu panel.'
+              : 'Contanos sobre tu emprendimiento. Después vas a poder completar el resto desde tu panel.'}
           </p>
         </div>
 

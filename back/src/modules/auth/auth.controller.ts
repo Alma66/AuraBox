@@ -1,10 +1,14 @@
-import { Body, Controller, Post, UsePipes, ValidationPipe } from '@nestjs/common';
+import { Body, Controller, Post, Request, UseGuards, UsePipes, ValidationPipe } from '@nestjs/common';
 import { Throttle } from '@nestjs/throttler';
 import { AuthService } from './auth.service';
 import { LoginDto } from '../users/dto/login.dto';
 import { Public } from '../../common/decorators/public.decorator';
+import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
+import { RolesGuard } from './roles.guard';
+import { Roles } from './roles.decorator';
 import {
   CompleteCustomerProfileDto,
+  CreateClubDto,
   RegisterClubDto,
   RegisterCustomerDto,
   RegisterEntrepreneurDto,
@@ -52,5 +56,14 @@ export class AuthController {
   @UsePipes(new ValidationPipe({ whitelist: true, transform: true }))
   async completeCustomerProfile(@Body() dto: CompleteCustomerProfileDto) {
     return this.authService.completeCustomerProfile(dto);
+  }
+
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('entrepreneur')
+  @Throttle({ default: { limit: 5, ttl: 60000 } })
+  @Post('entrepreneur/club')
+  @UsePipes(new ValidationPipe({ whitelist: true, transform: true }))
+  async createClubForSession(@Body() dto: CreateClubDto, @Request() req) {
+    return this.authService.createClubForSession(req.user.id, dto);
   }
 }

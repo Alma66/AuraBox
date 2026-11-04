@@ -137,11 +137,7 @@ export class CompleteCustomerProfileDto {
   postalCode?: string;
 }
 
-export class RegisterClubDto {
-  @IsString()
-  @IsNotEmpty({ message: 'entrepreneurToken es requerido' })
-  entrepreneurToken!: string;
-
+export class CreateClubDto {
   @Trim()
   @IsString()
   @IsNotEmpty({ message: 'El nombre del club es obligatorio' })
@@ -181,4 +177,10 @@ export class RegisterClubDto {
   @EmptyToUndefined()
   @IsUrl({ protocols: ['https'], require_protocol: true })
   logoUrl?: string;
+}
+
+export class RegisterClubDto extends CreateClubDto {
+  @IsString()
+  @IsNotEmpty({ message: 'entrepreneurToken es requerido' })
+  entrepreneurToken!: string;
 }

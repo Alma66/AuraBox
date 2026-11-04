@@ -2,9 +2,10 @@ import React, { useState } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import api from '../api/config';
 import { User } from '../types/user';
+import { userFromToken } from '../utils/session';
 
 interface LoginPageProps {
-  onLogin: (user: User) => void;
+  onLogin: (user: User) => Promise<User>;
 }
 
 const LoginPage: React.FC<LoginPageProps> = ({ onLogin }) => {
@@ -37,20 +38,12 @@ const LoginPage: React.FC<LoginPageProps> = ({ onLogin }) => {
 
       localStorage.setItem('access_token', access_token);
 
-      const payload = JSON.parse(atob(access_token.split('.')[1]));
+      const user = await onLogin(userFromToken(access_token));
 
-      const user: User = {
-        id: payload.sub?.toString() || '',
-        firstName: payload.firstName || '',
-        lastName: payload.lastName || '',
-        email: payload.email || '',
-        role: (payload.role?.toLowerCase() || 'customer') as 'customer' | 'entrepreneur' | 'admin',
-        registeredDate: payload.registeredDate || new Date().toISOString(),
-        lastLogin: new Date().toISOString(),
-        managedClubId: payload.managedClubId?.toString() || undefined,
-      };
-
-      onLogin(user);
+      if (user.role === 'entrepreneur' && !user.managedClubId) {
+        navigate('/register/complete-club', { replace: true });
+        return;
+      }
 
       const redirectTarget = getRedirectTarget();
       if (redirectTarget) {
@@ -70,7 +63,12 @@ const LoginPage: React.FC<LoginPageProps> = ({ onLogin }) => {
           setError('Rol del usuario no reconocido.');
       }
     } catch (err: any) {
-      setError(err.response?.data?.message || 'Error al iniciar sesión. Verificá tus credenciales.');
+      const message = err.response?.data?.message;
+      setError(
+        Array.isArray(message)
+          ? message.join('. ')
+          : message || 'Error al iniciar sesión. Verificá tus credenciales.'
+      );
     } finally {
       setLoading(false);
     }
@@ -82,29 +80,29 @@ const LoginPage: React.FC<LoginPageProps> = ({ onLogin }) => {
       <div className="absolute -bottom-32 -right-20 w-96 h-96 bg-aurora-terracotta/10 rounded-full blur-3xl pointer-events-none" />
 
       <div className="max-w-md w-full space-y-8 p-10 card-surface shadow-aurora relative animate-fadeInUp">
-        <div>
+        <div className="space-y-3">
           <div className="flex justify-center mb-4">
             <img src="/aurabox-logo.png" alt="AuraBox" className="h-14 w-auto" />
           </div>
           <h2 className="text-center font-display text-3xl font-bold text-aurora-navy">
             Bienvenido de nuevo
           </h2>
-          <p className="mt-2 text-center text-sm text-aurora-navy/60">
+          <p className="text-center text-sm text-aurora-navy/60">
             ¿No tenés una cuenta?{' '}
             <Link to="/register" className="font-semibold text-aurora-terracotta hover:text-aurora-terracottaDark">
               Registrate aquí
             </Link>
           </p>
-                  {reason === 'disabled' && (
-          <p role="alert" className="text-red-600 text-sm text-center bg-red-50 border border-red-100 rounded-lg py-2 px-3">
-            Tu cuenta fue deshabilitada. Si creés que es un error, contactá al equipo de AuraBox.
-          </p>
-        )}
-        {reason === 'expired' && (
-          <p role="status" className="text-aurora-navy text-sm text-center bg-aurora-gold/10 border border-aurora-gold/30 rounded-lg py-2 px-3">
-            Tu sesión expiró. Iniciá sesión de nuevo para continuar.
-          </p>
-        )}
+          {reason === 'disabled' && (
+            <p role="alert" className="text-red-600 text-sm text-center bg-red-50 border border-red-100 rounded-lg py-2 px-3">
+              Tu cuenta fue deshabilitada. Si creés que es un error, contactá al equipo de AuraBox.
+            </p>
+          )}
+          {reason === 'expired' && (
+            <p role="status" className="text-aurora-navy text-sm text-center bg-aurora-gold/10 border border-aurora-gold/30 rounded-lg py-2 px-3">
+              Tu sesión expiró. Iniciá sesión de nuevo para continuar.
+            </p>
+          )}
         </div>
 
         <form className="space-y-5" onSubmit={handleSubmit}>
@@ -152,7 +150,7 @@ const LoginPage: React.FC<LoginPageProps> = ({ onLogin }) => {
           </div>
 
           {error && (
-            <p className="text-red-600 text-sm text-center bg-red-50 border border-red-100 rounded-lg py-2 px-3">{error}</p>
+            <p role="alert" className="text-red-600 text-sm text-center bg-red-50 border border-red-100 rounded-lg py-2 px-3">{error}</p>
           )}
 
           <div className="flex items-center justify-between">

@@ -6,6 +6,7 @@ import { JwtService } from '@nestjs/jwt';
 import { PrismaService } from '../../prisma/prisma.service';
 import {
   CompleteCustomerProfileDto,
+  CreateClubDto,
   RegisterClubDto,
   RegisterCustomerDto,
   RegisterEntrepreneurDto,
@@ -269,20 +270,18 @@ export class AuthService {
     return { ...safe, role: 'entrepreneur', entrepreneurToken };
   }
 
-  async registerEntrepreneurClub(dto: RegisterClubDto) {
-    const entrepreneurId = this.verifyRegistrationToken(dto.entrepreneurToken, 'entrepreneur-club');
-
+    private async createClubFor(entrepreneurId: number, dto: CreateClubDto) {
     const entrepreneur = await this.prisma.entrepreneurs.findUnique({
       where: { id: entrepreneurId },
     });
     if (!entrepreneur) throw new BadRequestException('Emprendedor no encontrado');
 
-    const existing = await this.prisma.entrepreneur_Club.findFirst({
-      where: { idEntrepreneurs: entrepreneurId },
-    });
-    if (existing) throw new BadRequestException('Este emprendedor ya tiene un club registrado');
-
     return this.prisma.$transaction(async (tx) => {
+      const existing = await tx.entrepreneur_Club.findFirst({
+        where: { idEntrepreneurs: entrepreneurId },
+      });
+      if (existing) throw new BadRequestException('Este emprendedor ya tiene un club registrado');
+
       const club = await tx.club.create({
         data: {
           name: dto.name,
@@ -305,5 +304,17 @@ export class AuthService {
 
       return club;
     });
+  }
+
+  async registerEntrepreneurClub(dto: RegisterClubDto) {
+    const entrepreneurId = this.verifyRegistrationToken(dto.entrepreneurToken, 'entrepreneur-club');
+    return this.createClubFor(entrepreneurId, dto);
+  }
+
+  async createClubForSession(entrepreneurId: number, dto: CreateClubDto) {
+    const club = await this.createClubFor(entrepreneurId, dto);
+    const entrepreneur = await this.prisma.entrepreneurs.findUnique({ where: { id: entrepreneurId } });
+    const { access_token } = await this.buildToken({ ...(entrepreneur as any), role: 'entrepreneur' });
+    return { club, access_token };
   }
 }
