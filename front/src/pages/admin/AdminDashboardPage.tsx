@@ -108,10 +108,9 @@ const AdminDashboardPage: React.FC = () => {
   
   const maxValue = Math.max(...stats.monthly.map((item) => item.total), 0);
 
-  return (
+    return (
     <div className="space-y-6 px-4 py-6 lg:px-8">
-      <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
-              <div className="flex justify-end">
+      <div className="flex justify-end">
         <button
           type="button"
           onClick={runRenewals}
@@ -121,6 +120,8 @@ const AdminDashboardPage: React.FC = () => {
           {running ? 'Procesando...' : 'Ejecutar cobros ahora'}
         </button>
       </div>
+
+      <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
         <Kpi
           label="Clubes pendientes"
           value={stats.clubs.pending}

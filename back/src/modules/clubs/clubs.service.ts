@@ -440,9 +440,12 @@ export class ClubsService {
     };
   }
 
-  private sanitizeClub(club: any) {
+    private sanitizeClub(club: any) {
     if (!club) return club;
     const sanitized = { ...club };
+    delete sanitized.bankHolder;
+    delete sanitized.bankCbu;
+    delete sanitized.bankAlias;
     if (sanitized.creationDate instanceof Date) {
       sanitized.creationDate = sanitized.creationDate.toISOString();
     }
