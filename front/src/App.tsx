@@ -220,7 +220,7 @@ const AppContent: React.FC = () => {
       <Route path="/login" element={<LoginPage onLogin={login} />} />
       <Route path="/register" element={<RegisterPage />} />
       <Route path="/register/complete-profile" element={<CompleteProfilePage />} />
-            <Route path="/register/complete-club" element={<CompleteClubPage />} />
+      <Route path="/register/complete-club" element={<CompleteClubPage />} />
       <Route path="/about-us" element={<AboutUsPage />} />
       <Route path="/contact" element={<ContactPage />} />
       <Route path="/logout" element={<Logout />} />

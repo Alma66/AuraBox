@@ -23,6 +23,12 @@ export class PlatformRulesController {
     return this.svc.findActive();
   }
 
+  @Public()
+  @Get('required/:audience')
+  async findRequiredForSignup(@Param('audience') audience: string) {
+    return this.svc.findRequiredForSignup(audience);
+  }
+
   @Roles('admin')
   @Post()
   async create(@Body() dto: CreatePlatformRuleDto) {

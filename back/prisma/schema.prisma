@@ -313,15 +313,28 @@ model Permissions {
 }
 
 model Platform_Rules {
-  id              Int      @id @default(autoincrement()) @map("ID")
-  title           String   @map("Title")
-  content         String   @map("Content")
-  version         String   @map("Version")
-  publicationDate DateTime @default(now()) @map("Publication_Date")
-  active          Boolean  @default(true) @map("Active")
-  ruleType        String   @map("Rule_Type")
+  id              Int                 @id @default(autoincrement()) @map("ID")
+  title           String              @map("Title")
+  content         String              @map("Content")
+  version         String              @map("Version")
+  publicationDate DateTime            @default(now()) @map("Publication_Date")
+  active          Boolean             @default(true) @map("Active")
+  ruleType        String              @map("Rule_Type")
+  acceptanceScope RuleAcceptanceScope @default(NINGUNO) @map("Acceptance_Scope")
 
   @@map("Platform_Rules")
+}
+
+model Terms_Acceptance {
+  id             Int      @id @default(autoincrement()) @map("ID")
+  accountType    String   @map("Account_Type")
+  idAccount      Int      @map("ID_Account")
+  idPlatformRule Int      @map("ID_Platform_Rule")
+  ruleVersion    String   @map("Rule_Version")
+  acceptedAt     DateTime @default(now()) @map("Accepted_At")
+
+  @@unique([accountType, idAccount, idPlatformRule])
+  @@map("Terms_Acceptance")
 }
 
 model Promotion {
@@ -764,6 +777,13 @@ enum VerificationStatus {
 enum ContentType {
   Imagen @map("Imagen")
   Video  @map("Video")
+}
+
+enum RuleAcceptanceScope {
+  NINGUNO       @map("Ninguno")
+  TODOS         @map("Todos")
+  CLIENTES      @map("Clientes")
+  EMPRENDEDORES @map("Emprendedores")
 }
 
 enum Frequency {

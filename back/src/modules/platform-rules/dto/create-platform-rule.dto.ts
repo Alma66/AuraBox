@@ -1,4 +1,5 @@
-import { IsNotEmpty, IsString, MaxLength } from 'class-validator';
+import { IsEnum, IsNotEmpty, IsOptional, IsString, MaxLength } from 'class-validator';
+import { RuleAcceptanceScope } from '@prisma/client';
 
 export class CreatePlatformRuleDto {
   @IsString()
@@ -20,4 +21,8 @@ export class CreatePlatformRuleDto {
   @IsNotEmpty()
   @MaxLength(60)
   ruleType!: string;
+
+  @IsOptional()
+  @IsEnum(RuleAcceptanceScope)
+  acceptanceScope?: RuleAcceptanceScope;
 }

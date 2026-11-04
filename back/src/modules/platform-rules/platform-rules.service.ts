@@ -1,4 +1,5 @@
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
+import { RuleAcceptanceScope } from '@prisma/client';
 import { PrismaService } from '../../prisma/prisma.service';
 import { CreatePlatformRuleDto } from './dto/create-platform-rule.dto';
 import { UpdatePlatformRuleDto } from './dto/update-platform-rule.dto';
@@ -7,6 +8,18 @@ function sanitize(rule: any) {
   if (!rule) return rule;
   if (rule.publicationDate instanceof Date) rule.publicationDate = rule.publicationDate.toISOString();
   return rule;
+}
+
+function publicShape(rule: any) {
+  return sanitize({
+    id: rule.id,
+    title: rule.title,
+    content: rule.content,
+    version: rule.version,
+    ruleType: rule.ruleType,
+    acceptanceScope: rule.acceptanceScope,
+    publicationDate: rule.publicationDate,
+  });
 }
 
 @Injectable()
@@ -34,6 +47,7 @@ export class PlatformRulesService {
         content: dto.content.trim(),
         version,
         ruleType,
+        acceptanceScope: dto.acceptanceScope ?? RuleAcceptanceScope.NINGUNO,
         active: false,
         publicationDate: new Date(),
       },
@@ -51,16 +65,22 @@ export class PlatformRulesService {
       where: { active: true },
       orderBy: { ruleType: 'asc' },
     });
-    return rules.map((rule) =>
-      sanitize({
-        id: rule.id,
-        title: rule.title,
-        content: rule.content,
-        version: rule.version,
-        ruleType: rule.ruleType,
-        publicationDate: rule.publicationDate,
-      }),
-    );
+    return rules.map(publicShape);
+  }
+
+  async findRequiredForSignup(audience: string) {
+    if (audience !== 'customer' && audience !== 'entrepreneur') {
+      throw new BadRequestException('Tipo de cuenta inválido');
+    }
+    const scopes: RuleAcceptanceScope[] = [
+      RuleAcceptanceScope.TODOS,
+      audience === 'customer' ? RuleAcceptanceScope.CLIENTES : RuleAcceptanceScope.EMPRENDEDORES,
+    ];
+    const rules = await this.prisma.platform_Rules.findMany({
+      where: { active: true, acceptanceScope: { in: scopes } },
+      orderBy: { ruleType: 'asc' },
+    });
+    return rules.map(publicShape);
   }
 
   async findOne(id: number) {
@@ -89,6 +109,7 @@ export class PlatformRulesService {
         version,
         ...(dto.title !== undefined ? { title: dto.title.trim() } : {}),
         ...(dto.content !== undefined ? { content: dto.content.trim() } : {}),
+        ...(dto.acceptanceScope !== undefined ? { acceptanceScope: dto.acceptanceScope } : {}),
       },
     });
     return sanitize(updated);
@@ -122,6 +143,10 @@ export class PlatformRulesService {
     if (!item) throw new NotFoundException('Regla de plataforma no encontrada');
     if (item.active) {
       throw new BadRequestException('No se puede eliminar una regla publicada. Despublicala primero.');
+    }
+    const accepted = await this.prisma.terms_Acceptance.count({ where: { idPlatformRule: id } });
+    if (accepted > 0) {
+      throw new BadRequestException('Esta versión ya fue aceptada por usuarios y se conserva como historial');
     }
     await this.prisma.platform_Rules.delete({ where: { id } });
     return { message: 'Regla eliminada correctamente' };

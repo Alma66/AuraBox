@@ -1,6 +1,8 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import api, { getResponseData } from '../../api/config';
 
+type AcceptanceScope = 'NINGUNO' | 'TODOS' | 'CLIENTES' | 'EMPRENDEDORES';
+
 interface Rule {
   id: number;
   title: string;
@@ -9,6 +11,7 @@ interface Rule {
   ruleType: string;
   publicationDate: string;
   active: boolean;
+  acceptanceScope: AcceptanceScope;
 }
 
 interface RuleForm {
@@ -16,11 +19,12 @@ interface RuleForm {
   title: string;
   version: string;
   content: string;
+  acceptanceScope: AcceptanceScope;
 }
 
 type PendingAction = { id: number; kind: 'publish' | 'unpublish' | 'delete' } | null;
 
-const EMPTY_FORM: RuleForm = { ruleType: '', title: '', version: '', content: '' };
+const EMPTY_FORM: RuleForm = { ruleType: '', title: '', version: '', content: '', acceptanceScope: 'NINGUNO' };
 
 const TYPE_SUGGESTIONS = [
   'Términos y condiciones',
@@ -28,6 +32,20 @@ const TYPE_SUGGESTIONS = [
   'Reglas para clubes',
   'Reglas para clientes',
 ];
+
+const SCOPE_OPTIONS: { value: AcceptanceScope; label: string }[] = [
+  { value: 'NINGUNO', label: 'No se exige al registrarse' },
+  { value: 'TODOS', label: 'Se exige a todos al registrarse' },
+  { value: 'CLIENTES', label: 'Se exige solo a clientes' },
+  { value: 'EMPRENDEDORES', label: 'Se exige solo a emprendedores' },
+];
+
+const SCOPE_SHORT: Record<AcceptanceScope, string> = {
+  NINGUNO: '',
+  TODOS: 'Obligatoria para todos al registrarse',
+  CLIENTES: 'Obligatoria para clientes al registrarse',
+  EMPRENDEDORES: 'Obligatoria para emprendedores al registrarse',
+};
 
 const INPUT_CLASS =
   'min-h-[44px] w-full rounded-lg border border-aurora-navy/20 bg-white px-3 text-sm text-aurora-navy focus:border-aurora-terracotta focus:ring-aurora-terracotta';
@@ -81,9 +99,11 @@ const AdminRulesPage: React.FC = () => {
     return Array.from(map.entries()).sort(([a], [b]) => a.localeCompare(b));
   }, [rules]);
 
-  const updateField = (field: keyof RuleForm) => (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    setForm((current) => ({ ...current, [field]: event.target.value }));
-  };
+  const updateField =
+    (field: keyof RuleForm) =>
+    (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+      setForm((current) => ({ ...current, [field]: event.target.value }));
+    };
 
   const openNew = () => {
     setEditingId(null);
@@ -94,7 +114,13 @@ const AdminRulesPage: React.FC = () => {
 
   const openEdit = (rule: Rule) => {
     setEditingId(rule.id);
-    setForm({ ruleType: rule.ruleType, title: rule.title, version: rule.version, content: rule.content });
+    setForm({
+      ruleType: rule.ruleType,
+      title: rule.title,
+      version: rule.version,
+      content: rule.content,
+      acceptanceScope: rule.acceptanceScope,
+    });
     setFormError('');
     setShowForm(true);
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -102,7 +128,13 @@ const AdminRulesPage: React.FC = () => {
 
   const openNewVersion = (rule: Rule) => {
     setEditingId(null);
-    setForm({ ruleType: rule.ruleType, title: rule.title, version: '', content: rule.content });
+    setForm({
+      ruleType: rule.ruleType,
+      title: rule.title,
+      version: '',
+      content: rule.content,
+      acceptanceScope: rule.acceptanceScope,
+    });
     setFormError('');
     setShowForm(true);
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -132,6 +164,7 @@ const AdminRulesPage: React.FC = () => {
         title: form.title.trim(),
         version: form.version.trim(),
         content: form.content.trim(),
+        acceptanceScope: form.acceptanceScope,
       };
       if (editingId) {
         await api.put(`/platform-rules/${editingId}`, payload);
@@ -240,6 +273,19 @@ const AdminRulesPage: React.FC = () => {
               />
             </div>
             <div className="sm:col-span-3">
+              <label htmlFor="rule-scope" className="mb-1 block text-xs font-semibold text-aurora-navy/60">
+                Aceptación al registrarse
+              </label>
+              <select id="rule-scope" value={form.acceptanceScope} onChange={updateField('acceptanceScope')} className={INPUT_CLASS}>
+                {SCOPE_OPTIONS.map((option) => (
+                  <option key={option.value} value={option.value}>{option.label}</option>
+                ))}
+              </select>
+              <p className="mt-1 text-xs text-aurora-navy/50">
+                Si la exigís, quien se registre tiene que aceptar la versión publicada. Queda guardado qué versión aceptó y cuándo.
+              </p>
+            </div>
+            <div className="sm:col-span-3">
               <label htmlFor="rule-content" className="mb-1 block text-xs font-semibold text-aurora-navy/60">Contenido</label>
               <textarea
                 id="rule-content"
@@ -284,6 +330,7 @@ const AdminRulesPage: React.FC = () => {
                   const isPending = pending?.id === rule.id ? pending : null;
                   const isBusy = busyId === rule.id;
                   const isExpanded = expandedId === rule.id;
+                  const scopeText = SCOPE_SHORT[rule.acceptanceScope];
 
                   return (
                     <div key={rule.id} className="rounded-2xl border border-aurora-navy/5 bg-white p-5 shadow-sm">
@@ -295,6 +342,7 @@ const AdminRulesPage: React.FC = () => {
                           <p className="text-xs text-aurora-navy/50">
                             {rule.active ? 'Publicada' : 'Última modificación'} el {formatDate(rule.publicationDate)}
                           </p>
+                          {scopeText && <p className="mt-1 text-xs font-semibold text-aurora-terracotta">{scopeText}</p>}
                         </div>
                         <span
                           className={`rounded-full px-2.5 py-0.5 text-xs font-semibold ${
