@@ -7,9 +7,10 @@ import { AURABOX_COMMISSION } from '../payments/payments.constants';
 import { priceFor } from '../../common/utils/billing';
 import { Prisma, Frequency } from '@prisma/client';
 
+type RequestUser = { id: number; role: string };
+
 function sanitize(nt: any) {
-  type RequestUser = { id: number; role: string };
-  if (!nt) return nt;
+  if (!nt) return nt; if (!nt) return nt;
   for (const field of ['basePrice', 'cashDiscount', 'transferDiscount']) {
     if (nt[field] !== undefined && nt[field] !== null) {
       try { nt[field] = nt[field].toString(); } catch {}
@@ -172,7 +173,7 @@ export class SubscriptionTypesService {
     });
     return rows.map(sanitize);
   }
-  
+
   async update(id: number, dto: UpdateSubscriptionTypeDto, requesterId?: number, requesterRole?: string) {
     const existing = await this.prisma.subscription_Types.findUnique({ where: { id } });
     if (!existing) throw new NotFoundException('Tipo de suscripción no encontrado');

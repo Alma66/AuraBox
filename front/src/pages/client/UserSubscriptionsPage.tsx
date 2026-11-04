@@ -25,6 +25,29 @@ interface PaymentMethodInfo {
   method: string;
 }
 
+interface BoxItem {
+  id: number;
+  deliveryMonthYear: string;
+  productName: string;
+  productDescription: string;
+  usageInstructions?: string | null;
+  productExpirationDate?: string | null;
+  productImageUrl?: string | null;
+  productVideoUrl?: string | null;
+  additionalNotes?: string | null;
+  publicationDate: string;
+  ageRestriction?: boolean;
+  originLocation?: string | null;
+  containsAllergens?: boolean;
+  allergensDetail?: string | null;
+  isDangerousItem?: boolean;
+  dangerDetail?: string | null;
+  requiresCleaning?: boolean;
+  cleaningInstructions?: string | null;
+}
+
+type BoxState = { status: 'loading' } | { status: 'error' } | { status: 'ready'; items: BoxItem[] };
+
 const STATUS_COLORS: Record<SubscriptionStatus, string> = {
   Activa: 'bg-green-100 text-green-700',
   Pendiente_Pago: 'bg-yellow-100 text-yellow-700',
@@ -42,6 +65,95 @@ const FILTERS: { key: 'all' | SubscriptionStatus; label: string }[] = [
   { key: 'Finalizada', label: 'Finalizadas' },
 ];
 
+const formatDate = (date?: string | null) => (date ? new Date(date).toLocaleDateString('es-AR') : '—');
+const formatPrice = (amount?: string | null) => (amount ? `$${Number(amount).toLocaleString('es-AR')} ARS` : '—');
+
+const groupByMonth = (items: BoxItem[]) => {
+  const groups: Record<string, BoxItem[]> = {};
+  items.forEach((item) => {
+    if (!groups[item.deliveryMonthYear]) groups[item.deliveryMonthYear] = [];
+    groups[item.deliveryMonthYear].push(item);
+  });
+  return Object.entries(groups);
+};
+
+const BoxContent: React.FC<{ state: BoxState }> = ({ state }) => {
+  if (state.status === 'loading') {
+    return <p className="text-sm text-aurora-navy/60 py-2">Cargando contenido...</p>;
+  }
+  if (state.status === 'error') {
+    return <p className="text-sm text-red-600 py-2">No se pudo cargar el contenido de la caja.</p>;
+  }
+  if (state.items.length === 0) {
+    return <p className="text-sm text-aurora-navy/60 py-2">Todavía no hay contenido publicado para esta caja.</p>;
+  }
+
+  return (
+    <div className="space-y-4">
+      {groupByMonth(state.items).map(([month, items]) => (
+        <div key={month}>
+          <p className="text-xs font-semibold uppercase tracking-wide text-aurora-navy/50 mb-2">{month}</p>
+          <div className="space-y-3">
+            {items.map((item) => (
+              <div key={item.id} className="bg-aurora-cream rounded-lg p-3 flex gap-3">
+                {item.productImageUrl && (
+                  <img
+                    src={item.productImageUrl}
+                    alt={item.productName}
+                    className="w-16 h-16 rounded-md object-cover flex-shrink-0 border border-aurora-navy/10"
+                  />
+                )}
+                <div className="min-w-0 flex-grow space-y-1">
+                  <p className="font-semibold text-aurora-navy text-sm">{item.productName}</p>
+                  <p className="text-xs text-aurora-navy/70">{item.productDescription}</p>
+                  {item.originLocation && (
+                    <p className="text-xs text-aurora-navy/60">Origen: {item.originLocation}</p>
+                  )}
+                  {item.usageInstructions && (
+                    <p className="text-xs text-aurora-navy/60">Cómo usarlo: {item.usageInstructions}</p>
+                  )}
+                  {item.productExpirationDate && (
+                    <p className="text-xs text-aurora-navy/60">Vence: {formatDate(item.productExpirationDate)}</p>
+                  )}
+                  {item.containsAllergens && (
+                    <p className="text-xs text-orange-700">
+                      Alérgenos: {item.allergensDetail || 'contiene alérgenos'}
+                    </p>
+                  )}
+                  {item.isDangerousItem && (
+                    <p className="text-xs text-red-600">Precaución: {item.dangerDetail || 'producto delicado'}</p>
+                  )}
+                  {item.ageRestriction && (
+                    <p className="text-xs text-red-600">Solo para mayores de edad</p>
+                  )}
+                  {item.requiresCleaning && (
+                    <p className="text-xs text-aurora-navy/60">
+                      Limpieza: {item.cleaningInstructions || 'requiere limpieza antes de usar'}
+                    </p>
+                  )}
+                  {item.additionalNotes && (
+                    <p className="text-xs text-aurora-navy/60">{item.additionalNotes}</p>
+                  )}
+                  {item.productVideoUrl && (
+                    <a
+                      href={item.productVideoUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-block text-xs text-aurora-terracotta hover:text-aurora-terracottaDark underline"
+                    >
+                      Ver video
+                    </a>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+};
+
 const UserSubscriptionsPage: React.FC = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
@@ -56,6 +168,8 @@ const UserSubscriptionsPage: React.FC = () => {
   const [cancelingId, setCancelingId] = useState<number | null>(null);
   const [cancelReason, setCancelReason] = useState('');
   const [processingCancel, setProcessingCancel] = useState(false);
+  const [openBoxes, setOpenBoxes] = useState<Record<number, boolean>>({});
+  const [boxes, setBoxes] = useState<Record<number, BoxState>>({});
 
   const fetchData = async () => {
     if (!user) {
@@ -135,8 +249,21 @@ const UserSubscriptionsPage: React.FC = () => {
     }
   };
 
-  const formatDate = (date?: string | null) => date ? new Date(date).toLocaleDateString('es-AR') : '—';
-  const formatPrice = (amount?: string | null) => amount ? `$${Number(amount).toLocaleString('es-AR')} ARS` : '—';
+  const handleToggleBox = async (subId: number, idSubscriptionTypes: number) => {
+    const willOpen = !openBoxes[subId];
+    setOpenBoxes((prev) => ({ ...prev, [subId]: willOpen }));
+    if (!willOpen) return;
+    if (boxes[idSubscriptionTypes]?.status === 'ready') return;
+
+    setBoxes((prev) => ({ ...prev, [idSubscriptionTypes]: { status: 'loading' } }));
+    try {
+      const response = await api.get(`/box-content-history/by-subscription-type/${idSubscriptionTypes}`);
+      const items: BoxItem[] = getResponseData(response) || [];
+      setBoxes((prev) => ({ ...prev, [idSubscriptionTypes]: { status: 'ready', items } }));
+    } catch {
+      setBoxes((prev) => ({ ...prev, [idSubscriptionTypes]: { status: 'error' } }));
+    }
+  };
 
   if (loading) {
     return (
@@ -150,7 +277,7 @@ const UserSubscriptionsPage: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 py-8 px-4">
+    <div className="min-h-screen bg-aurora-cream py-8 px-4">
       <div className="max-w-5xl mx-auto">
         <div className="text-center mb-8">
           <h1 className="text-4xl font-bold text-aurora-navy mb-2">Mis Suscripciones</h1>
@@ -195,13 +322,16 @@ const UserSubscriptionsPage: React.FC = () => {
             <p className="text-lg text-aurora-navy/70 font-medium">No tenés suscripciones en este estado.</p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-start">
             {filteredSubscriptions.map((sub) => {
               const planInfo = subTypes[sub.idSubscriptionTypes];
               const clubInfo = planInfo ? clubs[planInfo.idClub] : undefined;
               const paymentMethodName = sub.idPaymentMethods ? paymentMethods[sub.idPaymentMethods] : undefined;
               const canCancel = normalizeStatus(sub.subscriptionStatus) === 'active' || normalizeStatus(sub.subscriptionStatus) === 'paused';
+              const canSeeBox = sub.subscriptionStatus !== 'Pendiente_Pago';
               const isCancelingThis = cancelingId === sub.id;
+              const isBoxOpen = !!openBoxes[sub.id];
+              const boxState = boxes[sub.idSubscriptionTypes];
 
               return (
                 <div key={sub.id} className="bg-white rounded-2xl shadow-md overflow-hidden">
@@ -247,6 +377,22 @@ const UserSubscriptionsPage: React.FC = () => {
                       </div>
                     )}
                   </div>
+
+                  {canSeeBox && (
+                    <div className="px-5 pb-5">
+                      <button
+                        onClick={() => handleToggleBox(sub.id, sub.idSubscriptionTypes)}
+                        className="w-full text-aurora-terracotta border border-aurora-terracotta/40 text-sm py-2 rounded-md hover:bg-aurora-terracotta/10 transition-colors font-medium"
+                      >
+                        {isBoxOpen ? 'Ocultar contenido de la caja' : 'Ver contenido de la caja'}
+                      </button>
+                      {isBoxOpen && (
+                        <div className="mt-3">
+                          <BoxContent state={boxState || { status: 'loading' }} />
+                        </div>
+                      )}
+                    </div>
+                  )}
 
                   {canCancel && (
                     <div className="p-5 pt-0">

@@ -24,31 +24,37 @@ export class BoxContentHistoryService {
   private async assertOwnership(idSubscriptionTypes: number, requesterId?: number, requesterRole?: string) {
     const subType = await this.prisma.subscription_Types.findUnique({ where: { id: idSubscriptionTypes } });
     if (!subType) throw new NotFoundException('Tipo de suscripción no encontrado');
-    if (requesterRole === 'entrepreneur' && requesterId) {
-      const assoc = await this.prisma.entrepreneur_Club.findFirst({
-        where: { idEntrepreneurs: requesterId, idClub: subType.idClub },
-      });
-      if (!assoc) throw new ForbiddenException('No tenés acceso a esta suscripción');
+    if (requesterRole === 'admin') return subType;
+    if (requesterRole !== 'entrepreneur' || !requesterId) {
+      throw new ForbiddenException('No tenés acceso a esta suscripción');
     }
+    const assoc = await this.prisma.entrepreneur_Club.findFirst({
+      where: { idEntrepreneurs: requesterId, idClub: subType.idClub },
+    });
+    if (!assoc) throw new ForbiddenException('No tenés acceso a esta suscripción');
     return subType;
   }
 
-  private async resolveAccess(idSubscriptionTypes: number, user: RequestUser) {
-    const subType = await this.prisma.subscription_Types.findUnique({ where: { id: idSubscriptionTypes } });
-    if (!subType) throw new NotFoundException('Tipo de suscripción no encontrado');
+  private async assertCustomerAccess(idSubscriptionTypes: number, idUser: number) {
+    const sub = await this.prisma.user_Subscriptions.findFirst({
+      where: {
+        idUser,
+        idSubscriptionTypes,
+        subscriptionStatus: { not: 'Pendiente_Pago' as any },
+      },
+    });
+    if (!sub) throw new ForbiddenException('Solo podés ver el contenido de las cajas a las que estás suscripto');
+  }
 
-    if (user.role === 'admin') return { full: true };
-
-    if (user.role === 'entrepreneur') {
-      const assoc = await this.prisma.entrepreneur_Club.findFirst({
-        where: { idEntrepreneurs: user.id, idClub: subType.idClub },
-      });
-      if (assoc) return { full: true };
+  private async assertReadAccess(idSubscriptionTypes: number, user: RequestUser) {
+    if (user.role === 'customer') {
+      const subType = await this.prisma.subscription_Types.findUnique({ where: { id: idSubscriptionTypes } });
+      if (!subType) throw new NotFoundException('Tipo de suscripción no encontrado');
+      await this.assertCustomerAccess(idSubscriptionTypes, user.id);
+      return { onlyPublished: true };
     }
-
-    const club = await this.prisma.club.findUnique({ where: { id: subType.idClub } });
-    if (!club || club.clubStatus !== 'APROBADO') throw new NotFoundException('Tipo de suscripción no encontrado');
-    return { full: false };
+    await this.assertOwnership(idSubscriptionTypes, user.id, user.role);
+    return { onlyPublished: false };
   }
 
   async create(dto: CreateBoxContentHistoryDto, imageFile?: Express.Multer.File, requesterId?: number, requesterRole?: string) {
@@ -86,7 +92,7 @@ export class BoxContentHistoryService {
 
   async findAll(page = 1, perPage = 50) {
     const safePage = Number.isFinite(page) && page > 0 ? page : 1;
-    const safePerPage = Number.isFinite(perPage) && perPage > 0 ? Math.min(perPage, 200) : 50;
+    const safePerPage = Number.isFinite(perPage) && perPage > 0 ? Math.min(perPage, 100) : 50;
     const histories = await this.prisma.boxContentHistory.findMany({
       skip: (safePage - 1) * safePerPage,
       take: safePerPage,
@@ -96,11 +102,11 @@ export class BoxContentHistoryService {
   }
 
   async findBySubscriptionType(idSubscriptionTypes: number, user: RequestUser) {
-    const { full } = await this.resolveAccess(idSubscriptionTypes, user);
+    const { onlyPublished } = await this.assertReadAccess(idSubscriptionTypes, user);
     const histories = await this.prisma.boxContentHistory.findMany({
       where: {
         idSubscriptionTypes,
-        ...(full ? {} : { OR: [{ publicationDate: null }, { publicationDate: { lte: new Date() } }] }),
+        ...(onlyPublished ? { publicationDate: { lte: new Date() } } : {}),
       },
       orderBy: { publicationDate: 'desc' },
     });
@@ -119,8 +125,8 @@ export class BoxContentHistoryService {
     const item = await this.prisma.boxContentHistory.findUnique({ where: { id } });
     if (!item) throw new NotFoundException('Historial de caja no encontrado');
 
-    const { full } = await this.resolveAccess(item.idSubscriptionTypes, user);
-    if (!full && item.publicationDate && item.publicationDate.getTime() > Date.now()) {
+    const { onlyPublished } = await this.assertReadAccess(item.idSubscriptionTypes, user);
+    if (onlyPublished && item.publicationDate > new Date()) {
       throw new NotFoundException('Historial de caja no encontrado');
     }
     return sanitize(item);
@@ -131,16 +137,12 @@ export class BoxContentHistoryService {
     if (!item) throw new NotFoundException('Historial de caja no encontrado');
     await this.assertOwnership(item.idSubscriptionTypes, requesterId, requesterRole);
 
-    const { idSubscriptionTypes, ...rest } = dto as any;
-    if (idSubscriptionTypes !== undefined && idSubscriptionTypes !== item.idSubscriptionTypes) {
-      await this.assertOwnership(idSubscriptionTypes, requesterId, requesterRole);
-    }
+    const { idSubscriptionTypes: _ignored, ...safeDto } = dto as any;
 
     const updated = await this.prisma.boxContentHistory.update({
       where: { id },
       data: {
-        ...rest,
-        ...(idSubscriptionTypes !== undefined ? { idSubscriptionTypes } : {}),
+        ...safeDto,
         productExpirationDate: dto.productExpirationDate ? new Date(dto.productExpirationDate) : item.productExpirationDate,
         publicationDate: dto.publicationDate ? new Date(dto.publicationDate) : item.publicationDate,
       },
@@ -154,10 +156,8 @@ export class BoxContentHistoryService {
     await this.assertOwnership(item.idSubscriptionTypes, requesterId, requesterRole);
 
     if (item.productImageUrl) {
-      try {
-        const publicId = this.cloudinary.extractPublicId(item.productImageUrl);
-        await this.cloudinary.deleteImage(publicId);
-      } catch {}
+      const publicId = this.cloudinary.extractPublicId(item.productImageUrl);
+      await this.cloudinary.deleteImage(publicId);
     }
 
     await this.prisma.boxContentHistory.delete({ where: { id } });
