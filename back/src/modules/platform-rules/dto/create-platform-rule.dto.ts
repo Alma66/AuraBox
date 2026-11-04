@@ -1,28 +1,23 @@
-import { 
-  IsString, 
-  IsOptional, 
-  IsBoolean, 
-  IsDateString,
- } from 'class-validator';
+import { IsNotEmpty, IsString, MaxLength } from 'class-validator';
 
 export class CreatePlatformRuleDto {
   @IsString()
+  @IsNotEmpty()
+  @MaxLength(150)
   title!: string;
 
   @IsString()
+  @IsNotEmpty()
+  @MaxLength(50000)
   content!: string;
 
   @IsString()
+  @IsNotEmpty()
+  @MaxLength(20)
   version!: string;
 
-  @IsOptional()
-  @IsDateString()
-  publicationDate?: string;
-
-  @IsOptional()
-  @IsBoolean()
-  active?: boolean;
-
   @IsString()
+  @IsNotEmpty()
+  @MaxLength(60)
   ruleType!: string;
 }

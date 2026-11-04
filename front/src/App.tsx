@@ -46,6 +46,8 @@ import InventoryPage from './pages/entrepreneur/management_and_finance/Inventory
 import SettingsPage from './pages/entrepreneur/administration_tools/SettingsPage';
 import AdminUsersPage from './pages/admin/AdminUsersPage';
 import AdminPaymentsPage from './pages/admin/AdminPaymentsPage';
+import AdminRulesPage from './pages/admin/AdminRulesPage';
+import PlatformRulesPage from './pages/PlatformRulesPage';
 import AdminReviewsPage from './pages/admin/AdminReviewsPage';
 import AdminLicensesPage from './pages/admin/AdminLicensesPage';
 import api from './api/config';
@@ -246,6 +248,8 @@ const AppContent: React.FC = () => {
       <Route path="/entrepreneur/club/:clubId/edit-subscriptions" element={pr(['entrepreneur'], <PlansRedirect tab="plans" />)} />
       <Route path="/entrepreneur/club/:clubId/subscription-boxes" element={pr(['entrepreneur'], <PlansRedirect tab="boxes" />)} />
       <Route path="/entrepreneur/club/:clubId/subscription-boxes/:subscriptionTypeId" element={pr(['entrepreneur'], <PlansRedirect tab="boxes" />)} />
+      <Route path="/admin/rules" element={<AdminRulesPage />} />
+      <Route path="/platform-rules" element={<PlatformRulesPage />} />
       <Route path="/admin/licenses" element={<AdminLicensesPage />} />
       <Route path="/admin/users" element={pr(['admin'], <AdminUsersPage />)} />
       <Route path="/admin/reviews" element={pr(['admin'], <AdminReviewsPage />)} />

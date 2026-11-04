@@ -14,6 +14,7 @@ export const ADMIN_SECTIONS: AdminSection[] = [
   { id: 'users', label: 'Usuarios', icon: 'users', to: '/admin/users' },
   { id: 'payments', label: 'Pagos', icon: 'finance', to: '/admin/payments' },
   { id: 'reviews', label: 'Reseñas', icon: 'community', to: '/admin/reviews' },
+  { id: 'rules', label: 'Reglas', icon: 'settings', to: '/admin/rules' },
   { id: 'admins', label: 'Admins', icon: 'user', to: '/admin/admins' },
 ];
 
