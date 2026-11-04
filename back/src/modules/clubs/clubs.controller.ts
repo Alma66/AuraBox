@@ -60,6 +60,7 @@ export class ClubsController {
   @UseGuards(JwtAuthGuard)
   @Get('recommendations')
   async getRecommendations(@Request() req: any) {
+    if (req.user.role !== 'customer') return [];
     return this.clubsService.getRecommendationsForUser(req.user.id);
   }
 

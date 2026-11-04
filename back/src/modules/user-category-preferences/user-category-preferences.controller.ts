@@ -2,9 +2,12 @@ import { Body, Controller, Get, Put, UseGuards, UsePipes, ValidationPipe, Reques
 import { UserCategoryPreferencesService } from './user-category-preferences.service';
 import { SetUserCategoryPreferencesDto } from './dto/set-user-category-preferences.dto';
 import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
+import { RolesGuard } from '../auth/roles.guard';
+import { Roles } from '../auth/roles.decorator';
 
 @Controller('user-category-preferences')
-@UseGuards(JwtAuthGuard)
+@UseGuards(JwtAuthGuard, RolesGuard)
+@Roles('customer')
 export class UserCategoryPreferencesController {
   constructor(private readonly svc: UserCategoryPreferencesService) {}
 

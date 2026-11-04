@@ -66,7 +66,7 @@ export class AuthService {
         where: { idEntrepreneurs: user.id },
         orderBy: { associationDate: 'asc' },
       });
-      
+
       if (association) managedClubId = association.idClub;
     }
 
@@ -101,8 +101,18 @@ export class AuthService {
     return payload.sub;
   }
 
+   private async emailInUse(email: string) {
+    const [customer, entrepreneur, admin] = await Promise.all([
+      this.prisma.user.findUnique({ where: { email } }),
+      this.prisma.entrepreneurs.findUnique({ where: { email } }),
+      this.prisma.admins.findUnique({ where: { email } }),
+    ]);
+    return !!(customer || entrepreneur || admin);
+  } 
+
   async registerCustomer(dto: any) {
-    const exists = await this.prisma.user.findFirst({
+     if (await this.emailInUse(dto.email)) throw new BadRequestException('Ese email ya está registrado');
+      const exists = await this.prisma.user.findFirst({
       where: { OR: [{ email: dto.email }, { documentNumber: parseInt(dto.documentNumber) }] },
     });
     if (exists) throw new BadRequestException('Email o documento ya registrado');
@@ -156,7 +166,8 @@ export class AuthService {
   }
 
   async registerEntrepreneur(dto: any) {
-    const exists = await this.prisma.entrepreneurs.findFirst({
+       if (await this.emailInUse(dto.email)) throw new BadRequestException('Ese email ya está registrado');
+        const exists = await this.prisma.entrepreneurs.findFirst({
       where: { OR: [{ email: dto.email }, { documentNumber: parseInt(dto.documentNumber) }] },
     });
     if (exists) throw new BadRequestException('Email o documento ya registrado');
