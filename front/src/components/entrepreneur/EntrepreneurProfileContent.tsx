@@ -115,7 +115,7 @@ const EntrepreneurProfileContent: React.FC<EntrepreneurProfileContentProps> = ({
 
   const handleSavePhoneNumber = async (newNumber: string) => {
     try {
-      await api.patch('/entrepreneurs/me', { phoneNumber: newNumber ? parseInt(newNumber) : null });
+      await api.patch('/entrepreneurs/me', { phoneNumber: newNumber || null });
       showFeedback('Teléfono guardado correctamente');
       onUserUpdate();
     } catch {

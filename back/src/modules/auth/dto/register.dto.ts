@@ -3,6 +3,7 @@ import {
   ArrayMaxSize, IsArray, IsDateString, IsEmail, IsIn, IsInt, IsNotEmpty, IsOptional, IsString, IsUrl,
   Matches, Max, MaxLength, Min, MinLength,
 } from 'class-validator';
+import { NormalizePhone, PHONE_MESSAGE, PHONE_REGEX } from '../../../common/utils/phone';
 
 const Trim = () => Transform(({ value }) => (typeof value === 'string' ? value.trim() : value));
 
@@ -58,11 +59,9 @@ export class RegisterCustomerDto {
   documentNumber!: string;
 
   @IsOptional()
-  @DigitsToNumber()
-  @IsInt({ message: 'El teléfono no es válido' })
-  @Min(1)
-  @Max(2147483647, { message: 'El teléfono no es válido' })
-  phoneNumber?: number;
+  @NormalizePhone()
+  @Matches(PHONE_REGEX, { message: PHONE_MESSAGE })
+  phoneNumber?: string | null;
 
   @IsDateString({}, { message: 'La fecha de nacimiento no es válida' })
   birthDate!: string;

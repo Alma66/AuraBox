@@ -11,6 +11,7 @@ import {
   IsBoolean,
 } from 'class-validator';
 import { DocumentType } from '@prisma/client';
+import { NormalizePhone, PHONE_MESSAGE, PHONE_REGEX } from '../../../common/utils/phone';
 
 export class UpdateEntrepreneurDto {
   @IsOptional()
@@ -49,8 +50,9 @@ export class UpdateEntrepreneurDto {
   cuitCuil?: number;
 
   @IsOptional()
-  @IsInt()
-  phoneNumber?: number;
+  @NormalizePhone()
+  @Matches(PHONE_REGEX, { message: PHONE_MESSAGE })
+  phoneNumber?: string | null;
 
   @IsOptional()
   @IsDateString()

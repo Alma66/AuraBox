@@ -12,7 +12,7 @@ export interface ShipmentRider {
   id: number;
   firstName: string;
   lastName: string;
-  phoneNumber: number | null;
+  phoneNumber: string | null;
   email: string;
 }
 
@@ -61,7 +61,7 @@ export interface PendingDeliveryUser {
   firstName: string;
   lastName: string;
   email: string;
-  phoneNumber: number | null;
+  phoneNumber: string | null;
   address: PendingDeliveryAddress;
 }
 
@@ -90,7 +90,7 @@ export interface RiderProfile {
   firstName: string;
   lastName: string;
   email: string;
-  phoneNumber: number | null;
+  phoneNumber: string | null;
   vehicleType: VehicleTypeValue | null;
   licensePlate: string | null;
   availability: boolean;

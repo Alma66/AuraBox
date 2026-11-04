@@ -9,7 +9,7 @@ interface AdminAccount {
   email: string;
   documentType: string;
   documentNumber: number;
-  phoneNumber: number | null;
+  phoneNumber: string | null;
   active: boolean;
   notes: string | null;
   createdAt: string;
@@ -99,8 +99,9 @@ const AdminAdminsPage: React.FC = () => {
       setFormError('El documento debe tener entre 6 y 9 dígitos, sin puntos.');
       return;
     }
-    if (form.phoneNumber && !/^\d{1,9}$/.test(form.phoneNumber)) {
-      setFormError('El teléfono debe tener hasta 9 dígitos, sin espacios ni guiones.');
+    const phoneDigits = form.phoneNumber.replace(/\D/g, '');
+    if (form.phoneNumber && (phoneDigits.length < 8 || phoneDigits.length > 15)) {
+      setFormError('El teléfono debe tener entre 8 y 15 dígitos.');
       return;
     }
     if (form.password.length < 8) {
@@ -117,7 +118,7 @@ const AdminAdminsPage: React.FC = () => {
         password: form.password,
         documentType: form.documentType,
         documentNumber: Number(form.documentNumber),
-        ...(form.phoneNumber ? { phoneNumber: Number(form.phoneNumber) } : {}),
+         ...(phoneDigits ? { phoneNumber: phoneDigits } : {}),
         ...(form.notes.trim() ? { notes: form.notes.trim() } : {}),
       });
       setForm(EMPTY_FORM);

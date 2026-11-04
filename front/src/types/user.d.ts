@@ -11,7 +11,7 @@ export interface User {
   registrationDate?: string;
   birthDate?: string | null;
   balanceAvailable?: string | null;
-  phoneNumber?: number | null;
+  phoneNumber?: string | null;
   streetAddress?: string | null;
   addressNumber?: number | null;
   floorNumber?: string | null;

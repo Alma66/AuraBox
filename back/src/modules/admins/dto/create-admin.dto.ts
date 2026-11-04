@@ -1,5 +1,6 @@
-import { IsEmail, IsEnum, IsInt, IsNotEmpty, IsOptional, IsString, Max, MaxLength, Min, MinLength } from 'class-validator';
+import { IsEmail, IsEnum, IsInt, IsNotEmpty, IsOptional, IsString, Matches, Max, MaxLength, Min, MinLength } from 'class-validator';
 import { DocumentType } from '@prisma/client';
+import { NormalizePhone, PHONE_MESSAGE, PHONE_REGEX } from '../../../common/utils/phone';
 
 export class CreateAdminDto {
   @IsString()
@@ -30,10 +31,9 @@ export class CreateAdminDto {
   documentNumber!: number;
 
   @IsOptional()
-  @IsInt()
-  @Min(0)
-  @Max(2147483647)
-  phoneNumber?: number;
+  @NormalizePhone()
+  @Matches(PHONE_REGEX, { message: PHONE_MESSAGE })
+  phoneNumber?: string | null;
 
   @IsOptional()
   @IsString()

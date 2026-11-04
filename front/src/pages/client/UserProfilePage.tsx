@@ -17,7 +17,7 @@ function mapApiUserToUser(data: any): User {
     birthDate: data.birthDate ? data.birthDate.split('T')[0] : '',
     documentType: data.documentType || '',
     documentNumber: data.documentNumber ? Number(data.documentNumber) : undefined,
-    phoneNumber: data.phoneNumber ? Number(data.phoneNumber) : null,
+    phoneNumber: data.phoneNumber ? String(data.phoneNumber) : null,
     streetAddress: data.streetAddress || '',
     addressNumber: data.addressNumber,
     floorNumber: data.floorNumber || '',

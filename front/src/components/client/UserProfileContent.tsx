@@ -103,7 +103,7 @@ const UserProfileContent: React.FC<UserProfileContentProps> = ({ activeSection, 
 
   const handleSavePhoneNumber = async (newNumber: string) => {
     try {
-      await api.patch('/users/me', { phoneNumber: newNumber ? parseInt(newNumber) : null });
+      await api.patch('/users/me', { phoneNumber: newNumber || null });
       showFeedback('Teléfono guardado correctamente');
       onUserUpdate();
     } catch {

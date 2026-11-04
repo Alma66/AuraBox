@@ -62,7 +62,7 @@ export interface BasicCustomerInfo {
 
 export interface SensitiveCustomerData {
   dni: number;
-  phoneNumber: number | null;
+  phoneNumber: string | null;
   streetAddress: string | null;
   addressNumber: number | null;
   floorNumber: string | null;

@@ -1,4 +1,5 @@
-import { IsInt, IsNotEmpty, IsOptional, IsString, Max, MaxLength, Min } from 'class-validator';
+import { IsNotEmpty, IsOptional, IsString, Matches, MaxLength } from 'class-validator';
+import { NormalizePhone, PHONE_MESSAGE, PHONE_REGEX } from '../../../common/utils/phone';
 
 export class UpdateAdminDto {
   @IsOptional()
@@ -14,10 +15,9 @@ export class UpdateAdminDto {
   lastName?: string;
 
   @IsOptional()
-  @IsInt()
-  @Min(0)
-  @Max(2147483647)
-  phoneNumber?: number;
+  @NormalizePhone()
+  @Matches(PHONE_REGEX, { message: PHONE_MESSAGE })
+  phoneNumber?: string | null;
 
   @IsOptional()
   @IsString()

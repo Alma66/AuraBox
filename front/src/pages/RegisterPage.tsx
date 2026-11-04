@@ -21,7 +21,7 @@ const ACCOUNT_OPTIONS: { id: AccountType; title: string; hint: string }[] = [
   { id: 'entrepreneur', title: 'Soy emprendedor', hint: 'Quiero registrar mi club' },
 ];
 
-const MAX_PHONE = 2147483647;
+
 
 const RegisterPage: React.FC = () => {
   const [searchParams] = useSearchParams();
@@ -114,8 +114,8 @@ const RegisterPage: React.FC = () => {
       return;
     }
     const phoneDigits = phoneNumber.replace(/\D/g, '');
-    if (phoneDigits && Number(phoneDigits) > MAX_PHONE) {
-      setError('Ese teléfono todavía no se puede guardar. Dejalo vacío por ahora.');
+    if (phoneDigits && (phoneDigits.length < 8 || phoneDigits.length > 15)) {
+      setError('El teléfono debe tener entre 8 y 15 dígitos.');
       return;
     }
     if (rulesStatus === 'error') {

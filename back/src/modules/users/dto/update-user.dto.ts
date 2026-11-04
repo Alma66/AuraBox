@@ -12,6 +12,7 @@ import {
 } from 'class-validator';
 import { Transform } from 'class-transformer';
 import { DocumentType } from '@prisma/client';
+import { NormalizePhone, PHONE_MESSAGE, PHONE_REGEX } from '../../../common/utils/phone';
 
 export class UpdateUserDto {
   @IsOptional()
@@ -43,9 +44,9 @@ export class UpdateUserDto {
   documentNumber?: number;
 
   @IsOptional()
-  @Transform(({ value }) => (value === null || value === undefined ? value : parseInt(String(value), 10)))
-  @IsInt()
-  phoneNumber?: number;
+  @NormalizePhone()
+  @Matches(PHONE_REGEX, { message: PHONE_MESSAGE })
+  phoneNumber?: string | null;
 
   @IsOptional()
   @IsDateString()
