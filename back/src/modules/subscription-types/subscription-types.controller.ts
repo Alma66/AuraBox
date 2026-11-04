@@ -20,15 +20,15 @@ export class SubscriptionTypesController {
 
   @Public()
   @Get()
-  async findAll(@Query('clubId') clubId?: string) {
-    if (clubId) return this.svc.findByClub(Number(clubId));
-    return this.svc.findAll();
+  async findAll(@Request() req, @Query('clubId') clubId?: string) {
+    if (clubId) return this.svc.findByClubForRequester(Number(clubId), req.user);
+    return this.svc.findAllForRequester(req.user);
   }
 
   @Public()
   @Get(':id')
-  async findOne(@Param('id', ParseIntPipe) id: number) {
-    return this.svc.findById(id);
+  async findOne(@Param('id', ParseIntPipe) id: number, @Request() req) {
+    return this.svc.findByIdForRequester(id, req.user);
   }
 
   @UseGuards(RolesGuard)

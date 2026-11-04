@@ -1,6 +1,7 @@
 import axios from 'axios';
 
 const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:3001';
+const AUTH_PAGES = /^\/(login|register|logout)(\/|$)/;
 
 const api = axios.create({
   baseURL: API_BASE_URL,
@@ -23,9 +24,16 @@ api.interceptors.request.use((config) => {
 api.interceptors.response.use(
   (response) => response,
   (error) => {
-    if (error.response?.status === 401) {
+    const url = error.config?.url ?? '';
+    const isCredentialCheck = url.includes('/auth/') || url.includes('verify-password');
+    if (error.response?.status === 401 && !isCredentialCheck) {
+      const hadToken = !!localStorage.getItem('access_token');
       localStorage.removeItem('access_token');
-      window.location.href = '/login';
+      if (hadToken && !AUTH_PAGES.test(window.location.pathname)) {
+        const disabled = error.response?.data?.message === 'Cuenta deshabilitada';
+        const here = encodeURIComponent(window.location.pathname + window.location.search);
+        window.location.href = disabled ? '/login?reason=disabled' : `/login?reason=expired&redirect=${here}`;
+      }
     }
     return Promise.reject(error);
   }

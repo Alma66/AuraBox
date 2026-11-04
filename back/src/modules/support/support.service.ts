@@ -406,7 +406,7 @@ export class SupportService {
       addressDetails: customer.addressDetails,
       postalCode: customer.postalCode,
       city: customer.city,
-      lastCardDigits: lastShipments.map((s) => s?.trackingNumber ?? null),
+      trackingNumbers: lastShipments.map((s) => s?.trackingNumber ?? null),
     };
 
     await this.prisma.sensitive_Data_Access_Log.create({

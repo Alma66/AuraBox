@@ -8,6 +8,7 @@ import { priceFor } from '../../common/utils/billing';
 import { Prisma, Frequency } from '@prisma/client';
 
 function sanitize(nt: any) {
+  type RequestUser = { id: number; role: string };
   if (!nt) return nt;
   for (const field of ['basePrice', 'cashDiscount', 'transferDiscount']) {
     if (nt[field] !== undefined && nt[field] !== null) {
@@ -114,6 +115,64 @@ export class SubscriptionTypesService {
     return rows.map(sanitize);
   }
 
+    private async canSeeAllPlans(idClub: number, user?: RequestUser) {
+    if (!user) return false;
+    if (user.role === 'admin') return true;
+    if (user.role !== 'entrepreneur') return false;
+    const assoc = await this.prisma.entrepreneur_Club.findFirst({
+      where: { idEntrepreneurs: user.id, idClub },
+    });
+    return !!assoc;
+  }
+
+  async findByIdForRequester(id: number, user?: RequestUser) {
+    const plan = await this.prisma.subscription_Types.findUnique({ where: { id } });
+    if (!plan) throw new NotFoundException('Tipo de suscripción no encontrado');
+
+    if (await this.canSeeAllPlans(plan.idClub, user)) return sanitize(plan);
+
+    if (user?.role === 'customer') {
+      const subscription = await this.prisma.user_Subscriptions.findFirst({
+        where: { idUser: user.id, idSubscriptionTypes: id },
+      });
+      if (subscription) return sanitize(plan);
+    }
+
+    const club = await this.prisma.club.findUnique({ where: { id: plan.idClub } });
+    if (!plan.active || !club || club.clubStatus !== 'APROBADO') {
+      throw new NotFoundException('Tipo de suscripción no encontrado');
+    }
+    return sanitize(plan);
+  }
+
+  async findByClubForRequester(idClub: number, user?: RequestUser) {
+    if (!Number.isInteger(idClub)) return [];
+    if (await this.canSeeAllPlans(idClub, user)) return this.findByClub(idClub);
+
+    const club = await this.prisma.club.findUnique({ where: { id: idClub } });
+    if (!club || club.clubStatus !== 'APROBADO') return [];
+
+    const rows = await this.prisma.subscription_Types.findMany({
+      where: { idClub, active: true },
+      orderBy: { id: 'desc' },
+    });
+    return rows.map(sanitize);
+  }
+
+  async findAllForRequester(user?: RequestUser) {
+    if (user?.role === 'admin') return this.findAll();
+
+    const clubs = await this.prisma.club.findMany({
+      where: { clubStatus: 'APROBADO' },
+      select: { id: true },
+    });
+    const rows = await this.prisma.subscription_Types.findMany({
+      where: { active: true, idClub: { in: clubs.map((club) => club.id) } },
+      orderBy: { id: 'desc' },
+    });
+    return rows.map(sanitize);
+  }
+  
   async update(id: number, dto: UpdateSubscriptionTypeDto, requesterId?: number, requesterRole?: string) {
     const existing = await this.prisma.subscription_Types.findUnique({ where: { id } });
     if (!existing) throw new NotFoundException('Tipo de suscripción no encontrado');

@@ -69,5 +69,6 @@ export interface SensitiveCustomerData {
   addressDetails: string | null;
   postalCode: string | null;
   city: string | null;
-  lastCardDigits: (string | null)[];
+  trackingNumbers: (string | null)[];
+
 }

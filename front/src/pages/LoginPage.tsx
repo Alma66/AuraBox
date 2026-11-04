@@ -15,6 +15,7 @@ const LoginPage: React.FC<LoginPageProps> = ({ onLogin }) => {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
+  const reason = new URLSearchParams(location.search).get('reason');
 
   const getRedirectTarget = (): string | null => {
     const params = new URLSearchParams(location.search);
@@ -94,6 +95,16 @@ const LoginPage: React.FC<LoginPageProps> = ({ onLogin }) => {
               Registrate aquí
             </Link>
           </p>
+                  {reason === 'disabled' && (
+          <p role="alert" className="text-red-600 text-sm text-center bg-red-50 border border-red-100 rounded-lg py-2 px-3">
+            Tu cuenta fue deshabilitada. Si creés que es un error, contactá al equipo de AuraBox.
+          </p>
+        )}
+        {reason === 'expired' && (
+          <p role="status" className="text-aurora-navy text-sm text-center bg-aurora-gold/10 border border-aurora-gold/30 rounded-lg py-2 px-3">
+            Tu sesión expiró. Iniciá sesión de nuevo para continuar.
+          </p>
+        )}
         </div>
 
         <form className="space-y-5" onSubmit={handleSubmit}>
