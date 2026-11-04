@@ -11,7 +11,8 @@ import { RolesGuard } from '../auth/roles.guard';
 import { Roles } from '../auth/roles.decorator';
 
 @Controller('user-club-preferences')
-@UseGuards(JwtAuthGuard)
+@UseGuards(JwtAuthGuard, RolesGuard)
+@Roles('customer', 'admin')
 export class UserClubPreferencesController {
   constructor(private readonly svc: UserClubPreferencesService) {}
 
@@ -24,7 +25,6 @@ export class UserClubPreferencesController {
     return this.svc.create(dto);
   }
 
-  @UseGuards(RolesGuard)
   @Roles('admin')
   @Get()
   async findAll() {
@@ -39,14 +39,12 @@ export class UserClubPreferencesController {
     return this.svc.findByUser(idUser);
   }
 
-  @UseGuards(RolesGuard)
   @Roles('entrepreneur', 'admin')
   @Get('by-club/:idClub')
   async findByClub(@Param('idClub', ParseIntPipe) idClub: number, @Request() req) {
     return this.svc.findByClub(idClub, req.user);
   }
 
-  @UseGuards(RolesGuard)
   @Roles('entrepreneur', 'admin')
   @Get('by-subscription-type/:idSubscriptionTypes')
   async findBySubscriptionType(@Param('idSubscriptionTypes', ParseIntPipe) idSubscriptionTypes: number, @Request() req) {

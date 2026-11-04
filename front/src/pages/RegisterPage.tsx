@@ -118,8 +118,9 @@ const RegisterPage: React.FC = () => {
         navigate('/register/complete-profile');
       }
     } catch (err: any) {
-      setError(err.response?.data?.message || 'Error al registrarse. Intentá de nuevo.');
-    } finally {
+      const msg = err.response?.data?.message;
+      setError(Array.isArray(msg) ? msg.join('. ') : msg || 'Error al registrarse. Intentá de nuevo.');
+        } finally {
       setLoading(false);
     }
   };

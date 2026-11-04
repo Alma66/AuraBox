@@ -3,6 +3,19 @@ import { UsersService } from '../users/users.service';
 import * as bcrypt from 'bcryptjs';
 import { JwtService } from '@nestjs/jwt';
 import { PrismaService } from '../../prisma/prisma.service';
+import {
+  CompleteCustomerProfileDto,
+  RegisterClubDto,
+  RegisterCustomerDto,
+  RegisterEntrepreneurDto,
+} from './dto/register.dto';
+
+const ageOn = (birth: Date, today: Date = new Date()) => {
+  let age = today.getUTCFullYear() - birth.getUTCFullYear();
+  const monthDiff = today.getUTCMonth() - birth.getUTCMonth();
+  if (monthDiff < 0 || (monthDiff === 0 && today.getUTCDate() < birth.getUTCDate())) age -= 1;
+  return age;
+};
 
 @Injectable()
 export class AuthService {
@@ -13,17 +26,18 @@ export class AuthService {
   ) {}
 
   async validateUser(email: string, pass: string): Promise<any> {
+    const lookup = { equals: email.trim(), mode: 'insensitive' as const };
     let user: any = null;
     let role = 'customer';
 
-    const foundUser = await this.prisma.user.findUnique({ where: { email } });
+    const foundUser = await this.prisma.user.findFirst({ where: { email: lookup } });
     if (foundUser) {
       user = foundUser;
       role = 'customer';
     }
 
     if (!user) {
-      const foundEntrepreneur = await this.prisma.entrepreneurs.findUnique({ where: { email } });
+      const foundEntrepreneur = await this.prisma.entrepreneurs.findFirst({ where: { email: lookup } });
       if (foundEntrepreneur) {
         user = foundEntrepreneur;
         role = 'entrepreneur';
@@ -31,7 +45,7 @@ export class AuthService {
     }
 
     if (!user) {
-      const foundAdmin = await this.prisma.admins.findUnique({ where: { email } });
+      const foundAdmin = await this.prisma.admins.findFirst({ where: { email: lookup } });
       if (foundAdmin) {
         user = foundAdmin;
         role = 'admin';
@@ -59,9 +73,8 @@ export class AuthService {
 
   async buildToken(user: any) {
     let managedClubId: number | null = null;
-    
+
     if (user.role === 'entrepreneur') {
-       
       const association = await this.prisma.entrepreneur_Club.findFirst({
         where: { idEntrepreneurs: user.id },
         orderBy: { associationDate: 'asc' },
@@ -101,25 +114,27 @@ export class AuthService {
     return payload.sub;
   }
 
-   private async emailInUse(email: string) {
+  private async emailInUse(email: string) {
+    const lookup = { equals: email.trim(), mode: 'insensitive' as const };
     const [customer, entrepreneur, admin] = await Promise.all([
-      this.prisma.user.findUnique({ where: { email } }),
-      this.prisma.entrepreneurs.findUnique({ where: { email } }),
-      this.prisma.admins.findUnique({ where: { email } }),
+      this.prisma.user.findFirst({ where: { email: lookup } }),
+      this.prisma.entrepreneurs.findFirst({ where: { email: lookup } }),
+      this.prisma.admins.findFirst({ where: { email: lookup } }),
     ]);
     return !!(customer || entrepreneur || admin);
-  } 
+  }
 
-  async registerCustomer(dto: any) {
-     if (await this.emailInUse(dto.email)) throw new BadRequestException('Ese email ya está registrado');
-      const exists = await this.prisma.user.findFirst({
-      where: { OR: [{ email: dto.email }, { documentNumber: parseInt(dto.documentNumber) }] },
-    });
-    if (exists) throw new BadRequestException('Email o documento ya registrado');
+  async registerCustomer(dto: RegisterCustomerDto) {
+    if (await this.emailInUse(dto.email)) throw new BadRequestException('Ese email ya está registrado');
+
+    const documentNumber = parseInt(dto.documentNumber, 10);
+    const exists = await this.prisma.user.findFirst({ where: { documentNumber } });
+    if (exists) throw new BadRequestException('Ese documento ya está registrado');
 
     const birthDate = new Date(dto.birthDate);
-    const age = new Date().getFullYear() - birthDate.getFullYear();
-    if (age < 16) throw new BadRequestException('Debes tener al menos 16 años para registrarte como cliente.');
+    if (ageOn(birthDate) < 16) {
+      throw new BadRequestException('Debes tener al menos 16 años para registrarte como cliente.');
+    }
 
     const hashed = await bcrypt.hash(dto.password, 10);
 
@@ -129,10 +144,10 @@ export class AuthService {
         lastName: dto.lastName,
         email: dto.email,
         passwordHash: hashed,
-        documentType: dto.documentType,
-        documentNumber: parseInt(dto.documentNumber),
-        phoneNumber: dto.phoneNumber ? parseInt(dto.phoneNumber) : null,
-        birthDate: new Date(dto.birthDate),
+        documentType: dto.documentType as any,
+        documentNumber,
+        phoneNumber: dto.phoneNumber ?? null,
+        birthDate,
       },
     });
 
@@ -141,23 +156,19 @@ export class AuthService {
     return { ...safe, role: 'customer', profileToken };
   }
 
-  async completeCustomerProfile(dto: any) {
-    const { profileToken, streetAddress, addressNumber, floorNumber, addressDetails, city, province, postalCode } = dto;
-
-    if (!profileToken) throw new BadRequestException('profileToken es requerido');
-
-    const userId = this.verifyRegistrationToken(profileToken, 'complete-profile');
+  async completeCustomerProfile(dto: CompleteCustomerProfileDto) {
+    const userId = this.verifyRegistrationToken(dto.profileToken, 'complete-profile');
 
     const updated = await this.prisma.user.update({
       where: { id: userId },
       data: {
-        streetAddress: streetAddress ?? null,
-        addressNumber: addressNumber ? parseInt(addressNumber) : null,
-        floorNumber: floorNumber ?? null,
-        addressDetails: addressDetails ?? null,
-        city: city ?? null,
-        province: province ?? null,
-        postalCode: postalCode ?? null,
+        streetAddress: dto.streetAddress ?? null,
+        addressNumber: dto.addressNumber ?? null,
+        floorNumber: dto.floorNumber ?? null,
+        addressDetails: dto.addressDetails ?? null,
+        city: dto.city ?? null,
+        province: dto.province ?? null,
+        postalCode: dto.postalCode ?? null,
       },
     });
 
@@ -165,16 +176,17 @@ export class AuthService {
     return safe;
   }
 
-  async registerEntrepreneur(dto: any) {
-       if (await this.emailInUse(dto.email)) throw new BadRequestException('Ese email ya está registrado');
-        const exists = await this.prisma.entrepreneurs.findFirst({
-      where: { OR: [{ email: dto.email }, { documentNumber: parseInt(dto.documentNumber) }] },
-    });
-    if (exists) throw new BadRequestException('Email o documento ya registrado');
+  async registerEntrepreneur(dto: RegisterEntrepreneurDto) {
+    if (await this.emailInUse(dto.email)) throw new BadRequestException('Ese email ya está registrado');
+
+    const documentNumber = parseInt(dto.documentNumber, 10);
+    const exists = await this.prisma.entrepreneurs.findFirst({ where: { documentNumber } });
+    if (exists) throw new BadRequestException('Ese documento ya está registrado');
 
     const birthDate = new Date(dto.birthDate);
-    const age = new Date().getFullYear() - birthDate.getFullYear();
-    if (age < 18) throw new BadRequestException('Debes tener al menos 18 años para registrarte como emprendedor.');
+    if (ageOn(birthDate) < 18) {
+      throw new BadRequestException('Debes tener al menos 18 años para registrarte como emprendedor.');
+    }
 
     const hashed = await bcrypt.hash(dto.password, 10);
 
@@ -184,10 +196,10 @@ export class AuthService {
         lastName: dto.lastName,
         email: dto.email,
         passwordHash: hashed,
-        documentType: dto.documentType,
-        documentNumber: parseInt(dto.documentNumber),
-        phoneNumber: dto.phoneNumber ? parseInt(dto.phoneNumber) : null,
-        birthDate: new Date(dto.birthDate),
+        documentType: dto.documentType as any,
+        documentNumber,
+        phoneNumber: dto.phoneNumber ?? null,
+        birthDate,
         city: dto.city ?? null,
         province: dto.province ?? null,
       },
@@ -198,15 +210,8 @@ export class AuthService {
     return { ...safe, role: 'entrepreneur', entrepreneurToken };
   }
 
-   async registerEntrepreneurClub(dto: any) {
-    const { entrepreneurToken, name, logoUrl, shortDescription, contactEmail, slogan, history, whatsappContact } = dto;
-
-    if (!entrepreneurToken) throw new BadRequestException('entrepreneurToken es requerido');
-    if (!name?.trim() || !shortDescription?.trim() || !contactEmail?.trim()) {
-      throw new BadRequestException('Nombre, descripción y email de contacto son obligatorios');
-    }
-
-    const entrepreneurId = this.verifyRegistrationToken(entrepreneurToken, 'entrepreneur-club');
+  async registerEntrepreneurClub(dto: RegisterClubDto) {
+    const entrepreneurId = this.verifyRegistrationToken(dto.entrepreneurToken, 'entrepreneur-club');
 
     const entrepreneur = await this.prisma.entrepreneurs.findUnique({
       where: { id: entrepreneurId },
@@ -221,13 +226,13 @@ export class AuthService {
     return this.prisma.$transaction(async (tx) => {
       const club = await tx.club.create({
         data: {
-          name: name.trim(),
-          logoUrl: logoUrl ?? '',
-          slogan: slogan ?? null,
-          history: history ?? null,
-          shortDescription: shortDescription.trim(),
-          contactEmail: contactEmail.trim(),
-          whatsappContact: whatsappContact ?? null,
+          name: dto.name,
+          logoUrl: dto.logoUrl ?? '',
+          slogan: dto.slogan ?? null,
+          history: dto.history ?? null,
+          shortDescription: dto.shortDescription,
+          contactEmail: dto.contactEmail,
+          whatsappContact: dto.whatsappContact ?? null,
           clubStatus: 'PENDIENTE_APROBACION',
         },
       });

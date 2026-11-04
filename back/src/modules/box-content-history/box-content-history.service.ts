@@ -4,6 +4,8 @@ import { CreateBoxContentHistoryDto } from './dto/create-box-content-history.dto
 import { UpdateBoxContentHistoryDto } from './dto/update-box-content-history.dto';
 import { CloudinaryService } from '../cloudinary/cloudinary.service';
 
+type RequestUser = { id: number; role: string };
+
 function sanitize(history: any) {
   if (!history) return history;
   if (history.productExpirationDate instanceof Date) history.productExpirationDate = history.productExpirationDate.toISOString();
@@ -29,6 +31,24 @@ export class BoxContentHistoryService {
       if (!assoc) throw new ForbiddenException('No tenés acceso a esta suscripción');
     }
     return subType;
+  }
+
+  private async resolveAccess(idSubscriptionTypes: number, user: RequestUser) {
+    const subType = await this.prisma.subscription_Types.findUnique({ where: { id: idSubscriptionTypes } });
+    if (!subType) throw new NotFoundException('Tipo de suscripción no encontrado');
+
+    if (user.role === 'admin') return { full: true };
+
+    if (user.role === 'entrepreneur') {
+      const assoc = await this.prisma.entrepreneur_Club.findFirst({
+        where: { idEntrepreneurs: user.id, idClub: subType.idClub },
+      });
+      if (assoc) return { full: true };
+    }
+
+    const club = await this.prisma.club.findUnique({ where: { id: subType.idClub } });
+    if (!club || club.clubStatus !== 'APROBADO') throw new NotFoundException('Tipo de suscripción no encontrado');
+    return { full: false };
   }
 
   async create(dto: CreateBoxContentHistoryDto, imageFile?: Express.Multer.File, requesterId?: number, requesterRole?: string) {
@@ -65,18 +85,23 @@ export class BoxContentHistoryService {
   }
 
   async findAll(page = 1, perPage = 50) {
-    const skip = (page - 1) * perPage;
+    const safePage = Number.isFinite(page) && page > 0 ? page : 1;
+    const safePerPage = Number.isFinite(perPage) && perPage > 0 ? Math.min(perPage, 200) : 50;
     const histories = await this.prisma.boxContentHistory.findMany({
-      skip,
-      take: perPage,
+      skip: (safePage - 1) * safePerPage,
+      take: safePerPage,
       orderBy: { publicationDate: 'desc' },
     });
     return histories.map(sanitize);
   }
 
-  async findBySubscriptionType(idSubscriptionTypes: number) {
+  async findBySubscriptionType(idSubscriptionTypes: number, user: RequestUser) {
+    const { full } = await this.resolveAccess(idSubscriptionTypes, user);
     const histories = await this.prisma.boxContentHistory.findMany({
-      where: { idSubscriptionTypes },
+      where: {
+        idSubscriptionTypes,
+        ...(full ? {} : { OR: [{ publicationDate: null }, { publicationDate: { lte: new Date() } }] }),
+      },
       orderBy: { publicationDate: 'desc' },
     });
     return histories.map(sanitize);
@@ -90,9 +115,14 @@ export class BoxContentHistoryService {
     return histories.map(sanitize);
   }
 
-  async findOne(id: number) {
+  async findOne(id: number, user: RequestUser) {
     const item = await this.prisma.boxContentHistory.findUnique({ where: { id } });
     if (!item) throw new NotFoundException('Historial de caja no encontrado');
+
+    const { full } = await this.resolveAccess(item.idSubscriptionTypes, user);
+    if (!full && item.publicationDate && item.publicationDate.getTime() > Date.now()) {
+      throw new NotFoundException('Historial de caja no encontrado');
+    }
     return sanitize(item);
   }
 
@@ -101,10 +131,16 @@ export class BoxContentHistoryService {
     if (!item) throw new NotFoundException('Historial de caja no encontrado');
     await this.assertOwnership(item.idSubscriptionTypes, requesterId, requesterRole);
 
+    const { idSubscriptionTypes, ...rest } = dto as any;
+    if (idSubscriptionTypes !== undefined && idSubscriptionTypes !== item.idSubscriptionTypes) {
+      await this.assertOwnership(idSubscriptionTypes, requesterId, requesterRole);
+    }
+
     const updated = await this.prisma.boxContentHistory.update({
       where: { id },
       data: {
-        ...dto,
+        ...rest,
+        ...(idSubscriptionTypes !== undefined ? { idSubscriptionTypes } : {}),
         productExpirationDate: dto.productExpirationDate ? new Date(dto.productExpirationDate) : item.productExpirationDate,
         publicationDate: dto.publicationDate ? new Date(dto.publicationDate) : item.publicationDate,
       },
@@ -118,8 +154,10 @@ export class BoxContentHistoryService {
     await this.assertOwnership(item.idSubscriptionTypes, requesterId, requesterRole);
 
     if (item.productImageUrl) {
-      const publicId = this.cloudinary.extractPublicId(item.productImageUrl);
-      await this.cloudinary.deleteImage(publicId);
+      try {
+        const publicId = this.cloudinary.extractPublicId(item.productImageUrl);
+        await this.cloudinary.deleteImage(publicId);
+      } catch {}
     }
 
     await this.prisma.boxContentHistory.delete({ where: { id } });

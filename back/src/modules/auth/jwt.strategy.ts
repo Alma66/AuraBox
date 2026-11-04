@@ -1,6 +1,7 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
 import { ExtractJwt, Strategy } from 'passport-jwt';
+import { PrismaService } from '../../prisma/prisma.service';
 
 function getJwtSecret(): string {
   const secret = process.env.JWT_SECRET;
@@ -12,7 +13,7 @@ function getJwtSecret(): string {
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
-  constructor() {
+  constructor(private readonly prisma: PrismaService) {
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
       ignoreExpiration: false,
@@ -21,6 +22,23 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
   }
 
   async validate(payload: any) {
-    return { id: payload.sub, email: payload.email, role: payload.role };
+    const id = Number(payload?.sub);
+    const role = payload?.role;
+    if (!Number.isInteger(id)) throw new UnauthorizedException();
+
+    let account: { active: boolean } | null = null;
+    if (role === 'customer') {
+      account = await this.prisma.user.findUnique({ where: { id }, select: { active: true } });
+    } else if (role === 'entrepreneur') {
+      account = await this.prisma.entrepreneurs.findUnique({ where: { id }, select: { active: true } });
+    } else if (role === 'admin') {
+      account = await this.prisma.admins.findUnique({ where: { id }, select: { active: true } });
+    }
+
+    if (!account || account.active === false) {
+      throw new UnauthorizedException('Cuenta deshabilitada');
+    }
+
+    return { id, email: payload.email, role };
   }
 }

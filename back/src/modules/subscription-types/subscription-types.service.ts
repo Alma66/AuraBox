@@ -3,6 +3,8 @@ import { PrismaService } from '../../prisma/prisma.service';
 import { CreateSubscriptionTypeDto } from './dto/create-subscription-types.dto';
 import { UpdateSubscriptionTypeDto } from './dto/update-subscription-types.dto';
 import { CloudinaryService } from '../cloudinary/cloudinary.service';
+import { AURABOX_COMMISSION } from '../payments/payments.constants';
+import { priceFor } from '../../common/utils/billing';
 import { Prisma, Frequency } from '@prisma/client';
 
 function sanitize(nt: any) {
@@ -35,6 +37,23 @@ export class SubscriptionTypesService {
     if (!assoc) throw new ForbiddenException('No sos owner de este club');
   }
 
+  private assertPricing(price: unknown, cash: unknown, transfer: unknown) {
+    const base = Number(price);
+    if (!Number.isFinite(base) || base <= AURABOX_COMMISSION) {
+      throw new BadRequestException(`El precio debe ser mayor a $${AURABOX_COMMISSION}`);
+    }
+    for (const discount of [cash, transfer]) {
+      if (discount === undefined || discount === null) continue;
+      const value = Number(discount);
+      if (!Number.isFinite(value) || value < 0 || value > 90) {
+        throw new BadRequestException('Los descuentos deben estar entre 0 y 90%');
+      }
+    }
+    if (priceFor(base, transfer, true) <= AURABOX_COMMISSION) {
+      throw new BadRequestException('Con el descuento por transferencia el precio queda por debajo del mínimo');
+    }
+  }
+
   private async deleteAsset(imageUrl?: string | null) {
     if (!imageUrl) return;
     const publicId = this.cloudinary.extractPublicId(imageUrl);
@@ -52,6 +71,8 @@ export class SubscriptionTypesService {
       await this.assertEntrepreneurOwnsClub(requesterId, dto.idClub);
     }
 
+    this.assertPricing(dto.basePrice ?? (dto as any).price, dto.cashDiscount, dto.transferDiscount);
+
     const includesStr = Array.isArray(dto.includes)
       ? JSON.stringify(dto.includes)
       : (dto.includes ?? null);
@@ -60,7 +81,7 @@ export class SubscriptionTypesService {
       idClub: dto.idClub,
       name: dto.name,
       description: dto.description ?? null,
-      basePrice: (dto.basePrice ?? dto.price) as any,
+      basePrice: (dto.basePrice ?? (dto as any).price) as any,
       frequency: dto.frequency as Frequency,
       cashDiscount: dto.cashDiscount ?? undefined,
       transferDiscount: dto.transferDiscount ?? undefined,
@@ -101,12 +122,19 @@ export class SubscriptionTypesService {
       await this.assertEntrepreneurOwnsClub(requesterId, existing.idClub);
     }
 
+    const newPrice = dto.basePrice ?? (dto as any).price;
+    if (newPrice !== undefined || dto.cashDiscount !== undefined || dto.transferDiscount !== undefined) {
+      this.assertPricing(
+        newPrice ?? existing.basePrice,
+        dto.cashDiscount ?? existing.cashDiscount,
+        dto.transferDiscount ?? existing.transferDiscount,
+      );
+    }
+
     const data: Prisma.Subscription_TypesUpdateInput = {};
     if (dto.name !== undefined) data.name = dto.name;
     if (dto.description !== undefined) data.description = dto.description;
-    if (dto.basePrice !== undefined || (dto as any).price !== undefined) {
-      data.basePrice = (dto.basePrice ?? (dto as any).price) as any;
-    }
+    if (newPrice !== undefined) data.basePrice = newPrice as any;
     if (dto.frequency !== undefined) data.frequency = dto.frequency as any;
     if (dto.cashDiscount !== undefined) data.cashDiscount = dto.cashDiscount as any;
     if (dto.transferDiscount !== undefined) data.transferDiscount = dto.transferDiscount as any;
@@ -154,7 +182,17 @@ export class SubscriptionTypesService {
       await this.assertEntrepreneurOwnsClub(requesterId, existing.idClub);
     }
 
-    await this.prisma.subscription_Types.delete({ where: { id } });
+    const subscriptions = await this.prisma.user_Subscriptions.count({ where: { idSubscriptionTypes: id } });
+    if (subscriptions > 0) {
+      throw new BadRequestException('Este plan ya tiene suscripciones registradas. Desactivalo en lugar de eliminarlo.');
+    }
+
+    await this.prisma.$transaction([
+      this.prisma.cart_Item.deleteMany({ where: { idSubscriptionTypes: id } }),
+      this.prisma.favorites.deleteMany({ where: { idSubscriptionTypes: id } }),
+      this.prisma.boxContentHistory.deleteMany({ where: { idSubscriptionTypes: id } }),
+      this.prisma.subscription_Types.delete({ where: { id } }),
+    ]);
     await this.deleteAsset(existing.imageUrl);
     return { ok: true };
   }

@@ -6,6 +6,7 @@ import {
 import { FilesInterceptor } from '@nestjs/platform-express';
 import { memoryStorage } from 'multer';
 import { Throttle } from '@nestjs/throttler';
+import { IMAGE_MAX_BYTES, hasValidImageSignature } from '../../common/utils/image-upload';
 import { SupportService } from './support.service';
 import { CreateConversationDto } from './dto/create-conversation.dto';
 import { CreateMessageDto } from './dto/create-message.dto';
@@ -34,8 +35,24 @@ const ALLOWED_ATTACHMENT_MIME_TYPES = new Set([
   'video/webm',
 ]);
 
+const attachmentUploadOptions = {
+  storage: memoryStorage(),
+  limits: { fileSize: 15 * 1024 * 1024 },
+  fileFilter: (
+    _req: unknown,
+    file: { mimetype: string },
+    callback: (error: Error | null, acceptFile: boolean) => void,
+  ) => {
+    if (!ALLOWED_ATTACHMENT_MIME_TYPES.has(file.mimetype)) {
+      callback(new BadRequestException(`Tipo de archivo no permitido: ${file.mimetype}`), false);
+      return;
+    }
+    callback(null, true);
+  },
+};
+
 @Controller('support')
-@UseGuards(JwtAuthGuard)
+@UseGuards(JwtAuthGuard, RolesGuard)
 export class SupportController {
   constructor(
     private readonly svc: SupportService,
@@ -45,25 +62,31 @@ export class SupportController {
   private async buildAttachments(files?: Express.Multer.File[]): Promise<AttachmentInput[]> {
     const attachments: AttachmentInput[] = [];
     for (const file of files ?? []) {
-      if (!ALLOWED_ATTACHMENT_MIME_TYPES.has(file.mimetype)) {
-        throw new BadRequestException(`Tipo de archivo no permitido: ${file.mimetype}`);
+      const isVideo = file.mimetype.startsWith('video/');
+      if (!isVideo) {
+        if (file.size > IMAGE_MAX_BYTES) {
+          throw new BadRequestException('Las imágenes no pueden superar los 8 MB');
+        }
+        if (!hasValidImageSignature(file.buffer)) {
+          throw new BadRequestException('El archivo no es una imagen válida');
+        }
       }
-      const type: 'Imagen' | 'Video' = file.mimetype.startsWith('video/') ? 'Video' : 'Imagen';
-      const url = await this.cloudinary.uploadImage(file, 'aurabox/support/attachments');
-      attachments.push({ url, type, name: file.originalname });
+      const url = isVideo
+        ? await this.cloudinary.uploadVideo(file, 'aurabox/support/attachments')
+        : await this.cloudinary.uploadImage(file, 'aurabox/support/attachments');
+      attachments.push({ url, type: isVideo ? 'Video' : 'Imagen', name: file.originalname });
     }
     return attachments;
   }
 
-  @UseGuards(RolesGuard)
   @Roles('customer')
+  @Throttle({ default: { limit: 10, ttl: 60000 } })
   @Post('conversations')
   @UsePipes(new ValidationPipe({ whitelist: true, transform: true }))
   async createConversation(@Body() dto: CreateConversationDto, @Request() req) {
     return this.svc.createConversation(dto, req.user.id);
   }
 
-  @UseGuards(RolesGuard)
   @Roles('entrepreneur', 'admin')
   @Get('conversations/by-club/:idClub')
   async findByClub(
@@ -74,81 +97,79 @@ export class SupportController {
     return this.svc.findByClub(idClub, req.user, status);
   }
 
+  @Roles('customer', 'entrepreneur', 'admin')
   @Get('conversations/:id')
   async findOne(@Param('id', ParseIntPipe) id: number, @Request() req) {
     return this.svc.findOne(id, req.user);
   }
 
+  @Roles('customer', 'entrepreneur', 'admin')
   @Get('conversations/:id/messages')
   async getMessages(@Param('id', ParseIntPipe) id: number, @Request() req) {
     return this.svc.getMessages(id, req.user);
   }
 
-  @UseGuards(RolesGuard)
-  @Roles('entrepreneur', 'admin')
+  @Roles('entrepreneur')
+  @Throttle({ default: { limit: 20, ttl: 60000 } })
   @Post('messages/entrepreneur')
-  @UseInterceptors(FilesInterceptor('files', 5, { storage: memoryStorage(), limits: { fileSize: 20 * 1024 * 1024 } }))
+  @UseInterceptors(FilesInterceptor('files', 5, attachmentUploadOptions))
   @UsePipes(new ValidationPipe({ whitelist: true, transform: true }))
   async sendEntrepreneurMessage(
     @Body() dto: CreateMessageDto,
     @Request() req,
     @UploadedFiles() files?: Express.Multer.File[],
   ) {
+    await this.svc.assertCanPost(dto.idConversation, req.user);
     const attachments = await this.buildAttachments(files);
     return this.svc.sendEntrepreneurMessage(dto, req.user, attachments);
   }
 
-  @UseGuards(RolesGuard)
   @Roles('customer')
+  @Throttle({ default: { limit: 20, ttl: 60000 } })
   @Post('messages/user')
-  @UseInterceptors(FilesInterceptor('files', 5, { storage: memoryStorage(), limits: { fileSize: 20 * 1024 * 1024 } }))
+  @UseInterceptors(FilesInterceptor('files', 5, attachmentUploadOptions))
   @UsePipes(new ValidationPipe({ whitelist: true, transform: true }))
   async sendUserMessage(
     @Body() dto: CreateMessageDto,
     @Request() req,
     @UploadedFiles() files?: Express.Multer.File[],
   ) {
+    await this.svc.assertCanPost(dto.idConversation, req.user);
     const attachments = await this.buildAttachments(files);
     return this.svc.sendUserMessage(dto, req.user, attachments);
   }
 
-  @UseGuards(RolesGuard)
   @Roles('entrepreneur', 'admin')
   @Patch('conversations/:id/read')
   async markRead(@Param('id', ParseIntPipe) id: number, @Request() req) {
     return this.svc.markRead(id, req.user);
   }
 
-  @UseGuards(RolesGuard)
   @Roles('customer')
   @Patch('conversations/:id/read/customer')
   async markReadCustomer(@Param('id', ParseIntPipe) id: number, @Request() req) {
     return this.svc.markRead(id, req.user);
   }
 
-  @UseGuards(RolesGuard)
   @Roles('entrepreneur', 'admin')
   @Patch('conversations/:id/close')
   async close(@Param('id', ParseIntPipe) id: number, @Request() req) {
     return this.svc.closeConversation(id, req.user);
   }
 
-  @UseGuards(RolesGuard)
   @Roles('entrepreneur', 'admin')
   @Patch('conversations/:id/reopen')
   async reopen(@Param('id', ParseIntPipe) id: number, @Request() req) {
     return this.svc.reopenConversation(id, req.user);
   }
 
-  @UseGuards(RolesGuard)
   @Roles('entrepreneur', 'admin')
   @Get('conversations/:id/basic-info')
   async basicInfo(@Param('id', ParseIntPipe) id: number, @Request() req) {
     return this.svc.getBasicCustomerInfo(id, req.user);
   }
 
-  @UseGuards(RolesGuard)
-  @Roles('entrepreneur', 'admin')
+  @Roles('entrepreneur')
   @Throttle({ default: { limit: 3, ttl: 60000 } })
   @Post('verification/request')
   @UsePipes(new ValidationPipe({ whitelist: true, transform: true }))
@@ -156,8 +177,7 @@ export class SupportController {
     return this.svc.requestVerification(dto, req.user);
   }
 
-  @UseGuards(RolesGuard)
-  @Roles('entrepreneur', 'admin')
+  @Roles('entrepreneur')
   @Throttle({ default: { limit: 5, ttl: 60000 } })
   @Post('verification/confirm')
   @UsePipes(new ValidationPipe({ whitelist: true, transform: true }))
@@ -165,14 +185,12 @@ export class SupportController {
     return this.svc.confirmVerification(dto, req.user);
   }
 
-  @UseGuards(RolesGuard)
   @Roles('entrepreneur', 'admin')
   @Get('conversations/:id/access-logs')
   async accessLogs(@Param('id', ParseIntPipe) id: number, @Request() req) {
     return this.svc.getAccessLogs(id, req.user);
   }
 
-  @UseGuards(RolesGuard)
   @Roles('entrepreneur', 'admin')
   @Post('auto-replies')
   @UsePipes(new ValidationPipe({ whitelist: true, transform: true }))
@@ -180,14 +198,12 @@ export class SupportController {
     return this.svc.createAutoReply(dto, req.user);
   }
 
-  @UseGuards(RolesGuard)
   @Roles('entrepreneur', 'admin')
   @Get('auto-replies/by-club/:idClub')
   async findAutoReplies(@Param('idClub', ParseIntPipe) idClub: number, @Request() req) {
     return this.svc.findAutoRepliesByClub(idClub, req.user);
   }
 
-  @UseGuards(RolesGuard)
   @Roles('entrepreneur', 'admin')
   @Put('auto-replies/:id')
   @UsePipes(new ValidationPipe({ whitelist: true, transform: true }))
@@ -195,7 +211,6 @@ export class SupportController {
     return this.svc.updateAutoReply(id, dto, req.user);
   }
 
-  @UseGuards(RolesGuard)
   @Roles('entrepreneur', 'admin')
   @Delete('auto-replies/:id')
   async removeAutoReply(@Param('id', ParseIntPipe) id: number, @Request() req) {

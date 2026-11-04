@@ -231,8 +231,9 @@ export class ClubsService {
     );
     const teamImagesRaw = images.filter((img) => img.section === 'Equipo' && isTeamImage(img));
     const socialNetworksRaw = await this.prisma.club_Social_Networks.findMany({ where: { idClub: id } });
-    const plans = await this.prisma.subscription_Types.findMany({ where: { idClub: id } });
-    const mappedPlans = plans.map((p) => this.mapPlan(p));
+    const plans = await this.prisma.subscription_Types.findMany({
+      where: { idClub: id, ...(isOwner || isAdmin ? {} : { active: true }) },
+    });    const mappedPlans = plans.map((p) => this.mapPlan(p));
     const categoryLinks = await this.prisma.club_Categories.findMany({ where: { idClub: id } });
     const categoryIds = categoryLinks.map((l) => l.idCategories);
     const categories = categoryIds.length > 0

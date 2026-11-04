@@ -10,6 +10,10 @@ import { ConfirmVerificationDto } from './dto/confirm-verification.dto';
 import { MailerService } from '../mailer/mailer.service';
 
 type RequestUser = { id: number; role: string };
+type AttachmentData = { url: string; type: 'Imagen' | 'Video'; name?: string };
+
+const CODE_COOLDOWN_MS = 60 * 1000;
+const CODE_LIFETIME_MS = 10 * 60 * 1000;
 
 function sanitize(item: any) {
   if (!item) return item;
@@ -47,6 +51,20 @@ export class SupportService {
     throw new ForbiddenException('No tenés acceso a esta conversación');
   }
 
+  private assertEntrepreneur(user: RequestUser) {
+    if (user.role !== 'entrepreneur') {
+      throw new ForbiddenException('Solo el emprendedor del club puede realizar esta acción');
+    }
+  }
+
+  async assertCanPost(idConversation: number, user: RequestUser) {
+    const conversation = await this.prisma.support_Conversation.findUnique({ where: { id: idConversation } });
+    if (!conversation) throw new NotFoundException('Conversación no encontrada');
+    await this.assertConversationAccess(conversation, user);
+    if (conversation.status === 'Cerrada') throw new BadRequestException('La conversación está cerrada');
+    return conversation;
+  }
+
   async createConversation(dto: CreateConversationDto, idUser: number) {
     const sub = await this.prisma.user_Subscriptions.findFirst({
       where: { idUser, idSubscriptionTypes: dto.idSubscriptionTypes },
@@ -58,18 +76,20 @@ export class SupportService {
       throw new BadRequestException('La suscripción no pertenece a este club');
     }
 
-    const conversation = await this.prisma.support_Conversation.create({
-      data: {
-        idClub: dto.idClub,
-        idUser,
-        idSubscriptionTypes: dto.idSubscriptionTypes,
-        subject: dto.subject.trim(),
-        status: 'Abierta',
-      },
-    });
-
-    await this.prisma.support_Message.create({
-      data: { idConversation: conversation.id, senderType: 'User', senderId: idUser, content: dto.content.trim() },
+    const conversation = await this.prisma.$transaction(async (tx) => {
+      const created = await tx.support_Conversation.create({
+        data: {
+          idClub: dto.idClub,
+          idUser,
+          idSubscriptionTypes: dto.idSubscriptionTypes,
+          subject: dto.subject.trim(),
+          status: 'Abierta',
+        },
+      });
+      await tx.support_Message.create({
+        data: { idConversation: created.id, senderType: 'User', senderId: idUser, content: dto.content.trim() },
+      });
+      return created;
     });
 
     await this.handleAutoReply(conversation.id, dto.idClub, dto.content, true);
@@ -97,27 +117,27 @@ export class SupportService {
   }
 
   async findByClub(idClub: number, user: RequestUser, status?: 'Abierta' | 'Cerrada') {
-  await this.assertClubAccess(idClub, user);
-  const conversations = await this.prisma.support_Conversation.findMany({
-    where: { idClub, ...(status ? { status } : {}) },
-    orderBy: { lastMessageAt: 'desc' },
-  });
+    await this.assertClubAccess(idClub, user);
+    const conversations = await this.prisma.support_Conversation.findMany({
+      where: { idClub, ...(status ? { status } : {}) },
+      orderBy: { lastMessageAt: 'desc' },
+    });
 
-  const userIds = Array.from(new Set(conversations.map((c) => c.idUser)));
-  const users = await this.prisma.user.findMany({
-    where: { id: { in: userIds } },
-    select: { id: true, firstName: true, lastName: true },
-  });
+    const userIds = Array.from(new Set(conversations.map((c) => c.idUser)));
+    const users = await this.prisma.user.findMany({
+      where: { id: { in: userIds } },
+      select: { id: true, firstName: true, lastName: true },
+    });
 
-  return conversations.map((c) => {
-    const customer = users.find((u) => u.id === c.idUser);
-    return {
-      ...sanitize(c),
-      customerFirstName: customer?.firstName ?? null,
-      customerLastName: customer?.lastName ?? null,
-    };
-  });
-}
+    return conversations.map((c) => {
+      const customer = users.find((u) => u.id === c.idUser);
+      return {
+        ...sanitize(c),
+        customerFirstName: customer?.firstName ?? null,
+        customerLastName: customer?.lastName ?? null,
+      };
+    });
+  }
 
   async findOne(id: number, user: RequestUser) {
     const conversation = await this.prisma.support_Conversation.findUnique({ where: { id } });
@@ -144,67 +164,67 @@ export class SupportService {
     }));
   }
 
-  async sendEntrepreneurMessage(
-    dto: CreateMessageDto,
-    user: RequestUser,
-    attachmentUrls: { url: string; type: 'Imagen' | 'Video'; name?: string }[] = [],
-  ) {
-    const conversation = await this.prisma.support_Conversation.findUnique({ where: { id: dto.idConversation } });
-    if (!conversation) throw new NotFoundException('Conversación no encontrada');
-    await this.assertClubAccess(conversation.idClub, user);
-    if (conversation.status === 'Cerrada') throw new BadRequestException('La conversación está cerrada');
+  async sendEntrepreneurMessage(dto: CreateMessageDto, user: RequestUser, attachmentUrls: AttachmentData[] = []) {
+    this.assertEntrepreneur(user);
+    await this.assertCanPost(dto.idConversation, user);
 
     const content = dto.content?.trim() || null;
     if (!content && attachmentUrls.length === 0) {
       throw new BadRequestException('El mensaje debe tener contenido o un archivo adjunto');
     }
 
-    const message = await this.prisma.support_Message.create({
-      data: { idConversation: dto.idConversation, senderType: 'Entrepreneur', senderId: user.id, content },
-    });
-
-    for (const att of attachmentUrls) {
-      await this.prisma.support_Message_Attachment.create({
-        data: { idMessage: message.id, fileUrl: att.url, fileType: att.type, fileName: att.name ?? null },
+    const message = await this.prisma.$transaction(async (tx) => {
+      const created = await tx.support_Message.create({
+        data: { idConversation: dto.idConversation, senderType: 'Entrepreneur', senderId: user.id, content },
       });
-    }
-
-    await this.prisma.support_Conversation.update({
-      where: { id: dto.idConversation },
-      data: { lastMessageAt: new Date(), hasUnreadForUser: true, hasUnreadForEntrepreneur: false },
+      if (attachmentUrls.length > 0) {
+        await tx.support_Message_Attachment.createMany({
+          data: attachmentUrls.map((att) => ({
+            idMessage: created.id,
+            fileUrl: att.url,
+            fileType: att.type,
+            fileName: att.name ?? null,
+          })),
+        });
+      }
+      await tx.support_Conversation.update({
+        where: { id: dto.idConversation },
+        data: { lastMessageAt: new Date(), hasUnreadForUser: true, hasUnreadForEntrepreneur: false },
+      });
+      return created;
     });
 
     return sanitize(message);
   }
 
-  async sendUserMessage(
-    dto: CreateMessageDto,
-    user: RequestUser,
-    attachmentUrls: { url: string; type: 'Imagen' | 'Video'; name?: string }[] = [],
-  ) {
-    const conversation = await this.prisma.support_Conversation.findUnique({ where: { id: dto.idConversation } });
-    if (!conversation) throw new NotFoundException('Conversación no encontrada');
-    await this.assertConversationAccess(conversation, user);
-    if (conversation.status === 'Cerrada') throw new BadRequestException('La conversación está cerrada');
+  async sendUserMessage(dto: CreateMessageDto, user: RequestUser, attachmentUrls: AttachmentData[] = []) {
+    if (user.role !== 'customer') throw new ForbiddenException('Solo el cliente puede enviar este mensaje');
+    const conversation = await this.assertCanPost(dto.idConversation, user);
 
     const content = dto.content?.trim() || null;
     if (!content && attachmentUrls.length === 0) {
       throw new BadRequestException('El mensaje debe tener contenido o un archivo adjunto');
     }
 
-    const message = await this.prisma.support_Message.create({
-      data: { idConversation: dto.idConversation, senderType: 'User', senderId: conversation.idUser, content },
-    });
-
-    for (const att of attachmentUrls) {
-      await this.prisma.support_Message_Attachment.create({
-        data: { idMessage: message.id, fileUrl: att.url, fileType: att.type, fileName: att.name ?? null },
+    const message = await this.prisma.$transaction(async (tx) => {
+      const created = await tx.support_Message.create({
+        data: { idConversation: dto.idConversation, senderType: 'User', senderId: conversation.idUser, content },
       });
-    }
-
-    await this.prisma.support_Conversation.update({
-      where: { id: dto.idConversation },
-      data: { lastMessageAt: new Date(), hasUnreadForEntrepreneur: true },
+      if (attachmentUrls.length > 0) {
+        await tx.support_Message_Attachment.createMany({
+          data: attachmentUrls.map((att) => ({
+            idMessage: created.id,
+            fileUrl: att.url,
+            fileType: att.type,
+            fileName: att.name ?? null,
+          })),
+        });
+      }
+      await tx.support_Conversation.update({
+        where: { id: dto.idConversation },
+        data: { lastMessageAt: new Date(), hasUnreadForEntrepreneur: true },
+      });
+      return created;
     });
 
     await this.handleAutoReply(dto.idConversation, conversation.idClub, content ?? '', false);
@@ -216,6 +236,8 @@ export class SupportService {
     const conversation = await this.prisma.support_Conversation.findUnique({ where: { id: idConversation } });
     if (!conversation) throw new NotFoundException('Conversación no encontrada');
     await this.assertConversationAccess(conversation, user);
+
+    if (user.role === 'admin') return sanitize(conversation);
 
     const data = user.role === 'customer' ? { hasUnreadForUser: false } : { hasUnreadForEntrepreneur: false };
     return sanitize(await this.prisma.support_Conversation.update({ where: { id: idConversation }, data }));
@@ -293,31 +315,54 @@ export class SupportService {
   }
 
   async requestVerification(dto: RequestVerificationDto, user: RequestUser) {
-  const conversation = await this.prisma.support_Conversation.findUnique({ where: { id: dto.idConversation } });
-  if (!conversation) throw new NotFoundException('Conversación no encontrada');
-  await this.assertClubAccess(conversation.idClub, user);
+    this.assertEntrepreneur(user);
 
-  const customer = await this.prisma.user.findUnique({ where: { id: conversation.idUser } });
-  if (!customer) throw new NotFoundException('Usuario no encontrado');
+    const conversation = await this.prisma.support_Conversation.findUnique({ where: { id: dto.idConversation } });
+    if (!conversation) throw new NotFoundException('Conversación no encontrada');
+    await this.assertClubAccess(conversation.idClub, user);
 
-  const code = randomInt(100000, 1000000).toString();
-  const expiresAt = new Date(Date.now() + 10 * 60 * 1000);
+    if (dto.channel !== 'Email') {
+      throw new BadRequestException('Por ahora la verificación solo está disponible por email');
+    }
 
-  await this.prisma.sensitive_Data_Verification.create({
-    data: { idConversation: dto.idConversation, code, channel: dto.channel, expiresAt, createdBy: user.id },
-  });
-
-  let sent = false;
-  if (dto.channel === 'Email') {
+    const customer = await this.prisma.user.findUnique({ where: { id: conversation.idUser } });
+    if (!customer) throw new NotFoundException('Usuario no encontrado');
     if (!customer.email) throw new BadRequestException('El cliente no tiene un email registrado');
-    await this.mailer.sendVerificationCode(customer.email, code, expiresAt);
-    sent = true;
+
+    const last = await this.prisma.sensitive_Data_Verification.findFirst({
+      where: { idConversation: dto.idConversation },
+      orderBy: { createdAt: 'desc' },
+    });
+    if (last && Date.now() - last.createdAt.getTime() < CODE_COOLDOWN_MS) {
+      throw new BadRequestException('Esperá un minuto antes de pedir otro código');
+    }
+
+    const code = randomInt(100000, 1000000).toString();
+    const expiresAt = new Date(Date.now() + CODE_LIFETIME_MS);
+
+    const [, verification] = await this.prisma.$transaction([
+      this.prisma.sensitive_Data_Verification.updateMany({
+        where: { idConversation: dto.idConversation, used: false },
+        data: { used: true },
+      }),
+      this.prisma.sensitive_Data_Verification.create({
+        data: { idConversation: dto.idConversation, code, channel: dto.channel, expiresAt, createdBy: user.id },
+      }),
+    ]);
+
+    try {
+      await this.mailer.sendVerificationCode(customer.email, code, expiresAt);
+    } catch {
+      await this.prisma.sensitive_Data_Verification.update({ where: { id: verification.id }, data: { used: true } });
+      throw new BadRequestException('No se pudo enviar el código al email del cliente');
+    }
+
+    return { channel: dto.channel, expiresAt: expiresAt.toISOString(), sent: true };
   }
 
-  return { channel: dto.channel, expiresAt: expiresAt.toISOString(), sent };
-}
-
   async confirmVerification(dto: ConfirmVerificationDto, user: RequestUser) {
+    this.assertEntrepreneur(user);
+
     const conversation = await this.prisma.support_Conversation.findUnique({ where: { id: dto.idConversation } });
     if (!conversation) throw new NotFoundException('Conversación no encontrada');
     await this.assertClubAccess(conversation.idClub, user);
@@ -325,17 +370,18 @@ export class SupportService {
     const customer = await this.prisma.user.findUnique({ where: { id: conversation.idUser } });
     if (!customer) throw new NotFoundException('Usuario no encontrado');
 
-    const normalizedDni = dto.dni.replace(/\D/g, '');
-    if (String(customer.documentNumber) !== normalizedDni) {
-      throw new BadRequestException('El DNI no coincide');
-    }
-
     const verification = await this.prisma.sensitive_Data_Verification.findFirst({
-      where: { idConversation: dto.idConversation, code: dto.code, used: false },
+      where: { idConversation: dto.idConversation, used: false, expiresAt: { gt: new Date() } },
       orderBy: { createdAt: 'desc' },
     });
-    if (!verification) throw new BadRequestException('Código inválido');
-    if (verification.expiresAt < new Date()) throw new BadRequestException('El código expiró');
+    const normalizedDni = String(dto.dni ?? '').replace(/\D/g, '');
+    const valid =
+      !!verification &&
+      verification.code === String(dto.code) &&
+      String(customer.documentNumber) === normalizedDni;
+    if (!valid || !verification) {
+      throw new BadRequestException('Los datos de verificación no son válidos o el código expiró');
+    }
 
     await this.prisma.sensitive_Data_Verification.update({ where: { id: verification.id }, data: { used: true } });
 

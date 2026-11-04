@@ -3,6 +3,12 @@ import { Throttle } from '@nestjs/throttler';
 import { AuthService } from './auth.service';
 import { LoginDto } from '../users/dto/login.dto';
 import { Public } from '../../common/decorators/public.decorator';
+import {
+  CompleteCustomerProfileDto,
+  RegisterClubDto,
+  RegisterCustomerDto,
+  RegisterEntrepreneurDto,
+} from './dto/register.dto';
 
 @Controller('auth')
 export class AuthController {
@@ -20,7 +26,7 @@ export class AuthController {
   @Throttle({ default: { limit: 3, ttl: 60000 } })
   @Post('register/customer')
   @UsePipes(new ValidationPipe({ whitelist: true, transform: true }))
-  async registerCustomer(@Body() dto: any) {
+  async registerCustomer(@Body() dto: RegisterCustomerDto) {
     return this.authService.registerCustomer(dto);
   }
 
@@ -28,7 +34,7 @@ export class AuthController {
   @Throttle({ default: { limit: 3, ttl: 60000 } })
   @Post('register/entrepreneur')
   @UsePipes(new ValidationPipe({ whitelist: true, transform: true }))
-  async registerEntrepreneur(@Body() dto: any) {
+  async registerEntrepreneur(@Body() dto: RegisterEntrepreneurDto) {
     return this.authService.registerEntrepreneur(dto);
   }
 
@@ -36,7 +42,7 @@ export class AuthController {
   @Throttle({ default: { limit: 5, ttl: 60000 } })
   @Post('register/entrepreneur/club')
   @UsePipes(new ValidationPipe({ whitelist: true, transform: true }))
-  async registerEntrepreneurClub(@Body() dto: any) {
+  async registerEntrepreneurClub(@Body() dto: RegisterClubDto) {
     return this.authService.registerEntrepreneurClub(dto);
   }
 
@@ -44,7 +50,7 @@ export class AuthController {
   @Throttle({ default: { limit: 5, ttl: 60000 } })
   @Post('register/customer/complete-profile')
   @UsePipes(new ValidationPipe({ whitelist: true, transform: true }))
-  async completeCustomerProfile(@Body() dto: any) {
+  async completeCustomerProfile(@Body() dto: CompleteCustomerProfileDto) {
     return this.authService.completeCustomerProfile(dto);
   }
 }

@@ -16,12 +16,11 @@ import { Roles } from '../auth/roles.decorator';
 export class ShipmentsController {
   constructor(private readonly shipmentsService: ShipmentsService) {}
 
+  @UseGuards(RolesGuard)
+  @Roles('admin')
   @Post()
   @UsePipes(new ValidationPipe({ whitelist: true, transform: true }))
-  async create(@Body() dto: CreateShipmentDto, @Request() req) {
-    if (req.user.role !== 'admin' && (req.user.role !== 'customer' || req.user.id !== dto.idUser)) {
-      throw new ForbiddenException('No autorizado para crear este envío');
-    }
+  async create(@Body() dto: CreateShipmentDto) {
     return this.shipmentsService.create(dto);
   }
 

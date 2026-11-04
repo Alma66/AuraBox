@@ -10,12 +10,11 @@ import { RolesGuard } from '../auth/roles.guard';
 import { Roles } from '../auth/roles.decorator';
 
 @Controller('rider-profile')
-@UseGuards(JwtAuthGuard)
+@UseGuards(JwtAuthGuard, RolesGuard)
+@Roles('entrepreneur', 'admin')
 export class RiderProfileController {
   constructor(private readonly svc: RiderProfileService) {}
 
-  @UseGuards(RolesGuard)
-  @Roles('entrepreneur', 'admin')
   @Post()
   @UsePipes(new ValidationPipe({ whitelist: true, transform: true }))
   async create(@Body() dto: CreateRiderProfileDto, @Request() req) {
@@ -25,15 +24,12 @@ export class RiderProfileController {
     return this.svc.create(dto);
   }
 
-  @UseGuards(RolesGuard)
   @Roles('admin')
   @Get()
   async findAll() {
     return this.svc.findAll();
   }
 
-  @UseGuards(RolesGuard)
-  @Roles('entrepreneur', 'admin')
   @Get('by-club/:idClub')
   async findByClub(@Param('idClub', ParseIntPipe) idClub: number, @Request() req) {
     await this.svc.assertClubAccess(idClub, req.user);
@@ -53,15 +49,12 @@ export class RiderProfileController {
     return this.svc.findOneForRequester(id, req.user);
   }
 
-  @UseGuards(RolesGuard)
-  @Roles('entrepreneur', 'admin')
   @Put(':id')
   @UsePipes(new ValidationPipe({ whitelist: true, transform: true }))
   async update(@Param('id', ParseIntPipe) id: number, @Body() dto: UpdateRiderProfileDto, @Request() req) {
     return this.svc.updateForRequester(id, dto, req.user);
   }
 
-  @UseGuards(RolesGuard)
   @Roles('admin')
   @Delete(':id')
   async remove(@Param('id', ParseIntPipe) id: number) {
