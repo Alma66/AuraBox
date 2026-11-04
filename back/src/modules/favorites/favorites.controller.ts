@@ -11,7 +11,8 @@ import { RolesGuard } from '../auth/roles.guard';
 import { Roles } from '../auth/roles.decorator';
 
 @Controller('favorites')
-@UseGuards(JwtAuthGuard)
+@UseGuards(JwtAuthGuard, RolesGuard)
+@Roles('customer', 'admin')
 export class FavoritesController {
   constructor(private readonly favoritesService: FavoritesService) {}
 
@@ -30,7 +31,6 @@ export class FavoritesController {
     return this.favoritesService.toggle(req.user.id, idSubscriptionTypes);
   }
 
-  @UseGuards(RolesGuard)
   @Roles('admin')
   @Get()
   async findAll() {
@@ -45,11 +45,10 @@ export class FavoritesController {
     return this.favoritesService.findByUserEnriched(idUser);
   }
 
-  @UseGuards(RolesGuard)
   @Roles('entrepreneur', 'admin')
   @Get('by-plan/:idSubscriptionTypes')
-  async findByPlan(@Param('idSubscriptionTypes', ParseIntPipe) idSubscriptionTypes: number) {
-    return this.favoritesService.findByPlan(idSubscriptionTypes);
+  async findByPlan(@Param('idSubscriptionTypes', ParseIntPipe) idSubscriptionTypes: number, @Request() req) {
+    return this.favoritesService.findByPlanForRequester(idSubscriptionTypes, req.user);
   }
 
   @Get('check/:idSubscriptionTypes')
@@ -66,7 +65,6 @@ export class FavoritesController {
     return favorite;
   }
 
-  @UseGuards(RolesGuard)
   @Roles('admin')
   @Put(':id')
   @UsePipes(new ValidationPipe({ whitelist: true, transform: true }))
@@ -74,7 +72,6 @@ export class FavoritesController {
     return this.favoritesService.update(id, dto);
   }
 
-  @UseGuards(RolesGuard)
   @Roles('admin')
   @Delete(':id')
   async remove(@Param('id', ParseIntPipe) id: number) {

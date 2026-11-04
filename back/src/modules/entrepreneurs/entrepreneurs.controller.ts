@@ -13,14 +13,13 @@ import { Roles } from '../auth/roles.decorator';
 import { ClubsService } from '../clubs/clubs.service';
 
 @Controller('entrepreneurs')
-@UseGuards(JwtAuthGuard)
+@UseGuards(JwtAuthGuard, RolesGuard)
 export class EntrepreneursController {
   constructor(
     private readonly entrepreneursService: EntrepreneursService,
     private readonly clubsService: ClubsService,
   ) {}
 
-  @UseGuards(RolesGuard)
   @Roles('admin')
   @Post()
   @UsePipes(new ValidationPipe({ whitelist: true, transform: true }))
@@ -28,6 +27,7 @@ export class EntrepreneursController {
     return this.entrepreneursService.create(dto);
   }
 
+  @Roles('entrepreneur')
   @Get('me')
   async getMe(@Request() req: any) {
     const entrepreneur = await this.entrepreneursService.findOne(req.user.id);
@@ -45,18 +45,22 @@ export class EntrepreneursController {
     };
   }
 
+  @Roles('entrepreneur')
   @Throttle({ default: { limit: 5, ttl: 60000 } })
   @Post('me/verify-password')
   async verifyPassword(@Request() req: any, @Body() body: { password: string }) {
     return this.entrepreneursService.verifyPassword(req.user.id, body.password);
   }
 
+  @Roles('entrepreneur')
   @Patch('me')
   @UsePipes(new ValidationPipe({ whitelist: true, transform: true }))
   async updateMe(@Request() req: any, @Body() dto: UpdateEntrepreneurDto) {
+    delete (dto as any).active;
     return this.entrepreneursService.update(req.user.id, dto);
   }
 
+  @Roles('entrepreneur')
   @Get('me/club')
   async getMyClub(@Request() req: any) {
     const club = await this.clubsService.findClubByEntrepreneur(req.user.id);
@@ -64,38 +68,40 @@ export class EntrepreneursController {
     return club;
   }
 
-  @UseGuards(RolesGuard)
   @Roles('admin')
   @Get()
   async findAll() {
     return this.entrepreneursService.findAll();
   }
 
+  @Roles('entrepreneur', 'admin')
   @Get(':id')
   async findOne(@Param('id', ParseIntPipe) id: number, @Request() req: any) {
-    if (req.user.id !== id && req.user.role !== 'admin') {
+    if (req.user.role !== 'admin' && req.user.id !== id) {
       throw new ForbiddenException('No autorizado para ver este emprendedor');
     }
     return this.entrepreneursService.findOne(id);
   }
 
+  @Roles('entrepreneur', 'admin')
   @Patch(':id')
   @UsePipes(new ValidationPipe({ whitelist: true, transform: true }))
   async update(@Param('id', ParseIntPipe) id: number, @Body() dto: UpdateEntrepreneurDto, @Request() req: any) {
-    if (req.user.id !== id && req.user.role !== 'admin') {
-      throw new ForbiddenException('No autorizado para actualizar este emprendedor');
+    if (req.user.role !== 'admin') {
+      if (req.user.id !== id) {
+        throw new ForbiddenException('No autorizado para actualizar este emprendedor');
+      }
+      delete (dto as any).active;
     }
     return this.entrepreneursService.update(id, dto);
   }
 
-  @UseGuards(RolesGuard)
   @Roles('admin')
   @Put(':id/deactivate')
   async deactivate(@Param('id', ParseIntPipe) id: number) {
     return this.entrepreneursService.deactivate(id);
   }
 
-  @UseGuards(RolesGuard)
   @Roles('admin')
   @Delete(':id')
   async remove(@Param('id', ParseIntPipe) id: number) {

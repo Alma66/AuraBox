@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
+import { Injectable, NotFoundException, BadRequestException, ForbiddenException } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
 import { CreateFavoriteDto } from './dto/create-favorite.dto';
 import { UpdateFavoriteDto } from './dto/update-favorite.dto';
@@ -42,6 +42,10 @@ export class FavoritesService {
     if (!user) throw new NotFoundException('Usuario no encontrado');
     const plan = await this.prisma.subscription_Types.findUnique({ where: { id: dto.idSubscriptionTypes } });
     if (!plan) throw new NotFoundException('Plan de suscripción no encontrado');
+    const club = await this.prisma.club.findUnique({ where: { id: plan.idClub } });
+    if (!plan.active || !club || club.clubStatus !== 'APROBADO') {
+      throw new BadRequestException('Este plan no está disponible');
+    }
     const existing = await this.prisma.favorites.findFirst({
       where: { idUser: dto.idUser, idSubscriptionTypes: dto.idSubscriptionTypes },
     });
@@ -134,6 +138,18 @@ export class FavoritesService {
     return favorites.map(sanitize);
   }
 
+    async findByPlanForRequester(idSubscriptionTypes: number, user: { id: number; role: string }) {
+    if (user.role !== 'admin') {
+      const plan = await this.prisma.subscription_Types.findUnique({ where: { id: idSubscriptionTypes } });
+      if (!plan) throw new NotFoundException('Plan de suscripción no encontrado');
+      const link = await this.prisma.entrepreneur_Club.findFirst({
+        where: { idClub: plan.idClub, idEntrepreneurs: user.id },
+      });
+      if (!link) throw new ForbiddenException('No tenés acceso a este plan');
+    }
+    return this.findByPlan(idSubscriptionTypes);
+  }
+  
   async update(id: number, dto: UpdateFavoriteDto) {
     const favorite = await this.prisma.favorites.findUnique({ where: { id } });
     if (!favorite) throw new NotFoundException('Favorito no encontrado');

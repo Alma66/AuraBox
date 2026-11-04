@@ -11,55 +11,51 @@ import { RolesGuard } from '../auth/roles.guard';
 import { Roles } from '../auth/roles.decorator';
 
 @Controller('users')
-@UseGuards(JwtAuthGuard)
+@UseGuards(JwtAuthGuard, RolesGuard)
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
-  @Post('register')
-  @UseGuards(RolesGuard)
   @Roles('admin')
+  @Post('register')
   @UsePipes(new ValidationPipe({ whitelist: true, transform: true }))
   async register(@Body() dto: CreateUserDto) {
     return this.usersService.create(dto);
   }
 
+  @Roles('customer')
   @Get('me')
   async getMe(@Request() req: any) {
     return this.usersService.findById(req.user.id);
   }
 
+  @Roles('customer')
   @Post('me/verify-password')
   async verifyPassword(@Request() req: any, @Body() body: { password: string }) {
     return this.usersService.verifyPassword(req.user.id, body.password);
   }
 
+  @Roles('customer')
   @Patch('me')
   @UsePipes(new ValidationPipe({ whitelist: true, transform: true }))
   async updateMe(@Request() req: any, @Body() dto: UpdateUserDto) {
+    delete (dto as any).active;
     return this.usersService.update(req.user.id, dto);
   }
 
-  @Get('newsletter-subscribers/:idClub')
-  @UseGuards(RolesGuard)
   @Roles('entrepreneur', 'admin')
-  
   @Get('newsletter-subscribers/:idClub')
-  @UseGuards(RolesGuard)
-  @Roles('entrepreneur', 'admin')
   async getNewsletterSubscribers(@Param('idClub', ParseIntPipe) idClub: number, @Request() req: any) {
     return this.usersService.findNewsletterRecipients(idClub, req.user);
   }
 
-  @Get()
-  @UseGuards(RolesGuard)
   @Roles('admin')
+  @Get()
   async findAll() {
     return this.usersService.findAll();
   }
 
-  @Get(':id')
-  @UseGuards(RolesGuard)
   @Roles('admin', 'customer')
+  @Get(':id')
   async findOne(@Param('id', ParseIntPipe) id: number, @Request() req: any) {
     if (req.user.role !== 'admin' && req.user.id !== id) {
       throw new ForbiddenException('No autorizado');
@@ -67,20 +63,21 @@ export class UsersController {
     return this.usersService.findById(id);
   }
 
-  @Put(':id')
-  @UseGuards(RolesGuard)
   @Roles('admin', 'customer')
+  @Put(':id')
   @UsePipes(new ValidationPipe({ whitelist: true, transform: true }))
   async update(@Param('id', ParseIntPipe) id: number, @Body() dto: UpdateUserDto, @Request() req: any) {
-    if (req.user.role !== 'admin' && req.user.id !== id) {
-      throw new ForbiddenException('No autorizado');
+    if (req.user.role !== 'admin') {
+      if (req.user.id !== id) {
+        throw new ForbiddenException('No autorizado');
+      }
+      delete (dto as any).active;
     }
     return this.usersService.update(id, dto);
   }
 
-  @Delete(':id')
-  @UseGuards(RolesGuard)
   @Roles('admin')
+  @Delete(':id')
   async remove(@Param('id', ParseIntPipe) id: number) {
     return this.usersService.remove(id);
   }

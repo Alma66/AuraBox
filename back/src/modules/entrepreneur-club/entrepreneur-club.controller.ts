@@ -36,10 +36,7 @@ export class EntrepreneurClubController {
 
   @Roles('admin')
   @Get('by-entrepreneur/:idEntrepreneur')
-  async findByEntrepreneur(@Param('idEntrepreneur', ParseIntPipe) idEntrepreneur: number, @Request() req) {
-    if (req.user.id !== idEntrepreneur && req.user.role !== 'admin') {
-      return this.service.findByEntrepreneur(idEntrepreneur);
-    }
+  async findByEntrepreneur(@Param('idEntrepreneur', ParseIntPipe) idEntrepreneur: number) {
     return this.service.findByEntrepreneur(idEntrepreneur);
   }
 
