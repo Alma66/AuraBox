@@ -37,6 +37,11 @@ export class CartItemController {
     return this.cartItemService.checkout(req.user.id, dto);
   }
 
+  @Get('shipping-options')
+  async shippingOptions(@Request() req) {
+    return this.cartItemService.getShippingOptions(req.user.id);
+  }
+
   @Delete(':idSubscriptionTypes')
   async remove(@Param('idSubscriptionTypes', ParseIntPipe) idSubscriptionTypes: number, @Request() req) {
     return this.cartItemService.remove(req.user.id, idSubscriptionTypes);

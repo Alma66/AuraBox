@@ -1,5 +1,17 @@
 import { Transform, Type } from 'class-transformer';
-import { IsIn, IsNotEmpty, IsOptional, IsString, Matches, MaxLength, ValidateNested } from 'class-validator';
+import {
+  ArrayMaxSize,
+  IsArray,
+  IsIn,
+  IsInt,
+  IsNotEmpty,
+  IsOptional,
+  IsString,
+  Matches,
+  MaxLength,
+  Min,
+  ValidateNested,
+} from 'class-validator';
 import { PAYMENT_METHOD_CODES } from '../../payments/payments.constants';
 
 const Trim = () => Transform(({ value }) => (typeof value === 'string' ? value.trim() : value));
@@ -47,6 +59,16 @@ class CheckoutAddressDto {
   instructions?: string;
 }
 
+class CheckoutShippingDto {
+  @IsInt()
+  @Min(1)
+  idClub!: number;
+
+  @IsInt()
+  @Min(1)
+  idCourier!: number;
+}
+
 export class CheckoutCartDto {
   @IsIn(PAYMENT_METHOD_CODES)
   paymentMethod!: string;
@@ -54,4 +76,11 @@ export class CheckoutCartDto {
   @ValidateNested()
   @Type(() => CheckoutAddressDto)
   address!: CheckoutAddressDto;
+
+  @IsOptional()
+  @IsArray()
+  @ArrayMaxSize(50)
+  @ValidateNested({ each: true })
+  @Type(() => CheckoutShippingDto)
+  shipping?: CheckoutShippingDto[];
 }

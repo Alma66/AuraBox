@@ -2,6 +2,7 @@ import { Injectable, Logger, OnModuleDestroy, OnModuleInit } from '@nestjs/commo
 import { PrismaService } from '../../prisma/prisma.service';
 import { AURABOX_COMMISSION, codeFromMethodName } from '../payments/payments.constants';
 import { nextFutureDate, priceFor } from '../../common/utils/billing';
+import { courierFee } from '../../common/utils/shipping';
 
 const RUN_EVERY_MS = 60 * 60 * 1000;
 const FIRST_RUN_DELAY_MS = 15 * 1000;
@@ -87,6 +88,32 @@ export class BillingService implements OnModuleInit, OnModuleDestroy {
     const clubById = new Map(clubs.map((club) => [club.id, club] as [number, typeof club]));
     const methodById = new Map(methods.map((method) => [method.id, method] as [number, typeof method]));
 
+    const dueUserIds = Array.from(new Set(all.map((sub) => sub.idUser)));
+    const dueClubIds = clubs.map((club) => club.id);
+    const preferences = dueClubIds.length
+      ? await this.prisma.user_Courier_Preference.findMany({
+          where: { idUser: { in: dueUserIds }, idClub: { in: dueClubIds }, active: true },
+        })
+      : [];
+    const clubCouriers = dueClubIds.length
+      ? await this.prisma.club_Courier.findMany({ where: { idClub: { in: dueClubIds }, active: true } })
+      : [];
+    const courierIds = Array.from(new Set(clubCouriers.map((link) => link.idCourier)));
+    const couriers = courierIds.length
+      ? await this.prisma.courier.findMany({ where: { id: { in: courierIds }, active: true } })
+      : [];
+    const courierById = new Map(couriers.map((courier) => [courier.id, courier] as [number, typeof courier]));
+
+    const shippingFeeFor = (idUser: number, idClub: number) => {
+      const chosen = preferences.filter((pref) => pref.idUser === idUser && pref.idClub === idClub);
+      for (const pref of chosen) {
+        const link = clubCouriers.find((item) => item.idClub === idClub && item.idCourier === pref.idCourier);
+        const courier = courierById.get(pref.idCourier);
+        if (link && courier) return courierFee(courier.isInternal, link.baseFee);
+      }
+      return 0;
+    };
+
     for (const sub of legacy) {
       const plan = planById.get(sub.idSubscriptionTypes);
       const next = plan ? nextFutureDate(sub.startDate, plan.frequency, now) : null;
@@ -114,11 +141,12 @@ export class BillingService implements OnModuleInit, OnModuleDestroy {
       const method = sub.idPaymentMethods ? methodById.get(sub.idPaymentMethods) : undefined;
       const code = method ? codeFromMethodName(method.method) : null;
       const isCash = code === 'efectivo';
-      const amount = priceFor(plan, code);
-      if (!next || !Number.isFinite(amount) || amount <= AURABOX_COMMISSION) {
+      const planAmount = priceFor(plan, code);
+      if (!next || !Number.isFinite(planAmount) || planAmount <= AURABOX_COMMISSION) {
         skipped += 1;
         continue;
       }
+      const amount = planAmount + shippingFeeFor(sub.idUser, plan.idClub);
 
       const charged = await this.prisma.$transaction(async (tx) => {
         const claimed = await tx.user_Subscriptions.updateMany({
