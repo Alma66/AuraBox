@@ -5,6 +5,12 @@ interface Props {
   sections: LegalSection[];
 }
 
+const alignClass = (layout?: string) =>
+  layout === 'left' ? 'text-left' : layout === 'right' ? 'text-right' : 'text-center';
+
+const justifyClass = (layout?: string) =>
+  layout === 'left' ? 'justify-start' : layout === 'right' ? 'justify-end' : 'justify-center';
+
 const LegalContentRenderer: React.FC<Props> = ({ sections }) => {
   return (
     <div className="space-y-10">
@@ -14,7 +20,7 @@ const LegalContentRenderer: React.FC<Props> = ({ sections }) => {
             return (
               <h2
                 key={section.id}
-                className="text-4xl font-extrabold text-gray-900 border-b-4 border-blue-600 pb-2"
+                className="text-4xl font-extrabold text-aurora-navy border-b-4 border-aurora-terracotta pb-2"
               >
                 {section.content}
               </h2>
@@ -23,13 +29,7 @@ const LegalContentRenderer: React.FC<Props> = ({ sections }) => {
             return (
               <p
                 key={section.id}
-                className={`text-gray-700 max-w-4xl mx-auto leading-relaxed ${
-                  section.layout === 'left'
-                    ? 'text-left'
-                    : section.layout === 'right'
-                    ? 'text-right'
-                    : 'text-center'
-                }`}
+                className={`text-aurora-navy/80 max-w-4xl mx-auto leading-relaxed ${alignClass(section.layout)}`}
               >
                 {section.content}
               </p>
@@ -38,13 +38,7 @@ const LegalContentRenderer: React.FC<Props> = ({ sections }) => {
             return (
               <ul
                 key={section.id}
-                className={`list-disc max-w-3xl mx-auto text-gray-700 ${
-                  section.layout === 'left'
-                    ? 'text-left'
-                    : section.layout === 'right'
-                    ? 'text-right'
-                    : 'text-center'
-                }`}
+                className={`list-disc max-w-3xl mx-auto text-aurora-navy/80 ${alignClass(section.layout)}`}
               >
                 {(section.content as string[]).map((item, idx) => (
                   <li key={idx} className="mb-1">
@@ -57,18 +51,12 @@ const LegalContentRenderer: React.FC<Props> = ({ sections }) => {
             return (
               <div
                 key={section.id}
-                className={`max-w-4xl mx-auto my-8 flex ${
-                  section.layout === 'left'
-                    ? 'justify-start'
-                    : section.layout === 'right'
-                    ? 'justify-end'
-                    : 'justify-center'
-                }`}
+                className={`max-w-4xl mx-auto my-8 flex ${justifyClass(section.layout)}`}
               >
                 <img
                   src={section.content as string}
                   alt="Legal Section"
-                  className="rounded-lg shadow-lg max-h-96 object-contain"
+                  className="rounded-lg shadow-aurora-sm max-h-96 object-contain"
                 />
               </div>
             );

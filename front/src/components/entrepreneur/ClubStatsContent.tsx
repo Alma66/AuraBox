@@ -12,7 +12,9 @@ interface ClubStatsContentProps {
   clubId: string;
 }
 
-const COLORS = ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#06b6d4'];
+const BRAND = '#C9762E';
+const NAVY = '#1B2A4A';
+const COLORS = [BRAND, NAVY, '#10b981', '#f59e0b', '#8b5cf6', '#06b6d4'];
 
 const fmt = (n: number | string) =>
   Number(n).toLocaleString('es-AR', { style: 'currency', currency: 'ARS', maximumFractionDigits: 0 });
@@ -42,7 +44,7 @@ const ClubStatsContent: React.FC<ClubStatsContentProps> = ({ activeSection, data
           </div>
           <div className="border border-aurora-navy/10 rounded-xl p-5 bg-white shadow-aurora-sm">
             <p className="text-xs text-aurora-navy/50 uppercase tracking-wide mb-1">Tasa de retención</p>
-            <p className="text-3xl font-bold text-blue-600">{data.retentionRate}%</p>
+            <p className="text-3xl font-bold text-aurora-terracotta">{data.retentionRate}%</p>
           </div>
           <div className="border border-aurora-navy/10 rounded-xl p-5 bg-white shadow-aurora-sm">
             <p className="text-xs text-aurora-navy/50 uppercase tracking-wide mb-1">Ticket promedio</p>
@@ -54,10 +56,10 @@ const ClubStatsContent: React.FC<ClubStatsContentProps> = ({ activeSection, data
           </div>
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <div className="border border-indigo-200 bg-indigo-50 rounded-xl p-5">
-            <p className="text-xs text-indigo-600 uppercase tracking-wide mb-1">Proyección MRR próximo mes</p>
-            <p className="text-3xl font-bold text-indigo-700">{fmt(proyeccionMrr)}</p>
-            <p className="text-xs text-indigo-500 mt-1">MRR actual × tasa de retención ({data.retentionRate}%)</p>
+          <div className="border border-aurora-gold/40 bg-aurora-gold/10 rounded-xl p-5">
+            <p className="text-xs text-aurora-navy/70 uppercase tracking-wide mb-1">Proyección MRR próximo mes</p>
+            <p className="text-3xl font-bold text-aurora-navy">{fmt(proyeccionMrr)}</p>
+            <p className="text-xs text-aurora-navy/60 mt-1">MRR actual × tasa de retención ({data.retentionRate}%)</p>
           </div>
           <div className="border border-orange-200 bg-orange-50 rounded-xl p-5">
             <p className="text-xs text-orange-600 uppercase tracking-wide mb-1">Churn Rate este mes</p>
@@ -85,7 +87,7 @@ const ClubStatsContent: React.FC<ClubStatsContentProps> = ({ activeSection, data
               <XAxis dataKey="month" tick={{ fontSize: 11 }} />
               <YAxis tick={{ fontSize: 11 }} />
               <Tooltip />
-              <Line type="monotone" dataKey="count" stroke="#3b82f6" strokeWidth={2} dot={{ r: 4 }} name="Suscriptores" />
+              <Line type="monotone" dataKey="count" stroke={BRAND} strokeWidth={2} dot={{ r: 4 }} name="Suscriptores" />
             </LineChart>
           </ResponsiveContainer>
         </div>
@@ -241,17 +243,17 @@ const ClubStatsContent: React.FC<ClubStatsContentProps> = ({ activeSection, data
           </div>
           <div className="border border-aurora-navy/10 rounded-xl p-5 bg-white shadow-aurora-sm">
             <p className="text-xs text-aurora-navy/50 uppercase tracking-wide mb-1">Con multimedia</p>
-            <p className="text-3xl font-bold text-blue-600">{rep.withMediaPercent}%</p>
+            <p className="text-3xl font-bold text-aurora-terracotta">{rep.withMediaPercent}%</p>
           </div>
           <div className="border border-aurora-navy/10 rounded-xl p-5 bg-white shadow-aurora-sm">
             <p className="text-xs text-aurora-navy/50 uppercase tracking-wide mb-1">Reseñas ocultas</p>
             <p className="text-3xl font-bold text-red-500">{rep.hiddenCount}</p>
           </div>
         </div>
-        <div className="border border-indigo-200 bg-indigo-50 rounded-xl p-5 inline-block">
-          <p className="text-xs text-indigo-600 uppercase tracking-wide mb-1">NPS Estimado</p>
-          <p className="text-3xl font-bold text-indigo-700">{nps}</p>
-          <p className="text-xs text-indigo-500 mt-1">% ratings 4-5★ menos % ratings 1-2★</p>
+        <div className="border border-aurora-gold/40 bg-aurora-gold/10 rounded-xl p-5 inline-block">
+          <p className="text-xs text-aurora-navy/70 uppercase tracking-wide mb-1">NPS Estimado</p>
+          <p className="text-3xl font-bold text-aurora-navy">{nps}</p>
+          <p className="text-xs text-aurora-navy/60 mt-1">% ratings 4-5★ menos % ratings 1-2★</p>
         </div>
         <div>
           <h3 className="text-base font-semibold text-aurora-navy/80 mb-3">Distribución de ratings (estimada)</h3>
@@ -316,7 +318,7 @@ const ClubStatsContent: React.FC<ClubStatsContentProps> = ({ activeSection, data
                 <YAxis dataKey="name" type="category" tick={{ fontSize: 11 }} width={110} />
                 <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
                 <Tooltip />
-                <Bar dataKey="activeCount" fill="#3b82f6" radius={[0, 4, 4, 0]} name="Activos">
+                <Bar dataKey="activeCount" fill={BRAND} radius={[0, 4, 4, 0]} name="Activos">
                   <LabelList dataKey="activeCount" position="right" style={{ fontSize: 11 }} />
                 </Bar>
               </BarChart>
@@ -340,7 +342,7 @@ const ClubStatsContent: React.FC<ClubStatsContentProps> = ({ activeSection, data
                   <tr key={plan.name} className="hover:bg-aurora-cream">
                     <td className="px-4 py-2 text-aurora-navy/40 font-bold">#{i + 1}</td>
                     <td className="px-4 py-2 font-medium text-aurora-navy">{plan.name}</td>
-                    <td className="px-4 py-2 text-right font-semibold text-blue-600">{plan.activeCount}</td>
+                    <td className="px-4 py-2 text-right font-semibold text-aurora-terracotta">{plan.activeCount}</td>
                     <td className="px-4 py-2 text-right text-aurora-navy/50">
                       {totalActivos > 0 ? ((plan.activeCount / totalActivos) * 100).toFixed(1) : '0.0'}%
                     </td>

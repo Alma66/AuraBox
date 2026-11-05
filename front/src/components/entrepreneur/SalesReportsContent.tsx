@@ -4,6 +4,7 @@ import {
   XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer,
 } from 'recharts';
 import { SalesReportData } from '../../types/analystics';
+
 interface SalesReportsContentProps {
   activeSection: string;
   data: SalesReportData;
@@ -13,9 +14,14 @@ interface SalesReportsContentProps {
   page: number;
   onPageChange: (page: number) => void;
 }
-const COLORS = ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#06b6d4'];
+
+const BRAND = '#C9762E';
+const NAVY = '#1B2A4A';
+const COLORS = [BRAND, NAVY, '#10b981', '#f59e0b', '#8b5cf6', '#06b6d4'];
+
 const fmt = (n: number | string) =>
   Number(n).toLocaleString('es-AR', { style: 'currency', currency: 'ARS', maximumFractionDigits: 0 });
+
 const SalesReportsContent: React.FC<SalesReportsContentProps> = ({
   activeSection,
   data,
@@ -26,6 +32,7 @@ const SalesReportsContent: React.FC<SalesReportsContentProps> = ({
   onPageChange,
 }) => {
   const pageSize = 20;
+
   if (activeSection === 'resumen') {
     const netRevenue = data.payments.reduce((s, p) => s + Number(p.clubAmount), 0);
     const commissions = data.payments.reduce((s, p) => s + Number(p.commissionAmount ?? 0), 0);
@@ -99,6 +106,7 @@ const SalesReportsContent: React.FC<SalesReportsContentProps> = ({
       </div>
     );
   }
+
   if (activeSection === 'graficos') {
     const acumulado = data.monthlyRevenue.reduce<{ month: string; acumulado: number }[]>((acc, r, i) => {
       const prev = i > 0 ? acc[i - 1].acumulado : 0;
@@ -117,8 +125,8 @@ const SalesReportsContent: React.FC<SalesReportsContentProps> = ({
               <YAxis tick={{ fontSize: 11 }} />
               <Tooltip formatter={(v) => fmt(Number(v))} />
               <Legend />
-              <Bar dataKey="current" name="Este período" fill="#3b82f6" radius={[4, 4, 0, 0]} />
-              <Bar dataKey="previous" name="Período anterior" fill="#93c5fd" radius={[4, 4, 0, 0]} />
+              <Bar dataKey="current" name="Este período" fill={BRAND} radius={[4, 4, 0, 0]} />
+              <Bar dataKey="previous" name="Período anterior" fill={NAVY} fillOpacity={0.35} radius={[4, 4, 0, 0]} />
             </BarChart>
           </ResponsiveContainer>
         </div>
@@ -130,7 +138,7 @@ const SalesReportsContent: React.FC<SalesReportsContentProps> = ({
               <XAxis dataKey="month" tick={{ fontSize: 11 }} />
               <YAxis tick={{ fontSize: 11 }} />
               <Tooltip formatter={(v) => fmt(Number(v))} />
-              <Area type="monotone" dataKey="acumulado" stroke="#3b82f6" fill="#eff6ff" name="Acumulado" />
+              <Area type="monotone" dataKey="acumulado" stroke={BRAND} fill={BRAND} fillOpacity={0.15} name="Acumulado" />
             </AreaChart>
           </ResponsiveContainer>
         </div>
@@ -162,6 +170,7 @@ const SalesReportsContent: React.FC<SalesReportsContentProps> = ({
       </div>
     );
   }
+
   if (activeSection === 'pagos') {
     const totalPages = Math.max(1, Math.ceil(data.totalCount / pageSize));
     return (
@@ -209,7 +218,7 @@ const SalesReportsContent: React.FC<SalesReportsContentProps> = ({
                       ${p.paymentStatus === 'Exitoso' ? 'bg-green-100 text-green-800' : ''}
                       ${p.paymentStatus === 'Pendiente' ? 'bg-yellow-100 text-yellow-800' : ''}
                       ${p.paymentStatus === 'Rechazado' ? 'bg-red-100 text-red-800' : ''}
-                      ${p.paymentStatus === 'Reembolsado' ? 'bg-gray-100 text-gray-700' : ''}
+                      ${p.paymentStatus === 'Reembolsado' ? 'bg-aurora-navy/10 text-aurora-navy/70' : ''}
                     `}>
                       {p.paymentStatus}
                     </span>
@@ -249,6 +258,7 @@ const SalesReportsContent: React.FC<SalesReportsContentProps> = ({
       </div>
     );
   }
+
   if (activeSection === 'metodos') {
     const metodos = data.byPaymentMethod;
     const totalMonto = metodos.reduce((s, m) => s + m.amount, 0);
@@ -271,10 +281,10 @@ const SalesReportsContent: React.FC<SalesReportsContentProps> = ({
         <h2 className="font-display text-xl font-bold text-aurora-navy">Análisis de Métodos de Pago</h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           {masUsado && (
-            <div className="border border-blue-200 bg-blue-50 rounded-xl p-5">
-              <p className="text-xs text-blue-600 uppercase tracking-wide mb-1">Método más usado</p>
-              <p className="text-2xl font-bold text-blue-700">{masUsado.method}</p>
-              <p className="text-sm text-blue-500 mt-1">{masUsado.count} transacciones ({masUsado.pctPagos}%)</p>
+            <div className="border border-aurora-terracotta/20 bg-aurora-terracotta/10 rounded-xl p-5">
+              <p className="text-xs text-aurora-terracottaDark uppercase tracking-wide mb-1">Método más usado</p>
+              <p className="text-2xl font-bold text-aurora-terracottaDark">{masUsado.method}</p>
+              <p className="text-sm text-aurora-terracottaDark/80 mt-1">{masUsado.count} transacciones ({masUsado.pctPagos}%)</p>
             </div>
           )}
           {masRentable && (
@@ -317,6 +327,7 @@ const SalesReportsContent: React.FC<SalesReportsContentProps> = ({
       </div>
     );
   }
+
   if (activeSection === 'proyecciones') {
     const monthly = data.monthlyRevenue;
     const last3 = monthly.slice(-3);
@@ -330,7 +341,7 @@ const SalesReportsContent: React.FC<SalesReportsContentProps> = ({
       <div className="space-y-6">
         <h2 className="font-display text-xl font-bold text-aurora-navy">Proyecciones</h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <div className="bg-gradient-to-br from-indigo-600 to-indigo-700 rounded-xl p-5 text-white">
+          <div className="bg-gradient-to-br from-aurora-terracotta to-aurora-terracottaDark rounded-xl p-5 text-white">
             <p className="text-xs uppercase tracking-wide mb-1 opacity-80">Proyección próximo mes</p>
             <p className="text-3xl font-bold">{fmt(avgLast3)}</p>
             <p className="text-xs opacity-70 mt-1">Promedio de los últimos 3 meses</p>
@@ -374,6 +385,8 @@ const SalesReportsContent: React.FC<SalesReportsContentProps> = ({
       </div>
     );
   }
+
   return null;
 };
+
 export default SalesReportsContent;

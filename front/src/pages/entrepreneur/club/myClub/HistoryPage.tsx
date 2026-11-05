@@ -39,6 +39,15 @@ const CURRENT_YEAR = new Date().getFullYear();
 const MAX_MILESTONE_YEAR = CURRENT_YEAR + 1;
 const MAX_MILESTONES = 12;
 
+const SECTION_CLASS = 'mb-20 p-8 bg-white rounded-3xl shadow-2xl border border-aurora-navy/10';
+const SECTION_TITLE_CLASS = 'text-3xl font-bold text-aurora-navy flex-grow';
+const EDIT_BUTTON_CLASS =
+  'ml-4 px-4 py-2 bg-aurora-terracotta text-white rounded-full text-sm font-semibold hover:bg-aurora-terracottaDark transition-colors duration-200 shadow-md';
+const SAVE_BUTTON_CLASS =
+  'px-5 py-2 bg-green-600 text-white rounded-lg font-semibold hover:bg-green-700 transition-colors duration-200 disabled:opacity-60';
+const CANCEL_BUTTON_CLASS =
+  'px-5 py-2 border border-aurora-navy/20 rounded-lg text-aurora-navy/80 hover:bg-aurora-cream transition-colors duration-200';
+
 function validateImageFile(file: File): string | null {
   if (!ACCEPTED_IMAGE_TYPES.includes(file.type)) {
     return 'Formato no permitido. Solo se aceptan imágenes JPG, PNG o WEBP.';
@@ -91,7 +100,7 @@ async function getCroppedBlob(imageSrc: string, croppedAreaPixels: any): Promise
 const HistoryPage: React.FC = () => {
   const { clubId } = useParams<{ clubId: string }>();
   const navigate = useNavigate();
-    const { pathname } = useLocation();
+  const { pathname } = useLocation();
   const insidePanel = pathname.endsWith('/my-club');
   const { user, userRole } = useAuth();
 
@@ -374,13 +383,13 @@ const HistoryPage: React.FC = () => {
     }
   };
 
-    const getTeamPhoto = (entrepreneurId: number): string => {
+  const getTeamPhoto = (entrepreneurId: number): string => {
     const img = (club?.teamImagesRaw ?? []).find((i) => i.description === `team-${entrepreneurId}`);
     return img?.imageUrl || DEFAULT_AVATAR;
   };
 
   if (loading) {
-    return <div className="text-center py-20">Cargando historia...</div>;
+    return <div className="text-center py-20 text-aurora-navy/70">Cargando historia...</div>;
   }
 
   if (!club) {
@@ -430,7 +439,7 @@ const HistoryPage: React.FC = () => {
         : 'grid grid-cols-1 md:grid-cols-3 gap-8';
 
   const reviews = (club as any).featuredReviews || [];
-  
+
   const socialMediaLinks = ((club as any).socialNetworksRaw ?? []).reduce(
     (acc: Record<string, string>, sn: { networkType: string; profileUrl: string }) => ({
       ...acc,
@@ -438,8 +447,9 @@ const HistoryPage: React.FC = () => {
     }),
     {} as Record<string, string>,
   );
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-blue-100">
+    <div className="min-h-screen bg-aurora-cream">
       {toast && (
         <div
           role="alert"
@@ -488,7 +498,7 @@ const HistoryPage: React.FC = () => {
                   step={0.01}
                   value={cropState.zoom}
                   onChange={(e) => setCropState((prev) => prev ? { ...prev, zoom: Number(e.target.value) } : null)}
-                  className="flex-1 accent-blue-600"
+                  className="flex-1 accent-aurora-terracotta"
                   aria-label="Zoom"
                 />
               </div>
@@ -496,7 +506,7 @@ const HistoryPage: React.FC = () => {
                 <button
                   onClick={() => setCropState(null)}
                   disabled={uploading}
-                  className="flex-1 px-4 py-2.5 rounded-xl border border-aurora-navy/10 text-aurora-navy/80 text-sm font-medium hover:bg-aurora-cream disabled:opacity-50 transition-colors"
+                  className="flex-1 px-4 py-2.5 rounded-xl border border-aurora-navy/10 text-aurora-navy/80 text-sm font-medium hover:bg-white disabled:opacity-50 transition-colors"
                 >
                   Cancelar
                 </button>
@@ -543,13 +553,13 @@ const HistoryPage: React.FC = () => {
         </AnimatedSection>
 
         <AnimatedSection delay="0.4s">
-          <section className="mb-20 p-8 bg-white rounded-3xl shadow-2xl border border-purple-200">
+          <section className={SECTION_CLASS}>
             <div className="flex justify-between items-center mb-6">
-              <h3 className="text-3xl font-bold text-purple-800 flex-grow">Nuestros Orígenes y Valores</h3>
+              <h3 className={SECTION_TITLE_CLASS}>Nuestros Orígenes y Valores</h3>
               {isOwner && !isEditingOrigins && (
                 <button
                   onClick={() => { setTempHistory(club.history || ''); setOriginsError(''); setIsEditingOrigins(true); }}
-                  className="ml-4 px-4 py-2 bg-aurora-terracotta text-white rounded-full text-sm font-semibold hover:bg-aurora-terracottaDark transition-colors duration-200 shadow-md"
+                  className={EDIT_BUTTON_CLASS}
                 >
                   Editar
                 </button>
@@ -558,7 +568,7 @@ const HistoryPage: React.FC = () => {
             {isEditingOrigins ? (
               <div>
                 <textarea
-                  className={`w-full border rounded-lg p-3 text-aurora-navy/80 text-base leading-relaxed focus:outline-none focus:ring-2 h-56 resize-none ${originsError ? 'border-red-300 focus:ring-red-400' : 'border-aurora-navy/20 focus:ring-purple-400'}`}
+                  className={`w-full border rounded-lg p-3 text-aurora-navy/80 text-base leading-relaxed focus:outline-none focus:ring-2 h-56 resize-none ${originsError ? 'border-red-300 focus:ring-red-400' : 'border-aurora-navy/20 focus:ring-aurora-terracotta/40'}`}
                   value={tempHistory}
                   onChange={(e) => { if (e.target.value.length <= MAX_HISTORY_LENGTH) setTempHistory(e.target.value); if (originsError) setOriginsError(''); }}
                   maxLength={MAX_HISTORY_LENGTH}
@@ -569,10 +579,10 @@ const HistoryPage: React.FC = () => {
                   </span>
                 </div>
                 <div className="flex justify-end gap-3 mt-3">
-                  <button onClick={() => { setIsEditingOrigins(false); setOriginsError(''); }} className="px-5 py-2 border border-aurora-navy/20 rounded-lg text-aurora-navy/80 hover:bg-aurora-cream transition-colors duration-200">
+                  <button onClick={() => { setIsEditingOrigins(false); setOriginsError(''); }} className={CANCEL_BUTTON_CLASS}>
                     Cancelar
                   </button>
-                  <button onClick={handleSaveOrigins} disabled={savingOrigins} className="px-5 py-2 bg-green-600 text-white rounded-lg font-semibold hover:bg-green-700 transition-colors duration-200 disabled:opacity-60">
+                  <button onClick={handleSaveOrigins} disabled={savingOrigins} className={SAVE_BUTTON_CLASS}>
                     {savingOrigins ? 'Guardando...' : 'Guardar'}
                   </button>
                 </div>
@@ -595,13 +605,13 @@ const HistoryPage: React.FC = () => {
         </AnimatedSection>
 
         <AnimatedSection delay="0.8s">
-          <section className="mb-20 p-8 bg-white rounded-3xl shadow-2xl border border-orange-200">
+          <section className={SECTION_CLASS}>
             <div className="flex justify-between items-center mb-10">
-              <h3 className="text-3xl font-bold text-orange-800 flex-grow">Nuestros Hitos</h3>
+              <h3 className={SECTION_TITLE_CLASS}>Nuestros Hitos</h3>
               {isOwner && !isEditingMilestones && (
                 <button
                   onClick={() => { setTempMilestones(club.milestones || []); setMilestonesError(''); setIsEditingMilestones(true); }}
-                  className="ml-4 px-4 py-2 bg-aurora-terracotta text-white rounded-full text-sm font-semibold hover:bg-aurora-terracottaDark transition-colors duration-200 shadow-md"
+                  className={EDIT_BUTTON_CLASS}
                 >
                   Editar
                 </button>
@@ -629,14 +639,14 @@ const HistoryPage: React.FC = () => {
                             min={MIN_MILESTONE_YEAR}
                             max={MAX_MILESTONE_YEAR}
                             step={1}
-                            className={`border rounded-lg px-3 py-2 w-28 text-aurora-navy/80 focus:outline-none focus:ring-2 ${fieldError && !Number.isNaN(milestone.year) ? 'border-red-300 focus:ring-red-400' : 'border-aurora-navy/20 focus:ring-orange-400'}`}
+                            className={`border rounded-lg px-3 py-2 w-28 text-aurora-navy/80 focus:outline-none focus:ring-2 ${fieldError && !Number.isNaN(milestone.year) ? 'border-red-300 focus:ring-red-400' : 'border-aurora-navy/20 focus:ring-aurora-terracotta/40'}`}
                             value={Number.isNaN(milestone.year) ? '' : milestone.year}
                             onChange={(e) => handleMilestoneYearChange(index, e.target.value)}
                             placeholder="Año"
                           />
                         </div>
                         <textarea
-                          className="border border-aurora-navy/20 rounded-lg px-3 py-2 text-aurora-navy/80 focus:outline-none focus:ring-2 focus:ring-orange-400 h-20 resize-none"
+                          className="border border-aurora-navy/20 rounded-lg px-3 py-2 text-aurora-navy/80 focus:outline-none focus:ring-2 focus:ring-aurora-terracotta/40 h-20 resize-none"
                           value={milestone.description}
                           onChange={(e) => handleMilestoneDescriptionChange(index, e.target.value)}
                           placeholder="Descripción"
@@ -653,28 +663,28 @@ const HistoryPage: React.FC = () => {
                 <button
                   onClick={handleAddMilestone}
                   disabled={tempMilestones.length >= MAX_MILESTONES}
-                  className="mb-4 px-4 py-2 border border-orange-400 text-orange-700 rounded-lg hover:bg-orange-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200 text-sm font-semibold"
+                  className="mb-4 px-4 py-2 border border-aurora-terracotta text-aurora-terracottaDark rounded-lg hover:bg-aurora-terracotta/10 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200 text-sm font-semibold"
                 >
                   + Agregar hito ({tempMilestones.length}/{MAX_MILESTONES})
                 </button>
                 <div className="flex justify-end gap-3 mt-2">
-                  <button onClick={() => { setIsEditingMilestones(false); setMilestonesError(''); }} className="px-5 py-2 border border-aurora-navy/20 rounded-lg text-aurora-navy/80 hover:bg-aurora-cream transition-colors duration-200">
+                  <button onClick={() => { setIsEditingMilestones(false); setMilestonesError(''); }} className={CANCEL_BUTTON_CLASS}>
                     Cancelar
                   </button>
-                  <button onClick={handleSaveMilestones} disabled={savingMilestones} className="px-5 py-2 bg-green-600 text-white rounded-lg font-semibold hover:bg-green-700 transition-colors duration-200 disabled:opacity-60">
+                  <button onClick={handleSaveMilestones} disabled={savingMilestones} className={SAVE_BUTTON_CLASS}>
                     {savingMilestones ? 'Guardando...' : 'Guardar'}
                   </button>
                 </div>
               </div>
             ) : (
               milestonesToDisplay.length > 0 ? (
-                <div className="relative border-l-4 border-orange-400 pl-8 ml-4">
+                <div className="relative border-l-4 border-aurora-gold pl-8 ml-4">
                   {milestonesToDisplay.map((milestone, idx) => (
                     <div key={idx} className="mb-8 relative">
-                      <div className="absolute -left-10 top-0 flex items-center justify-center w-8 h-8 bg-orange-500 rounded-full text-white font-bold text-sm">
+                      <div className="absolute -left-10 top-0 flex items-center justify-center w-8 h-8 bg-aurora-terracotta rounded-full text-white font-bold text-sm">
                         {milestone.year}
                       </div>
-                      <div className="bg-orange-50 p-6 rounded-lg shadow-md">
+                      <div className="bg-aurora-gold/10 border border-aurora-gold/30 p-6 rounded-lg shadow-aurora-sm">
                         <p className="text-aurora-navy text-lg">{milestone.description}</p>
                       </div>
                     </div>
@@ -709,12 +719,12 @@ const HistoryPage: React.FC = () => {
 
         {allEntrepreneurs.length > 0 && (
           <AnimatedSection delay="1.2s">
-            <section className="mb-20 p-8 bg-white rounded-3xl shadow-2xl border border-red-200">
-              <h3 className="text-3xl font-bold text-red-800 mb-10">Conoce a Nuestro Equipo</h3>
+            <section className={SECTION_CLASS}>
+              <h3 className="text-3xl font-bold text-aurora-navy mb-10">Conoce a Nuestro Equipo</h3>
 
               {isOwner && allEntrepreneurs.length > 1 && (
-                <div className="mb-8 p-4 bg-red-50 rounded-xl border border-red-100">
-                  <p className="text-sm font-semibold text-red-700 mb-3">
+                <div className="mb-8 p-4 bg-aurora-cream rounded-xl border border-aurora-navy/10">
+                  <p className="text-sm font-semibold text-aurora-navy mb-3">
                     Seleccioná quiénes aparecen en esta sección (máximo {MAX_TEAM_MEMBERS}): {selectedEntrepreneurIds.length}/{MAX_TEAM_MEMBERS}
                   </p>
                   {teamSelectionNotice && (
@@ -736,10 +746,10 @@ const HistoryPage: React.FC = () => {
                           disabled={isDisabled}
                           className={`px-4 py-2 rounded-full text-sm font-semibold border transition-colors duration-200 ${
                             isSelected
-                              ? 'bg-red-600 text-white border-red-600'
+                              ? 'bg-aurora-terracotta text-white border-aurora-terracotta'
                               : isDisabled
                                 ? 'bg-aurora-cream text-aurora-navy/40 border-aurora-navy/10 cursor-not-allowed'
-                                : 'bg-white text-red-700 border-red-300 hover:bg-red-50'
+                                : 'bg-white text-aurora-navy border-aurora-navy/20 hover:bg-aurora-cream'
                           }`}
                         >
                           {e.firstName} {e.lastName}
@@ -752,12 +762,12 @@ const HistoryPage: React.FC = () => {
 
               <div className={teamGridClass}>
                 {displayedEntrepreneurs.map((member) => (
-                  <div key={member.id} className={`flex flex-col items-center text-center bg-red-50 p-6 rounded-lg shadow-md border border-red-200 ${displayedEntrepreneurs.length < 3 ? 'w-full max-w-xs' : ''}`}>
+                  <div key={member.id} className={`flex flex-col items-center text-center bg-aurora-cream p-6 rounded-lg shadow-aurora-sm border border-aurora-navy/10 ${displayedEntrepreneurs.length < 3 ? 'w-full max-w-xs' : ''}`}>
                     <div className="relative mb-4">
                       <img
                         src={getTeamPhoto(member.id)}
                         alt={`${member.firstName} ${member.lastName}`}
-                        className="w-32 h-32 rounded-full object-cover border-4 border-red-400 shadow-lg"
+                        className="w-32 h-32 rounded-full object-cover border-4 border-aurora-terracotta shadow-lg"
                       />
                       {isOwner && (
                         <button
@@ -772,12 +782,12 @@ const HistoryPage: React.FC = () => {
                         </button>
                       )}
                     </div>
-                    <h4 className="text-xl font-bold text-red-700">{member.firstName} {member.lastName}</h4>
-                    <p className="text-md text-red-600 mb-3 italic">Emprendedor/a</p>
+                    <h4 className="text-xl font-bold text-aurora-navy">{member.firstName} {member.lastName}</h4>
+                    <p className="text-md text-aurora-terracottaDark mb-3 italic">Emprendedor/a</p>
                     {editingBioId === member.id ? (
                       <div className="w-full">
                         <textarea
-                          className="w-full border border-aurora-navy/20 rounded-lg px-3 py-2 text-aurora-navy/80 text-sm focus:outline-none focus:ring-2 focus:ring-red-400 h-24 resize-none"
+                          className="w-full border border-aurora-navy/20 rounded-lg px-3 py-2 text-aurora-navy/80 text-sm focus:outline-none focus:ring-2 focus:ring-aurora-terracotta/40 h-24 resize-none"
                           value={tempBio}
                           onChange={(e) => { if (e.target.value.length <= MAX_BIO_LENGTH) setTempBio(e.target.value); }}
                           placeholder="Escribí una bio..."
@@ -785,7 +795,7 @@ const HistoryPage: React.FC = () => {
                         />
                         <p className="text-xs text-aurora-navy/40 text-right mt-1">{tempBio.length} / {MAX_BIO_LENGTH}</p>
                         <div className="flex justify-center gap-2 mt-2">
-                          <button onClick={() => setEditingBioId(null)} className="px-3 py-1 border border-aurora-navy/20 rounded-lg text-aurora-navy/70 text-sm hover:bg-aurora-cream transition-colors duration-200">
+                          <button onClick={() => setEditingBioId(null)} className="px-3 py-1 border border-aurora-navy/20 rounded-lg text-aurora-navy/70 text-sm hover:bg-white transition-colors duration-200">
                             Cancelar
                           </button>
                           <button
@@ -822,13 +832,13 @@ const HistoryPage: React.FC = () => {
         )}
 
         <AnimatedSection delay="1.4s">
-          <section className="mb-20 p-8 bg-white rounded-3xl shadow-2xl border border-green-200">
+          <section className={SECTION_CLASS}>
             <div className="flex justify-between items-center mb-8">
-              <h3 className="text-3xl font-bold text-green-800 flex-grow">Únete a Nuestra Comunidad</h3>
+              <h3 className={SECTION_TITLE_CLASS}>Únete a Nuestra Comunidad</h3>
               {isOwner && !isEditingCommunity && (
                 <button
                   onClick={() => { setTempCommunityText(club.communityText || ''); setCommunityError(''); setIsEditingCommunity(true); }}
-                  className="ml-4 px-4 py-2 bg-aurora-terracotta text-white rounded-full text-sm font-semibold hover:bg-aurora-terracottaDark transition-colors duration-200 shadow-md"
+                  className={EDIT_BUTTON_CLASS}
                 >
                   Editar
                 </button>
@@ -837,7 +847,7 @@ const HistoryPage: React.FC = () => {
             {isEditingCommunity ? (
               <div>
                 <textarea
-                  className={`w-full border rounded-lg p-3 text-aurora-navy/80 text-base focus:outline-none focus:ring-2 h-32 resize-none ${communityError ? 'border-red-300 focus:ring-red-400' : 'border-aurora-navy/20 focus:ring-green-400'}`}
+                  className={`w-full border rounded-lg p-3 text-aurora-navy/80 text-base focus:outline-none focus:ring-2 h-32 resize-none ${communityError ? 'border-red-300 focus:ring-red-400' : 'border-aurora-navy/20 focus:ring-aurora-terracotta/40'}`}
                   value={tempCommunityText}
                   onChange={(e) => { if (e.target.value.length <= MAX_COMMUNITY_LENGTH) setTempCommunityText(e.target.value); if (communityError) setCommunityError(''); }}
                   maxLength={MAX_COMMUNITY_LENGTH}
@@ -848,10 +858,10 @@ const HistoryPage: React.FC = () => {
                   </span>
                 </div>
                 <div className="flex justify-end gap-3 mt-3">
-                  <button onClick={() => { setIsEditingCommunity(false); setCommunityError(''); }} className="px-5 py-2 border border-aurora-navy/20 rounded-lg text-aurora-navy/80 hover:bg-aurora-cream transition-colors duration-200">
+                  <button onClick={() => { setIsEditingCommunity(false); setCommunityError(''); }} className={CANCEL_BUTTON_CLASS}>
                     Cancelar
                   </button>
-                  <button onClick={handleSaveCommunity} disabled={savingCommunity} className="px-5 py-2 bg-green-600 text-white rounded-lg font-semibold hover:bg-green-700 transition-colors duration-200 disabled:opacity-60">
+                  <button onClick={handleSaveCommunity} disabled={savingCommunity} className={SAVE_BUTTON_CLASS}>
                     {savingCommunity ? 'Guardando...' : 'Guardar'}
                   </button>
                 </div>
@@ -867,14 +877,14 @@ const HistoryPage: React.FC = () => {
 
         {reviews.length > 0 && (
           <AnimatedSection delay="1.5s">
-            <section className="mb-20 p-8 bg-white rounded-3xl shadow-2xl border border-yellow-200">
-              <h3 className="text-3xl font-bold text-yellow-800 mb-10">Lo que dicen nuestros suscriptores</h3>
+            <section className={SECTION_CLASS}>
+              <h3 className="text-3xl font-bold text-aurora-navy mb-10">Lo que dicen nuestros suscriptores</h3>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {reviews.map((review: any, idx: number) => (
-                  <div key={review.id || idx} className="bg-yellow-50 p-6 rounded-xl shadow-md border border-yellow-200 flex flex-col gap-3">
-                    <div className="flex items-center gap-1">
+                  <div key={review.id || idx} className="bg-aurora-cream p-6 rounded-xl shadow-aurora-sm border border-aurora-navy/10 flex flex-col gap-3">
+                    <div className="flex items-center gap-1" role="img" aria-label={`${review.rating} de 5 estrellas`}>
                       {Array.from({ length: 5 }).map((_, i) => (
-                        <svg key={i} className={`w-5 h-5 ${i < review.rating ? 'text-yellow-400' : 'text-aurora-navy/30'}`} fill="currentColor" viewBox="0 0 20 20">
+                        <svg key={i} aria-hidden="true" className={`w-5 h-5 ${i < review.rating ? 'text-yellow-400' : 'text-aurora-navy/20'}`} fill="currentColor" viewBox="0 0 20 20">
                           <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
                         </svg>
                       ))}
@@ -890,14 +900,14 @@ const HistoryPage: React.FC = () => {
         )}
 
         <AnimatedSection delay="1.6s">
-          <div className="text-center py-20 bg-gradient-to-r from-blue-600 to-purple-700 text-white rounded-3xl shadow-2xl">
+          <div className="text-center py-20 px-4 bg-gradient-to-r from-aurora-navy to-aurora-navyDark text-white rounded-3xl shadow-2xl">
             <h2 className="text-4xl md:text-5xl font-extrabold mb-6">¿Listo para ser parte de nuestra historia?</h2>
             <p className="text-xl md:text-2xl mb-10 max-w-4xl mx-auto">
               Descubrí nuestros planes de suscripción y comenzá tu propia aventura con {club.name}.
             </p>
             <Link
               to={`/club/${club.id}`}
-              className="inline-block bg-white text-aurora-terracotta px-12 py-5 rounded-full font-bold text-xl hover:bg-aurora-terracotta/10 transition-all duration-300 shadow-lg"
+              className="inline-block bg-white text-aurora-terracotta px-12 py-5 rounded-full font-bold text-xl hover:bg-aurora-cream transition-all duration-300 shadow-lg"
             >
               ¡Suscribite Ahora!
             </Link>

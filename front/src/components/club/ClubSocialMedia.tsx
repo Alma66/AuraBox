@@ -100,7 +100,7 @@ const ClubSocialMedia: React.FC<ClubSocialMediaProps> = ({ socialMedia }) => {
       name: 'website',
       label: 'Sitio Web',
       url: socialMedia.website,
-      color: 'hover:text-green-600',
+      color: 'hover:text-aurora-terracotta',
       icon: (
         <svg className="w-7 h-7" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
           <circle cx="12" cy="12" r="10" />
@@ -115,7 +115,7 @@ const ClubSocialMedia: React.FC<ClubSocialMediaProps> = ({ socialMedia }) => {
   if (activeLinks.length === 0) return null;
 
   return (
-    <div className="flex flex-wrap gap-4 mt-4">
+    <div className="flex flex-wrap justify-center gap-4 mt-4">
       {activeLinks.map((social) => (
         <a
           key={social.name}
@@ -124,7 +124,7 @@ const ClubSocialMedia: React.FC<ClubSocialMediaProps> = ({ socialMedia }) => {
           rel="noopener noreferrer"
           aria-label={`Visitar ${social.label} de este club`}
           title={social.label}
-          className={`text-gray-500 transition-colors duration-200 ${social.color}`}
+          className={`text-aurora-navy/50 transition-colors duration-200 ${social.color}`}
         >
           {social.icon}
         </a>

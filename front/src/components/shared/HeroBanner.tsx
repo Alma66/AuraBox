@@ -15,8 +15,8 @@ const HeroBanner: React.FC<HeroBannerProps> = ({ title, subtitle, ctaText, ctaLi
       className="relative w-full h-96 md:h-[600px] bg-cover bg-center flex items-center justify-center text-center px-4 overflow-hidden"
       style={{ backgroundImage: `url(${backgroundImage})` }}
     >
-      <div className="absolute inset-0 bg-gradient-to-br from-blue-800/70 to-purple-800/70 backdrop-blur-sm animate-gradient-shift"></div>
-      
+      <div className="absolute inset-0 bg-gradient-to-br from-aurora-navy/80 to-aurora-terracottaDark/60 backdrop-blur-sm animate-gradient-shift"></div>
+
       <div className="relative z-10 text-white max-w-4xl">
         <h1 className="text-4xl md:text-6xl lg:text-7xl font-extrabold leading-tight mb-4 drop-shadow-lg animate-slideInUp">
           {title}
@@ -26,9 +26,9 @@ const HeroBanner: React.FC<HeroBannerProps> = ({ title, subtitle, ctaText, ctaLi
         </p>
         <Link
           to={ctaLink}
-          className="inline-block bg-white text-blue-700 px-10 py-4 rounded-full font-bold text-xl shadow-xl 
-                     transform transition-all duration-300 ease-in-out hover:scale-105 hover:bg-blue-100 
-                     focus:outline-none focus:ring-4 focus:ring-blue-300 focus:ring-opacity-70 opacity-0 animate-fadeInUp delay-500"
+          className="inline-block bg-white text-aurora-terracotta px-10 py-4 rounded-full font-bold text-xl shadow-xl
+                     transform transition-all duration-300 ease-in-out hover:scale-105 hover:bg-aurora-cream
+                     focus:outline-none focus:ring-4 focus:ring-aurora-gold focus:ring-opacity-70 opacity-0 animate-fadeInUp delay-500"
         >
           {ctaText}
         </Link>

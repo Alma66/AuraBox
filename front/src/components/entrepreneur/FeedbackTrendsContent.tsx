@@ -46,15 +46,15 @@ const FeedbackTrendsContent: React.FC<FeedbackTrendsContentProps> = ({ activeSec
       <div className="space-y-6">
         <h2 className="font-display text-xl font-bold text-aurora-navy">Tendencias de Rating</h2>
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-          <div className="border border-blue-100 bg-blue-50 rounded-xl px-5 py-4">
-            <p className="text-xs text-blue-600 uppercase tracking-wide mb-1">Tasa de conversión a reseña</p>
-            <p className="text-3xl font-bold text-blue-700">{data.reviewConversionRate}%</p>
-            <p className="text-xs text-blue-500 mt-1">de suscriptores dejaron una reseña</p>
+          <div className="border border-aurora-terracotta/20 bg-aurora-terracotta/10 rounded-xl px-5 py-4">
+            <p className="text-xs text-aurora-terracottaDark uppercase tracking-wide mb-1">Tasa de conversión a reseña</p>
+            <p className="text-3xl font-bold text-aurora-terracottaDark">{data.reviewConversionRate}%</p>
+            <p className="text-xs text-aurora-terracottaDark/80 mt-1">de suscriptores dejaron una reseña</p>
           </div>
-          <div className="border border-indigo-200 bg-indigo-50 rounded-xl px-5 py-4">
-            <p className="text-xs text-indigo-600 uppercase tracking-wide mb-1">NPS Estimado</p>
-            <p className="text-3xl font-bold text-indigo-700">{nps}</p>
-            <p className="text-xs text-indigo-500 mt-1">% 4-5★ menos % 1-2★</p>
+          <div className="border border-aurora-gold/40 bg-aurora-gold/10 rounded-xl px-5 py-4">
+            <p className="text-xs text-aurora-navy/70 uppercase tracking-wide mb-1">NPS Estimado</p>
+            <p className="text-3xl font-bold text-aurora-navy">{nps}</p>
+            <p className="text-xs text-aurora-navy/60 mt-1">% 4-5★ menos % 1-2★</p>
           </div>
           {lastMonth && (
             <div className={`rounded-xl px-5 py-4 border ${lastMonth.avgRating >= historicAvg ? 'border-green-200 bg-green-50' : 'border-orange-200 bg-orange-50'}`}>
@@ -263,7 +263,7 @@ const FeedbackTrendsContent: React.FC<FeedbackTrendsContentProps> = ({ activeSec
                 return (
                   <span
                     key={w.word}
-                    className="px-3 py-1 bg-blue-100 text-blue-800 rounded-full font-medium"
+                    className="px-3 py-1 bg-aurora-terracotta/10 text-aurora-terracottaDark rounded-full font-medium"
                     style={{ fontSize: `${size}px` }}
                     title={`${w.count} apariciones`}
                   >
@@ -279,7 +279,7 @@ const FeedbackTrendsContent: React.FC<FeedbackTrendsContentProps> = ({ activeSec
                   <div key={w.word} className="flex items-center gap-3">
                     <span className="text-sm text-aurora-navy/80 w-28 flex-shrink-0 font-medium">{w.word}</span>
                     <div className="flex-1 bg-aurora-cream rounded-full h-3">
-                      <div className="bg-blue-500 h-3 rounded-full" style={{ width: `${(w.count / max) * 100}%` }} />
+                      <div className="bg-aurora-terracotta h-3 rounded-full" style={{ width: `${(w.count / max) * 100}%` }} />
                     </div>
                     <span className="text-xs text-aurora-navy/50 w-8 text-right">{w.count}</span>
                   </div>
@@ -330,10 +330,10 @@ const FeedbackTrendsContent: React.FC<FeedbackTrendsContentProps> = ({ activeSec
       <div className="space-y-6">
         <h2 className="font-display text-xl font-bold text-aurora-navy">Reseñas con Media</h2>
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-          <div className="border border-blue-200 bg-blue-50 rounded-xl p-5">
-            <p className="text-xs text-blue-600 uppercase tracking-wide mb-1">Con multimedia</p>
-            <p className="text-3xl font-bold text-blue-700">{conMedia.length}</p>
-            <p className="text-xs text-blue-500 mt-1">{pctConMedia}% del total</p>
+          <div className="border border-aurora-terracotta/20 bg-aurora-terracotta/10 rounded-xl p-5">
+            <p className="text-xs text-aurora-terracottaDark uppercase tracking-wide mb-1">Con multimedia</p>
+            <p className="text-3xl font-bold text-aurora-terracottaDark">{conMedia.length}</p>
+            <p className="text-xs text-aurora-terracottaDark/80 mt-1">{pctConMedia}% del total</p>
           </div>
           <div className="border border-aurora-navy/10 rounded-xl p-5 bg-white shadow-aurora-sm">
             <p className="text-xs text-aurora-navy/50 uppercase tracking-wide mb-1">Sin multimedia</p>

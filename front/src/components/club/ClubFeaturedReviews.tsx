@@ -14,18 +14,19 @@ const ClubFeaturedReviews: React.FC<ClubFeaturedReviewsProps> = ({ reviews, club
   }
 
   return (
-    <div className="bg-white rounded-xl shadow-lg p-8 mb-8 animate-fadeInUp">
-      <h2 className="text-2xl font-bold text-gray-800 mb-4">Reseñas Destacadas</h2>
+    <div className="bg-white rounded-xl shadow-aurora-sm border border-aurora-navy/10 p-8 mb-8 animate-fadeInUp">
+      <h2 className="text-2xl font-bold text-aurora-navy mb-4">Reseñas Destacadas</h2>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
         {reviews.slice(0, 2).map((review) => (
-          <div key={review.id} className="bg-gray-50 p-5 rounded-lg border border-gray-200 shadow-sm">
+          <div key={review.id} className="bg-aurora-cream p-5 rounded-lg border border-aurora-navy/10 shadow-sm">
             <div className="flex items-center mb-2">
               <span className="text-yellow-500 text-xl font-bold mr-2">{review.rating}</span>
-              <div className="flex">
+              <div className="flex" role="img" aria-label={`${review.rating} de 5 estrellas`}>
                 {[...Array(5)].map((_, i) => (
                   <svg
                     key={i}
-                    className={`w-5 h-5 ${i < review.rating ? 'text-yellow-400' : 'text-gray-300'}`}
+                    aria-hidden="true"
+                    className={`w-5 h-5 ${i < review.rating ? 'text-yellow-400' : 'text-aurora-navy/20'}`}
                     fill="currentColor"
                     viewBox="0 0 20 20"
                   >
@@ -34,8 +35,8 @@ const ClubFeaturedReviews: React.FC<ClubFeaturedReviewsProps> = ({ reviews, club
                 ))}
               </div>
             </div>
-            <p className="text-gray-800 font-medium mb-2">"{review.text}"</p>
-            <p className="text-gray-600 text-sm">- {review.author}</p>
+            <p className="text-aurora-navy font-medium mb-2">"{review.text}"</p>
+            <p className="text-aurora-navy/60 text-sm">- {review.author}</p>
           </div>
         ))}
       </div>
@@ -43,7 +44,7 @@ const ClubFeaturedReviews: React.FC<ClubFeaturedReviewsProps> = ({ reviews, club
         <div className="text-center mt-6">
           <Link
             to={`/club/${clubId}/reviews`}
-            className="text-blue-600 hover:underline font-semibold text-lg transition-colors duration-200"
+            className="text-aurora-terracotta hover:text-aurora-terracottaDark hover:underline font-semibold text-lg transition-colors duration-200"
           >
             Ver todas las {reviews.length} reseñas de {clubName}
           </Link>
