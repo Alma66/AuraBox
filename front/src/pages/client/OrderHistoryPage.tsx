@@ -204,7 +204,9 @@ const OrderHistoryPage: React.FC = () => {
                       <div className="text-right flex-shrink-0">
                         <p className="font-bold text-aurora-navy">{formatPrice(payment.totalAmountPaid)}</p>
                         <span className={`inline-block text-xs font-semibold px-2 py-0.5 rounded-full ${PAYMENT_STATUS_COLORS[payment.paymentStatus]}`}>
-                          {PAYMENT_STATUS_LABELS[payment.paymentStatus]}
+                          {payment.paymentStatus === 'Pendiente' && pmName?.toLowerCase().includes('efectivo')
+  ? 'A pagar al recibir'
+  : PAYMENT_STATUS_LABELS[payment.paymentStatus]}
                         </span>
                       </div>
                     </div>

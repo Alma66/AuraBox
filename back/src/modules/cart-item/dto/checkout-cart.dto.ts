@@ -1,5 +1,6 @@
 import { Transform, Type } from 'class-transformer';
 import { IsIn, IsNotEmpty, IsOptional, IsString, Matches, MaxLength, ValidateNested } from 'class-validator';
+import { PAYMENT_METHOD_CODES } from '../../payments/payments.constants';
 
 const Trim = () => Transform(({ value }) => (typeof value === 'string' ? value.trim() : value));
 
@@ -47,7 +48,7 @@ class CheckoutAddressDto {
 }
 
 export class CheckoutCartDto {
-  @IsIn(['mercadopago', 'tarjeta', 'transferencia'])
+  @IsIn(PAYMENT_METHOD_CODES)
   paymentMethod!: string;
 
   @ValidateNested()

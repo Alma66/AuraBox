@@ -1,3 +1,5 @@
+import { PaymentMethodCode } from '../../modules/payments/payments.constants';
+
 const FREQUENCY_MONTHS: Record<string, number> = {
   Mensual: 1,
   Bimestral: 2,
@@ -33,8 +35,13 @@ export const nextFutureDate = (from: Date, frequency: string, now: Date): Date |
   return null;
 };
 
-export const priceFor = (basePrice: unknown, transferDiscount: unknown, isTransfer: boolean) => {
-  const base = Number(basePrice);
-  const discount = isTransfer ? Number(transferDiscount ?? 0) : 0;
+export const priceFor = (
+  plan: { basePrice: unknown; cashDiscount?: unknown; transferDiscount?: unknown },
+  code: PaymentMethodCode | null,
+) => {
+  const base = Number(plan.basePrice);
+  const rawDiscount =
+    code === 'transferencia' ? plan.transferDiscount : code === 'efectivo' ? plan.cashDiscount : 0;
+  const discount = Number(rawDiscount ?? 0);
   return Math.round(base * (1 - discount / 100) * 100) / 100;
 };

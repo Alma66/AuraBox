@@ -2,20 +2,22 @@ export const AURABOX_COMMISSION = 200;
 
 export const AUTO_CONFIRM_TRANSFERS = true;
 
-export type PaymentMethodCode = 'mercadopago' | 'tarjeta' | 'transferencia';
+export type PaymentMethodCode = 'mercadopago' | 'tarjeta' | 'transferencia' | 'efectivo';
 
-export const PAYMENT_METHOD_CODES: PaymentMethodCode[] = ['mercadopago', 'tarjeta', 'transferencia'];
+export const PAYMENT_METHOD_CODES: PaymentMethodCode[] = ['mercadopago', 'tarjeta', 'transferencia', 'efectivo'];
 
 export const PAYMENT_METHOD_KEYWORDS: Record<PaymentMethodCode, string> = {
   mercadopago: 'mercado',
   tarjeta: 'tarjeta',
   transferencia: 'transfer',
+  efectivo: 'efectivo',
 };
 
 export const PAYMENT_METHOD_DEFAULT_NAMES: Record<PaymentMethodCode, string> = {
   mercadopago: 'Mercado Pago',
   tarjeta: 'Tarjeta de crédito/débito',
   transferencia: 'Transferencia bancaria',
+  efectivo: 'Efectivo contra entrega',
 };
 
 export const codeFromMethodName = (name: string): PaymentMethodCode | null => {

@@ -2,7 +2,7 @@ import { Injectable, NotFoundException, ForbiddenException, BadRequestException 
 import { PrismaService } from '../../prisma/prisma.service';
 import { CreatePaymentDto } from './dto/create-payment.dto';
 import { UpdatePaymentDto } from './dto/update-payment.dto';
-import { AURABOX_COMMISSION } from './payments.constants';
+import { AURABOX_COMMISSION, codeFromMethodName } from './payments.constants';
 
 
 function sanitize(payment: any) {
@@ -110,13 +110,23 @@ export class PaymentsService {
     return payments.map(sanitize);
   }
 
-  async findByClub(idClub: number, user: { id: number; role: string }) {
+   async findByClub(idClub: number, user: { id: number; role: string }) {
     await this.assertClubAccess(idClub, user);
     const payments = await this.prisma.payment.findMany({
       where: { idClub },
       orderBy: { paymentDate: 'desc' },
     });
-    return payments.map(sanitize);
+    const methodIds = Array.from(
+      new Set(payments.map((p) => p.idPaymentMethods).filter((id): id is number => typeof id === 'number')),
+    );
+    const methods = methodIds.length
+      ? await this.prisma.payment_Methods.findMany({ where: { id: { in: methodIds } } })
+      : [];
+    const codeById = new Map(methods.map((m) => [m.id, codeFromMethodName(m.method)] as [number, string | null]));
+    return payments.map((p) => ({
+      ...sanitize(p),
+      paymentMethodCode: p.idPaymentMethods ? (codeById.get(p.idPaymentMethods) ?? null) : null,
+    }));
   }
 
   async update(id: number, dto: UpdatePaymentDto) {
@@ -152,6 +162,41 @@ export class PaymentsService {
     return sanitize(updated);
   }
 
+    async settle(id: number, action: 'confirm' | 'reject', user: { id: number; role: string }) {
+    const payment = await this.prisma.payment.findUnique({ where: { id } });
+    if (!payment) throw new NotFoundException('Pago no encontrado');
+    await this.assertClubAccess(payment.idClub, user);
+
+    const method = payment.idPaymentMethods
+      ? await this.prisma.payment_Methods.findUnique({ where: { id: payment.idPaymentMethods } })
+      : null;
+    if (!method || codeFromMethodName(method.method) !== 'efectivo') {
+      throw new BadRequestException('Solo se pueden resolver desde acá los pagos en efectivo');
+    }
+
+    const now = new Date();
+    await this.prisma.$transaction(async (tx) => {
+      const updated = await tx.payment.updateMany({
+        where: { id, paymentStatus: 'Pendiente' as any },
+        data:
+          action === 'confirm'
+            ? { paymentStatus: 'Exitoso' as any, paymentDate: now, idGatewayTransaction: `EFE-${now.getTime()}-${id}` }
+            : { paymentStatus: 'Rechazado' as any },
+      });
+      if (updated.count !== 1) throw new BadRequestException('Este pago ya fue resuelto');
+
+      if (action === 'confirm') {
+        await tx.user_Subscriptions.update({
+          where: { id: payment.idUserSubscription },
+          data: { lastPaymentDate: now, monthlyAmountPaid: payment.totalAmountPaid.toString() },
+        });
+      }
+    });
+
+    const refreshed = await this.prisma.payment.findUnique({ where: { id } });
+    return sanitize(refreshed);
+  }
+  
   async remove(id: number) {
     const payment = await this.prisma.payment.findUnique({ where: { id } });
     if (!payment) throw new NotFoundException('Pago no encontrado');

@@ -2,7 +2,12 @@ import { Injectable, NotFoundException, BadRequestException } from '@nestjs/comm
 import { PrismaService } from '../../prisma/prisma.service';
 import { CreateCartItemDto } from './dto/create-cart-item.dto';
 import { CheckoutCartDto } from './dto/checkout-cart.dto';
-import { AURABOX_COMMISSION, AUTO_CONFIRM_TRANSFERS, PAYMENT_METHOD_CODES } from '../payments/payments.constants';
+import {
+  AURABOX_COMMISSION,
+  AUTO_CONFIRM_TRANSFERS,
+  PAYMENT_METHOD_CODES,
+  PaymentMethodCode,
+} from '../payments/payments.constants';
 import { nextPaymentFrom, priceFor } from '../../common/utils/billing';
 import { findOrCreateMethod, getAcceptedCodes } from '../../common/utils/payment-methods';
 
@@ -185,8 +190,11 @@ export class CartItemService {
       });
     }
 
-    const isTransfer = dto.paymentMethod === 'transferencia';
-    const confirmNow = !isTransfer || AUTO_CONFIRM_TRANSFERS;
+    const code = dto.paymentMethod as PaymentMethodCode;
+    const isTransfer = code === 'transferencia';
+    const isCash = code === 'efectivo';
+    const paymentConfirmed = isCash ? false : !isTransfer || AUTO_CONFIRM_TRANSFERS;
+    const subscriptionActive = isCash || paymentConfirmed;
     const toCreate: { plan: (typeof plans)[number]; amount: number }[] = [];
 
     for (const item of items) {
@@ -197,7 +205,7 @@ export class CartItemService {
       if (!plan.active || club.clubStatus !== 'APROBADO') {
         throw new BadRequestException(`"${plan.name}" ya no está disponible. Quitalo del carrito para continuar.`);
       }
-      const amount = priceFor(plan.basePrice, plan.transferDiscount, isTransfer);
+      const amount = priceFor(plan, code);
       if (!Number.isFinite(amount) || amount <= AURABOX_COMMISSION) {
         throw new BadRequestException(`El precio de "${plan.name}" no es válido`);
       }
@@ -208,10 +216,10 @@ export class CartItemService {
       throw new BadRequestException('Ya tenés una suscripción vigente a los planes de tu carrito');
     }
 
-    const method = await findOrCreateMethod(this.prisma, dto.paymentMethod as any);
+    const method = await findOrCreateMethod(this.prisma, code);
     const now = new Date();
-    const subscriptionStatus = confirmNow ? 'Activa' : 'Pendiente_Pago';
-    const paymentStatus = confirmNow ? 'Exitoso' : 'Pendiente';
+    const subscriptionStatus = subscriptionActive ? 'Activa' : 'Pendiente_Pago';
+    const paymentStatus = paymentConfirmed ? 'Exitoso' : 'Pendiente';
     const streetNumber = parseInt(dto.address.streetNumber, 10);
 
     const created = await this.prisma.$transaction(async (tx) => {
@@ -225,9 +233,9 @@ export class CartItemService {
             idPaymentMethods: method.id,
             startDate: now,
             subscriptionStatus: subscriptionStatus as any,
-            lastPaymentDate: confirmNow ? now : undefined,
-            nextPaymentDate: confirmNow ? (nextPaymentFrom(now, plan.frequency) ?? undefined) : undefined,
-            monthlyAmountPaid: confirmNow ? String(amount) : undefined,
+            lastPaymentDate: paymentConfirmed ? now : undefined,
+            nextPaymentDate: subscriptionActive ? (nextPaymentFrom(now, plan.frequency) ?? undefined) : undefined,
+            monthlyAmountPaid: paymentConfirmed ? String(amount) : undefined,
           },
         });
 
@@ -237,7 +245,7 @@ export class CartItemService {
             idUser,
             idClub: plan.idClub,
             idPaymentMethods: method.id,
-            idGatewayTransaction: confirmNow ? `SIM-${now.getTime()}-${sub.id}` : null,
+            idGatewayTransaction: paymentConfirmed ? `SIM-${now.getTime()}-${sub.id}` : null,
             totalAmountPaid: String(amount),
             clubAmount: String(amount - AURABOX_COMMISSION),
             commissionAmount: String(AURABOX_COMMISSION),
@@ -267,7 +275,8 @@ export class CartItemService {
 
     return {
       createdCount: created.length,
-      pendingPayment: !confirmNow,
+      pendingPayment: !paymentConfirmed,
+      cashOnDelivery: isCash,
       total: toCreate.reduce((sum, entry) => sum + entry.amount, 0),
       subscriptions: created,
     };

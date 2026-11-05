@@ -1,5 +1,5 @@
 import {
-  Body, Controller, Get, Post, Put, Delete,
+  Body, Controller, Get, Post, Put, Patch, Delete,
   Param, ParseIntPipe, UseGuards, Request,
   UsePipes, ValidationPipe, ForbiddenException,
 } from '@nestjs/common';
@@ -9,6 +9,7 @@ import { UpdatePaymentDto } from './dto/update-payment.dto';
 import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
 import { RolesGuard } from '../auth/roles.guard';
 import { Roles } from '../auth/roles.decorator';
+import { SettlePaymentDto } from './dto/settle-payment.dto';
 
 @Controller('payments')
 @UseGuards(JwtAuthGuard)
@@ -48,6 +49,14 @@ export class PaymentsController {
   @Get(':id')
   async findOne(@Param('id', ParseIntPipe) id: number, @Request() req) {
     return this.paymentsService.findOneForUser(id, req.user);
+  }
+
+  @UseGuards(RolesGuard)
+  @Roles('entrepreneur')
+  @Patch(':id/settle')
+  @UsePipes(new ValidationPipe({ whitelist: true, transform: true }))
+  async settle(@Param('id', ParseIntPipe) id: number, @Body() dto: SettlePaymentDto, @Request() req) {
+    return this.paymentsService.settle(id, dto.action, req.user);
   }
 
   @UseGuards(RolesGuard)

@@ -44,13 +44,17 @@ const PAYMENT_METHODS = [
   { id: 'mercadopago', label: 'MercadoPago (Tarjeta/Débito)', icon: '💳' },
   { id: 'tarjeta', label: 'Tarjeta de Crédito/Débito', icon: '💳' },
   { id: 'transferencia', label: 'Transferencia Bancaria', icon: '🏦' },
+  { id: 'efectivo', label: 'Efectivo contra entrega', icon: '💵' },
 ];
 
 const fieldClass =
   'p-3 border border-aurora-navy/15 rounded-xl focus:ring-2 focus:ring-aurora-terracotta focus:border-transparent';
 
-const discountFor = (plan: CartPlan, method: string) =>
-  method === 'transferencia' ? plan.transferDiscount ?? 0 : 0;
+const discountFor = (plan: CartPlan, method: string) => {
+  if (method === 'transferencia') return plan.transferDiscount ?? 0;
+  if (method === 'efectivo') return plan.cashDiscount ?? 0;
+  return 0;
+};
 
 const money = (value: number) => `$${(Math.round(value * 100) / 100).toLocaleString('es-AR')} ARS`;
 
@@ -89,6 +93,7 @@ const CheckoutPage: React.FC = () => {
   const [isProcessing, setIsProcessing] = useState(false);
   const [success, setSuccess] = useState(false);
   const [pendingPayment, setPendingPayment] = useState(false);
+  const [paidInCash, setPaidInCash] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [postalError, setPostalError] = useState<string | null>(null);
 
@@ -189,7 +194,9 @@ const CheckoutPage: React.FC = () => {
           instructions: address.instructions.trim(),
         },
       });
-      setPendingPayment(Boolean(getResponseData(res)?.pendingPayment));
+      const result = getResponseData(res);
+      setPendingPayment(Boolean(result?.pendingPayment));
+      setPaidInCash(Boolean(result?.cashOnDelivery));
       setSuccess(true);
     } catch (err: any) {
       console.error('Error processing payment:', err);
@@ -206,7 +213,33 @@ const CheckoutPage: React.FC = () => {
   const savings = originalTotal - subtotal;
   const availableMethods = PAYMENT_METHODS.filter((method) => options.methods.includes(method.id));
   const transferHasDiscount = cartItems.some((item) => (item.plan.transferDiscount ?? 0) > 0);
+  const cashHasDiscount = cartItems.some((item) => (item.plan.cashDiscount ?? 0) > 0);
   const isTransfer = selectedPaymentMethod === 'transferencia';
+  const isCash = selectedPaymentMethod === 'efectivo';
+
+  const methodHint = (id: string) => {
+    if (id === 'transferencia') {
+      return transferHasDiscount ? 'Con descuento en los planes que lo incluyen' : 'Transferís a la cuenta del club';
+    }
+    if (id === 'efectivo') {
+      return cashHasDiscount
+        ? 'Pagás al recibir tu caja, con descuento en los planes que lo incluyen'
+        : 'Pagás en efectivo al recibir tu caja';
+    }
+    return 'Pago simulado de demostración';
+  };
+
+  const successTitle = paidInCash
+    ? '¡Compra confirmada!'
+    : pendingPayment
+      ? '¡Suscripción registrada!'
+      : '¡Pago Realizado Exitosamente!';
+
+  const successText = paidInCash
+    ? 'Tu suscripción ya está activa. Vas a pagar en efectivo cuando recibas tu caja y el club va a registrar el cobro. Podés ver el estado en Mis Suscripciones.'
+    : pendingPayment
+      ? 'Tu suscripción queda pendiente de pago hasta que el club confirme tu transferencia. Podés ver el estado en Mis Suscripciones.'
+      : 'Tu orden ha sido procesada. Podés seguir el estado de tus suscripciones desde tu cuenta. ¡Gracias por tu compra en AuraBox!';
 
   if (loading) {
     return (
@@ -238,14 +271,8 @@ const CheckoutPage: React.FC = () => {
       <div className="min-h-screen bg-aurora-cream py-8 px-4">
         <div className="max-w-4xl mx-auto text-center py-12">
           <div className="text-5xl mb-4">🎉</div>
-          <h1 className="text-4xl font-serif font-bold text-aurora-navy mb-4">
-            {pendingPayment ? '¡Suscripción registrada!' : '¡Pago Realizado Exitosamente!'}
-          </h1>
-          <p className="text-aurora-navy/70 mb-8 max-w-md mx-auto">
-            {pendingPayment
-              ? 'Tu suscripción queda pendiente de pago hasta que el club confirme tu transferencia. Podés ver el estado en Mis Suscripciones.'
-              : 'Tu orden ha sido procesada. Podés seguir el estado de tus suscripciones desde tu cuenta. ¡Gracias por tu compra en AuraBox!'}
-          </p>
+          <h1 className="text-4xl font-serif font-bold text-aurora-navy mb-4">{successTitle}</h1>
+          <p className="text-aurora-navy/70 mb-8 max-w-md mx-auto">{successText}</p>
           <div className="space-x-4">
             <button onClick={() => navigate('/')} className="bg-aurora-terracotta text-white px-6 py-3 rounded-xl hover:bg-aurora-terracottaDark transition-colors font-semibold">
               Volver al Inicio
@@ -298,7 +325,7 @@ const CheckoutPage: React.FC = () => {
                   </div>
                   {savings > 0 && (
                     <div className="flex justify-between text-green-700">
-                      <span>Descuento por transferencia</span>
+                      <span>{isCash ? 'Descuento por pago en efectivo' : 'Descuento por transferencia'}</span>
                       <span>-{money(savings)}</span>
                     </div>
                   )}
@@ -332,13 +359,7 @@ const CheckoutPage: React.FC = () => {
                       />
                       <div>
                         <span className="text-sm font-semibold text-aurora-navy">{method.icon} {method.label}</span>
-                        <p className="text-xs text-aurora-navy/50">
-                          {method.id === 'transferencia'
-                            ? transferHasDiscount
-                              ? 'Con descuento en los planes que lo incluyen'
-                              : 'Transferís a la cuenta del club'
-                            : 'Pago simulado de demostración'}
-                        </p>
+                        <p className="text-xs text-aurora-navy/50">{methodHint(method.id)}</p>
                       </div>
                     </label>
                   ))}
@@ -350,7 +371,9 @@ const CheckoutPage: React.FC = () => {
                 </p>
               )}
               <p className="mt-4 rounded-lg bg-aurora-gold/10 px-3 py-2 text-xs text-aurora-navy/70">
-                Entorno de demostración: el pago es simulado y no se realiza ningún cobro real.
+                {isCash
+                  ? 'No se cobra nada ahora. Pagás en efectivo al recibir cada caja y el club confirma el cobro.'
+                  : 'Entorno de demostración: el pago es simulado y no se realiza ningún cobro real.'}
               </p>
             </div>
 
@@ -435,10 +458,12 @@ const CheckoutPage: React.FC = () => {
               }`}
             >
               {isProcessing
-                ? 'Procesando Pago...'
+                ? 'Procesando...'
                 : isTransfer
                   ? `Ya realicé la transferencia · ${money(subtotal)}`
-                  : `Pagar ${money(subtotal)}`}
+                  : isCash
+                    ? `Confirmar compra · ${money(subtotal)}`
+                    : `Pagar ${money(subtotal)}`}
             </button>
             <div className="mt-4 space-x-4">
               <button type="button" onClick={() => navigate('/cart')} className="text-aurora-navy hover:underline font-semibold">← Volver al Carrito</button>

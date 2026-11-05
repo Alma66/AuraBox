@@ -3,15 +3,20 @@ import { useParams } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import api, { getResponseData } from '../../../api/config';
 
-type MethodCode = 'mercadopago' | 'tarjeta' | 'transferencia';
+type MethodCode = 'mercadopago' | 'tarjeta' | 'transferencia' | 'efectivo';
 
 const METHODS: { id: MethodCode; label: string; hint: string }[] = [
   { id: 'mercadopago', label: 'Mercado Pago', hint: 'El cliente paga con su cuenta de Mercado Pago.' },
   { id: 'tarjeta', label: 'Tarjeta de crédito o débito', hint: 'Pago directo con tarjeta.' },
-  {
+    {
     id: 'transferencia',
     label: 'Transferencia bancaria',
     hint: 'El cliente transfiere a tu cuenta y se aplica el descuento por transferencia de tus planes.',
+  },
+  {
+    id: 'efectivo',
+    label: 'Efectivo contra entrega',
+    hint: 'El cliente paga al recibir su caja. Vos confirmás el cobro desde cada suscripción y se aplica el descuento en efectivo de tus planes.',
   },
 ];
 

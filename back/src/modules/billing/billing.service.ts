@@ -112,8 +112,9 @@ export class BillingService implements OnModuleInit, OnModuleDestroy {
 
       const next = nextFutureDate(dueDate, plan.frequency, now);
       const method = sub.idPaymentMethods ? methodById.get(sub.idPaymentMethods) : undefined;
-      const isTransfer = method ? codeFromMethodName(method.method) === 'transferencia' : false;
-      const amount = priceFor(plan.basePrice, plan.transferDiscount, isTransfer);
+      const code = method ? codeFromMethodName(method.method) : null;
+      const isCash = code === 'efectivo';
+      const amount = priceFor(plan, code);
       if (!next || !Number.isFinite(amount) || amount <= AURABOX_COMMISSION) {
         skipped += 1;
         continue;
@@ -122,7 +123,10 @@ export class BillingService implements OnModuleInit, OnModuleDestroy {
       const charged = await this.prisma.$transaction(async (tx) => {
         const claimed = await tx.user_Subscriptions.updateMany({
           where: { id: sub.id, subscriptionStatus: 'Activa' as any, nextPaymentDate: dueDate },
-          data: { lastPaymentDate: now, nextPaymentDate: next, monthlyAmountPaid: String(amount) },
+          data: {
+            nextPaymentDate: next,
+            ...(isCash ? {} : { lastPaymentDate: now, monthlyAmountPaid: String(amount) }),
+          },
         });
         if (claimed.count !== 1) return false;
 
@@ -132,12 +136,12 @@ export class BillingService implements OnModuleInit, OnModuleDestroy {
             idUser: sub.idUser,
             idClub: plan.idClub,
             idPaymentMethods: sub.idPaymentMethods ?? undefined,
-            idGatewayTransaction: `SIM-R-${now.getTime()}-${sub.id}`,
+            idGatewayTransaction: isCash ? null : `SIM-R-${now.getTime()}-${sub.id}`,
             totalAmountPaid: String(amount),
             clubAmount: String(amount - AURABOX_COMMISSION),
             commissionAmount: String(AURABOX_COMMISSION),
             paymentDate: now,
-            paymentStatus: 'Exitoso' as any,
+            paymentStatus: (isCash ? 'Pendiente' : 'Exitoso') as any,
           },
         });
         return true;
