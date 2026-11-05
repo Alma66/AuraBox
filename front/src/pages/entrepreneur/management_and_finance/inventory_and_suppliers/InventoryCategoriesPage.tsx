@@ -5,6 +5,9 @@ import { useAuth } from '../../../../App';
 import { SupplyCategory, SupplierItem, ProductInventoryItem } from '../../../../types/inventory';
 import toast from 'react-hot-toast';
 
+const fieldClass =
+  'px-3 py-2 border border-aurora-navy/15 rounded-lg text-sm text-aurora-navy bg-white focus:outline-none focus:ring-2 focus:ring-aurora-terracotta/40 focus:border-aurora-terracotta';
+
 const InventoryCategoriesPage: React.FC = () => {
   const { user, userRole, loading: authLoading } = useAuth();
   const navigate = useNavigate();
@@ -55,51 +58,57 @@ const InventoryCategoriesPage: React.FC = () => {
   };
 
   const handleSubmit = async () => {
-  if (!name.trim()) {
-    toast.error('El nombre de la categoría es obligatorio');
-    return;
-  }
-  try {
-    if (editingId) {
-      await api.put(`/inventory/categories/${editingId}`, { name, description: description || undefined });
-    } else {
-      await api.post('/inventory/categories', { idClub, name, description: description || undefined });
+    if (!name.trim()) {
+      toast.error('El nombre de la categoría es obligatorio');
+      return;
     }
-    resetForm();
-    fetchAll();
-  } catch (err) {
-    console.error(err);
-    toast.error('Error al guardar la categoría');
-  }
-};
+    try {
+      if (editingId) {
+        await api.put(`/inventory/categories/${editingId}`, { name, description: description || undefined });
+      } else {
+        await api.post('/inventory/categories', { idClub, name, description: description || undefined });
+      }
+      resetForm();
+      fetchAll();
+    } catch (err) {
+      console.error(err);
+      toast.error('Error al guardar la categoría');
+    }
+  };
 
-const removeCategory = (id: number) => {
-  toast((t) => (
-    <div className="flex flex-col gap-3">
-      <p className="text-sm font-medium">¿Eliminar esta categoría?</p>
-      <div className="flex gap-2 justify-end">
-        <button onClick={() => toast.dismiss(t.id)} className="px-3 py-1 text-sm border border-gray-300 rounded-lg hover:bg-gray-50">
-          Cancelar
-        </button>
-        <button
-          onClick={async () => {
-            toast.dismiss(t.id);
-            try {
-              await api.delete(`/inventory/categories/${id}`);
-              fetchAll();
-            } catch (err: any) {
-              console.error(err);
-              toast.error(err?.response?.data?.message ?? 'Error al eliminar la categoría');
-            }
-          }}
-          className="px-3 py-1 text-sm bg-red-600 text-white rounded-lg hover:bg-red-700"
-        >
-          Eliminar
-        </button>
-      </div>
-    </div>
-  ), { duration: Infinity });
-};
+  const removeCategory = (id: number) => {
+    toast(
+      (t) => (
+        <div className="flex flex-col gap-3">
+          <p className="text-sm font-medium">¿Eliminar esta categoría?</p>
+          <div className="flex gap-2 justify-end">
+            <button
+              onClick={() => toast.dismiss(t.id)}
+              className="px-3 py-1 text-sm border border-aurora-cream/40 rounded-lg hover:bg-white/10"
+            >
+              Cancelar
+            </button>
+            <button
+              onClick={async () => {
+                toast.dismiss(t.id);
+                try {
+                  await api.delete(`/inventory/categories/${id}`);
+                  fetchAll();
+                } catch (err: any) {
+                  console.error(err);
+                  toast.error(err?.response?.data?.message ?? 'Error al eliminar la categoría');
+                }
+              }}
+              className="px-3 py-1 text-sm bg-red-600 text-white rounded-lg hover:bg-red-700"
+            >
+              Eliminar
+            </button>
+          </div>
+        </div>
+      ),
+      { duration: Infinity }
+    );
+  };
 
   const loadForEdit = (cat: SupplyCategory) => {
     setName(cat.name);
@@ -128,50 +137,52 @@ const removeCategory = (id: number) => {
   }, [categories, productsCount]);
 
   if (authLoading || loading) {
-    return <div className="text-center py-20 text-gray-500">Cargando categorías...</div>;
+    return <div className="text-center py-20 text-aurora-navy/60">Cargando categorías...</div>;
   }
 
   if (!idClub) {
-    return <div className="text-center py-20 text-gray-500">Club no encontrado</div>;
+    return <div className="text-center py-20 text-aurora-navy/60">Club no encontrado</div>;
   }
 
   return (
     <div className="px-4 py-6 lg:px-8">
-      <h1 className="text-2xl font-bold text-gray-900 mb-2">Categorías de Insumos</h1>
-      <p className="text-sm text-gray-500 mb-8">Organizá los insumos y proveedores de tu club por categoría, por ejemplo "Materia Prima", "Packaging" o "Extras".</p>
+      <h1 className="text-2xl font-bold text-aurora-navy mb-2">Categorías de Insumos</h1>
+      <p className="text-sm text-aurora-navy/60 mb-8">
+        Organizá los insumos y proveedores de tu club por categoría, por ejemplo "Materia Prima", "Packaging" o "Extras".
+      </p>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-8">
-        <div className="bg-white rounded-xl border border-gray-200 p-5">
-          <p className="text-xs font-semibold text-gray-500 uppercase">Categorías totales</p>
-          <p className="text-2xl font-bold text-gray-900 mt-1">{categories.length}</p>
+        <div className="bg-white rounded-xl border border-aurora-navy/10 p-5">
+          <p className="text-xs font-semibold text-aurora-navy/60 uppercase">Categorías totales</p>
+          <p className="text-2xl font-bold text-aurora-navy mt-1">{categories.length}</p>
         </div>
-        <div className="bg-white rounded-xl border border-gray-200 p-5">
-          <p className="text-xs font-semibold text-gray-500 uppercase">Categoría con más insumos</p>
-          <p className="text-lg font-bold text-gray-900 mt-1 truncate">{topCategory}</p>
+        <div className="bg-white rounded-xl border border-aurora-navy/10 p-5">
+          <p className="text-xs font-semibold text-aurora-navy/60 uppercase">Categoría con más insumos</p>
+          <p className="text-lg font-bold text-aurora-navy mt-1 truncate">{topCategory}</p>
         </div>
       </div>
 
-      <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-        <div className="flex gap-3 mb-6 max-w-xl">
+      <div className="bg-white rounded-xl shadow-aurora-sm border border-aurora-navy/10 p-6">
+        <div className="flex flex-col sm:flex-row gap-3 mb-6 max-w-xl">
           <input
             type="text"
             placeholder="Nombre de la categoría"
             value={name}
             onChange={(e) => setName(e.target.value)}
-            className="flex-1 px-3 py-2 border border-gray-300 rounded-lg text-sm"
+            className={`flex-1 ${fieldClass}`}
           />
           <input
             type="text"
             placeholder="Descripción (opcional)"
             value={description}
             onChange={(e) => setDescription(e.target.value)}
-            className="flex-1 px-3 py-2 border border-gray-300 rounded-lg text-sm"
+            className={`flex-1 ${fieldClass}`}
           />
-          <button onClick={handleSubmit} className="px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700">
+          <button onClick={handleSubmit} className="px-4 py-2 bg-aurora-terracotta text-white text-sm font-medium rounded-lg hover:bg-aurora-terracottaDark">
             {editingId ? 'Guardar' : 'Agregar'}
           </button>
           {editingId && (
-            <button onClick={resetForm} className="px-4 py-2 bg-gray-100 text-gray-700 text-sm font-medium rounded-lg hover:bg-gray-200">
+            <button onClick={resetForm} className="px-4 py-2 bg-aurora-navy/10 text-aurora-navy text-sm font-medium rounded-lg hover:bg-aurora-navy/15">
               Cancelar
             </button>
           )}
@@ -182,19 +193,21 @@ const removeCategory = (id: number) => {
           placeholder="Buscar por nombre..."
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          className="w-full max-w-xs px-3 py-2 border border-gray-300 rounded-lg text-sm mb-4"
+          className={`w-full max-w-xs mb-4 ${fieldClass}`}
         />
 
         <div className="space-y-2">
           {filtered.map((cat) => (
-            <div key={cat.id} className="flex items-center justify-between border border-gray-200 rounded-lg px-4 py-3">
+            <div key={cat.id} className="flex items-center justify-between border border-aurora-navy/10 rounded-lg px-4 py-3">
               <div>
-                <p className="text-sm font-medium text-gray-900">{cat.name}</p>
-                {cat.description && <p className="text-xs text-gray-500">{cat.description}</p>}
-                <p className="text-xs text-gray-400 mt-1">{productsCount(cat.id)} insumos · {suppliersCount(cat.id)} proveedores</p>
+                <p className="text-sm font-medium text-aurora-navy">{cat.name}</p>
+                {cat.description && <p className="text-xs text-aurora-navy/60">{cat.description}</p>}
+                <p className="text-xs text-aurora-navy/50 mt-1">
+                  {productsCount(cat.id)} insumos · {suppliersCount(cat.id)} proveedores
+                </p>
               </div>
               <div className="flex gap-2">
-                <button onClick={() => loadForEdit(cat)} className="text-xs font-medium px-3 py-1 rounded bg-blue-50 text-blue-700 hover:bg-blue-100">
+                <button onClick={() => loadForEdit(cat)} className="text-xs font-medium px-3 py-1 rounded bg-aurora-terracotta/10 text-aurora-terracottaDark hover:bg-aurora-terracotta/20">
                   Editar
                 </button>
                 <button onClick={() => removeCategory(cat.id)} className="text-xs font-medium px-3 py-1 rounded bg-red-50 text-red-600 hover:bg-red-100">
@@ -203,7 +216,7 @@ const removeCategory = (id: number) => {
               </div>
             </div>
           ))}
-          {filtered.length === 0 && <p className="text-center py-8 text-gray-500">No hay categorías creadas todavía.</p>}
+          {filtered.length === 0 && <p className="text-center py-8 text-aurora-navy/60">No hay categorías creadas todavía.</p>}
         </div>
       </div>
     </div>
