@@ -20,6 +20,11 @@ const emptyForm = {
 
 type SortKey = 'name' | 'stock' | 'cost';
 
+const fieldClass =
+  'px-3 py-2 border border-aurora-navy/15 rounded-lg text-sm text-aurora-navy bg-white focus:outline-none focus:ring-2 focus:ring-aurora-terracotta/40 focus:border-aurora-terracotta';
+
+const thClass = 'px-4 py-3 text-xs font-semibold text-aurora-navy/60 uppercase';
+
 const InventoryStockPage: React.FC = () => {
   const { user, userRole, loading: authLoading } = useAuth();
   const navigate = useNavigate();
@@ -71,62 +76,68 @@ const InventoryStockPage: React.FC = () => {
   };
 
   const handleSubmit = async () => {
-  if (!form.name.trim() || !form.idSupplyCategory) {
-    toast.error('Nombre y categoría son obligatorios');
-    return;
-  }
-  const payload = {
-    idClub,
-    idSupplyCategory: Number(form.idSupplyCategory),
-    idSupplier: form.idSupplier ? Number(form.idSupplier) : undefined,
-    name: form.name,
-    description: form.description || undefined,
-    unitType: form.unitType,
-    currentStock: Number(form.currentStock),
-    minStock: Number(form.minStock),
-    costPerUnit: Number(form.costPerUnit),
-  };
-  try {
-    if (editingId) {
-      await api.put(`/inventory/products/${editingId}`, payload);
-    } else {
-      await api.post('/inventory/products', payload);
+    if (!form.name.trim() || !form.idSupplyCategory) {
+      toast.error('Nombre y categoría son obligatorios');
+      return;
     }
-    resetForm();
-    fetchAll();
-  } catch (err) {
-    console.error(err);
-    toast.error('Error al guardar el producto');
-  }
-};
+    const payload = {
+      idClub,
+      idSupplyCategory: Number(form.idSupplyCategory),
+      idSupplier: form.idSupplier ? Number(form.idSupplier) : undefined,
+      name: form.name,
+      description: form.description || undefined,
+      unitType: form.unitType,
+      currentStock: Number(form.currentStock),
+      minStock: Number(form.minStock),
+      costPerUnit: Number(form.costPerUnit),
+    };
+    try {
+      if (editingId) {
+        await api.put(`/inventory/products/${editingId}`, payload);
+      } else {
+        await api.post('/inventory/products', payload);
+      }
+      resetForm();
+      fetchAll();
+    } catch (err) {
+      console.error(err);
+      toast.error('Error al guardar el producto');
+    }
+  };
 
-const removeProduct = (id: number) => {
-  toast((t) => (
-    <div className="flex flex-col gap-3">
-      <p className="text-sm font-medium">¿Eliminar este insumo del inventario?</p>
-      <div className="flex gap-2 justify-end">
-        <button onClick={() => toast.dismiss(t.id)} className="px-3 py-1 text-sm border border-gray-300 rounded-lg hover:bg-gray-50">
-          Cancelar
-        </button>
-        <button
-          onClick={async () => {
-            toast.dismiss(t.id);
-            try {
-              await api.delete(`/inventory/products/${id}`);
-              fetchAll();
-            } catch (err: any) {
-              console.error(err);
-              toast.error(err?.response?.data?.message ?? 'Error al eliminar el insumo');
-            }
-          }}
-          className="px-3 py-1 text-sm bg-red-600 text-white rounded-lg hover:bg-red-700"
-        >
-          Eliminar
-        </button>
-      </div>
-    </div>
-  ), { duration: Infinity });
-};
+  const removeProduct = (id: number) => {
+    toast(
+      (t) => (
+        <div className="flex flex-col gap-3">
+          <p className="text-sm font-medium">¿Eliminar este insumo del inventario?</p>
+          <div className="flex gap-2 justify-end">
+            <button
+              onClick={() => toast.dismiss(t.id)}
+              className="px-3 py-1 text-sm border border-aurora-cream/40 rounded-lg hover:bg-white/10"
+            >
+              Cancelar
+            </button>
+            <button
+              onClick={async () => {
+                toast.dismiss(t.id);
+                try {
+                  await api.delete(`/inventory/products/${id}`);
+                  fetchAll();
+                } catch (err: any) {
+                  console.error(err);
+                  toast.error(err?.response?.data?.message ?? 'Error al eliminar el insumo');
+                }
+              }}
+              className="px-3 py-1 text-sm bg-red-600 text-white rounded-lg hover:bg-red-700"
+            >
+              Eliminar
+            </button>
+          </div>
+        </div>
+      ),
+      { duration: Infinity }
+    );
+  };
 
   const loadForEdit = (p: ProductInventoryItem) => {
     setForm({
@@ -142,7 +153,6 @@ const removeProduct = (id: number) => {
     setEditingId(p.id);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
-
 
   const categoryName = (id: number) => categories.find((c) => c.id === id)?.name ?? 'Sin categoría';
   const supplierName = (id?: number | null) => suppliers.find((s) => s.id === id)?.name ?? '—';
@@ -187,44 +197,44 @@ const removeProduct = (id: number) => {
   };
 
   if (authLoading || loading) {
-    return <div className="text-center py-20 text-gray-500">Cargando stock e insumos...</div>;
+    return <div className="text-center py-20 text-aurora-navy/60">Cargando stock e insumos...</div>;
   }
 
   if (!idClub) {
-    return <div className="text-center py-20 text-gray-500">Club no encontrado</div>;
+    return <div className="text-center py-20 text-aurora-navy/60">Club no encontrado</div>;
   }
 
   return (
     <div className="px-4 py-6 lg:px-8">
-      <h1 className="text-2xl font-bold text-gray-900 mb-2">Stock e Insumos</h1>
-      <p className="text-sm text-gray-500 mb-8">Controlá el inventario de materia prima y packaging de tu club.</p>
+      <h1 className="text-2xl font-bold text-aurora-navy mb-2">Stock e Insumos</h1>
+      <p className="text-sm text-aurora-navy/60 mb-8">Controlá el inventario de materia prima y packaging de tu club.</p>
 
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
-        <div className="bg-white rounded-xl border border-gray-200 p-5">
-          <p className="text-xs font-semibold text-gray-500 uppercase">Insumos totales</p>
-          <p className="text-2xl font-bold text-gray-900 mt-1">{products.length}</p>
+        <div className="bg-white rounded-xl border border-aurora-navy/10 p-5">
+          <p className="text-xs font-semibold text-aurora-navy/60 uppercase">Insumos totales</p>
+          <p className="text-2xl font-bold text-aurora-navy mt-1">{products.length}</p>
         </div>
-        <div className={`rounded-xl border p-5 ${lowStockCount > 0 ? 'bg-red-50 border-red-200' : 'bg-white border-gray-200'}`}>
-          <p className="text-xs font-semibold text-gray-500 uppercase">Stock bajo</p>
-          <p className={`text-2xl font-bold mt-1 ${lowStockCount > 0 ? 'text-red-600' : 'text-gray-900'}`}>{lowStockCount}</p>
+        <div className={`rounded-xl border p-5 ${lowStockCount > 0 ? 'bg-red-50 border-red-200' : 'bg-white border-aurora-navy/10'}`}>
+          <p className="text-xs font-semibold text-aurora-navy/60 uppercase">Stock bajo</p>
+          <p className={`text-2xl font-bold mt-1 ${lowStockCount > 0 ? 'text-red-600' : 'text-aurora-navy'}`}>{lowStockCount}</p>
         </div>
-        <div className="bg-white rounded-xl border border-gray-200 p-5">
-          <p className="text-xs font-semibold text-gray-500 uppercase">Valor total en stock</p>
-          <p className="text-2xl font-bold text-gray-900 mt-1">${totalValue.toLocaleString('es-AR')}</p>
+        <div className="bg-white rounded-xl border border-aurora-navy/10 p-5">
+          <p className="text-xs font-semibold text-aurora-navy/60 uppercase">Valor total en stock</p>
+          <p className="text-2xl font-bold text-aurora-navy mt-1">${totalValue.toLocaleString('es-AR')}</p>
         </div>
       </div>
 
-      <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-        <div className="border border-gray-200 rounded-xl p-5 mb-8 space-y-3">
+      <div className="bg-white rounded-xl shadow-aurora-sm border border-aurora-navy/10 p-6">
+        <div className="border border-aurora-navy/10 rounded-xl p-5 mb-8 space-y-3">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-            <input type="text" placeholder="Nombre del insumo" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} className="px-3 py-2 border border-gray-300 rounded-lg text-sm" />
-            <select value={form.idSupplyCategory} onChange={(e) => setForm({ ...form, idSupplyCategory: e.target.value })} className="px-3 py-2 border border-gray-300 rounded-lg text-sm">
+            <input type="text" placeholder="Nombre del insumo" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} className={fieldClass} />
+            <select value={form.idSupplyCategory} onChange={(e) => setForm({ ...form, idSupplyCategory: e.target.value })} className={fieldClass}>
               <option value="">Categoría</option>
               {categories.map((c) => (
                 <option key={c.id} value={c.id}>{c.name}</option>
               ))}
             </select>
-            <select value={form.idSupplier} onChange={(e) => setForm({ ...form, idSupplier: e.target.value })} className="px-3 py-2 border border-gray-300 rounded-lg text-sm">
+            <select value={form.idSupplier} onChange={(e) => setForm({ ...form, idSupplier: e.target.value })} className={fieldClass}>
               <option value="">Proveedor habitual (opcional)</option>
               {suppliers.map((s) => (
                 <option key={s.id} value={s.id}>{s.name}</option>
@@ -232,22 +242,22 @@ const removeProduct = (id: number) => {
             </select>
           </div>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-            <select value={form.unitType} onChange={(e) => setForm({ ...form, unitType: e.target.value })} className="px-3 py-2 border border-gray-300 rounded-lg text-sm">
+            <select value={form.unitType} onChange={(e) => setForm({ ...form, unitType: e.target.value })} className={fieldClass}>
               {UNIT_OPTIONS.map((u) => (
                 <option key={u} value={u}>{u}</option>
               ))}
             </select>
-            <input type="number" placeholder="Stock actual" value={form.currentStock} onChange={(e) => setForm({ ...form, currentStock: e.target.value })} className="px-3 py-2 border border-gray-300 rounded-lg text-sm" />
-            <input type="number" placeholder="Stock mínimo" value={form.minStock} onChange={(e) => setForm({ ...form, minStock: e.target.value })} className="px-3 py-2 border border-gray-300 rounded-lg text-sm" />
-            <input type="number" placeholder="Costo por unidad" value={form.costPerUnit} onChange={(e) => setForm({ ...form, costPerUnit: e.target.value })} className="px-3 py-2 border border-gray-300 rounded-lg text-sm" />
+            <input type="number" placeholder="Stock actual" value={form.currentStock} onChange={(e) => setForm({ ...form, currentStock: e.target.value })} className={fieldClass} />
+            <input type="number" placeholder="Stock mínimo" value={form.minStock} onChange={(e) => setForm({ ...form, minStock: e.target.value })} className={fieldClass} />
+            <input type="number" placeholder="Costo por unidad" value={form.costPerUnit} onChange={(e) => setForm({ ...form, costPerUnit: e.target.value })} className={fieldClass} />
           </div>
-          <input type="text" placeholder="Descripción (opcional)" value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm" />
+          <input type="text" placeholder="Descripción (opcional)" value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} className={`w-full ${fieldClass}`} />
           <div className="flex gap-3">
-            <button onClick={handleSubmit} className="px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700">
+            <button onClick={handleSubmit} className="px-4 py-2 bg-aurora-terracotta text-white text-sm font-medium rounded-lg hover:bg-aurora-terracottaDark">
               {editingId ? 'Guardar cambios' : 'Agregar insumo'}
             </button>
             {editingId && (
-              <button onClick={resetForm} className="px-4 py-2 bg-gray-100 text-gray-700 text-sm font-medium rounded-lg hover:bg-gray-200">
+              <button onClick={resetForm} className="px-4 py-2 bg-aurora-navy/10 text-aurora-navy text-sm font-medium rounded-lg hover:bg-aurora-navy/15">
                 Cancelar
               </button>
             )}
@@ -255,53 +265,53 @@ const removeProduct = (id: number) => {
         </div>
 
         <div className="flex flex-wrap items-center gap-3 mb-4">
-          <input type="text" placeholder="Buscar por nombre..." value={search} onChange={(e) => setSearch(e.target.value)} className="px-3 py-2 border border-gray-300 rounded-lg text-sm flex-1 min-w-[180px]" />
-          <select value={filterCategory} onChange={(e) => setFilterCategory(e.target.value)} className="px-3 py-2 border border-gray-300 rounded-lg text-sm">
+          <input type="text" placeholder="Buscar por nombre..." value={search} onChange={(e) => setSearch(e.target.value)} className={`${fieldClass} flex-1 min-w-[180px]`} />
+          <select value={filterCategory} onChange={(e) => setFilterCategory(e.target.value)} className={fieldClass}>
             <option value="all">Todas las categorías</option>
             {categories.map((c) => (
               <option key={c.id} value={c.id}>{c.name}</option>
             ))}
           </select>
-          <select value={sortKey} onChange={(e) => setSortKey(e.target.value as SortKey)} className="px-3 py-2 border border-gray-300 rounded-lg text-sm">
+          <select value={sortKey} onChange={(e) => setSortKey(e.target.value as SortKey)} className={fieldClass}>
             <option value="name">Ordenar: Nombre</option>
             <option value="stock">Ordenar: Stock</option>
             <option value="cost">Ordenar: Costo</option>
           </select>
-          <label className="flex items-center text-sm text-gray-600">
-            <input type="checkbox" checked={filterLowStock} onChange={(e) => setFilterLowStock(e.target.checked)} className="mr-2" />
+          <label className="flex items-center text-sm text-aurora-navy/70">
+            <input type="checkbox" checked={filterLowStock} onChange={(e) => setFilterLowStock(e.target.checked)} className="mr-2 h-4 w-4 rounded border-aurora-navy/25 text-aurora-terracotta focus:ring-aurora-terracotta" />
             Solo stock bajo
           </label>
-          <button onClick={exportCsv} className="ml-auto px-4 py-2 bg-gray-100 text-gray-700 text-sm font-medium rounded-lg hover:bg-gray-200">
+          <button onClick={exportCsv} className="ml-auto px-4 py-2 bg-aurora-navy/10 text-aurora-navy text-sm font-medium rounded-lg hover:bg-aurora-navy/15">
             Exportar CSV
           </button>
         </div>
 
-        <div className="overflow-x-auto border border-gray-200 rounded-xl">
-          <table className="min-w-full divide-y divide-gray-100">
-            <thead className="bg-gray-50">
+        <div className="overflow-x-auto border border-aurora-navy/10 rounded-xl">
+          <table className="min-w-full divide-y divide-aurora-navy/10">
+            <thead className="bg-aurora-cream">
               <tr>
-                <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase">Nombre</th>
-                <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase">Categoría</th>
-                <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase">Proveedor</th>
-                <th className="px-4 py-3 text-right text-xs font-semibold text-gray-500 uppercase">Stock</th>
-                <th className="px-4 py-3 text-right text-xs font-semibold text-gray-500 uppercase">Mínimo</th>
-                <th className="px-4 py-3 text-right text-xs font-semibold text-gray-500 uppercase">Costo/u</th>
-                <th className="px-4 py-3 text-center text-xs font-semibold text-gray-500 uppercase">Acciones</th>
+                <th className={`${thClass} text-left`}>Nombre</th>
+                <th className={`${thClass} text-left`}>Categoría</th>
+                <th className={`${thClass} text-left`}>Proveedor</th>
+                <th className={`${thClass} text-right`}>Stock</th>
+                <th className={`${thClass} text-right`}>Mínimo</th>
+                <th className={`${thClass} text-right`}>Costo/u</th>
+                <th className={`${thClass} text-center`}>Acciones</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-100">
+            <tbody className="divide-y divide-aurora-navy/10">
               {filtered.map((p) => {
                 const low = Number(p.currentStock) <= Number(p.minStock);
                 return (
                   <tr key={p.id} className={low ? 'bg-red-50' : ''}>
-                    <td className="px-4 py-3 text-sm font-medium text-gray-900">{p.name}</td>
-                    <td className="px-4 py-3 text-sm text-gray-600">{categoryName(p.idSupplyCategory)}</td>
-                    <td className="px-4 py-3 text-sm text-gray-600">{supplierName(p.idSupplier)}</td>
-                    <td className="px-4 py-3 text-sm text-gray-900 text-right">{p.currentStock} {p.unitType}</td>
-                    <td className="px-4 py-3 text-sm text-gray-600 text-right">{p.minStock}</td>
-                    <td className="px-4 py-3 text-sm text-gray-600 text-right">${Number(p.costPerUnit).toLocaleString('es-AR')}</td>
+                    <td className="px-4 py-3 text-sm font-medium text-aurora-navy">{p.name}</td>
+                    <td className="px-4 py-3 text-sm text-aurora-navy/70">{categoryName(p.idSupplyCategory)}</td>
+                    <td className="px-4 py-3 text-sm text-aurora-navy/70">{supplierName(p.idSupplier)}</td>
+                    <td className="px-4 py-3 text-sm text-aurora-navy text-right">{p.currentStock} {p.unitType}</td>
+                    <td className="px-4 py-3 text-sm text-aurora-navy/70 text-right">{p.minStock}</td>
+                    <td className="px-4 py-3 text-sm text-aurora-navy/70 text-right">${Number(p.costPerUnit).toLocaleString('es-AR')}</td>
                     <td className="px-4 py-3 text-center">
-                      <button onClick={() => loadForEdit(p)} className="text-xs font-medium px-2 py-1 rounded bg-blue-50 text-blue-700 hover:bg-blue-100 mr-1">
+                      <button onClick={() => loadForEdit(p)} className="text-xs font-medium px-2 py-1 rounded bg-aurora-terracotta/10 text-aurora-terracottaDark hover:bg-aurora-terracotta/20 mr-1">
                         Editar
                       </button>
                       <button onClick={() => removeProduct(p.id)} className="text-xs font-medium px-2 py-1 rounded bg-red-50 text-red-600 hover:bg-red-100">
@@ -313,7 +323,7 @@ const removeProduct = (id: number) => {
               })}
             </tbody>
           </table>
-          {filtered.length === 0 && <p className="text-center py-8 text-gray-500">No hay insumos para mostrar.</p>}
+          {filtered.length === 0 && <p className="text-center py-8 text-aurora-navy/60">No hay insumos para mostrar.</p>}
         </div>
       </div>
     </div>
