@@ -68,6 +68,13 @@ const getNextMonthYear = (ym: string) => {
   return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
 };
 
+const inputClass =
+  'mt-1 block w-full rounded-md border-aurora-navy/15 shadow-sm focus:border-aurora-terracotta focus:ring-aurora-terracotta sm:text-sm';
+
+const labelClass = 'block text-sm font-medium text-aurora-navy/70';
+
+const checkboxClass = 'h-4 w-4 text-aurora-terracotta rounded border-aurora-navy/25 focus:ring-aurora-terracotta';
+
 interface ProductFieldsProps {
   value: ProductDraft;
   onChange: (value: ProductDraft) => void;
@@ -81,94 +88,94 @@ const ProductFields: React.FC<ProductFieldsProps> = ({ value, onChange, allowIma
     <div className="space-y-4">
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div>
-          <label className="block text-sm font-medium text-gray-700">Nombre del producto *</label>
+          <label className={labelClass}>Nombre del producto *</label>
           <input
             type="text"
             value={value.productName}
             onChange={(e) => set('productName', e.target.value)}
-            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
+            className={inputClass}
           />
         </div>
         <div>
-          <label className="block text-sm font-medium text-gray-700">Fecha de vencimiento</label>
+          <label className={labelClass}>Fecha de vencimiento</label>
           <input
             type="date"
             value={value.productExpirationDate}
             onChange={(e) => set('productExpirationDate', e.target.value)}
-            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
+            className={inputClass}
           />
         </div>
       </div>
 
       <div>
-        <label className="block text-sm font-medium text-gray-700">Descripción *</label>
+        <label className={labelClass}>Descripción *</label>
         <textarea
           value={value.productDescription}
           onChange={(e) => set('productDescription', e.target.value)}
           rows={2}
-          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
+          className={inputClass}
         />
       </div>
 
       <div>
-        <label className="block text-sm font-medium text-gray-700">Instrucciones de uso</label>
+        <label className={labelClass}>Instrucciones de uso</label>
         <textarea
           value={value.usageInstructions}
           onChange={(e) => set('usageInstructions', e.target.value)}
           rows={2}
-          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
+          className={inputClass}
         />
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div>
-          <label className="block text-sm font-medium text-gray-700">Origen de fabricación</label>
+          <label className={labelClass}>Origen de fabricación</label>
           <input
             type="text"
             value={value.originLocation}
             onChange={(e) => set('originLocation', e.target.value)}
             placeholder="Ej: Mendoza, Argentina"
-            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
+            className={inputClass}
           />
         </div>
         <div>
-          <label className="block text-sm font-medium text-gray-700">URL de video (opcional)</label>
+          <label className={labelClass}>URL de video (opcional)</label>
           <input
             type="url"
             value={value.productVideoUrl}
             onChange={(e) => set('productVideoUrl', e.target.value)}
-            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
+            className={inputClass}
           />
         </div>
       </div>
 
       <div>
-        <label className="block text-sm font-medium text-gray-700">Notas adicionales</label>
+        <label className={labelClass}>Notas adicionales</label>
         <textarea
           value={value.additionalNotes}
           onChange={(e) => set('additionalNotes', e.target.value)}
           rows={2}
-          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
+          className={inputClass}
         />
       </div>
 
-      <div className="bg-gray-50 rounded-md p-4 space-y-3">
-        <label className="flex items-center gap-2 text-sm text-gray-700">
+      <div className="bg-aurora-cream rounded-md p-4 space-y-3">
+        <label className="flex items-center gap-2 text-sm text-aurora-navy/80">
           <input
             type="checkbox"
             checked={value.ageRestriction}
             onChange={(e) => set('ageRestriction', e.target.checked)}
-            className="h-4 w-4 text-blue-600 rounded focus:ring-blue-500"
+            className={checkboxClass}
           />
           Apto solo para mayores de 18 años
         </label>
 
-        <label className="flex items-center gap-2 text-sm text-gray-700">
+        <label className="flex items-center gap-2 text-sm text-aurora-navy/80">
           <input
             type="checkbox"
             checked={value.containsAllergens}
             onChange={(e) => set('containsAllergens', e.target.checked)}
-            className="h-4 w-4 text-blue-600 rounded focus:ring-blue-500"
+            className={checkboxClass}
           />
           Contiene alérgenos
         </label>
@@ -178,16 +185,16 @@ const ProductFields: React.FC<ProductFieldsProps> = ({ value, onChange, allowIma
             onChange={(e) => set('allergensDetail', e.target.value)}
             rows={2}
             placeholder="Detalle de los alérgenos (ej: contiene maní, gluten)"
-            className="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
+            className="block w-full rounded-md border-aurora-navy/15 shadow-sm focus:border-aurora-terracotta focus:ring-aurora-terracotta sm:text-sm"
           />
         )}
 
-        <label className="flex items-center gap-2 text-sm text-gray-700">
+        <label className="flex items-center gap-2 text-sm text-aurora-navy/80">
           <input
             type="checkbox"
             checked={value.isDangerousItem}
             onChange={(e) => set('isDangerousItem', e.target.checked)}
-            className="h-4 w-4 text-blue-600 rounded focus:ring-blue-500"
+            className={checkboxClass}
           />
           Contiene un producto peligroso para el consumo
         </label>
@@ -197,16 +204,16 @@ const ProductFields: React.FC<ProductFieldsProps> = ({ value, onChange, allowIma
             onChange={(e) => set('dangerDetail', e.target.value)}
             rows={2}
             placeholder="Detalle del riesgo (ej: no ingerir, uso externo)"
-            className="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
+            className="block w-full rounded-md border-aurora-navy/15 shadow-sm focus:border-aurora-terracotta focus:ring-aurora-terracotta sm:text-sm"
           />
         )}
 
-        <label className="flex items-center gap-2 text-sm text-gray-700">
+        <label className="flex items-center gap-2 text-sm text-aurora-navy/80">
           <input
             type="checkbox"
             checked={value.requiresCleaning}
             onChange={(e) => set('requiresCleaning', e.target.checked)}
-            className="h-4 w-4 text-blue-600 rounded focus:ring-blue-500"
+            className={checkboxClass}
           />
           Requiere lavado o limpieza antes de usar
         </label>
@@ -216,14 +223,14 @@ const ProductFields: React.FC<ProductFieldsProps> = ({ value, onChange, allowIma
             onChange={(e) => set('cleaningInstructions', e.target.value)}
             rows={2}
             placeholder="Cómo lavarlo o limpiarlo"
-            className="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
+            className="block w-full rounded-md border-aurora-navy/15 shadow-sm focus:border-aurora-terracotta focus:ring-aurora-terracotta sm:text-sm"
           />
         )}
       </div>
 
       {allowImage && (
         <div>
-          <label className="block text-sm font-medium text-gray-700">Imagen del producto</label>
+          <label className={labelClass}>Imagen del producto</label>
           <input
             type="file"
             accept="image/*"
@@ -425,24 +432,24 @@ const SubscriptionBoxHistoryPage: React.FC<SubscriptionBoxHistoryPageProps> = (p
     }
   };
 
-  if (loading) return <div className="container mx-auto px-4 py-8 text-center">Cargando historial de cajas...</div>;
-  if (!subscriptionType) return <div className="container mx-auto px-4 py-8 text-center">Suscripción no encontrada.</div>;
+  if (loading) return <div className="container mx-auto px-4 py-8 text-center text-aurora-navy/70">Cargando historial de cajas...</div>;
+  if (!subscriptionType) return <div className="container mx-auto px-4 py-8 text-center text-aurora-navy/70">Suscripción no encontrada.</div>;
 
   return (
     <div className="container mx-auto px-4 py-8 min-h-screen">
       <button
         onClick={() => (props.onBack ? props.onBack() : navigate(`/entrepreneur/club/${clubId}/plans?tab=boxes`))}
-        className="mb-6 flex items-center text-blue-600 hover:text-blue-800 transition-colors duration-200"
+        className="mb-6 flex items-center text-aurora-terracotta hover:text-aurora-terracottaDark transition-colors duration-200"
       >
         ← Volver a mis suscripciones
       </button>
 
-      <div className="bg-white rounded-xl shadow-lg p-8 mb-6">
+      <div className="bg-white rounded-xl shadow-aurora-sm border border-aurora-navy/10 p-8 mb-6">
         <div className="flex flex-wrap items-center gap-3 justify-between">
           <div>
-            <h1 className="text-3xl font-bold text-gray-800">{subscriptionType.name}</h1>
+            <h1 className="text-3xl font-bold text-aurora-navy">{subscriptionType.name}</h1>
             {subscriptionType.createdAt && (
-              <p className="text-sm text-gray-500 mt-1">
+              <p className="text-sm text-aurora-navy/60 mt-1">
                 Creada el {new Date(subscriptionType.createdAt).toLocaleDateString('es-AR', { year: 'numeric', month: 'long', day: 'numeric' })}
               </p>
             )}
@@ -466,34 +473,34 @@ const SubscriptionBoxHistoryPage: React.FC<SubscriptionBoxHistoryPageProps> = (p
       <div className="flex justify-end mb-4">
         <button
           onClick={openCreate}
-          className="bg-blue-600 text-white px-5 py-2 rounded-md hover:bg-blue-700 transition-colors duration-200 font-semibold text-sm"
+          className="bg-aurora-terracotta text-white px-5 py-2 rounded-md hover:bg-aurora-terracottaDark transition-colors duration-200 font-semibold text-sm"
         >
           + Crear Próxima Caja
         </button>
       </div>
 
       {creating && (
-        <div className="bg-white rounded-xl shadow-lg p-8 mb-8 border-2 border-blue-200">
+        <div className="bg-white rounded-xl shadow-aurora-sm p-8 mb-8 border-2 border-aurora-terracotta/30">
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-xl font-bold text-gray-800">Nueva caja mensual</h2>
-            <button onClick={() => setCreating(false)} className="text-gray-400 hover:text-gray-700 text-xl leading-none">
+            <h2 className="text-xl font-bold text-aurora-navy">Nueva caja mensual</h2>
+            <button onClick={() => setCreating(false)} className="text-aurora-navy/40 hover:text-aurora-navy text-xl leading-none">
               &times;
             </button>
           </div>
           <div className="mb-6 max-w-xs">
-            <label className="block text-sm font-medium text-gray-700">Mes de entrega</label>
+            <label className={labelClass}>Mes de entrega</label>
             <input
               type="month"
               value={newMonth}
               onChange={(e) => setNewMonth(e.target.value)}
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
+              className={inputClass}
             />
           </div>
           <div className="space-y-6">
             {drafts.map((draft, index) => (
-              <div key={index} className="border border-gray-200 rounded-xl p-5 bg-gray-50">
+              <div key={index} className="border border-aurora-navy/10 rounded-xl p-5 bg-aurora-cream/50">
                 <div className="flex items-center justify-between mb-3">
-                  <h3 className="text-sm font-semibold text-gray-600 uppercase tracking-wide">Producto {index + 1}</h3>
+                  <h3 className="text-sm font-semibold text-aurora-navy/60 uppercase tracking-wide">Producto {index + 1}</h3>
                   {drafts.length > 1 && (
                     <button onClick={() => removeDraft(index)} className="text-red-500 hover:text-red-700 text-sm">
                       Quitar
@@ -505,7 +512,7 @@ const SubscriptionBoxHistoryPage: React.FC<SubscriptionBoxHistoryPageProps> = (p
             ))}
           </div>
           <div className="flex flex-wrap gap-3 mt-4">
-            <button onClick={addDraft} className="text-sm bg-white border border-gray-300 px-4 py-2 rounded-lg hover:bg-gray-100">
+            <button onClick={addDraft} className="text-sm bg-white border border-aurora-navy/15 px-4 py-2 rounded-lg text-aurora-navy hover:bg-aurora-cream">
               + Agregar otro producto a esta caja
             </button>
           </div>
@@ -513,7 +520,7 @@ const SubscriptionBoxHistoryPage: React.FC<SubscriptionBoxHistoryPageProps> = (p
             <button
               onClick={handleCreateBox}
               disabled={savingNew}
-              className={`bg-blue-600 text-white px-6 py-2 rounded-md hover:bg-blue-700 transition-colors duration-200 font-semibold ${savingNew ? 'opacity-50 cursor-not-allowed' : ''}`}
+              className={`bg-aurora-terracotta text-white px-6 py-2 rounded-md hover:bg-aurora-terracottaDark transition-colors duration-200 font-semibold ${savingNew ? 'opacity-50 cursor-not-allowed' : ''}`}
             >
               {savingNew ? 'Guardando...' : 'Guardar Caja'}
             </button>
@@ -522,26 +529,26 @@ const SubscriptionBoxHistoryPage: React.FC<SubscriptionBoxHistoryPageProps> = (p
       )}
 
       {sortedMonths.length === 0 ? (
-        <p className="text-gray-600 text-center">Todavía no cargaste ninguna caja para esta suscripción.</p>
+        <p className="text-aurora-navy/60 text-center">Todavía no cargaste ninguna caja para esta suscripción.</p>
       ) : (
         <div className="space-y-6">
           {sortedMonths.map((month) => (
-            <div key={month} className="bg-white rounded-xl shadow-lg p-6">
-              <h2 className="text-xl font-bold text-gray-800 mb-4 capitalize">{monthLabel(month)}</h2>
+            <div key={month} className="bg-white rounded-xl shadow-aurora-sm border border-aurora-navy/10 p-6">
+              <h2 className="text-xl font-bold text-aurora-navy mb-4 capitalize">{monthLabel(month)}</h2>
               <div className="space-y-4">
                 {boxesByMonth[month].map((item) => (
-                  <div key={item.id} className="border border-gray-200 rounded-xl p-5">
+                  <div key={item.id} className="border border-aurora-navy/10 rounded-xl p-5">
                     {editingId === item.id && editDraft ? (
                       <div>
                         <ProductFields value={editDraft} onChange={setEditDraft} allowImage={false} />
                         <div className="flex justify-end gap-3 mt-4">
-                          <button onClick={closeEdit} className="px-4 py-2 text-sm text-gray-600 hover:text-gray-800">
+                          <button onClick={closeEdit} className="px-4 py-2 text-sm text-aurora-navy/70 hover:text-aurora-navy">
                             Cancelar
                           </button>
                           <button
                             onClick={handleSaveEdit}
                             disabled={savingEdit}
-                            className={`bg-blue-600 text-white px-5 py-2 rounded-md hover:bg-blue-700 transition-colors duration-200 text-sm font-semibold ${savingEdit ? 'opacity-50 cursor-not-allowed' : ''}`}
+                            className={`bg-aurora-terracotta text-white px-5 py-2 rounded-md hover:bg-aurora-terracottaDark transition-colors duration-200 text-sm font-semibold ${savingEdit ? 'opacity-50 cursor-not-allowed' : ''}`}
                           >
                             {savingEdit ? 'Guardando...' : 'Guardar Cambios'}
                           </button>
@@ -558,12 +565,12 @@ const SubscriptionBoxHistoryPage: React.FC<SubscriptionBoxHistoryPageProps> = (p
                         )}
                         <div className="flex-1">
                           <div className="flex items-center justify-between gap-2 flex-wrap">
-                            <h3 className="text-lg font-semibold text-gray-800">{item.productName}</h3>
-                            <button onClick={() => openEdit(item)} className="text-blue-600 hover:text-blue-800 text-sm font-medium">
+                            <h3 className="text-lg font-semibold text-aurora-navy">{item.productName}</h3>
+                            <button onClick={() => openEdit(item)} className="text-aurora-terracotta hover:text-aurora-terracottaDark text-sm font-medium">
                               Editar
                             </button>
                           </div>
-                          <p className="text-gray-600 text-sm mt-1">{item.productDescription}</p>
+                          <p className="text-aurora-navy/70 text-sm mt-1">{item.productDescription}</p>
                           <div className="flex flex-wrap gap-2 mt-3">
                             {item.ageRestriction && (
                               <span className="text-xs font-semibold bg-red-100 text-red-700 px-2 py-1 rounded-full">+18</span>
@@ -575,14 +582,14 @@ const SubscriptionBoxHistoryPage: React.FC<SubscriptionBoxHistoryPageProps> = (p
                               <span className="text-xs font-semibold bg-orange-100 text-orange-700 px-2 py-1 rounded-full">Producto de riesgo</span>
                             )}
                             {item.requiresCleaning && (
-                              <span className="text-xs font-semibold bg-blue-100 text-blue-700 px-2 py-1 rounded-full">Requiere limpieza</span>
+                              <span className="text-xs font-semibold bg-aurora-gold/20 text-aurora-navy px-2 py-1 rounded-full">Requiere limpieza</span>
                             )}
                           </div>
                           {item.originLocation && (
-                            <p className="text-xs text-gray-500 mt-2">Origen: {item.originLocation}</p>
+                            <p className="text-xs text-aurora-navy/60 mt-2">Origen: {item.originLocation}</p>
                           )}
                           {item.usageInstructions && (
-                            <p className="text-xs text-gray-500 mt-1">Uso: {item.usageInstructions}</p>
+                            <p className="text-xs text-aurora-navy/60 mt-1">Uso: {item.usageInstructions}</p>
                           )}
                           {item.containsAllergens && item.allergensDetail && (
                             <p className="text-xs text-yellow-700 mt-1">Alérgenos: {item.allergensDetail}</p>
@@ -591,7 +598,7 @@ const SubscriptionBoxHistoryPage: React.FC<SubscriptionBoxHistoryPageProps> = (p
                             <p className="text-xs text-orange-700 mt-1">Riesgo: {item.dangerDetail}</p>
                           )}
                           {item.requiresCleaning && item.cleaningInstructions && (
-                            <p className="text-xs text-blue-700 mt-1">Limpieza: {item.cleaningInstructions}</p>
+                            <p className="text-xs text-aurora-navy/70 mt-1">Limpieza: {item.cleaningInstructions}</p>
                           )}
                         </div>
                       </div>
