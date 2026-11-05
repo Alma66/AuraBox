@@ -70,8 +70,9 @@ export class UpdateEntrepreneurDto {
   @IsBoolean()
   active?: boolean;
 
-  @IsOptional()
+ @IsOptional()
   @IsString()
+  @MaxLength(400)
   bio?: string;
 
   @IsOptional()

@@ -32,6 +32,13 @@ const USER_SELECT = {
   homeLongitude: true,
 };
 
+const NEWSLETTER_SELECT = {
+  id: true,
+  firstName: true,
+  lastName: true,
+  email: true,
+};
+
 function sanitizeUser(user: any) {
   if (!user) return user;
   const { passwordHash, ...rest } = user as any;
@@ -123,14 +130,18 @@ export class UsersService {
       const updated = await this.prisma.user.update({ where: { id }, data, select: USER_SELECT });
       return sanitizeUser(updated);
     } catch (err: any) {
-      if (err instanceof Prisma.PrismaClientKnownRequestError && err.code === 'P2025') {
-        throw new NotFoundException('Usuario no encontrado');
+      if (err instanceof Prisma.PrismaClientKnownRequestError) {
+        if (err.code === 'P2025') throw new NotFoundException('Usuario no encontrado');
+        if (err.code === 'P2002') throw new BadRequestException('El número de documento ya está registrado');
       }
       throw err;
     }
   }
 
   async verifyPassword(id: number, password: string) {
+    if (typeof password !== 'string' || password.length === 0) {
+      throw new BadRequestException('Contraseña requerida');
+    }
     const user = await this.prisma.user.findUnique({ where: { id } });
     if (!user) throw new NotFoundException('Usuario no encontrado');
     const ok = await bcrypt.compare(password, user.passwordHash);
@@ -168,9 +179,9 @@ export class UsersService {
     const userIds = Array.from(new Set(activeSubs.map((s) => s.idUser)));
     if (userIds.length === 0) return [];
 
-    const users = await this.prisma.user.findMany({
+   const users = await this.prisma.user.findMany({
       where: { id: { in: userIds }, acceptsNewsletter: true },
-      select: USER_SELECT,
+      select: NEWSLETTER_SELECT,
     });
     return users.map(sanitizeUser);
   }

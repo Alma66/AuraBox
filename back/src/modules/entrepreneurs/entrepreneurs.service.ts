@@ -98,6 +98,9 @@ export class EntrepreneursService {
   }
 
   async verifyPassword(id: number, password: string) {
+    if (typeof password !== 'string' || password.length === 0) {
+      throw new BadRequestException('Contraseña requerida');
+    }
     const ent = await this.prisma.entrepreneurs.findUnique({ where: { id } });
     if (!ent) throw new NotFoundException('Emprendedor no encontrado');
     const ok = await bcrypt.compare(password, ent.passwordHash);

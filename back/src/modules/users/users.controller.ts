@@ -9,6 +9,7 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
 import { RolesGuard } from '../auth/roles.guard';
 import { Roles } from '../auth/roles.decorator';
+import { Throttle } from '@nestjs/throttler';
 
 @Controller('users')
 @UseGuards(JwtAuthGuard, RolesGuard)
@@ -28,7 +29,8 @@ export class UsersController {
     return this.usersService.findById(req.user.id);
   }
 
-  @Roles('customer')
+ @Roles('customer')
+  @Throttle({ default: { limit: 5, ttl: 60000 } })
   @Post('me/verify-password')
   async verifyPassword(@Request() req: any, @Body() body: { password: string }) {
     return this.usersService.verifyPassword(req.user.id, body.password);
