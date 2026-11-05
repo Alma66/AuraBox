@@ -45,7 +45,8 @@ const SecuritySection: React.FC<SecuritySectionProps> = ({ showGenderPublicly, o
 
   const verifyEndpoint = userRole === 'entrepreneur' ? '/entrepreneurs/me/verify-password' : '/users/me/verify-password';
   const updateEndpoint = userRole === 'entrepreneur' ? '/entrepreneurs/me' : '/users/me';
-
+  const deactivateEndpoint = userRole === 'entrepreneur' ? '/entrepreneurs/me/deactivate' : '/users/me/deactivate';
+  
   const handleSecurityCheck = async () => {
     try {
       await api.post(verifyEndpoint, { password: securityPassword });
@@ -92,35 +93,39 @@ const SecuritySection: React.FC<SecuritySectionProps> = ({ showGenderPublicly, o
   };
 
   const handleRequestAccountDeletion = () => {
-  toast((t) => (
-    <div className="flex flex-col gap-3">
-      <p className="text-sm font-medium">¿Estás seguro de que querés desactivar tu cuenta? Vas a perder el acceso hasta que te pongas en contacto con soporte.</p>
-      <div className="flex gap-2 justify-end">
-        <button onClick={() => toast.dismiss(t.id)} className="px-3 py-1 text-sm border border-aurora-navy/20 rounded-lg text-aurora-navy hover:bg-aurora-cream">
-          Cancelar
-        </button>
-        <button
-          onClick={async () => {
-            toast.dismiss(t.id);
-            try {
-              await api.patch(updateEndpoint, { active: false });
-              setDeletionSuccess('Tu cuenta fue desactivada. Cerrando sesión...');
-              setTimeout(() => {
-                localStorage.removeItem('access_token');
-                window.location.href = '/login';
-              }, 2000);
-            } catch {
-              setDeletionError('No se pudo procesar la solicitud. Intentá de nuevo más tarde.');
-            }
-          }}
-          className="px-3 py-1 text-sm bg-red-600 text-white rounded-lg hover:bg-red-700"
-        >
-          Desactivar
-        </button>
+    toast((t) => (
+      <div className="flex flex-col gap-3">
+        <p className="text-sm font-medium">¿Estás seguro de que querés desactivar tu cuenta? Vas a perder el acceso hasta que te pongas en contacto con soporte.</p>
+        <div className="flex gap-2 justify-end">
+          <button onClick={() => toast.dismiss(t.id)} className="px-3 py-1 text-sm border border-aurora-navy/20 rounded-lg text-aurora-navy hover:bg-aurora-cream">
+            Cancelar
+          </button>
+          <button
+            onClick={async () => {
+              toast.dismiss(t.id);
+              setDeletionError('');
+              try {
+                await api.post(deactivateEndpoint, { password: securityPassword });
+                setDeletionSuccess('Tu cuenta fue desactivada. Cerrando sesión...');
+                setTimeout(() => {
+                  localStorage.removeItem('access_token');
+                  window.location.href = '/login';
+                }, 2000);
+              } catch (err: any) {
+                const msg = err?.response?.data?.message;
+                setDeletionError(
+                  Array.isArray(msg) ? msg.join(', ') : msg ?? 'No se pudo procesar la solicitud. Intentá de nuevo más tarde.',
+                );
+              }
+            }}
+            className="px-3 py-1 text-sm bg-red-600 text-white rounded-lg hover:bg-red-700"
+          >
+            Desactivar
+          </button>
+        </div>
       </div>
-    </div>
-  ), { duration: Infinity });
-};
+    ), { duration: Infinity });
+  };
 
   return (
     <div className="space-y-6">

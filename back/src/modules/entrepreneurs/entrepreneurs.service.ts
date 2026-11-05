@@ -120,6 +120,40 @@ export class EntrepreneursService {
     return sanitize(updated);
   }
 
+    async deactivateSelf(id: number, password: string) {
+    await this.verifyPassword(id, password);
+
+    const links = await this.prisma.entrepreneur_Club.findMany({
+      where: { idEntrepreneurs: id },
+      select: { idClub: true },
+    });
+
+    if (links.length > 0) {
+      const subTypes = await this.prisma.subscription_Types.findMany({
+        where: { idClub: { in: links.map((link) => link.idClub) } },
+        select: { id: true },
+      });
+
+      const activeSubscribers = subTypes.length === 0
+        ? 0
+        : await this.prisma.user_Subscriptions.count({
+            where: {
+              idSubscriptionTypes: { in: subTypes.map((type) => type.id) },
+              subscriptionStatus: { in: ['Activa', 'Pausada', 'Pendiente_Pago'] },
+            },
+          });
+
+      if (activeSubscribers > 0) {
+        throw new BadRequestException(
+          'Tu club tiene suscriptores activos. Para cerrar tu cuenta, contactá a soporte y coordinamos el cierre del club.',
+        );
+      }
+    }
+
+    await this.prisma.entrepreneurs.update({ where: { id }, data: { active: false } });
+    return { ok: true };
+  }
+  
   async remove(id: number) {
     const entrepreneur = await this.prisma.entrepreneurs.findUnique({ where: { id } });
     if (!entrepreneur) throw new NotFoundException('Emprendedor no encontrado');

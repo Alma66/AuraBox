@@ -36,6 +36,13 @@ export class UsersController {
     return this.usersService.verifyPassword(req.user.id, body.password);
   }
 
+ @Roles('customer')
+  @Throttle({ default: { limit: 5, ttl: 60000 } })
+  @Post('me/deactivate')
+  async deactivateMe(@Request() req: any, @Body() body: { password: string }) {
+    return this.usersService.deactivate(req.user.id, body.password);
+  }
+
   @Roles('customer')
   @Throttle({ default: { limit: 10, ttl: 60000 } })
   @Patch('me')

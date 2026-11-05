@@ -151,6 +151,22 @@ export class UsersService {
     return { ok: true };
   }
 
+    async deactivate(id: number, password: string) {
+    await this.verifyPassword(id, password);
+    await this.prisma.$transaction([
+      this.prisma.user_Subscriptions.updateMany({
+        where: { idUser: id, subscriptionStatus: { in: ['Activa', 'Pausada', 'Pendiente_Pago'] } },
+        data: {
+          subscriptionStatus: 'Cancelada',
+          cancellationReason: 'Cuenta desactivada por el usuario',
+          cancellationDate: new Date(),
+        },
+      }),
+      this.prisma.user.update({ where: { id }, data: { active: false } }),
+    ]);
+    return { ok: true };
+  }
+  
   async remove(id: number) {
     try {
       await this.prisma.user.delete({ where: { id } });

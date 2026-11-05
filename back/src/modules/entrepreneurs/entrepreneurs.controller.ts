@@ -53,6 +53,13 @@ export class EntrepreneursController {
   }
 
   @Roles('entrepreneur')
+  @Throttle({ default: { limit: 5, ttl: 60000 } })
+  @Post('me/deactivate')
+  async deactivateMe(@Request() req: any, @Body() body: { password: string }) {
+    return this.entrepreneursService.deactivateSelf(req.user.id, body.password);
+  }
+
+  @Roles('entrepreneur')
   @Throttle({ default: { limit: 10, ttl: 60000 } })
   @Patch('me')
   @UsePipes(new ValidationPipe({ whitelist: true, transform: true }))
