@@ -25,6 +25,14 @@ interface PaymentMethodInfo {
   method: string;
 }
 
+interface PaymentInfo {
+  id: number;
+  idUserSubscription: number;
+  idPaymentMethods?: number | null;
+  paymentStatus: string;
+  paymentDate: string;
+}
+
 interface BoxItem {
   id: number;
   deliveryMonthYear: string;
@@ -75,6 +83,32 @@ const groupByMonth = (items: BoxItem[]) => {
     groups[item.deliveryMonthYear].push(item);
   });
   return Object.entries(groups);
+};
+
+const CashNotice: React.FC<{ payment: PaymentInfo }> = ({ payment }) => {
+  if (payment.paymentStatus === 'Pendiente') {
+    return (
+      <div className="bg-yellow-50 border border-yellow-200 text-yellow-800 text-xs rounded-lg p-3">
+        <p className="font-semibold">Pago en efectivo pendiente</p>
+        <p className="mt-0.5">Abonás al recibir tu caja. El club confirma el cobro cuando te la entrega.</p>
+      </div>
+    );
+  }
+  if (payment.paymentStatus === 'Exitoso') {
+    return (
+      <div className="bg-green-50 border border-green-200 text-green-800 text-xs rounded-lg p-3">
+        Último pago en efectivo confirmado el {formatDate(payment.paymentDate)}.
+      </div>
+    );
+  }
+  if (payment.paymentStatus === 'Rechazado') {
+    return (
+      <div className="bg-red-50 border border-red-200 text-red-700 text-xs rounded-lg p-3">
+        El club no registró el cobro de tu última caja. Si ya pagaste, comunicate con el club.
+      </div>
+    );
+  }
+  return null;
 };
 
 const BoxContent: React.FC<{ state: BoxState }> = ({ state }) => {
@@ -162,6 +196,7 @@ const UserSubscriptionsPage: React.FC = () => {
   const [subTypes, setSubTypes] = useState<Record<number, SubscriptionTypeInfo>>({});
   const [clubs, setClubs] = useState<Record<number, ClubInfo>>({});
   const [paymentMethods, setPaymentMethods] = useState<Record<number, string>>({});
+  const [payments, setPayments] = useState<PaymentInfo[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [activeFilter, setActiveFilter] = useState<'all' | SubscriptionStatus>('all');
@@ -202,11 +237,15 @@ const UserSubscriptionsPage: React.FC = () => {
       clubsResults.forEach((c) => { if (c) clubsMap[c.id] = c; });
       setClubs(clubsMap);
 
-      const pmResponse = await api.get('/payment-methods/active');
+      const [pmResponse, paymentsResponse] = await Promise.all([
+        api.get('/payment-methods/active'),
+        api.get(`/payments/by-user/${user.id}`).catch(() => null),
+      ]);
       const pmList: PaymentMethodInfo[] = getResponseData(pmResponse) || [];
       const pmMap: Record<number, string> = {};
       pmList.forEach((pm) => { pmMap[pm.id] = pm.method; });
       setPaymentMethods(pmMap);
+      setPayments(paymentsResponse ? getResponseData(paymentsResponse) || [] : []);
     } catch {
       setError('Error al cargar tus suscripciones.');
     } finally {
@@ -219,10 +258,28 @@ const UserSubscriptionsPage: React.FC = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user]);
 
+  const latestPaymentBySubscription = useMemo(() => {
+    const sorted = [...payments].sort((a, b) => {
+      const diff = new Date(b.paymentDate).getTime() - new Date(a.paymentDate).getTime();
+      return diff !== 0 ? diff : b.id - a.id;
+    });
+    const map: Record<number, PaymentInfo> = {};
+    sorted.forEach((p) => {
+      if (!map[p.idUserSubscription]) map[p.idUserSubscription] = p;
+    });
+    return map;
+  }, [payments]);
+
   const filteredSubscriptions = useMemo(() => {
     if (activeFilter === 'all') return subscriptions;
     return subscriptions.filter((s) => s.subscriptionStatus === activeFilter);
   }, [subscriptions, activeFilter]);
+
+  const isCashMethod = (idMethod?: number | null) => {
+    if (!idMethod) return false;
+    const name = paymentMethods[idMethod];
+    return !!name && name.toLowerCase().includes('efectivo');
+  };
 
   const handleStartCancel = (id: number) => {
     setCancelingId(id);
@@ -332,6 +389,11 @@ const UserSubscriptionsPage: React.FC = () => {
               const isCancelingThis = cancelingId === sub.id;
               const isBoxOpen = !!openBoxes[sub.id];
               const boxState = boxes[sub.idSubscriptionTypes];
+              const lastPayment = latestPaymentBySubscription[sub.id];
+              const showCashNotice =
+                !!lastPayment &&
+                (sub.subscriptionStatus === 'Activa' || sub.subscriptionStatus === 'Pausada') &&
+                isCashMethod(lastPayment.idPaymentMethods ?? sub.idPaymentMethods);
 
               return (
                 <div key={sub.id} className="bg-white rounded-2xl shadow-md overflow-hidden">
@@ -377,6 +439,12 @@ const UserSubscriptionsPage: React.FC = () => {
                       </div>
                     )}
                   </div>
+
+                  {showCashNotice && lastPayment && (
+                    <div className="px-5 pb-5">
+                      <CashNotice payment={lastPayment} />
+                    </div>
+                  )}
 
                   {canSeeBox && (
                     <div className="px-5 pb-5">
