@@ -31,17 +31,17 @@ const WelcomeModal: React.FC<WelcomeModalProps> = ({ name, onClose }) => {
       >
         <button
           onClick={handleClose}
-          className="absolute top-3 right-3 text-gray-400 hover:text-gray-600 p-1 rounded-full hover:bg-gray-100 transition-colors"
+          className="absolute top-3 right-3 text-aurora-navy/40 hover:text-aurora-navy/70 p-1 rounded-full hover:bg-aurora-cream transition-colors"
         >
           <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
           </svg>
         </button>
         <img src="/aurabox-logo.png" alt="AuraBox" className="h-12 w-auto mb-4" />
-        <h2 className="text-xl font-bold text-gray-800 mb-1">
+        <h2 className="text-xl font-bold text-aurora-navy mb-1">
           ¡Bienvenido de nuevo{name ? `, ${name}` : ''}!
         </h2>
-        <p className="text-gray-500 text-sm">Nos alegra tenerte otra vez en AuraBox.</p>
+        <p className="text-aurora-navy/60 text-sm">Nos alegra tenerte otra vez en AuraBox.</p>
       </div>
     </div>
   );

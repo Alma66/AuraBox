@@ -145,7 +145,7 @@ const OrderHistoryPage: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-green-50 via-white to-blue-50 py-8 px-4">
+    <div className="min-h-screen bg-aurora-cream py-8 px-4">
       <div className="max-w-5xl mx-auto">
         <div className="text-center mb-8">
           <h1 className="text-4xl font-bold text-aurora-navy mb-2">Historial de Compras</h1>
@@ -262,7 +262,7 @@ const OrderHistoryPage: React.FC = () => {
         <div className="mt-12 text-center">
           <button
             onClick={() => navigate('/customer/subscriptions')}
-            className="bg-purple-600 text-white px-8 py-3 rounded-lg hover:bg-purple-700 transition-colors font-semibold"
+            className="bg-aurora-terracotta text-white px-8 py-3 rounded-lg hover:bg-aurora-terracottaDark transition-colors font-semibold"
           >
             Ver Mis Suscripciones
           </button>

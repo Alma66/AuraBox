@@ -17,12 +17,12 @@ const ClubLegalInfo: React.FC<ClubLegalInfoProps> = ({ termsAndConditions, priva
 
   return (
     <div className="bg-white rounded-xl shadow-lg p-8 mb-8">
-      <h2 className="text-3xl font-bold text-gray-800 mb-6 text-center">Información Legal de {clubName}</h2>
+      <h2 className="text-3xl font-bold text-aurora-navy mb-6 text-center">Información Legal de {clubName}</h2>
       <div className="flex flex-col md:flex-row justify-center items-center space-y-4 md:space-y-0 md:space-x-6">
         {hasTerms && (
           <button
             onClick={() => setOpenModal('terms')}
-            className="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-3 px-6 rounded-full transition-all duration-300 transform hover:scale-105 shadow-md w-full md:w-auto"
+            className="bg-aurora-terracotta hover:bg-aurora-terracottaDark text-white font-semibold py-3 px-6 rounded-full transition-all duration-300 transform hover:scale-105 shadow-md w-full md:w-auto"
           >
             Ver Términos y Condiciones
           </button>

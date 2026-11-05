@@ -205,7 +205,7 @@ const EditSubscriptionsPage: React.FC = () => {
         <div className="flex gap-2 justify-end">
           <button
             onClick={() => toast.dismiss(t.id)}
-            className="px-3 py-1 text-sm border border-gray-300 rounded-lg hover:bg-gray-50"
+            className="px-3 py-1 text-sm border border-aurora-navy/20 rounded-lg text-aurora-navy hover:bg-aurora-cream"
           >
             Cancelar
           </button>
@@ -384,7 +384,7 @@ const EditSubscriptionsPage: React.FC = () => {
         <button
           type="button"
           onClick={() => set('activo', !formData.activo)}
-          className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${formData.activo ? 'bg-aurora-terracotta' : 'bg-gray-300'}`}
+          className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${formData.activo ? 'bg-aurora-terracotta' : 'bg-aurora-navy/20'}`}
         >
           <span className={`inline-block h-4 w-4 transform rounded-full bg-white shadow transition-transform ${formData.activo ? 'translate-x-6' : 'translate-x-1'}`} />
         </button>

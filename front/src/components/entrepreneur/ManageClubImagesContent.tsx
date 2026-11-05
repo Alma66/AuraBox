@@ -138,7 +138,7 @@ const ManageClubImagesContent: React.FC<ManageClubImagesContentProps> = ({ activ
     <div className="flex flex-col gap-3">
       <p className="text-sm font-medium">¿Eliminar {selectedIds.length} imagen(es) seleccionada(s)? Esta acción no se puede deshacer.</p>
       <div className="flex gap-2 justify-end">
-        <button onClick={() => toast.dismiss(t.id)} className="px-3 py-1 text-sm border border-gray-300 rounded-lg hover:bg-gray-50">
+        <button onClick={() => toast.dismiss(t.id)} className="px-3 py-1 text-sm border border-aurora-navy/20 rounded-lg text-aurora-navy hover:bg-aurora-cream">
           Cancelar
         </button>
         <button
@@ -167,7 +167,7 @@ const deleteOne = (id: number) => {
     <div className="flex flex-col gap-3">
       <p className="text-sm font-medium">¿Eliminar esta imagen?</p>
       <div className="flex gap-2 justify-end">
-        <button onClick={() => toast.dismiss(t.id)} className="px-3 py-1 text-sm border border-gray-300 rounded-lg hover:bg-gray-50">
+        <button onClick={() => toast.dismiss(t.id)} className="px-3 py-1 text-sm border border-aurora-navy/20 rounded-lg text-aurora-navy hover:bg-aurora-cream">
           Cancelar
         </button>
         <button

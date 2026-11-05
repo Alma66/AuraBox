@@ -23,7 +23,7 @@ const getStatusColor = (status: ShipmentStatusValue) => {
   switch (status) {
     case 'Pendiente': return 'bg-amber-50 text-amber-700 border-amber-200';
     case 'Asignado': return 'bg-aurora-gold/10 text-aurora-navy border-aurora-gold/30';
-    case 'En_Camino': return 'bg-indigo-50 text-indigo-700 border-indigo-200';
+    case 'En_Camino': return 'bg-aurora-terracotta/10 text-aurora-terracottaDark border-aurora-terracotta/30';
     case 'Entregado': return 'bg-emerald-50 text-emerald-700 border-emerald-200';
     case 'Problema': return 'bg-red-50 text-red-700 border-red-200';
     case 'Devuelto': return 'bg-aurora-navy/5 text-aurora-navy/70 border-aurora-navy/15';
@@ -131,7 +131,7 @@ const ShipmentsListView: React.FC<ShipmentsListViewProps> = ({ clubId, clubName,
         </div>
         <div className="bg-white border border-aurora-navy/10 rounded-xl p-4">
           <p className="text-xs font-medium text-aurora-navy/50 uppercase">En curso</p>
-          <p className="text-2xl font-semibold text-indigo-600 mt-1">{stats.inTransit}</p>
+          <p className="text-2xl font-semibold text-aurora-terracotta mt-1">{stats.inTransit}</p>
         </div>
         <div className="bg-white border border-aurora-navy/10 rounded-xl p-4">
           <p className="text-xs font-medium text-aurora-navy/50 uppercase">Con problemas</p>

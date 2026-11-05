@@ -11,7 +11,7 @@ const roleClass = (role: string) => {
   if (role === 'administrador_del_club') return 'bg-aurora-navy/10 text-aurora-navy';
   if (role === 'delivery_rider') return 'bg-green-100 text-green-800';
   if (role.includes('moderador')) return 'bg-aurora-gold/20 text-aurora-terracottaDark';
-  return 'bg-gray-100 text-gray-700';
+  return 'bg-aurora-navy/10 text-aurora-navy/70';
 };
 
 const controlClass =
