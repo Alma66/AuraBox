@@ -37,11 +37,12 @@ export class UsersController {
   }
 
   @Roles('customer')
+  @Throttle({ default: { limit: 10, ttl: 60000 } })
   @Patch('me')
   @UsePipes(new ValidationPipe({ whitelist: true, transform: true }))
   async updateMe(@Request() req: any, @Body() dto: UpdateUserDto) {
     delete (dto as any).active;
-    return this.usersService.update(req.user.id, dto);
+    return this.usersService.update(req.user.id, dto, true);
   }
 
   @Roles('entrepreneur', 'admin')
@@ -66,6 +67,7 @@ export class UsersController {
   }
 
   @Roles('admin', 'customer')
+  @Throttle({ default: { limit: 10, ttl: 60000 } })
   @Put(':id')
   @UsePipes(new ValidationPipe({ whitelist: true, transform: true }))
   async update(@Param('id', ParseIntPipe) id: number, @Body() dto: UpdateUserDto, @Request() req: any) {
@@ -75,7 +77,7 @@ export class UsersController {
       }
       delete (dto as any).active;
     }
-    return this.usersService.update(id, dto);
+    return this.usersService.update(id, dto, req.user.role !== 'admin');
   }
 
   @Roles('admin')

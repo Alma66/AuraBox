@@ -59,7 +59,7 @@ const SecuritySection: React.FC<SecuritySectionProps> = ({ showGenderPublicly, o
   const handleSavePassword = async () => {
     setPasswordError(''); setPasswordSuccess('');
     if (!oldPassword) { setPasswordError('Ingresá tu contraseña actual.'); return; }
-    if (newPassword.length < 6) { setPasswordError('La nueva contraseña debe tener al menos 6 caracteres.'); return; }
+    if (newPassword.length < 8 || !/(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/.test(newPassword)) { setPasswordError('La nueva contraseña debe tener al menos 8 caracteres, una mayúscula, una minúscula y un número.'); return; }
     if (newPassword !== confirmNewPassword) { setPasswordError('Las contraseñas no coinciden.'); return; }
 
     try {
@@ -70,7 +70,7 @@ const SecuritySection: React.FC<SecuritySectionProps> = ({ showGenderPublicly, o
     }
 
     try {
-      await api.patch(updateEndpoint, { password: newPassword });
+      await api.patch(updateEndpoint, { currentPassword: oldPassword, password: newPassword });
       setPasswordSuccess('Contraseña actualizada con éxito.');
       setIsEditingPassword(false);
       setOldPassword(''); setNewPassword(''); setConfirmNewPassword('');

@@ -53,11 +53,12 @@ export class EntrepreneursController {
   }
 
   @Roles('entrepreneur')
+  @Throttle({ default: { limit: 10, ttl: 60000 } })
   @Patch('me')
   @UsePipes(new ValidationPipe({ whitelist: true, transform: true }))
   async updateMe(@Request() req: any, @Body() dto: UpdateEntrepreneurDto) {
     delete (dto as any).active;
-    return this.entrepreneursService.update(req.user.id, dto);
+    return this.entrepreneursService.update(req.user.id, dto, true);
   }
 
   @Roles('entrepreneur')
@@ -84,6 +85,7 @@ export class EntrepreneursController {
   }
 
   @Roles('entrepreneur', 'admin')
+  @Throttle({ default: { limit: 10, ttl: 60000 } })
   @Patch(':id')
   @UsePipes(new ValidationPipe({ whitelist: true, transform: true }))
   async update(@Param('id', ParseIntPipe) id: number, @Body() dto: UpdateEntrepreneurDto, @Request() req: any) {
@@ -93,7 +95,7 @@ export class EntrepreneursController {
       }
       delete (dto as any).active;
     }
-    return this.entrepreneursService.update(id, dto);
+    return this.entrepreneursService.update(id, dto, req.user.role !== 'admin');
   }
 
   @Roles('admin')

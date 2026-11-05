@@ -36,7 +36,6 @@ const NEWSLETTER_SELECT = {
   id: true,
   firstName: true,
   lastName: true,
-  email: true,
 };
 
 function sanitizeUser(user: any) {
@@ -102,7 +101,10 @@ export class UsersService {
     return this.prisma.user.findUnique({ where: { email } });
   }
 
-  async update(id: number, dto: UpdateUserDto) {
+  async update(id: number, dto: UpdateUserDto, requireCurrentPassword = false) {
+    if (dto.password && requireCurrentPassword) {
+      await this.verifyPassword(id, dto.currentPassword as string);
+    }
     const data: any = {};
     if (dto.firstName !== undefined)     data.firstName     = dto.firstName;
     if (dto.lastName !== undefined)      data.lastName      = dto.lastName;

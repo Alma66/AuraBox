@@ -74,9 +74,13 @@ export class EntrepreneursService {
     return this.prisma.entrepreneurs.findUnique({ where: { email } });
   }
 
-  async update(id: number, dto: UpdateEntrepreneurDto) {
+  async update(id: number, dto: UpdateEntrepreneurDto, requireCurrentPassword = false) {
     const entrepreneur = await this.prisma.entrepreneurs.findUnique({ where: { id } });
     if (!entrepreneur) throw new NotFoundException('Emprendedor no encontrado');
+
+    if (dto.password && requireCurrentPassword) {
+      await this.verifyPassword(id, dto.currentPassword as string);
+    }
 
     if (dto.email && dto.email !== entrepreneur.email) {
       const dup = await this.prisma.entrepreneurs.findUnique({ where: { email: dto.email } });
@@ -88,6 +92,7 @@ export class EntrepreneursService {
     }
 
     const data: any = { ...dto };
+     delete data.currentPassword;
     if (data.password) {
       data.passwordHash = await bcrypt.hash(data.password, 10);
       delete data.password;

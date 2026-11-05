@@ -35,6 +35,11 @@ export class UpdateUserDto {
   password?: string;
 
   @IsOptional()
+  @IsString()
+  @MaxLength(64)
+  currentPassword?: string;
+
+  @IsOptional()
   @IsEnum(DocumentType)
   documentType?: DocumentType;
 
