@@ -3,6 +3,9 @@ import toast from 'react-hot-toast';
 import api, { getResponseData } from '../../../api/config';
 import { PendingDelivery, RiderProfile } from '../../../types/delivery';
 
+type PendingWithPreference = PendingDelivery & { preferredCourierId?: number | null };
+type CourierWithFee = PendingDelivery['availableCouriers'][number] & { fee?: number };
+
 interface Selection {
   idCourier: number | '';
   idAssignedRider: number | '';
@@ -18,8 +21,12 @@ interface PendingAssignmentsProps {
 const selectClass =
   'min-h-[44px] min-w-[200px] rounded-lg border border-aurora-navy/15 bg-white px-3 text-sm text-aurora-navy focus:outline-none focus:ring-2 focus:ring-aurora-terracotta/40';
 
+const money = (value: number) => `$${value.toLocaleString('es-AR')}`;
+
+const couriersOf = (delivery: PendingWithPreference) => delivery.availableCouriers as CourierWithFee[];
+
 const PendingAssignments: React.FC<PendingAssignmentsProps> = ({ clubId, refreshKey, onCountChange, onOpenRiders }) => {
-  const [pending, setPending] = useState<PendingDelivery[]>([]);
+  const [pending, setPending] = useState<PendingWithPreference[]>([]);
   const [riders, setRiders] = useState<RiderProfile[]>([]);
   const [selections, setSelections] = useState<Record<number, Selection>>({});
   const [loading, setLoading] = useState(true);
@@ -34,9 +41,18 @@ const PendingAssignments: React.FC<PendingAssignmentsProps> = ({ clubId, refresh
         api.get(`/shipments/pending-by-club/${clubId}`),
         api.get(`/rider-profile/by-club/${clubId}`),
       ]);
-      const list: PendingDelivery[] = getResponseData(pendingRes) || [];
+      const list: PendingWithPreference[] = getResponseData(pendingRes) || [];
       setPending(list);
       onCountChange(list.length);
+      setSelections((prev) => {
+        const next = { ...prev };
+        list.forEach((item) => {
+          if (item.preferredCourierId && !next[item.idUserSubscriptions]) {
+            next[item.idUserSubscriptions] = { idCourier: item.preferredCourierId, idAssignedRider: '' };
+          }
+        });
+        return next;
+      });
       setRiders((getResponseData(ridersRes) || []).filter((r: RiderProfile) => r.isActive));
     } catch (err) {
       console.error(err);
@@ -60,10 +76,10 @@ const PendingAssignments: React.FC<PendingAssignmentsProps> = ({ clubId, refresh
     }));
   };
 
-  const isInternal = (delivery: PendingDelivery, idCourier: number | '') =>
+  const isInternal = (delivery: PendingWithPreference, idCourier: number | '') =>
     delivery.availableCouriers.find((c) => c.id === idCourier)?.isInternal ?? false;
 
-  const assign = async (delivery: PendingDelivery) => {
+  const assign = async (delivery: PendingWithPreference) => {
     const selection = selections[delivery.idUserSubscriptions];
     if (!selection || selection.idCourier === '') {
       toast.error('Seleccioná un método de envío antes de asignar.');
@@ -134,6 +150,10 @@ const PendingAssignments: React.FC<PendingAssignmentsProps> = ({ clubId, refresh
         const selection = selections[delivery.idUserSubscriptions] ?? { idCourier: '', idAssignedRider: '' };
         const internal = isInternal(delivery, selection.idCourier);
         const busy = assigningId === delivery.idUserSubscriptions;
+        const couriers = couriersOf(delivery);
+        const preferred = couriers.find((c) => c.id === delivery.preferredCourierId);
+        const choseOther =
+          !!preferred && selection.idCourier !== '' && selection.idCourier !== preferred.id;
         const address =
           delivery.user &&
           [delivery.user.address.street, delivery.user.address.addressNumber, delivery.user.address.city, delivery.user.address.province]
@@ -150,6 +170,12 @@ const PendingAssignments: React.FC<PendingAssignmentsProps> = ({ clubId, refresh
                 {delivery.user && (
                   <p className="mt-1 text-sm text-aurora-navy/45">{address || 'Sin dirección registrada'}</p>
                 )}
+                {preferred && (
+                  <p className="mt-2 inline-flex items-center rounded-full bg-aurora-terracotta/10 px-3 py-1 text-xs font-semibold text-aurora-terracotta">
+                    Elegido por el cliente: {preferred.name}
+                    {(preferred.fee ?? 0) > 0 ? ` · ${money(preferred.fee ?? 0)} por caja` : ' · sin costo'}
+                  </p>
+                )}
               </div>
               <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center">
                 <select
@@ -159,9 +185,11 @@ const PendingAssignments: React.FC<PendingAssignmentsProps> = ({ clubId, refresh
                   className={selectClass}
                 >
                   <option value="">Método de envío</option>
-                  {delivery.availableCouriers.map((c) => (
+                  {couriers.map((c) => (
                     <option key={c.id} value={c.id}>
                       {c.name}
+                      {(c.fee ?? 0) > 0 ? ` · ${money(c.fee ?? 0)}` : ''}
+                      {c.id === delivery.preferredCourierId ? ' (elegido)' : ''}
                     </option>
                   ))}
                 </select>
@@ -190,6 +218,11 @@ const PendingAssignments: React.FC<PendingAssignmentsProps> = ({ clubId, refresh
                 </button>
               </div>
             </div>
+            {choseOther && (
+              <p className="mt-3 text-sm text-amber-700">
+                El cliente eligió {preferred?.name}. Si usás otra empresa, el costo de envío registrado va a ser el de la nueva.
+              </p>
+            )}
             {delivery.availableCouriers.length === 0 && (
               <p className="mt-3 text-sm text-amber-700">
                 Este club todavía no tiene métodos de envío configurados.{' '}
