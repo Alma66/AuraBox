@@ -197,22 +197,8 @@ const formatExpiry = (value: string) => {
   return digits.length > 2 ? `${digits.slice(0, 2)}/${digits.slice(2)}` : digits;
 };
 
-const luhnValid = (value: string) => {
-  const digits = digitsOnly(value);
-  if (digits.length < 13) return false;
-  let sum = 0;
-  let double = false;
-  for (let i = digits.length - 1; i >= 0; i -= 1) {
-    let digit = Number(digits[i]);
-    if (double) {
-      digit *= 2;
-      if (digit > 9) digit -= 9;
-    }
-    sum += digit;
-    double = !double;
-  }
-  return sum % 10 === 0;
-};
+
+
 
 const cardBrand = (value: string) => {
   const digits = digitsOnly(value);
@@ -224,7 +210,9 @@ const cardBrand = (value: string) => {
 
 const validateCard = (card: CardData): CardErrors => {
   const errors: CardErrors = {};
-  if (!luhnValid(card.number)) errors.number = 'Revisá el número de tarjeta.';
+  const numberLength = digitsOnly(card.number).length;
+  if (numberLength < 13 || numberLength > 19) errors.number = 'El número debe tener entre 13 y 19 dígitos.';
+
   if (card.holder.trim().length < 3) errors.holder = 'Ingresá el nombre tal como figura en la tarjeta.';
   const match = /^(\d{2})\/(\d{2})$/.exec(card.expiry);
   if (!match) {
@@ -1138,7 +1126,7 @@ const CheckoutPage: React.FC = () => {
             {club.couriers.length === 0 ? (
               <div className="flex items-start gap-3 rounded-xl bg-aurora-cream p-4 text-sm text-aurora-navy/80">
                 <Icon name="box" className="mt-0.5 h-5 w-5 flex-shrink-0" />
-                <p>Este club coordina el envío directamente con vos. No tiene costo adicional.</p>
+                <p>                    Podés usar cualquier número de prueba. Estos datos solo se validan en tu navegador y no se envían ni se guardan.</p>
               </div>
             ) : (
               <div className="space-y-3" role="radiogroup" aria-label={`Envío de ${club.clubName}`}>
