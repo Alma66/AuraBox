@@ -171,6 +171,29 @@ export class ReviewsController {
     return this.reviewsService.removeForbiddenWord(id, req.user);
   }
 
+    @Public()
+  @Get('public/by-club/:idClub')
+  async findPublicByClub(
+    @Param('idClub', ParseIntPipe) idClub: number,
+    @Request() req,
+    @Query('limit') limit?: string,
+    @Query('offset') offset?: string,
+    @Query('rating') rating?: string,
+  ) {
+    const parsedRating = rating ? Number(rating) : undefined;
+    const validRating =
+      parsedRating !== undefined && Number.isInteger(parsedRating) && parsedRating >= 1 && parsedRating <= 5
+        ? parsedRating
+        : undefined;
+    return this.reviewsService.findPublicByClub(
+      idClub,
+      req.user,
+      limit ? Number(limit) : 10,
+      offset ? Number(offset) : 0,
+      validRating,
+    );
+  }
+  
   @Get(':id')
   async findOne(@Param('id', ParseIntPipe) id: number, @Request() req) {
     return this.reviewsService.findOneForRequester(id, req.user);

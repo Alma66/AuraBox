@@ -287,6 +287,88 @@ export class ReviewsService {
     return { average: agg._avg.rating ?? 0, count: agg._count.rating };
   }
 
+    async findPublicByClub(
+    idClub: number,
+    user: OptionalRequestUser,
+    limit = 10,
+    offset = 0,
+    rating?: number,
+  ) {
+    await assertClubVisible(this.prisma, idClub, user);
+
+    const take = Number.isFinite(limit) ? Math.min(Math.max(Math.floor(limit), 1), MAX_PAGE_SIZE) : 10;
+    const skip = Number.isFinite(offset) ? Math.max(Math.floor(offset), 0) : 0;
+    const baseWhere = { idClub, isHidden: false, active: true };
+    const where = rating ? { ...baseWhere, rating } : baseWhere;
+
+    const [reviews, total, grouped] = await Promise.all([
+      this.prisma.reviews.findMany({
+        where,
+        orderBy: { reviewDate: 'desc' },
+        include: { media: true },
+        take,
+        skip,
+      }),
+      this.prisma.reviews.count({ where }),
+      this.prisma.reviews.groupBy({ by: ['rating'], where: baseWhere, _count: { _all: true } }),
+    ]);
+
+    const userIds = Array.from(new Set(reviews.map((review) => review.idUser)));
+    const planIds = Array.from(
+      new Set(reviews.map((review) => review.idSubscriptionTypes).filter((id): id is number => typeof id === 'number')),
+    );
+    const [users, plans] = await Promise.all([
+      userIds.length
+        ? this.prisma.user.findMany({
+            where: { id: { in: userIds } },
+            select: { id: true, firstName: true, lastName: true },
+          })
+        : [],
+      planIds.length
+        ? this.prisma.subscription_Types.findMany({
+            where: { id: { in: planIds } },
+            select: { id: true, name: true },
+          })
+        : [],
+    ]);
+    const usersById = new Map(users.map((entry) => [entry.id, entry] as [number, (typeof users)[number]]));
+    const planNames = new Map(plans.map((entry) => [entry.id, entry.name] as [number, string]));
+
+    const distribution: Record<number, number> = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 };
+    grouped.forEach((row) => {
+      distribution[row.rating] = row._count._all;
+    });
+    const count = Object.values(distribution).reduce((sum, value) => sum + value, 0);
+    const weighted = [1, 2, 3, 4, 5].reduce((sum, star) => sum + star * distribution[star], 0);
+
+    return {
+      reviews: reviews.map((review) => {
+        const customer = usersById.get(review.idUser);
+        const lastInitial = customer?.lastName ? `${customer.lastName.charAt(0).toUpperCase()}.` : '';
+        return {
+          id: review.id,
+          rating: review.rating,
+          title: review.title,
+          comment: review.comment,
+          reviewDate: review.reviewDate instanceof Date ? review.reviewDate.toISOString() : review.reviewDate,
+          customerName: customer ? `${customer.firstName} ${lastInitial}`.trim() : 'Cliente',
+          planName: review.idSubscriptionTypes != null ? planNames.get(review.idSubscriptionTypes) ?? null : null,
+          media: review.media.map((item) => ({
+            id: item.id,
+            mediaUrl: item.mediaUrl,
+            mediaType: item.mediaType,
+          })),
+        };
+      }),
+      total,
+      summary: {
+        average: count > 0 ? weighted / count : 0,
+        count,
+        distribution,
+      },
+    };
+  }
+  
   async updateForRequester(id: number, dto: UpdateReviewDto, user: RequestUser) {
     const review = await this.findOne(id);
     const isOwner = user.role === 'customer' && user.id === review.idUser;

@@ -18,6 +18,7 @@ import ExploreClubsPage from './pages/ExploreClubsPage';
 import FAQPage from './pages/FAQPage';
 import AboutUsPage from './pages/AboutUsPage';
 import ContactPage from './pages/ContactPage';
+import ClubReviewsPage from './pages/ClubReviewsPage';
 import PlatformRulesPage from './pages/PlatformRulesPage';
 import SubscriptionPlanDetailPage from './pages/SubscriptionPlanDetailPage';
 import LoginPage from './pages/LoginPage';
@@ -237,7 +238,8 @@ const AppContent: React.FC = () => {
       <Route path="/club/:clubId/terms-and-conditions" element={<TermsAndConditionsPage />} />
       <Route path="/club/:clubId/privacy-and-security" element={<PrivacyAndSecurityPolicyPage />} />
       <Route path="/club/:clubId/plan/:planId" element={<SubscriptionPlanDetailPage />} />
-
+      <Route path="/club/:clubId/reviews" element={<ClubReviewsPage />} />
+      
       <Route path="/login" element={<LoginPage onLogin={login} />} />
       <Route path="/logout" element={<Logout />} />
       <Route path="/register" element={<RegisterPage />} />
