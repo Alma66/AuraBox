@@ -26,22 +26,22 @@ let PromotionController = class PromotionController {
         this.svc = svc;
     }
     async create(dto, req) {
-        return this.svc.create(dto, req.user?.id);
+        return this.svc.create(dto, req.user);
     }
-    async findByClub(idClub) {
-        return this.svc.findByClub(idClub);
+    async findByClub(idClub, req) {
+        return this.svc.findByClub(idClub, req.user);
     }
-    async findOne(id) {
-        return this.svc.findOne(id);
+    async findOne(id, req) {
+        return this.svc.findOne(id, req.user);
     }
-    async update(id, dto) {
-        return this.svc.update(id, dto);
+    async update(id, dto, req) {
+        return this.svc.update(id, dto, req.user);
     }
-    async toggle(id, body) {
-        return this.svc.toggleActive(id, body.active);
+    async toggle(id, body, req) {
+        return this.svc.toggleActive(id, body.active, req.user);
     }
-    async remove(id) {
-        return this.svc.remove(id);
+    async remove(id, req) {
+        return this.svc.remove(id, req.user);
     }
 };
 exports.PromotionController = PromotionController;
@@ -57,15 +57,17 @@ __decorate([
 __decorate([
     (0, common_1.Get)('by-club/:idClub'),
     __param(0, (0, common_1.Param)('idClub', common_1.ParseIntPipe)),
+    __param(1, (0, common_1.Request)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Number]),
+    __metadata("design:paramtypes", [Number, Object]),
     __metadata("design:returntype", Promise)
 ], PromotionController.prototype, "findByClub", null);
 __decorate([
     (0, common_1.Get)(':id'),
     __param(0, (0, common_1.Param)('id', common_1.ParseIntPipe)),
+    __param(1, (0, common_1.Request)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Number]),
+    __metadata("design:paramtypes", [Number, Object]),
     __metadata("design:returntype", Promise)
 ], PromotionController.prototype, "findOne", null);
 __decorate([
@@ -73,23 +75,26 @@ __decorate([
     (0, common_1.UsePipes)(new common_1.ValidationPipe({ whitelist: true, transform: true })),
     __param(0, (0, common_1.Param)('id', common_1.ParseIntPipe)),
     __param(1, (0, common_1.Body)()),
+    __param(2, (0, common_1.Request)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Number, update_promotion_dto_1.UpdatePromotionDto]),
+    __metadata("design:paramtypes", [Number, update_promotion_dto_1.UpdatePromotionDto, Object]),
     __metadata("design:returntype", Promise)
 ], PromotionController.prototype, "update", null);
 __decorate([
     (0, common_1.Patch)(':id/toggle'),
     __param(0, (0, common_1.Param)('id', common_1.ParseIntPipe)),
     __param(1, (0, common_1.Body)()),
+    __param(2, (0, common_1.Request)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Number, Object]),
+    __metadata("design:paramtypes", [Number, Object, Object]),
     __metadata("design:returntype", Promise)
 ], PromotionController.prototype, "toggle", null);
 __decorate([
     (0, common_1.Delete)(':id'),
     __param(0, (0, common_1.Param)('id', common_1.ParseIntPipe)),
+    __param(1, (0, common_1.Request)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Number]),
+    __metadata("design:paramtypes", [Number, Object]),
     __metadata("design:returntype", Promise)
 ], PromotionController.prototype, "remove", null);
 exports.PromotionController = PromotionController = __decorate([

@@ -25,6 +25,7 @@ const public_decorator_1 = require("../../common/decorators/public.decorator");
 const shipments_service_1 = require("../shipments/shipments.service");
 const rider_profile_service_1 = require("../rider-profile/rider-profile.service");
 const assign_delivery_dto_1 = require("../shipments/dto/assign-delivery.dto");
+const image_upload_1 = require("../../common/utils/image-upload");
 let ClubsController = class ClubsController {
     clubsService;
     shipmentsService;
@@ -51,8 +52,13 @@ let ClubsController = class ClubsController {
     async findFeatured() {
         return this.clubsService.findFeatured();
     }
+    async getRecommendations(req) {
+        if (req.user.role !== 'customer')
+            return [];
+        return this.clubsService.getRecommendationsForUser(req.user.id);
+    }
     async findOne(id, req) {
-        return this.clubsService.findOne(id, req.user?.id);
+        return this.clubsService.findOne(id, req.user);
     }
     async getClubSubscriptions(id, req) {
         return this.clubsService.findSubscriptionsByClub(id, req.user.id);
@@ -73,7 +79,7 @@ let ClubsController = class ClubsController {
         return this.shipmentsService.assignRiderForClub(shipmentId, id, dto);
     }
     async update(id, dto, req) {
-        return this.clubsService.update(id, dto, req.user.id);
+        return this.clubsService.update(id, dto, req.user);
     }
     async updateLogo(id, file, req) {
         return this.clubsService.updateLogo(id, file, req.user.id);
@@ -85,7 +91,7 @@ let ClubsController = class ClubsController {
 exports.ClubsController = ClubsController;
 __decorate([
     (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard, roles_guard_1.RolesGuard),
-    (0, roles_decorator_1.Roles)('entrepreneur', 'admin'),
+    (0, roles_decorator_1.Roles)('admin'),
     (0, common_1.Post)(),
     (0, common_1.UsePipes)(new common_1.ValidationPipe({ whitelist: true, transform: true })),
     __param(0, (0, common_1.Body)()),
@@ -111,6 +117,14 @@ __decorate([
     __metadata("design:paramtypes", []),
     __metadata("design:returntype", Promise)
 ], ClubsController.prototype, "findFeatured", null);
+__decorate([
+    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),
+    (0, common_1.Get)('recommendations'),
+    __param(0, (0, common_1.Request)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", Promise)
+], ClubsController.prototype, "getRecommendations", null);
 __decorate([
     (0, public_decorator_1.Public)(),
     (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),
@@ -190,7 +204,7 @@ __decorate([
     (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard, roles_guard_1.RolesGuard),
     (0, roles_decorator_1.Roles)('entrepreneur'),
     (0, common_1.Patch)(':id/logo'),
-    (0, common_1.UseInterceptors)((0, platform_express_1.FileInterceptor)('logo')),
+    (0, common_1.UseInterceptors)((0, platform_express_1.FileInterceptor)('logo', image_upload_1.imageUploadOptions)),
     __param(0, (0, common_1.Param)('id', common_1.ParseIntPipe)),
     __param(1, (0, common_1.UploadedFile)()),
     __param(2, (0, common_1.Request)()),

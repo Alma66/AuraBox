@@ -30,6 +30,28 @@ let RiderProfileService = class RiderProfileService {
     constructor(prisma) {
         this.prisma = prisma;
     }
+    async assertClubAccess(idClub, user) {
+        if (user.role === 'admin')
+            return;
+        const assoc = await this.prisma.entrepreneur_Club.findFirst({
+            where: { idClub, idEntrepreneurs: user.id },
+        });
+        if (!assoc)
+            throw new common_1.ForbiddenException('No tenés acceso a este club');
+    }
+    async sharesClub(entrepreneurA, entrepreneurB) {
+        const clubsA = await this.prisma.entrepreneur_Club.findMany({
+            where: { idEntrepreneurs: entrepreneurA },
+            select: { idClub: true },
+        });
+        if (clubsA.length === 0)
+            return false;
+        const clubIds = clubsA.map((c) => c.idClub);
+        const match = await this.prisma.entrepreneur_Club.findFirst({
+            where: { idEntrepreneurs: entrepreneurB, idClub: { in: clubIds } },
+        });
+        return !!match;
+    }
     async create(dto) {
         const entrepreneur = await this.prisma.entrepreneurs.findUnique({ where: { id: dto.idEntrepreneur } });
         if (!entrepreneur)
@@ -59,6 +81,19 @@ let RiderProfileService = class RiderProfileService {
         if (!profile)
             throw new common_1.NotFoundException('Perfil de rider no encontrado');
         return sanitize(profile);
+    }
+    async findOneForRequester(id, user) {
+        const profile = await this.findOne(id);
+        if (user.role === 'admin')
+            return profile;
+        if (user.role === 'entrepreneur') {
+            if (profile.idEntrepreneur === user.id)
+                return profile;
+            const shared = await this.sharesClub(profile.idEntrepreneur, user.id);
+            if (shared)
+                return profile;
+        }
+        throw new common_1.ForbiddenException('No autorizado para ver este perfil');
     }
     async findByEntrepreneur(idEntrepreneur) {
         const profile = await this.prisma.rider_Profile.findUnique({ where: { idEntrepreneur } });
@@ -114,11 +149,23 @@ let RiderProfileService = class RiderProfileService {
         const profile = await this.prisma.rider_Profile.findUnique({ where: { id } });
         if (!profile)
             throw new common_1.NotFoundException('Perfil de rider no encontrado');
+        const { idEntrepreneur, ...rest } = dto;
         const updated = await this.prisma.rider_Profile.update({
             where: { id },
-            data: { ...dto },
+            data: rest,
         });
         return sanitize(updated);
+    }
+    async updateForRequester(id, dto, user) {
+        const profile = await this.prisma.rider_Profile.findUnique({ where: { id } });
+        if (!profile)
+            throw new common_1.NotFoundException('Perfil de rider no encontrado');
+        if (user.role !== 'admin' && profile.idEntrepreneur !== user.id) {
+            const shared = await this.sharesClub(profile.idEntrepreneur, user.id);
+            if (!shared)
+                throw new common_1.ForbiddenException('No autorizado para editar este perfil');
+        }
+        return this.update(id, dto);
     }
     async remove(id) {
         const profile = await this.prisma.rider_Profile.findUnique({ where: { id } });

@@ -25,19 +25,24 @@ let FinanceController = class FinanceController {
     constructor(svc) {
         this.svc = svc;
     }
-    async getMovements(idClub) {
+    async getMovements(idClub, req) {
+        await this.svc.assertClubAccess(idClub, req.user);
         return this.svc.getMovements(idClub);
     }
-    async getProfitability(idClub) {
+    async getProfitability(idClub, req) {
+        await this.svc.assertClubAccess(idClub, req.user);
         return this.svc.getProfitability(idClub);
     }
-    async createEntry(dto) {
+    async createEntry(dto, req) {
+        await this.svc.assertClubAccess(dto.idClub, req.user);
         return this.svc.createEntry(dto);
     }
-    async updateEntry(id, dto) {
+    async updateEntry(id, dto, req) {
+        await this.svc.assertEntryAccess(id, req.user);
         return this.svc.updateEntry(id, dto);
     }
-    async removeEntry(id) {
+    async removeEntry(id, req) {
+        await this.svc.assertEntryAccess(id, req.user);
         return this.svc.removeEntry(id);
     }
 };
@@ -45,23 +50,26 @@ exports.FinanceController = FinanceController;
 __decorate([
     (0, common_1.Get)('movements/by-club/:idClub'),
     __param(0, (0, common_1.Param)('idClub', common_1.ParseIntPipe)),
+    __param(1, (0, common_1.Request)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Number]),
+    __metadata("design:paramtypes", [Number, Object]),
     __metadata("design:returntype", Promise)
 ], FinanceController.prototype, "getMovements", null);
 __decorate([
     (0, common_1.Get)('profitability/by-club/:idClub'),
     __param(0, (0, common_1.Param)('idClub', common_1.ParseIntPipe)),
+    __param(1, (0, common_1.Request)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Number]),
+    __metadata("design:paramtypes", [Number, Object]),
     __metadata("design:returntype", Promise)
 ], FinanceController.prototype, "getProfitability", null);
 __decorate([
     (0, common_1.Post)('entries'),
     (0, common_1.UsePipes)(new common_1.ValidationPipe({ whitelist: true, transform: true })),
     __param(0, (0, common_1.Body)()),
+    __param(1, (0, common_1.Request)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [create_financial_entry_dto_1.CreateFinancialEntryDto]),
+    __metadata("design:paramtypes", [create_financial_entry_dto_1.CreateFinancialEntryDto, Object]),
     __metadata("design:returntype", Promise)
 ], FinanceController.prototype, "createEntry", null);
 __decorate([
@@ -69,15 +77,17 @@ __decorate([
     (0, common_1.UsePipes)(new common_1.ValidationPipe({ whitelist: true, transform: true })),
     __param(0, (0, common_1.Param)('id', common_1.ParseIntPipe)),
     __param(1, (0, common_1.Body)()),
+    __param(2, (0, common_1.Request)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Number, update_financial_entry_dto_1.UpdateFinancialEntryDto]),
+    __metadata("design:paramtypes", [Number, update_financial_entry_dto_1.UpdateFinancialEntryDto, Object]),
     __metadata("design:returntype", Promise)
 ], FinanceController.prototype, "updateEntry", null);
 __decorate([
     (0, common_1.Delete)('entries/:id'),
     __param(0, (0, common_1.Param)('id', common_1.ParseIntPipe)),
+    __param(1, (0, common_1.Request)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Number]),
+    __metadata("design:paramtypes", [Number, Object]),
     __metadata("design:returntype", Promise)
 ], FinanceController.prototype, "removeEntry", null);
 exports.FinanceController = FinanceController = __decorate([

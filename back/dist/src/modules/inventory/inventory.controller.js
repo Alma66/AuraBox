@@ -31,53 +31,53 @@ let InventoryController = class InventoryController {
     constructor(svc) {
         this.svc = svc;
     }
-    async createCategory(dto) {
-        return this.svc.createCategory(dto);
+    async createCategory(dto, req) {
+        return this.svc.createCategory(dto, req.user);
     }
-    async findCategories(idClub) {
-        return this.svc.findCategoriesByClub(idClub);
+    async findCategories(idClub, req) {
+        return this.svc.findCategoriesByClub(idClub, req.user);
     }
-    async updateCategory(id, dto) {
-        return this.svc.updateCategory(id, dto);
+    async updateCategory(id, dto, req) {
+        return this.svc.updateCategory(id, dto, req.user);
     }
-    async removeCategory(id) {
-        return this.svc.removeCategory(id);
+    async removeCategory(id, req) {
+        return this.svc.removeCategory(id, req.user);
     }
-    async createSupplier(dto) {
-        return this.svc.createSupplier(dto);
+    async createSupplier(dto, req) {
+        return this.svc.createSupplier(dto, req.user);
     }
-    async findSuppliers(idClub) {
-        return this.svc.findSuppliersByClub(idClub);
+    async findSuppliers(idClub, req) {
+        return this.svc.findSuppliersByClub(idClub, req.user);
     }
-    async updateSupplier(id, dto) {
-        return this.svc.updateSupplier(id, dto);
+    async updateSupplier(id, dto, req) {
+        return this.svc.updateSupplier(id, dto, req.user);
     }
-    async removeSupplier(id) {
-        return this.svc.removeSupplier(id);
+    async removeSupplier(id, req) {
+        return this.svc.removeSupplier(id, req.user);
     }
-    async createProduct(dto) {
-        return this.svc.createProduct(dto);
+    async createProduct(dto, req) {
+        return this.svc.createProduct(dto, req.user);
     }
-    async findProducts(idClub) {
-        return this.svc.findProductsByClub(idClub);
+    async findProducts(idClub, req) {
+        return this.svc.findProductsByClub(idClub, req.user);
     }
-    async updateProduct(id, dto) {
-        return this.svc.updateProduct(id, dto);
+    async updateProduct(id, dto, req) {
+        return this.svc.updateProduct(id, dto, req.user);
     }
-    async removeProduct(id) {
-        return this.svc.removeProduct(id);
+    async removeProduct(id, req) {
+        return this.svc.removeProduct(id, req.user);
     }
-    async createOrder(dto) {
-        return this.svc.createOrder(dto);
+    async createOrder(dto, req) {
+        return this.svc.createOrder(dto, req.user);
     }
-    async findOrders(idClub) {
-        return this.svc.findOrdersByClub(idClub);
+    async findOrders(idClub, req) {
+        return this.svc.findOrdersByClub(idClub, req.user);
     }
-    async updateOrder(id, dto) {
-        return this.svc.updateOrder(id, dto);
+    async updateOrder(id, dto, req) {
+        return this.svc.updateOrder(id, dto, req.user);
     }
-    async removeOrder(id) {
-        return this.svc.removeOrder(id);
+    async removeOrder(id, req) {
+        return this.svc.removeOrder(id, req.user);
     }
 };
 exports.InventoryController = InventoryController;
@@ -85,15 +85,17 @@ __decorate([
     (0, common_1.Post)('categories'),
     (0, common_1.UsePipes)(new common_1.ValidationPipe({ whitelist: true, transform: true })),
     __param(0, (0, common_1.Body)()),
+    __param(1, (0, common_1.Request)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [create_supply_category_dto_1.CreateSupplyCategoryDto]),
+    __metadata("design:paramtypes", [create_supply_category_dto_1.CreateSupplyCategoryDto, Object]),
     __metadata("design:returntype", Promise)
 ], InventoryController.prototype, "createCategory", null);
 __decorate([
     (0, common_1.Get)('categories/by-club/:idClub'),
     __param(0, (0, common_1.Param)('idClub', common_1.ParseIntPipe)),
+    __param(1, (0, common_1.Request)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Number]),
+    __metadata("design:paramtypes", [Number, Object]),
     __metadata("design:returntype", Promise)
 ], InventoryController.prototype, "findCategories", null);
 __decorate([
@@ -101,30 +103,34 @@ __decorate([
     (0, common_1.UsePipes)(new common_1.ValidationPipe({ whitelist: true, transform: true })),
     __param(0, (0, common_1.Param)('id', common_1.ParseIntPipe)),
     __param(1, (0, common_1.Body)()),
+    __param(2, (0, common_1.Request)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Number, update_supply_category_dto_1.UpdateSupplyCategoryDto]),
+    __metadata("design:paramtypes", [Number, update_supply_category_dto_1.UpdateSupplyCategoryDto, Object]),
     __metadata("design:returntype", Promise)
 ], InventoryController.prototype, "updateCategory", null);
 __decorate([
     (0, common_1.Delete)('categories/:id'),
     __param(0, (0, common_1.Param)('id', common_1.ParseIntPipe)),
+    __param(1, (0, common_1.Request)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Number]),
+    __metadata("design:paramtypes", [Number, Object]),
     __metadata("design:returntype", Promise)
 ], InventoryController.prototype, "removeCategory", null);
 __decorate([
     (0, common_1.Post)('suppliers'),
     (0, common_1.UsePipes)(new common_1.ValidationPipe({ whitelist: true, transform: true })),
     __param(0, (0, common_1.Body)()),
+    __param(1, (0, common_1.Request)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [create_supplier_dto_1.CreateSupplierDto]),
+    __metadata("design:paramtypes", [create_supplier_dto_1.CreateSupplierDto, Object]),
     __metadata("design:returntype", Promise)
 ], InventoryController.prototype, "createSupplier", null);
 __decorate([
     (0, common_1.Get)('suppliers/by-club/:idClub'),
     __param(0, (0, common_1.Param)('idClub', common_1.ParseIntPipe)),
+    __param(1, (0, common_1.Request)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Number]),
+    __metadata("design:paramtypes", [Number, Object]),
     __metadata("design:returntype", Promise)
 ], InventoryController.prototype, "findSuppliers", null);
 __decorate([
@@ -132,30 +138,34 @@ __decorate([
     (0, common_1.UsePipes)(new common_1.ValidationPipe({ whitelist: true, transform: true })),
     __param(0, (0, common_1.Param)('id', common_1.ParseIntPipe)),
     __param(1, (0, common_1.Body)()),
+    __param(2, (0, common_1.Request)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Number, update_supplier_dto_1.UpdateSupplierDto]),
+    __metadata("design:paramtypes", [Number, update_supplier_dto_1.UpdateSupplierDto, Object]),
     __metadata("design:returntype", Promise)
 ], InventoryController.prototype, "updateSupplier", null);
 __decorate([
     (0, common_1.Delete)('suppliers/:id'),
     __param(0, (0, common_1.Param)('id', common_1.ParseIntPipe)),
+    __param(1, (0, common_1.Request)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Number]),
+    __metadata("design:paramtypes", [Number, Object]),
     __metadata("design:returntype", Promise)
 ], InventoryController.prototype, "removeSupplier", null);
 __decorate([
     (0, common_1.Post)('products'),
     (0, common_1.UsePipes)(new common_1.ValidationPipe({ whitelist: true, transform: true })),
     __param(0, (0, common_1.Body)()),
+    __param(1, (0, common_1.Request)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [create_product_inventory_dto_1.CreateProductInventoryDto]),
+    __metadata("design:paramtypes", [create_product_inventory_dto_1.CreateProductInventoryDto, Object]),
     __metadata("design:returntype", Promise)
 ], InventoryController.prototype, "createProduct", null);
 __decorate([
     (0, common_1.Get)('products/by-club/:idClub'),
     __param(0, (0, common_1.Param)('idClub', common_1.ParseIntPipe)),
+    __param(1, (0, common_1.Request)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Number]),
+    __metadata("design:paramtypes", [Number, Object]),
     __metadata("design:returntype", Promise)
 ], InventoryController.prototype, "findProducts", null);
 __decorate([
@@ -163,30 +173,34 @@ __decorate([
     (0, common_1.UsePipes)(new common_1.ValidationPipe({ whitelist: true, transform: true })),
     __param(0, (0, common_1.Param)('id', common_1.ParseIntPipe)),
     __param(1, (0, common_1.Body)()),
+    __param(2, (0, common_1.Request)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Number, update_product_inventory_dto_1.UpdateProductInventoryDto]),
+    __metadata("design:paramtypes", [Number, update_product_inventory_dto_1.UpdateProductInventoryDto, Object]),
     __metadata("design:returntype", Promise)
 ], InventoryController.prototype, "updateProduct", null);
 __decorate([
     (0, common_1.Delete)('products/:id'),
     __param(0, (0, common_1.Param)('id', common_1.ParseIntPipe)),
+    __param(1, (0, common_1.Request)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Number]),
+    __metadata("design:paramtypes", [Number, Object]),
     __metadata("design:returntype", Promise)
 ], InventoryController.prototype, "removeProduct", null);
 __decorate([
     (0, common_1.Post)('orders'),
     (0, common_1.UsePipes)(new common_1.ValidationPipe({ whitelist: true, transform: true })),
     __param(0, (0, common_1.Body)()),
+    __param(1, (0, common_1.Request)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [create_supply_order_dto_1.CreateSupplyOrderDto]),
+    __metadata("design:paramtypes", [create_supply_order_dto_1.CreateSupplyOrderDto, Object]),
     __metadata("design:returntype", Promise)
 ], InventoryController.prototype, "createOrder", null);
 __decorate([
     (0, common_1.Get)('orders/by-club/:idClub'),
     __param(0, (0, common_1.Param)('idClub', common_1.ParseIntPipe)),
+    __param(1, (0, common_1.Request)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Number]),
+    __metadata("design:paramtypes", [Number, Object]),
     __metadata("design:returntype", Promise)
 ], InventoryController.prototype, "findOrders", null);
 __decorate([
@@ -194,15 +208,17 @@ __decorate([
     (0, common_1.UsePipes)(new common_1.ValidationPipe({ whitelist: true, transform: true })),
     __param(0, (0, common_1.Param)('id', common_1.ParseIntPipe)),
     __param(1, (0, common_1.Body)()),
+    __param(2, (0, common_1.Request)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Number, update_supply_order_dto_1.UpdateSupplyOrderDto]),
+    __metadata("design:paramtypes", [Number, update_supply_order_dto_1.UpdateSupplyOrderDto, Object]),
     __metadata("design:returntype", Promise)
 ], InventoryController.prototype, "updateOrder", null);
 __decorate([
     (0, common_1.Delete)('orders/:id'),
     __param(0, (0, common_1.Param)('id', common_1.ParseIntPipe)),
+    __param(1, (0, common_1.Request)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Number]),
+    __metadata("design:paramtypes", [Number, Object]),
     __metadata("design:returntype", Promise)
 ], InventoryController.prototype, "removeOrder", null);
 exports.InventoryController = InventoryController = __decorate([

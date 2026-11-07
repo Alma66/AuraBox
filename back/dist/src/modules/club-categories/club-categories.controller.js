@@ -25,8 +25,8 @@ let ClubCategoriesController = class ClubCategoriesController {
     constructor(service) {
         this.service = service;
     }
-    async create(dto) {
-        return this.service.create(dto);
+    async create(dto, req) {
+        return this.service.create(dto, req.user);
     }
     async findAll() {
         return this.service.findAll();
@@ -54,8 +54,9 @@ __decorate([
     (0, common_1.Post)(),
     (0, common_1.UsePipes)(new common_1.ValidationPipe({ whitelist: true, transform: true })),
     __param(0, (0, common_1.Body)()),
+    __param(1, (0, common_1.Request)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [create_club_category_dto_1.CreateClubCategoryDto]),
+    __metadata("design:paramtypes", [create_club_category_dto_1.CreateClubCategoryDto, Object]),
     __metadata("design:returntype", Promise)
 ], ClubCategoriesController.prototype, "create", null);
 __decorate([

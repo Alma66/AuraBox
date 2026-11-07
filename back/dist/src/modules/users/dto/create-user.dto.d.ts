@@ -6,7 +6,7 @@ export declare class CreateUserDto {
     password: string;
     documentType: DocumentType;
     documentNumber: number;
-    phoneNumber?: number;
+    phoneNumber?: string | null;
     birthDate: string;
     userType: 'customer' | 'entrepreneur';
 }

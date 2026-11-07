@@ -6,11 +6,11 @@ export declare class BoxContentHistoryController {
     constructor(svc: BoxContentHistoryService);
     create(dto: CreateBoxContentHistoryDto, req: any, image?: Express.Multer.File): Promise<any>;
     findAll(page?: string, perPage?: string): Promise<any[]>;
-    findBySubscriptionType(idSubscriptionTypes: number): Promise<any[]>;
+    findBySubscriptionType(idSubscriptionTypes: number, req: any): Promise<any[]>;
     findByDeliveryMonth(deliveryMonthYear: string): Promise<any[]>;
-    findOne(id: number): Promise<any>;
-    update(id: number, dto: UpdateBoxContentHistoryDto): Promise<any>;
-    remove(id: number): Promise<{
+    findOne(id: number, req: any): Promise<any>;
+    update(id: number, dto: UpdateBoxContentHistoryDto, req: any): Promise<any>;
+    remove(id: number, req: any): Promise<{
         message: string;
     }>;
 }

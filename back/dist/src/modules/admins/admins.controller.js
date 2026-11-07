@@ -17,6 +17,8 @@ const common_1 = require("@nestjs/common");
 const admins_service_1 = require("./admins.service");
 const create_admin_dto_1 = require("./dto/create-admin.dto");
 const update_admin_dto_1 = require("./dto/update-admin.dto");
+const set_admin_active_dto_1 = require("./dto/set-admin-active.dto");
+const set_admin_password_dto_1 = require("./dto/set-admin-password.dto");
 const jwt_auth_guard_1 = require("../../common/guards/jwt-auth.guard");
 const roles_guard_1 = require("../auth/roles.guard");
 const roles_decorator_1 = require("../auth/roles.decorator");
@@ -40,32 +42,28 @@ let AdminsController = class AdminsController {
     async update(id, dto) {
         return this.svc.update(id, dto);
     }
-    async remove(id) {
-        return this.svc.remove(id);
+    async setActive(id, dto, req) {
+        return this.svc.setActive(id, dto.active, req.user.id);
+    }
+    async setPassword(id, dto) {
+        return this.svc.setPassword(id, dto.password);
     }
 };
 exports.AdminsController = AdminsController;
 __decorate([
-    (0, common_1.UseGuards)(roles_guard_1.RolesGuard),
-    (0, roles_decorator_1.Roles)('admin'),
     (0, common_1.Post)(),
-    (0, common_1.UsePipes)(new common_1.ValidationPipe({ whitelist: true, transform: true })),
     __param(0, (0, common_1.Body)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [create_admin_dto_1.CreateAdminDto]),
     __metadata("design:returntype", Promise)
 ], AdminsController.prototype, "create", null);
 __decorate([
-    (0, common_1.UseGuards)(roles_guard_1.RolesGuard),
-    (0, roles_decorator_1.Roles)('admin'),
     (0, common_1.Get)(),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", []),
     __metadata("design:returntype", Promise)
 ], AdminsController.prototype, "findAll", null);
 __decorate([
-    (0, common_1.UseGuards)(roles_guard_1.RolesGuard),
-    (0, roles_decorator_1.Roles)('admin'),
     (0, common_1.Get)('by-email/:email'),
     __param(0, (0, common_1.Param)('email')),
     __metadata("design:type", Function),
@@ -73,8 +71,6 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], AdminsController.prototype, "findByEmail", null);
 __decorate([
-    (0, common_1.UseGuards)(roles_guard_1.RolesGuard),
-    (0, roles_decorator_1.Roles)('admin'),
     (0, common_1.Get)(':id'),
     __param(0, (0, common_1.Param)('id', common_1.ParseIntPipe)),
     __metadata("design:type", Function),
@@ -82,8 +78,6 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], AdminsController.prototype, "findOne", null);
 __decorate([
-    (0, common_1.UseGuards)(roles_guard_1.RolesGuard),
-    (0, roles_decorator_1.Roles)('admin'),
     (0, common_1.Put)(':id'),
     __param(0, (0, common_1.Param)('id', common_1.ParseIntPipe)),
     __param(1, (0, common_1.Body)()),
@@ -92,17 +86,27 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], AdminsController.prototype, "update", null);
 __decorate([
-    (0, common_1.UseGuards)(roles_guard_1.RolesGuard),
-    (0, roles_decorator_1.Roles)('admin'),
-    (0, common_1.Delete)(':id'),
+    (0, common_1.Patch)(':id/active'),
     __param(0, (0, common_1.Param)('id', common_1.ParseIntPipe)),
+    __param(1, (0, common_1.Body)()),
+    __param(2, (0, common_1.Request)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Number]),
+    __metadata("design:paramtypes", [Number, set_admin_active_dto_1.SetAdminActiveDto, Object]),
     __metadata("design:returntype", Promise)
-], AdminsController.prototype, "remove", null);
+], AdminsController.prototype, "setActive", null);
+__decorate([
+    (0, common_1.Patch)(':id/password'),
+    __param(0, (0, common_1.Param)('id', common_1.ParseIntPipe)),
+    __param(1, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Number, set_admin_password_dto_1.SetAdminPasswordDto]),
+    __metadata("design:returntype", Promise)
+], AdminsController.prototype, "setPassword", null);
 exports.AdminsController = AdminsController = __decorate([
     (0, common_1.Controller)('admins'),
-    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),
+    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard, roles_guard_1.RolesGuard),
+    (0, roles_decorator_1.Roles)('admin'),
+    (0, common_1.UsePipes)(new common_1.ValidationPipe({ whitelist: true, transform: true })),
     __metadata("design:paramtypes", [admins_service_1.AdminsService])
 ], AdminsController);
 //# sourceMappingURL=admins.controller.js.map

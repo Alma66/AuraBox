@@ -4,7 +4,7 @@ import { UpdateClubSocialNetworkDto } from './dto/update-club-social-network.dto
 export declare class ClubSocialNetworksController {
     private readonly svc;
     constructor(svc: ClubSocialNetworksService);
-    create(dto: CreateClubSocialNetworkDto): Promise<{
+    create(dto: CreateClubSocialNetworkDto, req: any): Promise<{
         id: number;
         idClub: number;
         networkType: string;
@@ -28,13 +28,13 @@ export declare class ClubSocialNetworksController {
         networkType: string;
         profileUrl: string;
     }>;
-    update(id: number, dto: UpdateClubSocialNetworkDto): Promise<{
+    update(id: number, dto: UpdateClubSocialNetworkDto, req: any): Promise<{
         id: number;
         idClub: number;
         networkType: string;
         profileUrl: string;
     }>;
-    remove(id: number): Promise<{
+    remove(id: number, req: any): Promise<{
         message: string;
     }>;
 }

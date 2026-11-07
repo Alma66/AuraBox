@@ -39,30 +39,32 @@ __decorate([
 ], CreateUserSubscriptionDto.prototype, "idPaymentMethods", void 0);
 __decorate([
     (0, class_validator_1.IsOptional)(),
-    (0, class_validator_1.IsDateString)(),
-    (0, class_transformer_1.Transform)(({ value }) => (value ? new Date(value) : undefined)),
+    (0, class_transformer_1.Type)(() => Date),
+    (0, class_validator_1.IsDate)(),
     __metadata("design:type", Date)
 ], CreateUserSubscriptionDto.prototype, "startDate", void 0);
 __decorate([
     (0, class_validator_1.IsOptional)(),
-    (0, class_validator_1.IsDateString)(),
-    (0, class_transformer_1.Transform)(({ value }) => (value ? new Date(value) : undefined)),
+    (0, class_transformer_1.Type)(() => Date),
+    (0, class_validator_1.IsDate)(),
     __metadata("design:type", Date)
 ], CreateUserSubscriptionDto.prototype, "expectedEndDate", void 0);
 __decorate([
     (0, class_validator_1.IsOptional)(),
     (0, class_transformer_1.Transform)(({ value }) => (value === null || value === undefined ? value : String(value))),
+    (0, class_validator_1.IsNumberString)(),
     __metadata("design:type", String)
 ], CreateUserSubscriptionDto.prototype, "monthlyAmountPaid", void 0);
 __decorate([
     (0, class_validator_1.IsOptional)(),
     (0, class_validator_1.IsString)(),
+    (0, class_validator_1.MaxLength)(500),
     __metadata("design:type", String)
 ], CreateUserSubscriptionDto.prototype, "cancellationReason", void 0);
 __decorate([
     (0, class_validator_1.IsOptional)(),
-    (0, class_validator_1.IsDateString)(),
-    (0, class_transformer_1.Transform)(({ value }) => (value ? new Date(value) : undefined)),
+    (0, class_transformer_1.Type)(() => Date),
+    (0, class_validator_1.IsDate)(),
     __metadata("design:type", Date)
 ], CreateUserSubscriptionDto.prototype, "cancellationDate", void 0);
 //# sourceMappingURL=create-user-subscription.dto.js.map

@@ -17,13 +17,23 @@ let ClubCategoriesService = class ClubCategoriesService {
     constructor(prisma) {
         this.prisma = prisma;
     }
-    async create(dto) {
+    async assertClubAccess(idClub, user) {
+        if (user.role === 'admin')
+            return;
+        const assoc = await this.prisma.entrepreneur_Club.findFirst({
+            where: { idClub, idEntrepreneurs: user.id },
+        });
+        if (!assoc)
+            throw new common_1.ForbiddenException('No tenés acceso a este club');
+    }
+    async create(dto, user) {
         const category = await this.prisma.categories.findUnique({ where: { id: dto.idCategories } });
         if (!category)
             throw new common_1.NotFoundException('Categoría no encontrada');
         const club = await this.prisma.club.findUnique({ where: { id: dto.idClub } });
         if (!club)
             throw new common_1.NotFoundException('Club no encontrado');
+        await this.assertClubAccess(dto.idClub, user);
         const exists = await this.prisma.club_Categories.findFirst({
             where: { idCategories: dto.idCategories, idClub: dto.idClub },
         });

@@ -9,4 +9,12 @@ export declare class CreateBoxContentHistoryDto {
     productVideoUrl?: string;
     additionalNotes?: string;
     publicationDate?: string;
+    ageRestriction?: boolean;
+    originLocation?: string;
+    containsAllergens?: boolean;
+    allergensDetail?: string;
+    isDangerousItem?: boolean;
+    dangerDetail?: string;
+    requiresCleaning?: boolean;
+    cleaningInstructions?: string;
 }

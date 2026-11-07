@@ -6,12 +6,12 @@ export declare class RiderProfileController {
     constructor(svc: RiderProfileService);
     create(dto: CreateRiderProfileDto, req: any): Promise<any>;
     findAll(): Promise<any[]>;
-    findByClub(idClub: number): Promise<{
+    findByClub(idClub: number, req: any): Promise<{
         id: number;
         firstName: string;
         lastName: string;
         email: string;
-        phoneNumber: number | null;
+        phoneNumber: string | null;
         vehicleType: import("@prisma/client").$Enums.VehicleType | null;
         licensePlate: string | null;
         availability: boolean;
@@ -22,8 +22,8 @@ export declare class RiderProfileController {
         currentAssignments: number;
     }[]>;
     findByEntrepreneur(idEntrepreneur: number, req: any): Promise<any>;
-    findOne(id: number): Promise<any>;
-    update(id: number, dto: UpdateRiderProfileDto): Promise<any>;
+    findOne(id: number, req: any): Promise<any>;
+    update(id: number, dto: UpdateRiderProfileDto, req: any): Promise<any>;
     remove(id: number): Promise<{
         message: string;
     }>;

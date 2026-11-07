@@ -7,94 +7,100 @@ import { CreateProductInventoryDto } from './dto/create-product-inventory.dto';
 import { UpdateProductInventoryDto } from './dto/update-product-inventory.dto';
 import { CreateSupplyOrderDto } from './dto/create-supply-order.dto';
 import { UpdateSupplyOrderDto } from './dto/update-supply-order.dto';
+type RequestUser = {
+    id: number;
+    role: string;
+};
 export declare class InventoryService {
     private readonly prisma;
     constructor(prisma: PrismaService);
-    createCategory(dto: CreateSupplyCategoryDto): Promise<{
+    private assertClubAccess;
+    createCategory(dto: CreateSupplyCategoryDto, user: RequestUser): Promise<{
+        id: number;
         name: string;
         description: string | null;
-        createdAt: Date;
-        id: number;
         idClub: number;
+        createdAt: Date;
     }>;
-    findCategoriesByClub(idClub: number): Promise<{
+    findCategoriesByClub(idClub: number, user: RequestUser): Promise<{
+        id: number;
         name: string;
         description: string | null;
-        createdAt: Date;
-        id: number;
         idClub: number;
+        createdAt: Date;
     }[]>;
-    updateCategory(id: number, dto: UpdateSupplyCategoryDto): Promise<{
+    updateCategory(id: number, dto: UpdateSupplyCategoryDto, user: RequestUser): Promise<{
+        id: number;
         name: string;
         description: string | null;
-        createdAt: Date;
-        id: number;
         idClub: number;
+        createdAt: Date;
     }>;
-    removeCategory(id: number): Promise<{
+    removeCategory(id: number, user: RequestUser): Promise<{
         message: string;
     }>;
-    createSupplier(dto: CreateSupplierDto): Promise<{
+    createSupplier(dto: CreateSupplierDto, user: RequestUser): Promise<{
         categoryIds: number[];
-        name: string;
-        createdAt: Date;
         id: number;
-        active: boolean;
-        notes: string | null;
-        contactEmail: string | null;
+        name: string;
         idClub: number;
-        contactPhone: string | null;
+        contactEmail: string | null;
+        active: boolean;
+        createdAt: Date;
+        notes: string | null;
         address: string | null;
+        contactPhone: string | null;
     }>;
-    findSuppliersByClub(idClub: number): Promise<{
+    findSuppliersByClub(idClub: number, user: RequestUser): Promise<{
         categoryIds: number[];
-        name: string;
-        createdAt: Date;
         id: number;
-        active: boolean;
-        notes: string | null;
-        contactEmail: string | null;
+        name: string;
         idClub: number;
-        contactPhone: string | null;
+        contactEmail: string | null;
+        active: boolean;
+        createdAt: Date;
+        notes: string | null;
         address: string | null;
+        contactPhone: string | null;
     }[]>;
     findSupplierById(id: number): Promise<{
         categoryIds: number[];
-        name: string;
-        createdAt: Date;
         id: number;
-        active: boolean;
-        notes: string | null;
-        contactEmail: string | null;
+        name: string;
         idClub: number;
-        contactPhone: string | null;
+        contactEmail: string | null;
+        active: boolean;
+        createdAt: Date;
+        notes: string | null;
         address: string | null;
+        contactPhone: string | null;
     }>;
-    updateSupplier(id: number, dto: UpdateSupplierDto): Promise<{
+    updateSupplier(id: number, dto: UpdateSupplierDto, user: RequestUser): Promise<{
         categoryIds: number[];
-        name: string;
-        createdAt: Date;
         id: number;
-        active: boolean;
-        notes: string | null;
-        contactEmail: string | null;
+        name: string;
         idClub: number;
-        contactPhone: string | null;
+        contactEmail: string | null;
+        active: boolean;
+        createdAt: Date;
+        notes: string | null;
         address: string | null;
+        contactPhone: string | null;
     }>;
-    removeSupplier(id: number): Promise<{
+    removeSupplier(id: number, user: RequestUser): Promise<{
         message: string;
     }>;
-    createProduct(dto: CreateProductInventoryDto): Promise<any>;
-    findProductsByClub(idClub: number): Promise<any[]>;
-    updateProduct(id: number, dto: UpdateProductInventoryDto): Promise<any>;
-    removeProduct(id: number): Promise<{
+    createProduct(dto: CreateProductInventoryDto, user: RequestUser): Promise<any>;
+    findProductsByClub(idClub: number, user: RequestUser): Promise<any[]>;
+    updateProduct(id: number, dto: UpdateProductInventoryDto, user: RequestUser): Promise<any>;
+    removeProduct(id: number, user: RequestUser): Promise<{
         message: string;
     }>;
-    createOrder(dto: CreateSupplyOrderDto): Promise<any>;
-    findOrdersByClub(idClub: number): Promise<any[]>;
-    updateOrder(id: number, dto: UpdateSupplyOrderDto): Promise<any>;
-    removeOrder(id: number): Promise<{
+    createOrder(dto: CreateSupplyOrderDto, user: RequestUser): Promise<any>;
+    findOrdersByClub(idClub: number, user: RequestUser): Promise<any[]>;
+    updateOrder(id: number, dto: UpdateSupplyOrderDto, user: RequestUser): Promise<any>;
+    removeOrder(id: number, user: RequestUser): Promise<{
         message: string;
     }>;
 }
+export {};

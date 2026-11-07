@@ -10,8 +10,8 @@ export declare class ClubsController {
     private readonly riderProfileService;
     constructor(clubsService: ClubsService, shipmentsService: ShipmentsService, riderProfileService: RiderProfileService);
     create(dto: CreateClubDto): Promise<{
-        name: string;
         id: number;
+        name: string;
         logoUrl: string;
         slogan: string | null;
         history: string | null;
@@ -26,20 +26,23 @@ export declare class ClubsController {
         milestones: string | null;
         shippingWindowStartDay: number | null;
         shippingWindowEndDay: number | null;
+        bankHolder: string | null;
+        bankCbu: string | null;
+        bankAlias: string | null;
     }>;
     findAll(search?: string, category?: string, minRating?: string, minReviews?: string): Promise<any[]>;
     findFeatured(): Promise<any[]>;
+    getRecommendations(req: any): Promise<any[]>;
     findOne(id: number, req: any): Promise<any>;
     getClubSubscriptions(id: number, req: any): Promise<any[]>;
     getClubCustomers(id: number, req: any): Promise<{
-        registrationDate: string;
-        birthDate: string | null;
         id: number;
         firstName: string;
         lastName: string;
         email: string;
         active: boolean;
-        phoneNumber: number | null;
+        registrationDate: string;
+        phoneNumber: string | null;
         streetAddress: string | null;
         addressNumber: number | null;
         floorNumber: string | null;
@@ -54,7 +57,7 @@ export declare class ClubsController {
         firstName: string;
         lastName: string;
         email: string;
-        phoneNumber: number | null;
+        phoneNumber: string | null;
         vehicleType: import("@prisma/client").$Enums.VehicleType | null;
         licensePlate: string | null;
         availability: boolean;

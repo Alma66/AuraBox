@@ -1,10 +1,15 @@
 import { PrismaService } from '../../prisma/prisma.service';
 import { CreateClubCategoryDto } from './dto/create-club-category.dto';
 import { UpdateClubCategoryDto } from './dto/update-club-category.dto';
+type RequestUser = {
+    id: number;
+    role: string;
+};
 export declare class ClubCategoriesService {
     private readonly prisma;
     constructor(prisma: PrismaService);
-    create(dto: CreateClubCategoryDto): Promise<{
+    private assertClubAccess;
+    create(dto: CreateClubCategoryDto, user: RequestUser): Promise<{
         id: number;
         idCategories: number;
         idClub: number;
@@ -38,3 +43,4 @@ export declare class ClubCategoriesService {
         message: string;
     }>;
 }
+export {};

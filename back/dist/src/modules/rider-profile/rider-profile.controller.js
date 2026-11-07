@@ -34,7 +34,8 @@ let RiderProfileController = class RiderProfileController {
     async findAll() {
         return this.svc.findAll();
     }
-    async findByClub(idClub) {
+    async findByClub(idClub, req) {
+        await this.svc.assertClubAccess(idClub, req.user);
         return this.svc.findByClub(idClub);
     }
     async findByEntrepreneur(idEntrepreneur, req) {
@@ -43,11 +44,11 @@ let RiderProfileController = class RiderProfileController {
         }
         return this.svc.findByEntrepreneur(idEntrepreneur);
     }
-    async findOne(id) {
-        return this.svc.findOne(id);
+    async findOne(id, req) {
+        return this.svc.findOneForRequester(id, req.user);
     }
-    async update(id, dto) {
-        return this.svc.update(id, dto);
+    async update(id, dto, req) {
+        return this.svc.updateForRequester(id, dto, req.user);
     }
     async remove(id) {
         return this.svc.remove(id);
@@ -55,8 +56,6 @@ let RiderProfileController = class RiderProfileController {
 };
 exports.RiderProfileController = RiderProfileController;
 __decorate([
-    (0, common_1.UseGuards)(roles_guard_1.RolesGuard),
-    (0, roles_decorator_1.Roles)('entrepreneur', 'admin'),
     (0, common_1.Post)(),
     (0, common_1.UsePipes)(new common_1.ValidationPipe({ whitelist: true, transform: true })),
     __param(0, (0, common_1.Body)()),
@@ -66,7 +65,6 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], RiderProfileController.prototype, "create", null);
 __decorate([
-    (0, common_1.UseGuards)(roles_guard_1.RolesGuard),
     (0, roles_decorator_1.Roles)('admin'),
     (0, common_1.Get)(),
     __metadata("design:type", Function),
@@ -74,12 +72,11 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], RiderProfileController.prototype, "findAll", null);
 __decorate([
-    (0, common_1.UseGuards)(roles_guard_1.RolesGuard),
-    (0, roles_decorator_1.Roles)('entrepreneur', 'admin'),
     (0, common_1.Get)('by-club/:idClub'),
     __param(0, (0, common_1.Param)('idClub', common_1.ParseIntPipe)),
+    __param(1, (0, common_1.Request)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Number]),
+    __metadata("design:paramtypes", [Number, Object]),
     __metadata("design:returntype", Promise)
 ], RiderProfileController.prototype, "findByClub", null);
 __decorate([
@@ -93,23 +90,22 @@ __decorate([
 __decorate([
     (0, common_1.Get)(':id'),
     __param(0, (0, common_1.Param)('id', common_1.ParseIntPipe)),
+    __param(1, (0, common_1.Request)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Number]),
+    __metadata("design:paramtypes", [Number, Object]),
     __metadata("design:returntype", Promise)
 ], RiderProfileController.prototype, "findOne", null);
 __decorate([
-    (0, common_1.UseGuards)(roles_guard_1.RolesGuard),
-    (0, roles_decorator_1.Roles)('entrepreneur', 'admin'),
     (0, common_1.Put)(':id'),
     (0, common_1.UsePipes)(new common_1.ValidationPipe({ whitelist: true, transform: true })),
     __param(0, (0, common_1.Param)('id', common_1.ParseIntPipe)),
     __param(1, (0, common_1.Body)()),
+    __param(2, (0, common_1.Request)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Number, update_rider_profile_dto_1.UpdateRiderProfileDto]),
+    __metadata("design:paramtypes", [Number, update_rider_profile_dto_1.UpdateRiderProfileDto, Object]),
     __metadata("design:returntype", Promise)
 ], RiderProfileController.prototype, "update", null);
 __decorate([
-    (0, common_1.UseGuards)(roles_guard_1.RolesGuard),
     (0, roles_decorator_1.Roles)('admin'),
     (0, common_1.Delete)(':id'),
     __param(0, (0, common_1.Param)('id', common_1.ParseIntPipe)),
@@ -119,7 +115,8 @@ __decorate([
 ], RiderProfileController.prototype, "remove", null);
 exports.RiderProfileController = RiderProfileController = __decorate([
     (0, common_1.Controller)('rider-profile'),
-    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),
+    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard, roles_guard_1.RolesGuard),
+    (0, roles_decorator_1.Roles)('entrepreneur', 'admin'),
     __metadata("design:paramtypes", [rider_profile_service_1.RiderProfileService])
 ], RiderProfileController);
 //# sourceMappingURL=rider-profile.controller.js.map

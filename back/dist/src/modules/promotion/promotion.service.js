@@ -34,10 +34,20 @@ let PromotionService = class PromotionService {
     constructor(prisma) {
         this.prisma = prisma;
     }
-    async create(dto, createdBy) {
+    async assertClubAccess(idClub, user) {
+        if (user.role === 'admin')
+            return;
+        const assoc = await this.prisma.entrepreneur_Club.findFirst({
+            where: { idClub, idEntrepreneurs: user.id },
+        });
+        if (!assoc)
+            throw new common_1.ForbiddenException('No tenés acceso a este club');
+    }
+    async create(dto, user) {
         const club = await this.prisma.club.findUnique({ where: { id: dto.idClub } });
         if (!club)
             throw new common_1.NotFoundException('Club no encontrado');
+        await this.assertClubAccess(dto.idClub, user);
         const created = await this.prisma.promotion.create({
             data: {
                 idClub: dto.idClub,
@@ -54,49 +64,56 @@ let PromotionService = class PromotionService {
                 startDate: dto.startDate ? new Date(dto.startDate) : null,
                 endDate: dto.endDate ? new Date(dto.endDate) : null,
                 active: dto.active ?? true,
-                createdBy: createdBy ?? null,
+                createdBy: user.id,
             },
         });
         return sanitize(created);
     }
-    async findByClub(idClub) {
+    async findByClub(idClub, user) {
+        await this.assertClubAccess(idClub, user);
         const promos = await this.prisma.promotion.findMany({
             where: { idClub },
             orderBy: { createdAt: 'desc' },
         });
         return promos.map(sanitize);
     }
-    async findOne(id) {
+    async findOne(id, user) {
         const promo = await this.prisma.promotion.findUnique({ where: { id } });
         if (!promo)
             throw new common_1.NotFoundException('Promoción no encontrada');
+        await this.assertClubAccess(promo.idClub, user);
         return sanitize(promo);
     }
-    async update(id, dto) {
+    async update(id, dto, user) {
         const existing = await this.prisma.promotion.findUnique({ where: { id } });
         if (!existing)
             throw new common_1.NotFoundException('Promoción no encontrada');
+        await this.assertClubAccess(existing.idClub, user);
+        const targetIdClub = user.role === 'admin' && dto.idClub ? dto.idClub : existing.idClub;
         const updated = await this.prisma.promotion.update({
             where: { id },
             data: {
                 ...dto,
+                idClub: targetIdClub,
                 startDate: dto.startDate ? new Date(dto.startDate) : existing.startDate,
                 endDate: dto.endDate ? new Date(dto.endDate) : existing.endDate,
             },
         });
         return sanitize(updated);
     }
-    async toggleActive(id, active) {
+    async toggleActive(id, active, user) {
         const existing = await this.prisma.promotion.findUnique({ where: { id } });
         if (!existing)
             throw new common_1.NotFoundException('Promoción no encontrada');
+        await this.assertClubAccess(existing.idClub, user);
         const updated = await this.prisma.promotion.update({ where: { id }, data: { active } });
         return sanitize(updated);
     }
-    async remove(id) {
+    async remove(id, user) {
         const existing = await this.prisma.promotion.findUnique({ where: { id } });
         if (!existing)
             throw new common_1.NotFoundException('Promoción no encontrada');
+        await this.assertClubAccess(existing.idClub, user);
         await this.prisma.promotion.delete({ where: { id } });
         return { message: 'Promoción eliminada correctamente' };
     }

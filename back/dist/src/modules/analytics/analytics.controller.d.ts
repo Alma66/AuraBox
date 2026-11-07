@@ -1,8 +1,11 @@
 import { AnalyticsService } from './analytics.service';
+import { PrismaService } from '../../prisma/prisma.service';
 export declare class AnalyticsController {
     private readonly analyticsService;
-    constructor(analyticsService: AnalyticsService);
-    getClubStats(idClub: number): Promise<{
+    private readonly prisma;
+    constructor(analyticsService: AnalyticsService, prisma: PrismaService);
+    private assertClubAccess;
+    getClubStats(idClub: number, req: any): Promise<{
         activeSubscribers: number;
         newThisMonth: number;
         cancelledThisMonth: number;
@@ -28,7 +31,7 @@ export declare class AnalyticsController {
             activeCount: number;
         }[];
     }>;
-    getSalesReport(idClub: number, from?: string, to?: string, idSubscriptionTypes?: string, paymentStatus?: string, idPaymentMethods?: string, page?: string, pageSize?: string): Promise<{
+    getSalesReport(idClub: number, req: any, from?: string, to?: string, idSubscriptionTypes?: string, paymentStatus?: string, idPaymentMethods?: string, page?: string, pageSize?: string): Promise<{
         totalRevenue: string;
         successfulPaymentsCount: number;
         avgTicket: string;
@@ -59,7 +62,7 @@ export declare class AnalyticsController {
         }[];
         totalCount: number;
     }>;
-    getSalesReportExport(idClub: number, from?: string, to?: string, idSubscriptionTypes?: string, paymentStatus?: string, idPaymentMethods?: string): Promise<{
+    getSalesReportExport(idClub: number, req: any, from?: string, to?: string, idSubscriptionTypes?: string, paymentStatus?: string, idPaymentMethods?: string): Promise<{
         id: number;
         fecha: string | null;
         idUsuario: number;
@@ -71,7 +74,7 @@ export declare class AnalyticsController {
         estado: import("@prisma/client").$Enums.PaymentStatus;
         transaccion: string;
     }[]>;
-    getFeedbackTrends(idClub: number): Promise<{
+    getFeedbackTrends(idClub: number, req: any): Promise<{
         ratingEvolution: {
             month: string;
             avgRating: number;

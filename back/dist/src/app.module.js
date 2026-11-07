@@ -10,16 +10,24 @@ exports.AppModule = void 0;
 const common_1 = require("@nestjs/common");
 const core_1 = require("@nestjs/core");
 const jwt_1 = require("@nestjs/jwt");
+const throttler_1 = require("@nestjs/throttler");
+const common_2 = require("@nestjs/common");
 const app_controller_1 = require("./app.controller");
 const app_service_1 = require("./app.service");
+const admin_panel_module_1 = require("./modules/admin-panel/admin-panel.module");
 const config_1 = require("@nestjs/config");
 const cloudinary_module_1 = require("./modules/cloudinary/cloudinary.module");
 const prisma_module_1 = require("./prisma/prisma.module");
+const newsletter_module_1 = require("./modules/newsletter/newsletter.module");
+const user_category_preferences_module_1 = require("./modules/user-category-preferences/user-category-preferences.module");
+const cart_item_module_1 = require("./modules/cart-item/cart-item.module");
 const analytics_module_1 = require("./modules/analytics/analytics.module");
 const admin_or_entrepreneur_role_module_1 = require("./modules/admin-or-entrepreneur-role/admin-or-entrepreneur-role.module");
 const admins_module_1 = require("./modules/admins/admins.module");
 const auth_module_1 = require("./modules/auth/auth.module");
 const box_content_history_module_1 = require("./modules/box-content-history/box-content-history.module");
+const club_billing_module_1 = require("./modules/club-billing/club-billing.module");
+const billing_module_1 = require("./modules/billing/billing.module");
 const categories_module_1 = require("./modules/categories/categories.module");
 const club_categories_module_1 = require("./modules/club-categories/club-categories.module");
 const club_payment_method_module_1 = require("./modules/club-payment-method/club-payment-method.module");
@@ -51,9 +59,14 @@ const promotion_module_1 = require("./modules/promotion/promotion.module");
 const support_module_1 = require("./modules/support/support.module");
 const inventory_module_1 = require("./modules/inventory/inventory.module");
 const finance_module_1 = require("./modules/finance/finance.module");
+const club_legal_content_module_1 = require("./modules/club-legal-content/club-legal-content.module");
 const jwt_auth_guard_1 = require("./common/guards/jwt-auth.guard");
 const transform_interceptor_1 = require("./common/interceptors/transform.interceptor");
 const all_exceptions_filter_1 = require("./common/filters/all-exceptions.filter");
+const jwtSecret = process.env.JWT_SECRET;
+if (!jwtSecret) {
+    throw new Error('JWT_SECRET environment variable is required');
+}
 let AppModule = class AppModule {
 };
 exports.AppModule = AppModule;
@@ -65,14 +78,20 @@ exports.AppModule = AppModule = __decorate([
             cloudinary_module_1.CloudinaryModule,
             jwt_1.JwtModule.register({
                 global: true,
-                secret: process.env.JWT_SECRET || 'superSecretDevKey',
-                signOptions: { expiresIn: '7d' },
+                secret: jwtSecret,
+                signOptions: { expiresIn: '2h' },
+            }),
+            throttler_1.ThrottlerModule.forRoot({
+                throttlers: [{ ttl: 60000, limit: 30 }],
             }),
             analytics_module_1.AnalyticsModule,
             admin_or_entrepreneur_role_module_1.AdminOrEntrepreneurRoleModule,
+            admin_panel_module_1.AdminPanelModule,
             admins_module_1.AdminsModule,
             auth_module_1.AuthModule,
             box_content_history_module_1.BoxContentHistoryModule,
+            billing_module_1.BillingModule,
+            club_billing_module_1.ClubBillingModule,
             categories_module_1.CategoriesModule,
             club_categories_module_1.ClubCategoriesModule,
             club_payment_method_module_1.ClubPaymentMethodModule,
@@ -104,6 +123,10 @@ exports.AppModule = AppModule = __decorate([
             support_module_1.SupportModule,
             inventory_module_1.InventoryModule,
             finance_module_1.FinanceModule,
+            cart_item_module_1.CartItemModule,
+            user_category_preferences_module_1.UserCategoryPreferencesModule,
+            club_legal_content_module_1.ClubLegalContentModule,
+            newsletter_module_1.NewsletterModule,
         ],
         controllers: [app_controller_1.AppController],
         providers: [
@@ -111,11 +134,15 @@ exports.AppModule = AppModule = __decorate([
             core_1.Reflector,
             {
                 provide: core_1.APP_GUARD,
+                useClass: throttler_1.ThrottlerGuard,
+            },
+            {
+                provide: core_1.APP_GUARD,
                 useClass: jwt_auth_guard_1.JwtAuthGuard,
             },
             {
                 provide: core_1.APP_PIPE,
-                useFactory: () => new common_1.ValidationPipe({
+                useFactory: () => new common_2.ValidationPipe({
                     whitelist: true,
                     forbidNonWhitelisted: true,
                     transform: true,

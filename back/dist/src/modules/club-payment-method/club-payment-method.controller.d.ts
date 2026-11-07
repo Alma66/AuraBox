@@ -4,7 +4,7 @@ import { UpdateClubPaymentMethodDto } from './dto/update-club-payment-method.dto
 export declare class ClubPaymentMethodController {
     private readonly svc;
     constructor(svc: ClubPaymentMethodService);
-    create(dto: CreateClubPaymentMethodDto): Promise<{
+    create(dto: CreateClubPaymentMethodDto, req: any): Promise<{
         id: number;
         idClub: number;
         idPaymentMethod: number;
@@ -34,7 +34,7 @@ export declare class ClubPaymentMethodController {
         idClub: number;
         idPaymentMethod: number;
     }>;
-    remove(id: number): Promise<{
+    remove(id: number, req: any): Promise<{
         message: string;
     }>;
 }

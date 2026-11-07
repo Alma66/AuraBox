@@ -25,8 +25,8 @@ let ClubPaymentMethodController = class ClubPaymentMethodController {
     constructor(svc) {
         this.svc = svc;
     }
-    async create(dto) {
-        return this.svc.create(dto);
+    async create(dto, req) {
+        return this.svc.create(dto, req.user);
     }
     async findAll() {
         return this.svc.findAll();
@@ -43,8 +43,8 @@ let ClubPaymentMethodController = class ClubPaymentMethodController {
     async update(id, dto) {
         return this.svc.update(id, dto);
     }
-    async remove(id) {
-        return this.svc.remove(id);
+    async remove(id, req) {
+        return this.svc.remove(id, req.user);
     }
 };
 exports.ClubPaymentMethodController = ClubPaymentMethodController;
@@ -54,8 +54,9 @@ __decorate([
     (0, common_1.Post)(),
     (0, common_1.UsePipes)(new common_1.ValidationPipe({ whitelist: true, transform: true })),
     __param(0, (0, common_1.Body)()),
+    __param(1, (0, common_1.Request)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [create_club_payment_method_dto_1.CreateClubPaymentMethodDto]),
+    __metadata("design:paramtypes", [create_club_payment_method_dto_1.CreateClubPaymentMethodDto, Object]),
     __metadata("design:returntype", Promise)
 ], ClubPaymentMethodController.prototype, "create", null);
 __decorate([
@@ -103,8 +104,9 @@ __decorate([
     (0, roles_decorator_1.Roles)('entrepreneur', 'admin'),
     (0, common_1.Delete)(':id'),
     __param(0, (0, common_1.Param)('id', common_1.ParseIntPipe)),
+    __param(1, (0, common_1.Request)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Number]),
+    __metadata("design:paramtypes", [Number, Object]),
     __metadata("design:returntype", Promise)
 ], ClubPaymentMethodController.prototype, "remove", null);
 exports.ClubPaymentMethodController = ClubPaymentMethodController = __decorate([

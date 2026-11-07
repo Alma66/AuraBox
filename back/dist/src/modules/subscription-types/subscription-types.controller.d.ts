@@ -4,8 +4,8 @@ import { UpdateSubscriptionTypeDto } from './dto/update-subscription-types.dto';
 export declare class SubscriptionTypesController {
     private readonly svc;
     constructor(svc: SubscriptionTypesService);
-    findAll(clubId?: string): Promise<any[]>;
-    findOne(id: number): Promise<any>;
+    findAll(req: any, clubId?: string): Promise<any[]>;
+    findOne(id: number, req: any): Promise<any>;
     create(dto: CreateSubscriptionTypeDto, req: any): Promise<any>;
     update(id: number, dto: UpdateSubscriptionTypeDto, req: any): Promise<any>;
     updateImage(id: number, file: Express.Multer.File, req: any): Promise<{

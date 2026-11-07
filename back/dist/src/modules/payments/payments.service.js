@@ -12,7 +12,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.PaymentsService = void 0;
 const common_1 = require("@nestjs/common");
 const prisma_service_1 = require("../../prisma/prisma.service");
-const AURABOX_COMMISSION = 200;
+const payments_constants_1 = require("./payments.constants");
 function sanitize(payment) {
     if (!payment)
         return payment;
@@ -33,23 +33,42 @@ let PaymentsService = class PaymentsService {
     constructor(prisma) {
         this.prisma = prisma;
     }
+    async assertClubAccess(idClub, user) {
+        if (user.role === 'admin')
+            return;
+        const assoc = await this.prisma.entrepreneur_Club.findFirst({
+            where: { idClub, idEntrepreneurs: user.id },
+        });
+        if (!assoc)
+            throw new common_1.ForbiddenException('No tenés acceso a este club');
+    }
     async create(dto) {
         const sub = await this.prisma.user_Subscriptions.findUnique({ where: { id: dto.idUserSubscription } });
         if (!sub)
             throw new common_1.NotFoundException('Suscripción no encontrada');
+        if (sub.idUser !== dto.idUser) {
+            throw new common_1.BadRequestException('La suscripción no pertenece al usuario indicado');
+        }
         const user = await this.prisma.user.findUnique({ where: { id: dto.idUser } });
         if (!user)
             throw new common_1.NotFoundException('Usuario no encontrado');
         const club = await this.prisma.club.findUnique({ where: { id: dto.idClub } });
         if (!club)
             throw new common_1.NotFoundException('Club no encontrado');
+        const subType = await this.prisma.subscription_Types.findUnique({ where: { id: sub.idSubscriptionTypes } });
+        if (!subType || subType.idClub !== dto.idClub) {
+            throw new common_1.BadRequestException('El club no coincide con el de la suscripción');
+        }
         if (dto.idPaymentMethods) {
             const pm = await this.prisma.payment_Methods.findUnique({ where: { id: dto.idPaymentMethods } });
             if (!pm)
                 throw new common_1.NotFoundException('Método de pago no encontrado');
         }
-        const totalAmountPaid = dto.totalAmountPaid !== undefined && dto.totalAmountPaid !== null ? Number(dto.totalAmountPaid) : 0;
-        const commissionAmount = AURABOX_COMMISSION;
+        const totalAmountPaid = Number(dto.totalAmountPaid);
+        if (!Number.isFinite(totalAmountPaid) || totalAmountPaid <= payments_constants_1.AURABOX_COMMISSION) {
+            throw new common_1.BadRequestException('El monto debe ser mayor a la comisión de la plataforma');
+        }
+        const commissionAmount = payments_constants_1.AURABOX_COMMISSION;
         const clubAmount = totalAmountPaid - commissionAmount;
         const data = {
             idUserSubscription: dto.idUserSubscription,
@@ -75,11 +94,19 @@ let PaymentsService = class PaymentsService {
         });
         return payments.map(sanitize);
     }
-    async findOne(id) {
+    async findOneForUser(id, user) {
         const payment = await this.prisma.payment.findUnique({ where: { id } });
         if (!payment)
             throw new common_1.NotFoundException('Pago no encontrado');
-        return sanitize(payment);
+        if (user.role === 'admin')
+            return sanitize(payment);
+        if (user.role === 'customer' && payment.idUser === user.id)
+            return sanitize(payment);
+        if (user.role === 'entrepreneur') {
+            await this.assertClubAccess(payment.idClub, user);
+            return sanitize(payment);
+        }
+        throw new common_1.ForbiddenException('No autorizado para ver este pago');
     }
     async findByUser(idUser) {
         const payments = await this.prisma.payment.findMany({
@@ -88,12 +115,21 @@ let PaymentsService = class PaymentsService {
         });
         return payments.map(sanitize);
     }
-    async findByClub(idClub) {
+    async findByClub(idClub, user) {
+        await this.assertClubAccess(idClub, user);
         const payments = await this.prisma.payment.findMany({
             where: { idClub },
             orderBy: { paymentDate: 'desc' },
         });
-        return payments.map(sanitize);
+        const methodIds = Array.from(new Set(payments.map((p) => p.idPaymentMethods).filter((id) => typeof id === 'number')));
+        const methods = methodIds.length
+            ? await this.prisma.payment_Methods.findMany({ where: { id: { in: methodIds } } })
+            : [];
+        const codeById = new Map(methods.map((m) => [m.id, (0, payments_constants_1.codeFromMethodName)(m.method)]));
+        return payments.map((p) => ({
+            ...sanitize(p),
+            paymentMethodCode: p.idPaymentMethods ? (codeById.get(p.idPaymentMethods) ?? null) : null,
+        }));
     }
     async update(id, dto) {
         const payment = await this.prisma.payment.findUnique({ where: { id } });
@@ -130,6 +166,37 @@ let PaymentsService = class PaymentsService {
             data,
         });
         return sanitize(updated);
+    }
+    async settle(id, action, user) {
+        const payment = await this.prisma.payment.findUnique({ where: { id } });
+        if (!payment)
+            throw new common_1.NotFoundException('Pago no encontrado');
+        await this.assertClubAccess(payment.idClub, user);
+        const method = payment.idPaymentMethods
+            ? await this.prisma.payment_Methods.findUnique({ where: { id: payment.idPaymentMethods } })
+            : null;
+        if (!method || (0, payments_constants_1.codeFromMethodName)(method.method) !== 'efectivo') {
+            throw new common_1.BadRequestException('Solo se pueden resolver desde acá los pagos en efectivo');
+        }
+        const now = new Date();
+        await this.prisma.$transaction(async (tx) => {
+            const updated = await tx.payment.updateMany({
+                where: { id, paymentStatus: 'Pendiente' },
+                data: action === 'confirm'
+                    ? { paymentStatus: 'Exitoso', paymentDate: now, idGatewayTransaction: `EFE-${now.getTime()}-${id}` }
+                    : { paymentStatus: 'Rechazado' },
+            });
+            if (updated.count !== 1)
+                throw new common_1.BadRequestException('Este pago ya fue resuelto');
+            if (action === 'confirm') {
+                await tx.user_Subscriptions.update({
+                    where: { id: payment.idUserSubscription },
+                    data: { lastPaymentDate: now, monthlyAmountPaid: payment.totalAmountPaid.toString() },
+                });
+            }
+        });
+        const refreshed = await this.prisma.payment.findUnique({ where: { id } });
+        return sanitize(refreshed);
     }
     async remove(id) {
         const payment = await this.prisma.payment.findUnique({ where: { id } });

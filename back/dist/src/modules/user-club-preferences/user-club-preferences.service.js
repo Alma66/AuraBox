@@ -24,6 +24,26 @@ let UserClubPreferencesService = class UserClubPreferencesService {
     constructor(prisma) {
         this.prisma = prisma;
     }
+    async assertClubAccess(idClub, user) {
+        if (user.role === 'admin')
+            return;
+        const assoc = await this.prisma.entrepreneur_Club.findFirst({
+            where: { idClub, idEntrepreneurs: user.id },
+        });
+        if (!assoc)
+            throw new common_1.ForbiddenException('No tenés acceso a este club');
+    }
+    async assertPreferenceAccess(item, user) {
+        if (user.role === 'admin')
+            return;
+        if (user.role === 'customer' && item.idUser === user.id)
+            return;
+        if (user.role === 'entrepreneur') {
+            await this.assertClubAccess(item.idClub, user);
+            return;
+        }
+        throw new common_1.ForbiddenException('No autorizado para acceder a esta preferencia');
+    }
     async create(dto) {
         const user = await this.prisma.user.findUnique({ where: { id: dto.idUser } });
         if (!user)
@@ -50,10 +70,11 @@ let UserClubPreferencesService = class UserClubPreferencesService {
         const preferences = await this.prisma.user_Club_Preferences.findMany({ orderBy: { updateDate: 'desc' } });
         return preferences.map(sanitize);
     }
-    async findOne(id) {
+    async findOne(id, user) {
         const item = await this.prisma.user_Club_Preferences.findUnique({ where: { id } });
         if (!item)
             throw new common_1.NotFoundException('Preferencia no encontrada');
+        await this.assertPreferenceAccess(item, user);
         return sanitize(item);
     }
     async findByUser(idUser) {
@@ -63,14 +84,19 @@ let UserClubPreferencesService = class UserClubPreferencesService {
         });
         return preferences.map(sanitize);
     }
-    async findByClub(idClub) {
+    async findByClub(idClub, user) {
+        await this.assertClubAccess(idClub, user);
         const preferences = await this.prisma.user_Club_Preferences.findMany({
             where: { idClub },
             orderBy: { updateDate: 'desc' },
         });
         return preferences.map(sanitize);
     }
-    async findBySubscriptionType(idSubscriptionTypes) {
+    async findBySubscriptionType(idSubscriptionTypes, user) {
+        const subType = await this.prisma.subscription_Types.findUnique({ where: { id: idSubscriptionTypes } });
+        if (!subType)
+            throw new common_1.NotFoundException('Tipo de suscripción no encontrado');
+        await this.assertClubAccess(subType.idClub, user);
         const preferences = await this.prisma.user_Club_Preferences.findMany({
             where: { idSubscriptionTypes },
             orderBy: { updateDate: 'desc' },
@@ -81,9 +107,7 @@ let UserClubPreferencesService = class UserClubPreferencesService {
         const item = await this.prisma.user_Club_Preferences.findUnique({ where: { id } });
         if (!item)
             throw new common_1.NotFoundException('Preferencia no encontrada');
-        if (user.role !== 'ADMIN' && user.id !== item.idUser) {
-            throw new common_1.ForbiddenException('No autorizado para modificar esta preferencia');
-        }
+        await this.assertPreferenceAccess(item, user);
         if (dto.idUser) {
             const u = await this.prisma.user.findUnique({ where: { id: dto.idUser } });
             if (!u)
@@ -112,9 +136,7 @@ let UserClubPreferencesService = class UserClubPreferencesService {
         const item = await this.prisma.user_Club_Preferences.findUnique({ where: { id } });
         if (!item)
             throw new common_1.NotFoundException('Preferencia no encontrada');
-        if (user.role !== 'ADMIN' && user.id !== item.idUser) {
-            throw new common_1.ForbiddenException('No autorizado para eliminar esta preferencia');
-        }
+        await this.assertPreferenceAccess(item, user);
         await this.prisma.user_Club_Preferences.delete({ where: { id } });
         return { message: 'Preferencia eliminada correctamente' };
     }

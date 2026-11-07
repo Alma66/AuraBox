@@ -27,6 +27,8 @@ __decorate([
 ], CreateAutoReplyDto.prototype, "idClub", void 0);
 __decorate([
     (0, class_validator_1.IsString)(),
+    (0, class_validator_1.IsNotEmpty)(),
+    (0, class_validator_1.MaxLength)(100),
     __metadata("design:type", String)
 ], CreateAutoReplyDto.prototype, "name", void 0);
 __decorate([
@@ -36,10 +38,13 @@ __decorate([
 __decorate([
     (0, class_validator_1.IsOptional)(),
     (0, class_validator_1.IsString)(),
+    (0, class_validator_1.MaxLength)(200),
     __metadata("design:type", String)
 ], CreateAutoReplyDto.prototype, "triggerValue", void 0);
 __decorate([
     (0, class_validator_1.IsString)(),
+    (0, class_validator_1.IsNotEmpty)(),
+    (0, class_validator_1.MaxLength)(1000),
     __metadata("design:type", String)
 ], CreateAutoReplyDto.prototype, "replyMessage", void 0);
 __decorate([

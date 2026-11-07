@@ -15,57 +15,45 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.BoxContentHistoryController = void 0;
 const common_1 = require("@nestjs/common");
 const platform_express_1 = require("@nestjs/platform-express");
-const multer_1 = require("multer");
 const box_content_history_service_1 = require("./box-content-history.service");
 const create_box_content_history_dto_1 = require("./dto/create-box-content-history.dto");
 const update_box_content_history_dto_1 = require("./dto/update-box-content-history.dto");
 const jwt_auth_guard_1 = require("../../common/guards/jwt-auth.guard");
 const roles_guard_1 = require("../auth/roles.guard");
 const roles_decorator_1 = require("../auth/roles.decorator");
+const image_upload_1 = require("../../common/utils/image-upload");
 let BoxContentHistoryController = class BoxContentHistoryController {
     svc;
     constructor(svc) {
         this.svc = svc;
     }
     async create(dto, req, image) {
-        return this.svc.create(dto, image);
+        return this.svc.create(dto, image, req.user.id, req.user.role);
     }
     async findAll(page, perPage) {
         return this.svc.findAll(page ? parseInt(page, 10) : 1, perPage ? parseInt(perPage, 10) : 50);
     }
-    async findBySubscriptionType(idSubscriptionTypes) {
-        return this.svc.findBySubscriptionType(idSubscriptionTypes);
+    async findBySubscriptionType(idSubscriptionTypes, req) {
+        return this.svc.findBySubscriptionType(idSubscriptionTypes, req.user);
     }
     async findByDeliveryMonth(deliveryMonthYear) {
         return this.svc.findByDeliveryMonth(deliveryMonthYear);
     }
-    async findOne(id) {
-        return this.svc.findOne(id);
+    async findOne(id, req) {
+        return this.svc.findOne(id, req.user);
     }
-    async update(id, dto) {
-        return this.svc.update(id, dto);
+    async update(id, dto, req) {
+        return this.svc.update(id, dto, req.user.id, req.user.role);
     }
-    async remove(id) {
-        return this.svc.remove(id);
+    async remove(id, req) {
+        return this.svc.remove(id, req.user.id, req.user.role);
     }
 };
 exports.BoxContentHistoryController = BoxContentHistoryController;
 __decorate([
-    (0, common_1.UseGuards)(roles_guard_1.RolesGuard),
     (0, roles_decorator_1.Roles)('entrepreneur', 'admin'),
     (0, common_1.Post)(),
-    (0, common_1.UseInterceptors)((0, platform_express_1.FileInterceptor)('image', {
-        storage: (0, multer_1.memoryStorage)(),
-        limits: { fileSize: 5 * 1024 * 1024 },
-        fileFilter: (req, file, callback) => {
-            if (!file.mimetype.match(/\/(jpg|jpeg|png|gif|webp)$/)) {
-                callback(new Error('Solo se permiten imágenes'), false);
-            }
-            else {
-                callback(null, true);
-            }
-        },
-    })),
+    (0, common_1.UseInterceptors)((0, platform_express_1.FileInterceptor)('image', image_upload_1.imageUploadOptions)),
     (0, common_1.UsePipes)(new common_1.ValidationPipe({ whitelist: true, transform: true })),
     __param(0, (0, common_1.Body)()),
     __param(1, (0, common_1.Request)()),
@@ -75,7 +63,6 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], BoxContentHistoryController.prototype, "create", null);
 __decorate([
-    (0, common_1.UseGuards)(roles_guard_1.RolesGuard),
     (0, roles_decorator_1.Roles)('admin'),
     (0, common_1.Get)(),
     __param(0, (0, common_1.Query)('page')),
@@ -85,13 +72,16 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], BoxContentHistoryController.prototype, "findAll", null);
 __decorate([
+    (0, roles_decorator_1.Roles)('customer', 'entrepreneur', 'admin'),
     (0, common_1.Get)('by-subscription-type/:idSubscriptionTypes'),
     __param(0, (0, common_1.Param)('idSubscriptionTypes', common_1.ParseIntPipe)),
+    __param(1, (0, common_1.Request)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Number]),
+    __metadata("design:paramtypes", [Number, Object]),
     __metadata("design:returntype", Promise)
 ], BoxContentHistoryController.prototype, "findBySubscriptionType", null);
 __decorate([
+    (0, roles_decorator_1.Roles)('admin'),
     (0, common_1.Get)('by-delivery-month/:deliveryMonthYear'),
     __param(0, (0, common_1.Param)('deliveryMonthYear')),
     __metadata("design:type", Function),
@@ -99,35 +89,37 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], BoxContentHistoryController.prototype, "findByDeliveryMonth", null);
 __decorate([
+    (0, roles_decorator_1.Roles)('customer', 'entrepreneur', 'admin'),
     (0, common_1.Get)(':id'),
     __param(0, (0, common_1.Param)('id', common_1.ParseIntPipe)),
+    __param(1, (0, common_1.Request)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Number]),
+    __metadata("design:paramtypes", [Number, Object]),
     __metadata("design:returntype", Promise)
 ], BoxContentHistoryController.prototype, "findOne", null);
 __decorate([
-    (0, common_1.UseGuards)(roles_guard_1.RolesGuard),
     (0, roles_decorator_1.Roles)('entrepreneur', 'admin'),
     (0, common_1.Put)(':id'),
     (0, common_1.UsePipes)(new common_1.ValidationPipe({ whitelist: true, transform: true })),
     __param(0, (0, common_1.Param)('id', common_1.ParseIntPipe)),
     __param(1, (0, common_1.Body)()),
+    __param(2, (0, common_1.Request)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Number, update_box_content_history_dto_1.UpdateBoxContentHistoryDto]),
+    __metadata("design:paramtypes", [Number, update_box_content_history_dto_1.UpdateBoxContentHistoryDto, Object]),
     __metadata("design:returntype", Promise)
 ], BoxContentHistoryController.prototype, "update", null);
 __decorate([
-    (0, common_1.UseGuards)(roles_guard_1.RolesGuard),
     (0, roles_decorator_1.Roles)('entrepreneur', 'admin'),
     (0, common_1.Delete)(':id'),
     __param(0, (0, common_1.Param)('id', common_1.ParseIntPipe)),
+    __param(1, (0, common_1.Request)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Number]),
+    __metadata("design:paramtypes", [Number, Object]),
     __metadata("design:returntype", Promise)
 ], BoxContentHistoryController.prototype, "remove", null);
 exports.BoxContentHistoryController = BoxContentHistoryController = __decorate([
     (0, common_1.Controller)('box-content-history'),
-    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),
+    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard, roles_guard_1.RolesGuard),
     __metadata("design:paramtypes", [box_content_history_service_1.BoxContentHistoryService])
 ], BoxContentHistoryController);
 //# sourceMappingURL=box-content-history.controller.js.map

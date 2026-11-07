@@ -36,6 +36,15 @@ let ShipmentsService = class ShipmentsService {
     constructor(prisma) {
         this.prisma = prisma;
     }
+    async assertClubAccess(idClub, user) {
+        if (user.role === 'admin')
+            return;
+        const assoc = await this.prisma.entrepreneur_Club.findFirst({
+            where: { idClub, idEntrepreneurs: user.id },
+        });
+        if (!assoc)
+            throw new common_1.ForbiddenException('No tenés acceso a este club');
+    }
     async validateCourierForClub(idClub, idCourier) {
         const clubCourier = await this.prisma.club_Courier.findFirst({
             where: { idClub, idCourier, active: true },
@@ -69,6 +78,9 @@ let ShipmentsService = class ShipmentsService {
         const sub = await this.prisma.user_Subscriptions.findUnique({ where: { id: dto.idUserSubscriptions } });
         if (!sub)
             throw new common_1.NotFoundException('Suscripción no encontrada');
+        if (sub.idUser !== dto.idUser) {
+            throw new common_1.BadRequestException('La suscripción no pertenece al usuario indicado');
+        }
         if (dto.idClub) {
             const club = await this.prisma.club.findUnique({ where: { id: dto.idClub } });
             if (!club)
@@ -112,6 +124,9 @@ let ShipmentsService = class ShipmentsService {
         const sub = await this.prisma.user_Subscriptions.findUnique({ where: { id: dto.idUserSubscriptions } });
         if (!sub)
             throw new common_1.NotFoundException('Suscripción no encontrada');
+        if (sub.idUser !== dto.idUser) {
+            throw new common_1.BadRequestException('La suscripción no pertenece al usuario indicado');
+        }
         const club = await this.prisma.club.findUnique({ where: { id: dto.idClub } });
         if (!club)
             throw new common_1.NotFoundException('Club no encontrado');

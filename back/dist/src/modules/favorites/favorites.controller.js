@@ -26,10 +26,14 @@ let FavoritesController = class FavoritesController {
         this.favoritesService = favoritesService;
     }
     async create(dto, req) {
-        if (req.user.id !== dto.idUser && req.user.role !== 'admin') {
+        const idUser = dto.idUser ?? req.user.id;
+        if (req.user.id !== idUser && req.user.role !== 'admin') {
             throw new common_1.ForbiddenException('No autorizado para crear este favorito');
         }
-        return this.favoritesService.create(dto);
+        return this.favoritesService.create({ ...dto, idUser });
+    }
+    async toggle(idSubscriptionTypes, req) {
+        return this.favoritesService.toggle(req.user.id, idSubscriptionTypes);
     }
     async findAll() {
         return this.favoritesService.findAll();
@@ -38,10 +42,13 @@ let FavoritesController = class FavoritesController {
         if (req.user.id !== idUser && req.user.role !== 'admin') {
             throw new common_1.ForbiddenException('No autorizado para ver estos favoritos');
         }
-        return this.favoritesService.findByUser(idUser);
+        return this.favoritesService.findByUserEnriched(idUser);
     }
-    async findByClub(idClub) {
-        return this.favoritesService.findByClub(idClub);
+    async findByPlan(idSubscriptionTypes, req) {
+        return this.favoritesService.findByPlanForRequester(idSubscriptionTypes, req.user);
+    }
+    async check(idSubscriptionTypes, req) {
+        return this.favoritesService.check(req.user.id, idSubscriptionTypes);
     }
     async findOne(id, req) {
         const favorite = await this.favoritesService.findOne(id);
@@ -68,7 +75,14 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], FavoritesController.prototype, "create", null);
 __decorate([
-    (0, common_1.UseGuards)(roles_guard_1.RolesGuard),
+    (0, common_1.Post)('toggle/:idSubscriptionTypes'),
+    __param(0, (0, common_1.Param)('idSubscriptionTypes', common_1.ParseIntPipe)),
+    __param(1, (0, common_1.Request)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Number, Object]),
+    __metadata("design:returntype", Promise)
+], FavoritesController.prototype, "toggle", null);
+__decorate([
     (0, roles_decorator_1.Roles)('admin'),
     (0, common_1.Get)(),
     __metadata("design:type", Function),
@@ -84,14 +98,22 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], FavoritesController.prototype, "findByUser", null);
 __decorate([
-    (0, common_1.UseGuards)(roles_guard_1.RolesGuard),
     (0, roles_decorator_1.Roles)('entrepreneur', 'admin'),
-    (0, common_1.Get)('by-club/:idClub'),
-    __param(0, (0, common_1.Param)('idClub', common_1.ParseIntPipe)),
+    (0, common_1.Get)('by-plan/:idSubscriptionTypes'),
+    __param(0, (0, common_1.Param)('idSubscriptionTypes', common_1.ParseIntPipe)),
+    __param(1, (0, common_1.Request)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Number]),
+    __metadata("design:paramtypes", [Number, Object]),
     __metadata("design:returntype", Promise)
-], FavoritesController.prototype, "findByClub", null);
+], FavoritesController.prototype, "findByPlan", null);
+__decorate([
+    (0, common_1.Get)('check/:idSubscriptionTypes'),
+    __param(0, (0, common_1.Param)('idSubscriptionTypes', common_1.ParseIntPipe)),
+    __param(1, (0, common_1.Request)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Number, Object]),
+    __metadata("design:returntype", Promise)
+], FavoritesController.prototype, "check", null);
 __decorate([
     (0, common_1.Get)(':id'),
     __param(0, (0, common_1.Param)('id', common_1.ParseIntPipe)),
@@ -101,7 +123,6 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], FavoritesController.prototype, "findOne", null);
 __decorate([
-    (0, common_1.UseGuards)(roles_guard_1.RolesGuard),
     (0, roles_decorator_1.Roles)('admin'),
     (0, common_1.Put)(':id'),
     (0, common_1.UsePipes)(new common_1.ValidationPipe({ whitelist: true, transform: true })),
@@ -112,7 +133,6 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], FavoritesController.prototype, "update", null);
 __decorate([
-    (0, common_1.UseGuards)(roles_guard_1.RolesGuard),
     (0, roles_decorator_1.Roles)('admin'),
     (0, common_1.Delete)(':id'),
     __param(0, (0, common_1.Param)('id', common_1.ParseIntPipe)),
@@ -122,7 +142,8 @@ __decorate([
 ], FavoritesController.prototype, "remove", null);
 exports.FavoritesController = FavoritesController = __decorate([
     (0, common_1.Controller)('favorites'),
-    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),
+    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard, roles_guard_1.RolesGuard),
+    (0, roles_decorator_1.Roles)('customer', 'admin'),
     __metadata("design:paramtypes", [favorites_service_1.FavoritesService])
 ], FavoritesController);
 //# sourceMappingURL=favorites.controller.js.map

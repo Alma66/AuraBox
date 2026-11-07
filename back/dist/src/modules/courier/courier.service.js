@@ -28,6 +28,15 @@ let CourierService = class CourierService {
     constructor(prisma) {
         this.prisma = prisma;
     }
+    async assertClubAccess(idClub, user) {
+        if (user.role === 'admin')
+            return;
+        const assoc = await this.prisma.entrepreneur_Club.findFirst({
+            where: { idClub, idEntrepreneurs: user.id },
+        });
+        if (!assoc)
+            throw new common_1.ForbiddenException('No tenés acceso a este club');
+    }
     async create(dto) {
         const exists = await this.prisma.courier.findUnique({ where: { code: dto.code } });
         if (exists)

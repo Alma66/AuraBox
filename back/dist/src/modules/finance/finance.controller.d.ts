@@ -4,7 +4,7 @@ import { UpdateFinancialEntryDto } from './dto/update-financial-entry.dto';
 export declare class FinanceController {
     private readonly svc;
     constructor(svc: FinanceService);
-    getMovements(idClub: number): Promise<{
+    getMovements(idClub: number, req: any): Promise<{
         movements: import("./finance.service").UnifiedMovement[];
         monthlyTotals: Record<string, {
             ingresos: number;
@@ -19,7 +19,7 @@ export declare class FinanceController {
             totalSupplyExpenses: number;
         };
     }>;
-    getProfitability(idClub: number): Promise<{
+    getProfitability(idClub: number, req: any): Promise<{
         breakdown: {
             idSubscriptionType: number;
             name: string;
@@ -40,29 +40,29 @@ export declare class FinanceController {
             totalNetMargin: number;
         };
     }>;
-    createEntry(dto: CreateFinancialEntryDto): Promise<{
-        description: string;
-        createdAt: Date;
+    createEntry(dto: CreateFinancialEntryDto, req: any): Promise<{
         id: number;
-        idClub: number;
+        description: string;
         status: import("@prisma/client").$Enums.FinancialEntryStatus;
+        idClub: number;
+        createdAt: Date;
+        type: import("@prisma/client").$Enums.FinancialEntryType;
         amount: import("@prisma/client/runtime/library").Decimal;
         category: string;
-        type: import("@prisma/client").$Enums.FinancialEntryType;
         entryDate: Date;
     }>;
-    updateEntry(id: number, dto: UpdateFinancialEntryDto): Promise<{
-        description: string;
-        createdAt: Date;
+    updateEntry(id: number, dto: UpdateFinancialEntryDto, req: any): Promise<{
         id: number;
-        idClub: number;
+        description: string;
         status: import("@prisma/client").$Enums.FinancialEntryStatus;
+        idClub: number;
+        createdAt: Date;
+        type: import("@prisma/client").$Enums.FinancialEntryType;
         amount: import("@prisma/client/runtime/library").Decimal;
         category: string;
-        type: import("@prisma/client").$Enums.FinancialEntryType;
         entryDate: Date;
     }>;
-    removeEntry(id: number): Promise<{
+    removeEntry(id: number, req: any): Promise<{
         message: string;
     }>;
 }

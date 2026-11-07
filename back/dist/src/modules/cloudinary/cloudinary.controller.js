@@ -15,8 +15,12 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.CloudinaryController = void 0;
 const common_1 = require("@nestjs/common");
 const platform_express_1 = require("@nestjs/platform-express");
-const multer_1 = require("multer");
+const throttler_1 = require("@nestjs/throttler");
 const cloudinary_service_1 = require("./cloudinary.service");
+const image_upload_1 = require("../../common/utils/image-upload");
+const jwt_auth_guard_1 = require("../../common/guards/jwt-auth.guard");
+const roles_guard_1 = require("../auth/roles.guard");
+const roles_decorator_1 = require("../auth/roles.decorator");
 let CloudinaryController = class CloudinaryController {
     cloudinaryService;
     constructor(cloudinaryService) {
@@ -31,19 +35,9 @@ let CloudinaryController = class CloudinaryController {
 };
 exports.CloudinaryController = CloudinaryController;
 __decorate([
+    (0, throttler_1.Throttle)({ default: { limit: 20, ttl: 60000 } }),
     (0, common_1.Post)('image'),
-    (0, common_1.UseInterceptors)((0, platform_express_1.FileInterceptor)('image', {
-        storage: (0, multer_1.memoryStorage)(),
-        limits: { fileSize: 5 * 1024 * 1024 },
-        fileFilter: (req, file, callback) => {
-            if (!file.mimetype.match(/\/(jpg|jpeg|png|gif|webp)$/)) {
-                callback(new common_1.BadRequestException('Solo se permiten imágenes'), false);
-            }
-            else {
-                callback(null, true);
-            }
-        },
-    })),
+    (0, common_1.UseInterceptors)((0, platform_express_1.FileInterceptor)('image', image_upload_1.imageUploadOptions)),
     __param(0, (0, common_1.UploadedFile)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [Object]),
@@ -51,6 +45,8 @@ __decorate([
 ], CloudinaryController.prototype, "uploadImage", null);
 exports.CloudinaryController = CloudinaryController = __decorate([
     (0, common_1.Controller)('upload'),
+    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard, roles_guard_1.RolesGuard),
+    (0, roles_decorator_1.Roles)('admin'),
     __metadata("design:paramtypes", [cloudinary_service_1.CloudinaryService])
 ], CloudinaryController);
 //# sourceMappingURL=cloudinary.controller.js.map

@@ -51,8 +51,12 @@ export class SubscriptionTypesService {
         throw new BadRequestException('Los descuentos deben estar entre 0 y 90%');
       }
     }
-    if (priceFor(base, transfer, true) <= AURABOX_COMMISSION) {
-      throw new BadRequestException('Con el descuento por transferencia el precio queda por debajo del mínimo');
+    const lowestPrice = Math.min(
+      priceFor({ basePrice: base, transferDiscount: transfer }, 'transferencia'),
+      priceFor({ basePrice: base, cashDiscount: cash }, 'efectivo'),
+    );
+    if (lowestPrice <= AURABOX_COMMISSION) {
+      throw new BadRequestException('Con los descuentos el precio queda por debajo del mínimo');
     }
   }
 

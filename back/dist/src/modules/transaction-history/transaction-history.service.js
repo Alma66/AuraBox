@@ -32,6 +32,38 @@ let TransactionHistoryService = class TransactionHistoryService {
     constructor(prisma) {
         this.prisma = prisma;
     }
+    async assertClubAccess(idClub, user) {
+        if (user.role === 'admin')
+            return;
+        const assoc = await this.prisma.entrepreneur_Club.findFirst({
+            where: { idClub, idEntrepreneurs: user.id },
+        });
+        if (!assoc)
+            throw new common_1.ForbiddenException('No tenés acceso a este club');
+    }
+    async resolveClubId(item) {
+        if (item.idClub)
+            return item.idClub;
+        const sub = await this.prisma.user_Subscriptions.findUnique({ where: { id: item.idUserSubscriptions } });
+        if (!sub)
+            return null;
+        const subType = await this.prisma.subscription_Types.findUnique({ where: { id: sub.idSubscriptionTypes } });
+        return subType?.idClub ?? null;
+    }
+    async assertTransactionAccess(item, user) {
+        if (user.role === 'admin')
+            return;
+        if (user.role === 'customer' && item.idUser === user.id)
+            return;
+        if (user.role === 'entrepreneur') {
+            const clubId = await this.resolveClubId(item);
+            if (clubId) {
+                await this.assertClubAccess(clubId, user);
+                return;
+            }
+        }
+        throw new common_1.ForbiddenException('No autorizado para ver esta transacción');
+    }
     async create(dto) {
         const user = await this.prisma.user.findUnique({ where: { id: dto.idUser } });
         if (!user)
@@ -39,6 +71,8 @@ let TransactionHistoryService = class TransactionHistoryService {
         const sub = await this.prisma.user_Subscriptions.findUnique({ where: { id: dto.idUserSubscriptions } });
         if (!sub)
             throw new common_1.NotFoundException('Suscripción no encontrada');
+        if (sub.idUser !== dto.idUser)
+            throw new common_1.NotFoundException('La suscripción no pertenece a este usuario');
         if (dto.idClub) {
             const club = await this.prisma.club.findUnique({ where: { id: dto.idClub } });
             if (!club)
@@ -70,27 +104,46 @@ let TransactionHistoryService = class TransactionHistoryService {
         const histories = await this.prisma.transaction_History.findMany({ orderBy: { paymentDate: 'desc' } });
         return histories.map(sanitize);
     }
-    async findOne(id) {
+    async findOne(id, user) {
         const item = await this.prisma.transaction_History.findUnique({ where: { id } });
         if (!item)
             throw new common_1.NotFoundException('Registro de transacción no encontrado');
+        await this.assertTransactionAccess(item, user);
         return sanitize(item);
     }
-    async findByUser(idUser) {
+    async findByUser(idUser, user) {
+        if (user.role !== 'admin' && user.id !== idUser) {
+            throw new common_1.ForbiddenException('No autorizado para ver estas transacciones');
+        }
         const histories = await this.prisma.transaction_History.findMany({
             where: { idUser },
             orderBy: { paymentDate: 'desc' },
         });
         return histories.map(sanitize);
     }
-    async findBySubscription(idUserSubscriptions) {
+    async findBySubscription(idUserSubscriptions, user) {
+        const sub = await this.prisma.user_Subscriptions.findUnique({ where: { id: idUserSubscriptions } });
+        if (!sub)
+            throw new common_1.NotFoundException('Suscripción no encontrada');
+        if (user.role !== 'admin') {
+            if (user.role === 'customer' && sub.idUser !== user.id) {
+                throw new common_1.ForbiddenException('No autorizado para ver estas transacciones');
+            }
+            if (user.role === 'entrepreneur') {
+                const subType = await this.prisma.subscription_Types.findUnique({ where: { id: sub.idSubscriptionTypes } });
+                if (!subType)
+                    throw new common_1.NotFoundException('Tipo de suscripción no encontrado');
+                await this.assertClubAccess(subType.idClub, user);
+            }
+        }
         const histories = await this.prisma.transaction_History.findMany({
             where: { idUserSubscriptions },
             orderBy: { paymentDate: 'desc' },
         });
         return histories.map(sanitize);
     }
-    async findByClub(idClub) {
+    async findByClub(idClub, user) {
+        await this.assertClubAccess(idClub, user);
         const histories = await this.prisma.transaction_History.findMany({
             where: { idClub },
             orderBy: { paymentDate: 'desc' },

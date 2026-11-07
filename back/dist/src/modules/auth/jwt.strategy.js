@@ -13,21 +13,48 @@ exports.JwtStrategy = void 0;
 const common_1 = require("@nestjs/common");
 const passport_1 = require("@nestjs/passport");
 const passport_jwt_1 = require("passport-jwt");
+const prisma_service_1 = require("../../prisma/prisma.service");
+function getJwtSecret() {
+    const secret = process.env.JWT_SECRET;
+    if (!secret) {
+        throw new Error('JWT_SECRET environment variable is required');
+    }
+    return secret;
+}
 let JwtStrategy = class JwtStrategy extends (0, passport_1.PassportStrategy)(passport_jwt_1.Strategy) {
-    constructor() {
+    prisma;
+    constructor(prisma) {
         super({
             jwtFromRequest: passport_jwt_1.ExtractJwt.fromAuthHeaderAsBearerToken(),
             ignoreExpiration: false,
-            secretOrKey: process.env.JWT_SECRET || 'superSecretDevKey',
+            secretOrKey: getJwtSecret(),
         });
+        this.prisma = prisma;
     }
     async validate(payload) {
-        return { id: payload.sub, email: payload.email, role: payload.role };
+        const id = Number(payload?.sub);
+        const role = payload?.role;
+        if (!Number.isInteger(id))
+            throw new common_1.UnauthorizedException();
+        let account = null;
+        if (role === 'customer') {
+            account = await this.prisma.user.findUnique({ where: { id }, select: { active: true } });
+        }
+        else if (role === 'entrepreneur') {
+            account = await this.prisma.entrepreneurs.findUnique({ where: { id }, select: { active: true } });
+        }
+        else if (role === 'admin') {
+            account = await this.prisma.admins.findUnique({ where: { id }, select: { active: true } });
+        }
+        if (!account || account.active === false) {
+            throw new common_1.UnauthorizedException('Cuenta deshabilitada');
+        }
+        return { id, email: payload.email, role };
     }
 };
 exports.JwtStrategy = JwtStrategy;
 exports.JwtStrategy = JwtStrategy = __decorate([
     (0, common_1.Injectable)(),
-    __metadata("design:paramtypes", [])
+    __metadata("design:paramtypes", [prisma_service_1.PrismaService])
 ], JwtStrategy);
 //# sourceMappingURL=jwt.strategy.js.map

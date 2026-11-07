@@ -15,18 +15,32 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.AnalyticsController = void 0;
 const common_1 = require("@nestjs/common");
 const analytics_service_1 = require("./analytics.service");
+const prisma_service_1 = require("../../prisma/prisma.service");
 const jwt_auth_guard_1 = require("../../common/guards/jwt-auth.guard");
 const roles_guard_1 = require("../auth/roles.guard");
 const roles_decorator_1 = require("../auth/roles.decorator");
 let AnalyticsController = class AnalyticsController {
     analyticsService;
-    constructor(analyticsService) {
+    prisma;
+    constructor(analyticsService, prisma) {
         this.analyticsService = analyticsService;
+        this.prisma = prisma;
     }
-    async getClubStats(idClub) {
+    async assertClubAccess(idClub, user) {
+        if (user.role === 'admin')
+            return;
+        const assoc = await this.prisma.entrepreneur_Club.findFirst({
+            where: { idClub, idEntrepreneurs: user.id },
+        });
+        if (!assoc)
+            throw new common_1.ForbiddenException('No tenés acceso a este club');
+    }
+    async getClubStats(idClub, req) {
+        await this.assertClubAccess(idClub, req.user);
         return this.analyticsService.getClubStats(idClub);
     }
-    async getSalesReport(idClub, from, to, idSubscriptionTypes, paymentStatus, idPaymentMethods, page, pageSize) {
+    async getSalesReport(idClub, req, from, to, idSubscriptionTypes, paymentStatus, idPaymentMethods, page, pageSize) {
+        await this.assertClubAccess(idClub, req.user);
         return this.analyticsService.getSalesReport(idClub, {
             from,
             to,
@@ -37,7 +51,8 @@ let AnalyticsController = class AnalyticsController {
             pageSize: pageSize ? Number(pageSize) : 20,
         });
     }
-    async getSalesReportExport(idClub, from, to, idSubscriptionTypes, paymentStatus, idPaymentMethods) {
+    async getSalesReportExport(idClub, req, from, to, idSubscriptionTypes, paymentStatus, idPaymentMethods) {
+        await this.assertClubAccess(idClub, req.user);
         return this.analyticsService.getSalesReportExport(idClub, {
             from,
             to,
@@ -46,7 +61,8 @@ let AnalyticsController = class AnalyticsController {
             idPaymentMethods: idPaymentMethods ? Number(idPaymentMethods) : undefined,
         });
     }
-    async getFeedbackTrends(idClub) {
+    async getFeedbackTrends(idClub, req) {
+        await this.assertClubAccess(idClub, req.user);
         return this.analyticsService.getFeedbackTrends(idClub);
     }
 };
@@ -54,47 +70,52 @@ exports.AnalyticsController = AnalyticsController;
 __decorate([
     (0, common_1.Get)('club-stats/:idClub'),
     __param(0, (0, common_1.Param)('idClub', common_1.ParseIntPipe)),
+    __param(1, (0, common_1.Request)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Number]),
+    __metadata("design:paramtypes", [Number, Object]),
     __metadata("design:returntype", Promise)
 ], AnalyticsController.prototype, "getClubStats", null);
 __decorate([
     (0, common_1.Get)('sales-report/:idClub'),
     __param(0, (0, common_1.Param)('idClub', common_1.ParseIntPipe)),
-    __param(1, (0, common_1.Query)('from')),
-    __param(2, (0, common_1.Query)('to')),
-    __param(3, (0, common_1.Query)('idSubscriptionTypes')),
-    __param(4, (0, common_1.Query)('paymentStatus')),
-    __param(5, (0, common_1.Query)('idPaymentMethods')),
-    __param(6, (0, common_1.Query)('page')),
-    __param(7, (0, common_1.Query)('pageSize')),
+    __param(1, (0, common_1.Request)()),
+    __param(2, (0, common_1.Query)('from')),
+    __param(3, (0, common_1.Query)('to')),
+    __param(4, (0, common_1.Query)('idSubscriptionTypes')),
+    __param(5, (0, common_1.Query)('paymentStatus')),
+    __param(6, (0, common_1.Query)('idPaymentMethods')),
+    __param(7, (0, common_1.Query)('page')),
+    __param(8, (0, common_1.Query)('pageSize')),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Number, String, String, String, String, String, String, String]),
+    __metadata("design:paramtypes", [Number, Object, String, String, String, String, String, String, String]),
     __metadata("design:returntype", Promise)
 ], AnalyticsController.prototype, "getSalesReport", null);
 __decorate([
     (0, common_1.Get)('sales-report-export/:idClub'),
     __param(0, (0, common_1.Param)('idClub', common_1.ParseIntPipe)),
-    __param(1, (0, common_1.Query)('from')),
-    __param(2, (0, common_1.Query)('to')),
-    __param(3, (0, common_1.Query)('idSubscriptionTypes')),
-    __param(4, (0, common_1.Query)('paymentStatus')),
-    __param(5, (0, common_1.Query)('idPaymentMethods')),
+    __param(1, (0, common_1.Request)()),
+    __param(2, (0, common_1.Query)('from')),
+    __param(3, (0, common_1.Query)('to')),
+    __param(4, (0, common_1.Query)('idSubscriptionTypes')),
+    __param(5, (0, common_1.Query)('paymentStatus')),
+    __param(6, (0, common_1.Query)('idPaymentMethods')),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Number, String, String, String, String, String]),
+    __metadata("design:paramtypes", [Number, Object, String, String, String, String, String]),
     __metadata("design:returntype", Promise)
 ], AnalyticsController.prototype, "getSalesReportExport", null);
 __decorate([
     (0, common_1.Get)('feedback-trends/:idClub'),
     __param(0, (0, common_1.Param)('idClub', common_1.ParseIntPipe)),
+    __param(1, (0, common_1.Request)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Number]),
+    __metadata("design:paramtypes", [Number, Object]),
     __metadata("design:returntype", Promise)
 ], AnalyticsController.prototype, "getFeedbackTrends", null);
 exports.AnalyticsController = AnalyticsController = __decorate([
     (0, common_1.Controller)('analytics'),
     (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard, roles_guard_1.RolesGuard),
     (0, roles_decorator_1.Roles)('entrepreneur', 'admin'),
-    __metadata("design:paramtypes", [analytics_service_1.AnalyticsService])
+    __metadata("design:paramtypes", [analytics_service_1.AnalyticsService,
+        prisma_service_1.PrismaService])
 ], AnalyticsController);
 //# sourceMappingURL=analytics.controller.js.map

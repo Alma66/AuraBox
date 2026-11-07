@@ -13,9 +13,10 @@ export declare class ClubsService {
     private readonly prisma;
     private readonly cloudinaryService;
     constructor(prisma: PrismaService, cloudinaryService: CloudinaryService);
+    private readonly categoryAffinity;
     create(dto: CreateClubDto): Promise<{
-        name: string;
         id: number;
+        name: string;
         logoUrl: string;
         slogan: string | null;
         history: string | null;
@@ -30,26 +31,35 @@ export declare class ClubsService {
         milestones: string | null;
         shippingWindowStartDay: number | null;
         shippingWindowEndDay: number | null;
+        bankHolder: string | null;
+        bankCbu: string | null;
+        bankAlias: string | null;
     }>;
     findAll(filters?: FindAllFilters): Promise<any[]>;
     private attachCategories;
     findFeatured(): Promise<any[]>;
-    findOne(id: number, requestingUserId?: number): Promise<any>;
-    update(id: number, dto: UpdateClubDto, entrepreneurId: number): Promise<any>;
+    getRecommendationsForUser(userId: number): Promise<any[]>;
+    findOne(id: number, requester?: number | {
+        id: number;
+        role: string;
+    }): Promise<any>;
+    update(id: number, dto: UpdateClubDto, user: {
+        id: number;
+        role: string;
+    }): Promise<any>;
     updateLogo(id: number, file: Express.Multer.File, entrepreneurId: number): Promise<any>;
     remove(id: number): Promise<{
         ok: boolean;
     }>;
     findSubscriptionsByClub(clubId: number, entrepreneurId: number): Promise<any[]>;
     findCustomersByClub(clubId: number, entrepreneurId: number): Promise<{
-        registrationDate: string;
-        birthDate: string | null;
         id: number;
         firstName: string;
         lastName: string;
         email: string;
         active: boolean;
-        phoneNumber: number | null;
+        registrationDate: string;
+        phoneNumber: string | null;
         streetAddress: string | null;
         addressNumber: number | null;
         floorNumber: string | null;
@@ -61,8 +71,8 @@ export declare class ClubsService {
     findClubByEntrepreneur(entrepreneurId: number): Promise<any>;
     assertOwnership(clubId: number, entrepreneurId: number): Promise<{
         id: number;
-        idClub: number;
         idEntrepreneurs: number;
+        idClub: number;
         associationDate: Date;
     }>;
     private mapPlan;

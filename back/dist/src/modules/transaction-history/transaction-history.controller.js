@@ -25,29 +25,23 @@ let TransactionHistoryController = class TransactionHistoryController {
     constructor(svc) {
         this.svc = svc;
     }
-    async create(dto, req) {
-        if (req.user.id !== dto.idUser && req.user.role !== 'admin') {
-            throw new common_1.ForbiddenException('No autorizado para registrar esta transacción');
-        }
+    async create(dto) {
         return this.svc.create(dto);
     }
     async findAll() {
         return this.svc.findAll();
     }
     async findByUser(idUser, req) {
-        if (req.user.id !== idUser && req.user.role !== 'admin') {
-            throw new common_1.ForbiddenException('No autorizado para ver estas transacciones');
-        }
-        return this.svc.findByUser(idUser);
+        return this.svc.findByUser(idUser, req.user);
     }
-    async findBySubscription(idUserSubscriptions) {
-        return this.svc.findBySubscription(idUserSubscriptions);
+    async findBySubscription(idUserSubscriptions, req) {
+        return this.svc.findBySubscription(idUserSubscriptions, req.user);
     }
-    async findByClub(idClub) {
-        return this.svc.findByClub(idClub);
+    async findByClub(idClub, req) {
+        return this.svc.findByClub(idClub, req.user);
     }
-    async findOne(id) {
-        return this.svc.findOne(id);
+    async findOne(id, req) {
+        return this.svc.findOne(id, req.user);
     }
     async update(id, dto) {
         return this.svc.update(id, dto);
@@ -58,12 +52,13 @@ let TransactionHistoryController = class TransactionHistoryController {
 };
 exports.TransactionHistoryController = TransactionHistoryController;
 __decorate([
+    (0, common_1.UseGuards)(roles_guard_1.RolesGuard),
+    (0, roles_decorator_1.Roles)('admin'),
     (0, common_1.Post)(),
     (0, common_1.UsePipes)(new common_1.ValidationPipe({ whitelist: true, transform: true })),
     __param(0, (0, common_1.Body)()),
-    __param(1, (0, common_1.Request)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [create_transaction_history_dto_1.CreateTransactionHistoryDto, Object]),
+    __metadata("design:paramtypes", [create_transaction_history_dto_1.CreateTransactionHistoryDto]),
     __metadata("design:returntype", Promise)
 ], TransactionHistoryController.prototype, "create", null);
 __decorate([
@@ -85,8 +80,9 @@ __decorate([
 __decorate([
     (0, common_1.Get)('by-subscription/:idUserSubscriptions'),
     __param(0, (0, common_1.Param)('idUserSubscriptions', common_1.ParseIntPipe)),
+    __param(1, (0, common_1.Request)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Number]),
+    __metadata("design:paramtypes", [Number, Object]),
     __metadata("design:returntype", Promise)
 ], TransactionHistoryController.prototype, "findBySubscription", null);
 __decorate([
@@ -94,15 +90,17 @@ __decorate([
     (0, roles_decorator_1.Roles)('entrepreneur', 'admin'),
     (0, common_1.Get)('by-club/:idClub'),
     __param(0, (0, common_1.Param)('idClub', common_1.ParseIntPipe)),
+    __param(1, (0, common_1.Request)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Number]),
+    __metadata("design:paramtypes", [Number, Object]),
     __metadata("design:returntype", Promise)
 ], TransactionHistoryController.prototype, "findByClub", null);
 __decorate([
     (0, common_1.Get)(':id'),
     __param(0, (0, common_1.Param)('id', common_1.ParseIntPipe)),
+    __param(1, (0, common_1.Request)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Number]),
+    __metadata("design:paramtypes", [Number, Object]),
     __metadata("design:returntype", Promise)
 ], TransactionHistoryController.prototype, "findOne", null);
 __decorate([

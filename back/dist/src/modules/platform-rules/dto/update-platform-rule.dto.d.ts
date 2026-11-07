@@ -1,5 +1,8 @@
-import { CreatePlatformRuleDto } from './create-platform-rule.dto';
-declare const UpdatePlatformRuleDto_base: import("@nestjs/mapped-types").MappedType<Partial<CreatePlatformRuleDto>>;
-export declare class UpdatePlatformRuleDto extends UpdatePlatformRuleDto_base {
+import { RuleAcceptanceScope } from '@prisma/client';
+export declare class UpdatePlatformRuleDto {
+    title?: string;
+    content?: string;
+    version?: string;
+    ruleType?: string;
+    acceptanceScope?: RuleAcceptanceScope;
 }
-export {};

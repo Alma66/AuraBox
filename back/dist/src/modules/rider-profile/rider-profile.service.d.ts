@@ -1,19 +1,26 @@
 import { PrismaService } from '../../prisma/prisma.service';
 import { CreateRiderProfileDto } from './dto/create-rider-profile.dto';
 import { UpdateRiderProfileDto } from './dto/update-rider-profile.dto';
+type RequestUser = {
+    id: number;
+    role: string;
+};
 export declare class RiderProfileService {
     private readonly prisma;
     constructor(prisma: PrismaService);
+    assertClubAccess(idClub: number, user: RequestUser): Promise<void>;
+    private sharesClub;
     create(dto: CreateRiderProfileDto): Promise<any>;
     findAll(): Promise<any[]>;
     findOne(id: number): Promise<any>;
+    findOneForRequester(id: number, user: RequestUser): Promise<any>;
     findByEntrepreneur(idEntrepreneur: number): Promise<any>;
     findByClub(idClub: number): Promise<{
         id: number;
         firstName: string;
         lastName: string;
         email: string;
-        phoneNumber: number | null;
+        phoneNumber: string | null;
         vehicleType: import("@prisma/client").$Enums.VehicleType | null;
         licensePlate: string | null;
         availability: boolean;
@@ -24,7 +31,9 @@ export declare class RiderProfileService {
         currentAssignments: number;
     }[]>;
     update(id: number, dto: UpdateRiderProfileDto): Promise<any>;
+    updateForRequester(id: number, dto: UpdateRiderProfileDto, user: RequestUser): Promise<any>;
     remove(id: number): Promise<{
         message: string;
     }>;
 }
+export {};

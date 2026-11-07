@@ -11,39 +11,42 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.CreatePlatformRuleDto = void 0;
 const class_validator_1 = require("class-validator");
+const client_1 = require("@prisma/client");
 class CreatePlatformRuleDto {
     title;
     content;
     version;
-    publicationDate;
-    active;
     ruleType;
+    acceptanceScope;
 }
 exports.CreatePlatformRuleDto = CreatePlatformRuleDto;
 __decorate([
     (0, class_validator_1.IsString)(),
+    (0, class_validator_1.IsNotEmpty)(),
+    (0, class_validator_1.MaxLength)(150),
     __metadata("design:type", String)
 ], CreatePlatformRuleDto.prototype, "title", void 0);
 __decorate([
     (0, class_validator_1.IsString)(),
+    (0, class_validator_1.IsNotEmpty)(),
+    (0, class_validator_1.MaxLength)(50000),
     __metadata("design:type", String)
 ], CreatePlatformRuleDto.prototype, "content", void 0);
 __decorate([
     (0, class_validator_1.IsString)(),
+    (0, class_validator_1.IsNotEmpty)(),
+    (0, class_validator_1.MaxLength)(20),
     __metadata("design:type", String)
 ], CreatePlatformRuleDto.prototype, "version", void 0);
 __decorate([
-    (0, class_validator_1.IsOptional)(),
-    (0, class_validator_1.IsDateString)(),
-    __metadata("design:type", String)
-], CreatePlatformRuleDto.prototype, "publicationDate", void 0);
-__decorate([
-    (0, class_validator_1.IsOptional)(),
-    (0, class_validator_1.IsBoolean)(),
-    __metadata("design:type", Boolean)
-], CreatePlatformRuleDto.prototype, "active", void 0);
-__decorate([
     (0, class_validator_1.IsString)(),
+    (0, class_validator_1.IsNotEmpty)(),
+    (0, class_validator_1.MaxLength)(60),
     __metadata("design:type", String)
 ], CreatePlatformRuleDto.prototype, "ruleType", void 0);
+__decorate([
+    (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.IsEnum)(client_1.RuleAcceptanceScope),
+    __metadata("design:type", String)
+], CreatePlatformRuleDto.prototype, "acceptanceScope", void 0);
 //# sourceMappingURL=create-platform-rule.dto.js.map

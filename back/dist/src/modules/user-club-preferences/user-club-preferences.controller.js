@@ -40,14 +40,14 @@ let UserClubPreferencesController = class UserClubPreferencesController {
         }
         return this.svc.findByUser(idUser);
     }
-    async findByClub(idClub) {
-        return this.svc.findByClub(idClub);
+    async findByClub(idClub, req) {
+        return this.svc.findByClub(idClub, req.user);
     }
-    async findBySubscriptionType(idSubscriptionTypes) {
-        return this.svc.findBySubscriptionType(idSubscriptionTypes);
+    async findBySubscriptionType(idSubscriptionTypes, req) {
+        return this.svc.findBySubscriptionType(idSubscriptionTypes, req.user);
     }
-    async findOne(id) {
-        return this.svc.findOne(id);
+    async findOne(id, req) {
+        return this.svc.findOne(id, req.user);
     }
     async update(id, dto, req) {
         return this.svc.update(id, dto, req.user);
@@ -67,7 +67,6 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], UserClubPreferencesController.prototype, "create", null);
 __decorate([
-    (0, common_1.UseGuards)(roles_guard_1.RolesGuard),
     (0, roles_decorator_1.Roles)('admin'),
     (0, common_1.Get)(),
     __metadata("design:type", Function),
@@ -83,24 +82,29 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], UserClubPreferencesController.prototype, "findByUser", null);
 __decorate([
+    (0, roles_decorator_1.Roles)('entrepreneur', 'admin'),
     (0, common_1.Get)('by-club/:idClub'),
     __param(0, (0, common_1.Param)('idClub', common_1.ParseIntPipe)),
+    __param(1, (0, common_1.Request)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Number]),
+    __metadata("design:paramtypes", [Number, Object]),
     __metadata("design:returntype", Promise)
 ], UserClubPreferencesController.prototype, "findByClub", null);
 __decorate([
+    (0, roles_decorator_1.Roles)('entrepreneur', 'admin'),
     (0, common_1.Get)('by-subscription-type/:idSubscriptionTypes'),
     __param(0, (0, common_1.Param)('idSubscriptionTypes', common_1.ParseIntPipe)),
+    __param(1, (0, common_1.Request)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Number]),
+    __metadata("design:paramtypes", [Number, Object]),
     __metadata("design:returntype", Promise)
 ], UserClubPreferencesController.prototype, "findBySubscriptionType", null);
 __decorate([
     (0, common_1.Get)(':id'),
     __param(0, (0, common_1.Param)('id', common_1.ParseIntPipe)),
+    __param(1, (0, common_1.Request)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Number]),
+    __metadata("design:paramtypes", [Number, Object]),
     __metadata("design:returntype", Promise)
 ], UserClubPreferencesController.prototype, "findOne", null);
 __decorate([
@@ -123,7 +127,8 @@ __decorate([
 ], UserClubPreferencesController.prototype, "remove", null);
 exports.UserClubPreferencesController = UserClubPreferencesController = __decorate([
     (0, common_1.Controller)('user-club-preferences'),
-    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),
+    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard, roles_guard_1.RolesGuard),
+    (0, roles_decorator_1.Roles)('customer', 'admin'),
     __metadata("design:paramtypes", [user_club_preferences_service_1.UserClubPreferencesService])
 ], UserClubPreferencesController);
 //# sourceMappingURL=user-club-preferences.controller.js.map

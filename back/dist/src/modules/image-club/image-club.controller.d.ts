@@ -8,13 +8,13 @@ export declare class ImageClubController {
     findAll(): Promise<any[]>;
     findByClub(idClub: number, section?: string): Promise<any[]>;
     findOne(id: number): Promise<any>;
-    update(id: number, dto: UpdateImageClubDto): Promise<any>;
+    update(id: number, dto: UpdateImageClubDto, req: any): Promise<any>;
     removeMany(body: {
         ids: number[];
-    }): Promise<{
+    }, req: any): Promise<{
         message: string;
     }>;
-    remove(id: number): Promise<{
+    remove(id: number, req: any): Promise<{
         message: string;
     }>;
 }

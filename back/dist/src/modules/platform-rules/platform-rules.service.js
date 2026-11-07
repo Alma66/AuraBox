@@ -11,6 +11,7 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.PlatformRulesService = void 0;
 const common_1 = require("@nestjs/common");
+const client_1 = require("@prisma/client");
 const prisma_service_1 = require("../../prisma/prisma.service");
 function sanitize(rule) {
     if (!rule)
@@ -19,20 +20,44 @@ function sanitize(rule) {
         rule.publicationDate = rule.publicationDate.toISOString();
     return rule;
 }
+function publicShape(rule) {
+    return sanitize({
+        id: rule.id,
+        title: rule.title,
+        content: rule.content,
+        version: rule.version,
+        ruleType: rule.ruleType,
+        acceptanceScope: rule.acceptanceScope,
+        publicationDate: rule.publicationDate,
+    });
+}
 let PlatformRulesService = class PlatformRulesService {
     prisma;
     constructor(prisma) {
         this.prisma = prisma;
     }
+    async assertVersionFree(ruleType, version, excludeId) {
+        const duplicate = await this.prisma.platform_Rules.findFirst({
+            where: { ruleType, version, ...(excludeId ? { id: { not: excludeId } } : {}) },
+            select: { id: true },
+        });
+        if (duplicate) {
+            throw new common_1.BadRequestException(`Ya existe la versión ${version} para este tipo de regla`);
+        }
+    }
     async create(dto) {
+        const ruleType = dto.ruleType.trim();
+        const version = dto.version.trim();
+        await this.assertVersionFree(ruleType, version);
         const created = await this.prisma.platform_Rules.create({
             data: {
-                title: dto.title,
-                content: dto.content,
-                version: dto.version,
-                publicationDate: dto.publicationDate ? new Date(dto.publicationDate) : new Date(),
-                active: dto.active ?? true,
-                ruleType: dto.ruleType,
+                title: dto.title.trim(),
+                content: dto.content.trim(),
+                version,
+                ruleType,
+                acceptanceScope: dto.acceptanceScope ?? client_1.RuleAcceptanceScope.NINGUNO,
+                active: false,
+                publicationDate: new Date(),
             },
         });
         return sanitize(created);
@@ -44,9 +69,23 @@ let PlatformRulesService = class PlatformRulesService {
     async findActive() {
         const rules = await this.prisma.platform_Rules.findMany({
             where: { active: true },
-            orderBy: { publicationDate: 'desc' },
+            orderBy: { ruleType: 'asc' },
         });
-        return rules.map(sanitize);
+        return rules.map(publicShape);
+    }
+    async findRequiredForSignup(audience) {
+        if (audience !== 'customer' && audience !== 'entrepreneur') {
+            throw new common_1.BadRequestException('Tipo de cuenta inválido');
+        }
+        const scopes = [
+            client_1.RuleAcceptanceScope.TODOS,
+            audience === 'customer' ? client_1.RuleAcceptanceScope.CLIENTES : client_1.RuleAcceptanceScope.EMPRENDEDORES,
+        ];
+        const rules = await this.prisma.platform_Rules.findMany({
+            where: { active: true, acceptanceScope: { in: scopes } },
+            orderBy: { ruleType: 'asc' },
+        });
+        return rules.map(publicShape);
     }
     async findOne(id) {
         const item = await this.prisma.platform_Rules.findUnique({ where: { id } });
@@ -58,19 +97,59 @@ let PlatformRulesService = class PlatformRulesService {
         const item = await this.prisma.platform_Rules.findUnique({ where: { id } });
         if (!item)
             throw new common_1.NotFoundException('Regla de plataforma no encontrada');
+        if (item.active) {
+            throw new common_1.BadRequestException('Una regla publicada no se puede editar. Creá una nueva versión.');
+        }
+        const ruleType = dto.ruleType !== undefined ? dto.ruleType.trim() : item.ruleType;
+        const version = dto.version !== undefined ? dto.version.trim() : item.version;
+        if (ruleType !== item.ruleType || version !== item.version) {
+            await this.assertVersionFree(ruleType, version, id);
+        }
         const updated = await this.prisma.platform_Rules.update({
             where: { id },
             data: {
-                ...dto,
-                publicationDate: dto.publicationDate ? new Date(dto.publicationDate) : item.publicationDate,
+                ruleType,
+                version,
+                ...(dto.title !== undefined ? { title: dto.title.trim() } : {}),
+                ...(dto.content !== undefined ? { content: dto.content.trim() } : {}),
+                ...(dto.acceptanceScope !== undefined ? { acceptanceScope: dto.acceptanceScope } : {}),
             },
         });
         return sanitize(updated);
+    }
+    async setActive(id, active) {
+        const item = await this.prisma.platform_Rules.findUnique({ where: { id } });
+        if (!item)
+            throw new common_1.NotFoundException('Regla de plataforma no encontrada');
+        if (item.active === active)
+            return sanitize(item);
+        if (!active) {
+            const updated = await this.prisma.platform_Rules.update({ where: { id }, data: { active: false } });
+            return sanitize(updated);
+        }
+        const [, published] = await this.prisma.$transaction([
+            this.prisma.platform_Rules.updateMany({
+                where: { ruleType: item.ruleType, active: true, id: { not: id } },
+                data: { active: false },
+            }),
+            this.prisma.platform_Rules.update({
+                where: { id },
+                data: { active: true, publicationDate: new Date() },
+            }),
+        ]);
+        return sanitize(published);
     }
     async remove(id) {
         const item = await this.prisma.platform_Rules.findUnique({ where: { id } });
         if (!item)
             throw new common_1.NotFoundException('Regla de plataforma no encontrada');
+        if (item.active) {
+            throw new common_1.BadRequestException('No se puede eliminar una regla publicada. Despublicala primero.');
+        }
+        const accepted = await this.prisma.terms_Acceptance.count({ where: { idPlatformRule: id } });
+        if (accepted > 0) {
+            throw new common_1.BadRequestException('Esta versión ya fue aceptada por usuarios y se conserva como historial');
+        }
         await this.prisma.platform_Rules.delete({ where: { id } });
         return { message: 'Regla eliminada correctamente' };
     }

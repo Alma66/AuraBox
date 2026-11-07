@@ -17,10 +17,20 @@ let ClubSocialNetworksService = class ClubSocialNetworksService {
     constructor(prisma) {
         this.prisma = prisma;
     }
-    async create(dto) {
+    async assertClubAccess(idClub, user) {
+        if (user.role === 'admin')
+            return;
+        const assoc = await this.prisma.entrepreneur_Club.findFirst({
+            where: { idClub, idEntrepreneurs: user.id },
+        });
+        if (!assoc)
+            throw new common_1.ForbiddenException('No tenés acceso a este club');
+    }
+    async create(dto, user) {
         const club = await this.prisma.club.findUnique({ where: { id: dto.idClub } });
         if (!club)
             throw new common_1.NotFoundException('Club no encontrado');
+        await this.assertClubAccess(dto.idClub, user);
         const exists = await this.prisma.club_Social_Networks.findUnique({ where: { profileUrl: dto.profileUrl } });
         if (exists)
             throw new common_1.ConflictException('Ya existe una red social con esa URL de perfil');
@@ -47,29 +57,36 @@ let ClubSocialNetworksService = class ClubSocialNetworksService {
             throw new common_1.NotFoundException('Red social no encontrada');
         return item;
     }
-    async update(id, dto) {
+    async update(id, dto, user) {
         const existing = await this.prisma.club_Social_Networks.findUnique({ where: { id } });
         if (!existing)
             throw new common_1.NotFoundException('Red social no encontrada');
+        await this.assertClubAccess(existing.idClub, user);
         if (dto.profileUrl && dto.profileUrl !== existing.profileUrl) {
             const dup = await this.prisma.club_Social_Networks.findUnique({ where: { profileUrl: dto.profileUrl } });
             if (dup)
                 throw new common_1.ConflictException('Ya existe otra red social con esa URL de perfil');
         }
-        if (dto.idClub) {
+        if (user.role === 'admin' && dto.idClub && dto.idClub !== existing.idClub) {
             const c = await this.prisma.club.findUnique({ where: { id: dto.idClub } });
             if (!c)
                 throw new common_1.NotFoundException('Club (nuevo) no encontrado');
         }
+        const targetIdClub = user.role === 'admin' && dto.idClub ? dto.idClub : existing.idClub;
         return this.prisma.club_Social_Networks.update({
             where: { id },
-            data: { ...dto },
+            data: {
+                idClub: targetIdClub,
+                networkType: dto.networkType ?? existing.networkType,
+                profileUrl: dto.profileUrl ?? existing.profileUrl,
+            },
         });
     }
-    async remove(id) {
+    async remove(id, user) {
         const existing = await this.prisma.club_Social_Networks.findUnique({ where: { id } });
         if (!existing)
             throw new common_1.NotFoundException('Red social no encontrada');
+        await this.assertClubAccess(existing.idClub, user);
         await this.prisma.club_Social_Networks.delete({ where: { id } });
         return { message: 'Red social eliminada correctamente' };
     }

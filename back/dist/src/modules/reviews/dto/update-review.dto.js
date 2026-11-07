@@ -10,14 +10,34 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.UpdateReviewDto = void 0;
-const mapped_types_1 = require("@nestjs/mapped-types");
-const create_review_dto_1 = require("./create-review.dto");
 const class_validator_1 = require("class-validator");
-class UpdateReviewDto extends (0, mapped_types_1.PartialType)(create_review_dto_1.CreateReviewDto) {
+class UpdateReviewDto {
+    rating;
+    title;
+    comment;
     isHidden;
     hiddenReason;
 }
 exports.UpdateReviewDto = UpdateReviewDto;
+__decorate([
+    (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.IsInt)(),
+    (0, class_validator_1.Min)(1),
+    (0, class_validator_1.Max)(5),
+    __metadata("design:type", Number)
+], UpdateReviewDto.prototype, "rating", void 0);
+__decorate([
+    (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.MaxLength)(120),
+    __metadata("design:type", String)
+], UpdateReviewDto.prototype, "title", void 0);
+__decorate([
+    (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.MaxLength)(2000),
+    __metadata("design:type", String)
+], UpdateReviewDto.prototype, "comment", void 0);
 __decorate([
     (0, class_validator_1.IsOptional)(),
     (0, class_validator_1.IsBoolean)(),
@@ -26,6 +46,7 @@ __decorate([
 __decorate([
     (0, class_validator_1.IsOptional)(),
     (0, class_validator_1.IsString)(),
+    (0, class_validator_1.MaxLength)(300),
     __metadata("design:type", String)
 ], UpdateReviewDto.prototype, "hiddenReason", void 0);
 //# sourceMappingURL=update-review.dto.js.map

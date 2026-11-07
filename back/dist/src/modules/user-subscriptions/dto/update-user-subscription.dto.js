@@ -29,30 +29,32 @@ __decorate([
 ], UpdateUserSubscriptionDto.prototype, "subscriptionStatus", void 0);
 __decorate([
     (0, class_validator_1.IsOptional)(),
-    (0, class_validator_1.IsDateString)(),
-    (0, class_transformer_1.Transform)(({ value }) => (value ? new Date(value) : undefined)),
+    (0, class_transformer_1.Type)(() => Date),
+    (0, class_validator_1.IsDate)(),
     __metadata("design:type", Date)
 ], UpdateUserSubscriptionDto.prototype, "lastPaymentDate", void 0);
 __decorate([
     (0, class_validator_1.IsOptional)(),
-    (0, class_validator_1.IsDateString)(),
-    (0, class_transformer_1.Transform)(({ value }) => (value ? new Date(value) : undefined)),
+    (0, class_transformer_1.Type)(() => Date),
+    (0, class_validator_1.IsDate)(),
     __metadata("design:type", Date)
 ], UpdateUserSubscriptionDto.prototype, "nextPaymentDate", void 0);
 __decorate([
     (0, class_validator_1.IsOptional)(),
     (0, class_transformer_1.Transform)(({ value }) => (value === null || value === undefined ? value : String(value))),
+    (0, class_validator_1.IsNumberString)(),
     __metadata("design:type", String)
 ], UpdateUserSubscriptionDto.prototype, "monthlyAmountPaid", void 0);
 __decorate([
     (0, class_validator_1.IsOptional)(),
     (0, class_validator_1.IsString)(),
+    (0, class_validator_1.MaxLength)(500),
     __metadata("design:type", String)
 ], UpdateUserSubscriptionDto.prototype, "cancellationReason", void 0);
 __decorate([
     (0, class_validator_1.IsOptional)(),
-    (0, class_validator_1.IsDateString)(),
-    (0, class_transformer_1.Transform)(({ value }) => (value ? new Date(value) : undefined)),
+    (0, class_transformer_1.Type)(() => Date),
+    (0, class_validator_1.IsDate)(),
     __metadata("design:type", Date)
 ], UpdateUserSubscriptionDto.prototype, "cancellationDate", void 0);
 //# sourceMappingURL=update-user-subscription.dto.js.map

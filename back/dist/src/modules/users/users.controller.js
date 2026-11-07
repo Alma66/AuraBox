@@ -20,6 +20,7 @@ const update_user_dto_1 = require("./dto/update-user.dto");
 const jwt_auth_guard_1 = require("../../common/guards/jwt-auth.guard");
 const roles_guard_1 = require("../auth/roles.guard");
 const roles_decorator_1 = require("../auth/roles.decorator");
+const throttler_1 = require("@nestjs/throttler");
 let UsersController = class UsersController {
     usersService;
     constructor(usersService) {
@@ -34,11 +35,15 @@ let UsersController = class UsersController {
     async verifyPassword(req, body) {
         return this.usersService.verifyPassword(req.user.id, body.password);
     }
-    async updateMe(req, dto) {
-        return this.usersService.update(req.user.id, dto);
+    async deactivateMe(req, body) {
+        return this.usersService.deactivate(req.user.id, body.password);
     }
-    async getNewsletterSubscribers(idClub) {
-        return this.usersService.findSubscribersByClub(idClub);
+    async updateMe(req, dto) {
+        delete dto.active;
+        return this.usersService.update(req.user.id, dto, true);
+    }
+    async getNewsletterSubscribers(idClub, req) {
+        return this.usersService.findNewsletterRecipients(idClub, req.user);
     }
     async findAll() {
         return this.usersService.findAll();
@@ -50,10 +55,13 @@ let UsersController = class UsersController {
         return this.usersService.findById(id);
     }
     async update(id, dto, req) {
-        if (req.user.role !== 'admin' && req.user.id !== id) {
-            throw new common_1.ForbiddenException('No autorizado');
+        if (req.user.role !== 'admin') {
+            if (req.user.id !== id) {
+                throw new common_1.ForbiddenException('No autorizado');
+            }
+            delete dto.active;
         }
-        return this.usersService.update(id, dto);
+        return this.usersService.update(id, dto, req.user.role !== 'admin');
     }
     async remove(id) {
         return this.usersService.remove(id);
@@ -61,6 +69,7 @@ let UsersController = class UsersController {
 };
 exports.UsersController = UsersController;
 __decorate([
+    (0, roles_decorator_1.Roles)('admin'),
     (0, common_1.Post)('register'),
     (0, common_1.UsePipes)(new common_1.ValidationPipe({ whitelist: true, transform: true })),
     __param(0, (0, common_1.Body)()),
@@ -69,6 +78,7 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], UsersController.prototype, "register", null);
 __decorate([
+    (0, roles_decorator_1.Roles)('customer'),
     (0, common_1.Get)('me'),
     __param(0, (0, common_1.Request)()),
     __metadata("design:type", Function),
@@ -76,6 +86,8 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], UsersController.prototype, "getMe", null);
 __decorate([
+    (0, roles_decorator_1.Roles)('customer'),
+    (0, throttler_1.Throttle)({ default: { limit: 5, ttl: 60000 } }),
     (0, common_1.Post)('me/verify-password'),
     __param(0, (0, common_1.Request)()),
     __param(1, (0, common_1.Body)()),
@@ -84,6 +96,18 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], UsersController.prototype, "verifyPassword", null);
 __decorate([
+    (0, roles_decorator_1.Roles)('customer'),
+    (0, throttler_1.Throttle)({ default: { limit: 5, ttl: 60000 } }),
+    (0, common_1.Post)('me/deactivate'),
+    __param(0, (0, common_1.Request)()),
+    __param(1, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object, Object]),
+    __metadata("design:returntype", Promise)
+], UsersController.prototype, "deactivateMe", null);
+__decorate([
+    (0, roles_decorator_1.Roles)('customer'),
+    (0, throttler_1.Throttle)({ default: { limit: 10, ttl: 60000 } }),
     (0, common_1.Patch)('me'),
     (0, common_1.UsePipes)(new common_1.ValidationPipe({ whitelist: true, transform: true })),
     __param(0, (0, common_1.Request)()),
@@ -93,26 +117,24 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], UsersController.prototype, "updateMe", null);
 __decorate([
-    (0, common_1.Get)('newsletter-subscribers/:idClub'),
-    (0, common_1.UseGuards)(roles_guard_1.RolesGuard),
     (0, roles_decorator_1.Roles)('entrepreneur', 'admin'),
+    (0, common_1.Get)('newsletter-subscribers/:idClub'),
     __param(0, (0, common_1.Param)('idClub', common_1.ParseIntPipe)),
+    __param(1, (0, common_1.Request)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Number]),
+    __metadata("design:paramtypes", [Number, Object]),
     __metadata("design:returntype", Promise)
 ], UsersController.prototype, "getNewsletterSubscribers", null);
 __decorate([
-    (0, common_1.Get)(),
-    (0, common_1.UseGuards)(roles_guard_1.RolesGuard),
     (0, roles_decorator_1.Roles)('admin'),
+    (0, common_1.Get)(),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", []),
     __metadata("design:returntype", Promise)
 ], UsersController.prototype, "findAll", null);
 __decorate([
-    (0, common_1.Get)(':id'),
-    (0, common_1.UseGuards)(roles_guard_1.RolesGuard),
     (0, roles_decorator_1.Roles)('admin', 'customer'),
+    (0, common_1.Get)(':id'),
     __param(0, (0, common_1.Param)('id', common_1.ParseIntPipe)),
     __param(1, (0, common_1.Request)()),
     __metadata("design:type", Function),
@@ -120,9 +142,9 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], UsersController.prototype, "findOne", null);
 __decorate([
-    (0, common_1.Put)(':id'),
-    (0, common_1.UseGuards)(roles_guard_1.RolesGuard),
     (0, roles_decorator_1.Roles)('admin', 'customer'),
+    (0, throttler_1.Throttle)({ default: { limit: 10, ttl: 60000 } }),
+    (0, common_1.Put)(':id'),
     (0, common_1.UsePipes)(new common_1.ValidationPipe({ whitelist: true, transform: true })),
     __param(0, (0, common_1.Param)('id', common_1.ParseIntPipe)),
     __param(1, (0, common_1.Body)()),
@@ -132,9 +154,8 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], UsersController.prototype, "update", null);
 __decorate([
-    (0, common_1.Delete)(':id'),
-    (0, common_1.UseGuards)(roles_guard_1.RolesGuard),
     (0, roles_decorator_1.Roles)('admin'),
+    (0, common_1.Delete)(':id'),
     __param(0, (0, common_1.Param)('id', common_1.ParseIntPipe)),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [Number]),
@@ -142,7 +163,7 @@ __decorate([
 ], UsersController.prototype, "remove", null);
 exports.UsersController = UsersController = __decorate([
     (0, common_1.Controller)('users'),
-    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),
+    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard, roles_guard_1.RolesGuard),
     __metadata("design:paramtypes", [users_service_1.UsersService])
 ], UsersController);
 //# sourceMappingURL=users.controller.js.map

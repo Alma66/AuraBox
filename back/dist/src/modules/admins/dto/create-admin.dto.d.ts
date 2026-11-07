@@ -6,7 +6,6 @@ export declare class CreateAdminDto {
     password: string;
     documentType: DocumentType;
     documentNumber: number;
-    phoneNumber: number;
+    phoneNumber?: string | null;
     notes?: string;
-    active?: boolean;
 }

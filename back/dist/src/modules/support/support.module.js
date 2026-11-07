@@ -12,12 +12,13 @@ const support_service_1 = require("./support.service");
 const support_controller_1 = require("./support.controller");
 const prisma_module_1 = require("../../prisma/prisma.module");
 const cloudinary_module_1 = require("../cloudinary/cloudinary.module");
+const mailer_module_1 = require("../mailer/mailer.module");
 let SupportModule = class SupportModule {
 };
 exports.SupportModule = SupportModule;
 exports.SupportModule = SupportModule = __decorate([
     (0, common_1.Module)({
-        imports: [prisma_module_1.PrismaModule, cloudinary_module_1.CloudinaryModule],
+        imports: [prisma_module_1.PrismaModule, cloudinary_module_1.CloudinaryModule, mailer_module_1.MailerModule],
         controllers: [support_controller_1.SupportController],
         providers: [support_service_1.SupportService],
     })

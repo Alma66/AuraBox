@@ -11,8 +11,13 @@ export declare class UsersController {
     }): Promise<{
         ok: boolean;
     }>;
+    deactivateMe(req: any, body: {
+        password: string;
+    }): Promise<{
+        ok: boolean;
+    }>;
     updateMe(req: any, dto: UpdateUserDto): Promise<any>;
-    getNewsletterSubscribers(idClub: number): Promise<any[]>;
+    getNewsletterSubscribers(idClub: number, req: any): Promise<any[]>;
     findAll(): Promise<any[]>;
     findOne(id: number, req: any): Promise<any>;
     update(id: number, dto: UpdateUserDto, req: any): Promise<any>;

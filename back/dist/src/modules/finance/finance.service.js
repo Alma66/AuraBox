@@ -20,6 +20,21 @@ let FinanceService = class FinanceService {
     constructor(prisma) {
         this.prisma = prisma;
     }
+    async assertClubAccess(idClub, user) {
+        if (user.role === 'admin')
+            return;
+        const assoc = await this.prisma.entrepreneur_Club.findFirst({
+            where: { idClub, idEntrepreneurs: user.id },
+        });
+        if (!assoc)
+            throw new common_1.ForbiddenException('No tenés acceso a este club');
+    }
+    async assertEntryAccess(entryId, user) {
+        const entry = await this.prisma.financial_Entry.findUnique({ where: { id: entryId } });
+        if (!entry)
+            throw new common_1.NotFoundException('Movimiento no encontrado');
+        await this.assertClubAccess(entry.idClub, user);
+    }
     async getMovements(idClub) {
         const movements = [];
         const payments = await this.prisma.payment.findMany({

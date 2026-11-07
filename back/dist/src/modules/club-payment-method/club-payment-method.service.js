@@ -17,10 +17,20 @@ let ClubPaymentMethodService = class ClubPaymentMethodService {
     constructor(prisma) {
         this.prisma = prisma;
     }
-    async create(dto) {
+    async assertClubAccess(idClub, user) {
+        if (user.role === 'admin')
+            return;
+        const assoc = await this.prisma.entrepreneur_Club.findFirst({
+            where: { idClub, idEntrepreneurs: user.id },
+        });
+        if (!assoc)
+            throw new common_1.ForbiddenException('No tenés acceso a este club');
+    }
+    async create(dto, user) {
         const club = await this.prisma.club.findUnique({ where: { id: dto.idClub } });
         if (!club)
             throw new common_1.NotFoundException('Club no encontrado');
+        await this.assertClubAccess(dto.idClub, user);
         const pm = await this.prisma.payment_Methods.findUnique({ where: { id: dto.idPaymentMethod } });
         if (!pm)
             throw new common_1.NotFoundException('Método de pago no encontrado');
@@ -88,10 +98,11 @@ let ClubPaymentMethodService = class ClubPaymentMethodService {
             },
         });
     }
-    async remove(id) {
+    async remove(id, user) {
         const existing = await this.prisma.club_Payment_Method.findUnique({ where: { id } });
         if (!existing)
             throw new common_1.NotFoundException('Asociación club-método de pago no encontrada');
+        await this.assertClubAccess(existing.idClub, user);
         await this.prisma.club_Payment_Method.delete({ where: { id } });
         return { message: 'Asociación eliminada correctamente' };
     }

@@ -26,38 +26,44 @@ let ShipmentsController = class ShipmentsController {
     constructor(shipmentsService) {
         this.shipmentsService = shipmentsService;
     }
-    async create(dto, req) {
-        if (req.user.id !== dto.idUser && req.user.role !== 'admin') {
-            throw new common_1.ForbiddenException('No autorizado para crear este envío');
-        }
+    async create(dto) {
         return this.shipmentsService.create(dto);
     }
-    async assignNew(dto) {
+    async assignNew(dto, req) {
+        await this.shipmentsService.assertClubAccess(dto.idClub, req.user);
         return this.shipmentsService.assignNewShipment(dto);
     }
     async findAll() {
         return this.shipmentsService.findAll();
     }
     async findByUser(idUser, req) {
-        if (req.user.id !== idUser && req.user.role !== 'admin') {
+        if (req.user.role !== 'admin' && (req.user.role !== 'customer' || req.user.id !== idUser)) {
             throw new common_1.ForbiddenException('No autorizado para ver estos envíos');
         }
         return this.shipmentsService.findByUser(idUser);
     }
-    async findByClub(idClub) {
+    async findByClub(idClub, req) {
+        await this.shipmentsService.assertClubAccess(idClub, req.user);
         return this.shipmentsService.findByClub(idClub);
     }
-    async findPendingByClub(idClub) {
+    async findPendingByClub(idClub, req) {
+        await this.shipmentsService.assertClubAccess(idClub, req.user);
         return this.shipmentsService.getPendingForClub(idClub);
     }
     async findOne(id, req) {
         const shipment = await this.shipmentsService.findOne(id);
-        if (req.user.role !== 'admin' && req.user.id !== shipment.idUser) {
-            throw new common_1.ForbiddenException('No autorizado para ver este envío');
+        if (req.user.role === 'admin')
+            return shipment;
+        if (req.user.role === 'customer' && req.user.id === shipment.idUser)
+            return shipment;
+        if (req.user.role === 'entrepreneur' && shipment.idClub) {
+            await this.shipmentsService.assertClubAccess(shipment.idClub, req.user);
+            return shipment;
         }
-        return shipment;
+        throw new common_1.ForbiddenException('No autorizado para ver este envío');
     }
-    async assignExisting(id, idClub, dto) {
+    async assignExisting(id, idClub, dto, req) {
+        await this.shipmentsService.assertClubAccess(idClub, req.user);
         return this.shipmentsService.assignRiderForClub(id, idClub, dto);
     }
     async update(id, dto) {
@@ -69,12 +75,13 @@ let ShipmentsController = class ShipmentsController {
 };
 exports.ShipmentsController = ShipmentsController;
 __decorate([
+    (0, common_1.UseGuards)(roles_guard_1.RolesGuard),
+    (0, roles_decorator_1.Roles)('admin'),
     (0, common_1.Post)(),
     (0, common_1.UsePipes)(new common_1.ValidationPipe({ whitelist: true, transform: true })),
     __param(0, (0, common_1.Body)()),
-    __param(1, (0, common_1.Request)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [create_shipment_dto_1.CreateShipmentDto, Object]),
+    __metadata("design:paramtypes", [create_shipment_dto_1.CreateShipmentDto]),
     __metadata("design:returntype", Promise)
 ], ShipmentsController.prototype, "create", null);
 __decorate([
@@ -83,8 +90,9 @@ __decorate([
     (0, common_1.Post)('assign'),
     (0, common_1.UsePipes)(new common_1.ValidationPipe({ whitelist: true, transform: true })),
     __param(0, (0, common_1.Body)()),
+    __param(1, (0, common_1.Request)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [assign_delivery_dto_1.AssignNewShipmentDto]),
+    __metadata("design:paramtypes", [assign_delivery_dto_1.AssignNewShipmentDto, Object]),
     __metadata("design:returntype", Promise)
 ], ShipmentsController.prototype, "assignNew", null);
 __decorate([
@@ -108,8 +116,9 @@ __decorate([
     (0, roles_decorator_1.Roles)('entrepreneur', 'admin'),
     (0, common_1.Get)('by-club/:idClub'),
     __param(0, (0, common_1.Param)('idClub', common_1.ParseIntPipe)),
+    __param(1, (0, common_1.Request)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Number]),
+    __metadata("design:paramtypes", [Number, Object]),
     __metadata("design:returntype", Promise)
 ], ShipmentsController.prototype, "findByClub", null);
 __decorate([
@@ -117,8 +126,9 @@ __decorate([
     (0, roles_decorator_1.Roles)('entrepreneur', 'admin'),
     (0, common_1.Get)('pending-by-club/:idClub'),
     __param(0, (0, common_1.Param)('idClub', common_1.ParseIntPipe)),
+    __param(1, (0, common_1.Request)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Number]),
+    __metadata("design:paramtypes", [Number, Object]),
     __metadata("design:returntype", Promise)
 ], ShipmentsController.prototype, "findPendingByClub", null);
 __decorate([
@@ -137,8 +147,9 @@ __decorate([
     __param(0, (0, common_1.Param)('id', common_1.ParseIntPipe)),
     __param(1, (0, common_1.Param)('idClub', common_1.ParseIntPipe)),
     __param(2, (0, common_1.Body)()),
+    __param(3, (0, common_1.Request)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Number, Number, assign_delivery_dto_1.AssignDeliveryDto]),
+    __metadata("design:paramtypes", [Number, Number, assign_delivery_dto_1.AssignDeliveryDto, Object]),
     __metadata("design:returntype", Promise)
 ], ShipmentsController.prototype, "assignExisting", null);
 __decorate([

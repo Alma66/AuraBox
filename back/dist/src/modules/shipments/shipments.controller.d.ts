@@ -5,12 +5,12 @@ import { AssignDeliveryDto, AssignNewShipmentDto } from './dto/assign-delivery.d
 export declare class ShipmentsController {
     private readonly shipmentsService;
     constructor(shipmentsService: ShipmentsService);
-    create(dto: CreateShipmentDto, req: any): Promise<any>;
-    assignNew(dto: AssignNewShipmentDto): Promise<any>;
+    create(dto: CreateShipmentDto): Promise<any>;
+    assignNew(dto: AssignNewShipmentDto, req: any): Promise<any>;
     findAll(): Promise<any[]>;
     findByUser(idUser: number, req: any): Promise<any[]>;
-    findByClub(idClub: number): Promise<any[]>;
-    findPendingByClub(idClub: number): Promise<{
+    findByClub(idClub: number, req: any): Promise<any[]>;
+    findPendingByClub(idClub: number, req: any): Promise<{
         idUserSubscriptions: number;
         idUser: number;
         idSubscriptionTypes: number;
@@ -21,7 +21,7 @@ export declare class ShipmentsController {
             firstName: string;
             lastName: string;
             email: string;
-            phoneNumber: number | null;
+            phoneNumber: string | null;
             address: {
                 street: string | null;
                 addressNumber: number | null;
@@ -40,7 +40,7 @@ export declare class ShipmentsController {
         }[];
     }[]>;
     findOne(id: number, req: any): Promise<any>;
-    assignExisting(id: number, idClub: number, dto: AssignDeliveryDto): Promise<any>;
+    assignExisting(id: number, idClub: number, dto: AssignDeliveryDto, req: any): Promise<any>;
     update(id: number, dto: UpdateShipmentDto): Promise<any>;
     remove(id: number): Promise<{
         message: string;

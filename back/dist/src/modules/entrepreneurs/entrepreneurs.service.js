@@ -70,6 +70,10 @@ let EntrepreneursService = class EntrepreneursService {
         });
         if (exists)
             throw new common_1.ConflictException('Email o documento ya registrado');
+        const birthDate = new Date(dto.birthDate);
+        const age = new Date().getFullYear() - birthDate.getFullYear();
+        if (age < 18)
+            throw new common_1.BadRequestException('Debes tener al menos 18 años para registrarte como emprendedor.');
         const passwordHash = await bcrypt.hash(dto.password, 10);
         const created = await this.prisma.entrepreneurs.create({
             data: {
@@ -81,7 +85,7 @@ let EntrepreneursService = class EntrepreneursService {
                 documentNumber: dto.documentNumber,
                 cuitCuil: dto.cuitCuil ?? null,
                 phoneNumber: dto.phoneNumber ?? null,
-                birthDate: new Date(dto.birthDate),
+                birthDate,
                 registrationDate: new Date(),
                 city: dto.city ?? null,
                 province: dto.province ?? null,
@@ -110,11 +114,25 @@ let EntrepreneursService = class EntrepreneursService {
     async findByEmail(email) {
         return this.prisma.entrepreneurs.findUnique({ where: { email } });
     }
-    async update(id, dto) {
+    async update(id, dto, requireCurrentPassword = false) {
         const entrepreneur = await this.prisma.entrepreneurs.findUnique({ where: { id } });
         if (!entrepreneur)
             throw new common_1.NotFoundException('Emprendedor no encontrado');
+        if (dto.password && requireCurrentPassword) {
+            await this.verifyPassword(id, dto.currentPassword);
+        }
+        if (dto.email && dto.email !== entrepreneur.email) {
+            const dup = await this.prisma.entrepreneurs.findUnique({ where: { email: dto.email } });
+            if (dup)
+                throw new common_1.ConflictException('Ese email ya está en uso');
+        }
+        if (dto.documentNumber && dto.documentNumber !== entrepreneur.documentNumber) {
+            const dup = await this.prisma.entrepreneurs.findFirst({ where: { documentNumber: dto.documentNumber } });
+            if (dup)
+                throw new common_1.ConflictException('Ese documento ya está en uso');
+        }
         const data = { ...dto };
+        delete data.currentPassword;
         if (data.password) {
             data.passwordHash = await bcrypt.hash(data.password, 10);
             delete data.password;
@@ -125,6 +143,9 @@ let EntrepreneursService = class EntrepreneursService {
         return sanitize(updated);
     }
     async verifyPassword(id, password) {
+        if (typeof password !== 'string' || password.length === 0) {
+            throw new common_1.BadRequestException('Contraseña requerida');
+        }
         const ent = await this.prisma.entrepreneurs.findUnique({ where: { id } });
         if (!ent)
             throw new common_1.NotFoundException('Emprendedor no encontrado');
@@ -140,25 +161,38 @@ let EntrepreneursService = class EntrepreneursService {
         const updated = await this.prisma.entrepreneurs.update({ where: { id }, data: { active: false } });
         return sanitize(updated);
     }
+    async deactivateSelf(id, password) {
+        await this.verifyPassword(id, password);
+        const links = await this.prisma.entrepreneur_Club.findMany({
+            where: { idEntrepreneurs: id },
+            select: { idClub: true },
+        });
+        if (links.length > 0) {
+            const subTypes = await this.prisma.subscription_Types.findMany({
+                where: { idClub: { in: links.map((link) => link.idClub) } },
+                select: { id: true },
+            });
+            const activeSubscribers = subTypes.length === 0
+                ? 0
+                : await this.prisma.user_Subscriptions.count({
+                    where: {
+                        idSubscriptionTypes: { in: subTypes.map((type) => type.id) },
+                        subscriptionStatus: { in: ['Activa', 'Pausada', 'Pendiente_Pago'] },
+                    },
+                });
+            if (activeSubscribers > 0) {
+                throw new common_1.BadRequestException('Tu club tiene suscriptores activos. Para cerrar tu cuenta, contactá a soporte y coordinamos el cierre del club.');
+            }
+        }
+        await this.prisma.entrepreneurs.update({ where: { id }, data: { active: false } });
+        return { ok: true };
+    }
     async remove(id) {
         const entrepreneur = await this.prisma.entrepreneurs.findUnique({ where: { id } });
         if (!entrepreneur)
             throw new common_1.NotFoundException('Emprendedor no encontrado');
         await this.prisma.entrepreneurs.delete({ where: { id } });
         return { message: 'Emprendedor eliminado correctamente' };
-    }
-    async findClubByEntrepreneur(entrepreneurId) {
-        const association = await this.prisma.entrepreneur_Club.findFirst({
-            where: { idEntrepreneurs: entrepreneurId },
-        });
-        if (!association)
-            return null;
-        try {
-            return await this.findOne(association.idClub);
-        }
-        catch {
-            return null;
-        }
     }
 };
 exports.EntrepreneursService = EntrepreneursService;

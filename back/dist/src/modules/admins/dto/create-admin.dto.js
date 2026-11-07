@@ -12,6 +12,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.CreateAdminDto = void 0;
 const class_validator_1 = require("class-validator");
 const client_1 = require("@prisma/client");
+const phone_1 = require("../../../common/utils/phone");
 class CreateAdminDto {
     firstName;
     lastName;
@@ -21,24 +22,29 @@ class CreateAdminDto {
     documentNumber;
     phoneNumber;
     notes;
-    active;
 }
 exports.CreateAdminDto = CreateAdminDto;
 __decorate([
     (0, class_validator_1.IsString)(),
+    (0, class_validator_1.IsNotEmpty)(),
+    (0, class_validator_1.MaxLength)(80),
     __metadata("design:type", String)
 ], CreateAdminDto.prototype, "firstName", void 0);
 __decorate([
     (0, class_validator_1.IsString)(),
+    (0, class_validator_1.IsNotEmpty)(),
+    (0, class_validator_1.MaxLength)(80),
     __metadata("design:type", String)
 ], CreateAdminDto.prototype, "lastName", void 0);
 __decorate([
     (0, class_validator_1.IsEmail)(),
+    (0, class_validator_1.MaxLength)(150),
     __metadata("design:type", String)
 ], CreateAdminDto.prototype, "email", void 0);
 __decorate([
     (0, class_validator_1.IsString)(),
-    (0, class_validator_1.MinLength)(6),
+    (0, class_validator_1.MinLength)(8),
+    (0, class_validator_1.MaxLength)(72),
     __metadata("design:type", String)
 ], CreateAdminDto.prototype, "password", void 0);
 __decorate([
@@ -47,20 +53,20 @@ __decorate([
 ], CreateAdminDto.prototype, "documentType", void 0);
 __decorate([
     (0, class_validator_1.IsInt)(),
+    (0, class_validator_1.Min)(1),
+    (0, class_validator_1.Max)(2147483647),
     __metadata("design:type", Number)
 ], CreateAdminDto.prototype, "documentNumber", void 0);
 __decorate([
-    (0, class_validator_1.IsInt)(),
-    __metadata("design:type", Number)
+    (0, class_validator_1.IsOptional)(),
+    (0, phone_1.NormalizePhone)(),
+    (0, class_validator_1.Matches)(phone_1.PHONE_REGEX, { message: phone_1.PHONE_MESSAGE }),
+    __metadata("design:type", Object)
 ], CreateAdminDto.prototype, "phoneNumber", void 0);
 __decorate([
     (0, class_validator_1.IsOptional)(),
     (0, class_validator_1.IsString)(),
+    (0, class_validator_1.MaxLength)(500),
     __metadata("design:type", String)
 ], CreateAdminDto.prototype, "notes", void 0);
-__decorate([
-    (0, class_validator_1.IsOptional)(),
-    (0, class_validator_1.IsBoolean)(),
-    __metadata("design:type", Boolean)
-], CreateAdminDto.prototype, "active", void 0);
 //# sourceMappingURL=create-admin.dto.js.map

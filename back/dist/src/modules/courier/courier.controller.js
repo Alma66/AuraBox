@@ -28,13 +28,16 @@ let CourierController = class CourierController {
     async findAll() {
         return this.svc.findAll();
     }
-    async findByClub(idClub) {
+    async findByClub(idClub, req) {
+        await this.svc.assertClubAccess(idClub, req.user);
         return this.svc.findByClub(idClub);
     }
-    async setClubCouriers(idClub, dto) {
+    async setClubCouriers(idClub, dto, req) {
+        await this.svc.assertClubAccess(idClub, req.user);
         return this.svc.setClubCouriers(idClub, dto);
     }
-    async setCourierFee(idClub, idCourier, dto) {
+    async setCourierFee(idClub, idCourier, dto, req) {
+        await this.svc.assertClubAccess(idClub, req.user);
         return this.svc.setCourierFee(idClub, idCourier, dto);
     }
 };
@@ -50,8 +53,9 @@ __decorate([
     (0, roles_decorator_1.Roles)('entrepreneur', 'admin'),
     (0, common_1.Get)('by-club/:idClub'),
     __param(0, (0, common_1.Param)('idClub', common_1.ParseIntPipe)),
+    __param(1, (0, common_1.Request)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Number]),
+    __metadata("design:paramtypes", [Number, Object]),
     __metadata("design:returntype", Promise)
 ], CourierController.prototype, "findByClub", null);
 __decorate([
@@ -61,8 +65,9 @@ __decorate([
     (0, common_1.UsePipes)(new common_1.ValidationPipe({ whitelist: true, transform: true })),
     __param(0, (0, common_1.Param)('idClub', common_1.ParseIntPipe)),
     __param(1, (0, common_1.Body)()),
+    __param(2, (0, common_1.Request)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Number, set_club_couriers_dto_1.SetClubCouriersDto]),
+    __metadata("design:paramtypes", [Number, set_club_couriers_dto_1.SetClubCouriersDto, Object]),
     __metadata("design:returntype", Promise)
 ], CourierController.prototype, "setClubCouriers", null);
 __decorate([
@@ -73,8 +78,9 @@ __decorate([
     __param(0, (0, common_1.Param)('idClub', common_1.ParseIntPipe)),
     __param(1, (0, common_1.Param)('idCourier', common_1.ParseIntPipe)),
     __param(2, (0, common_1.Body)()),
+    __param(3, (0, common_1.Request)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Number, Number, set_courier_fee_dto_1.SetCourierFeeDto]),
+    __metadata("design:paramtypes", [Number, Number, set_courier_fee_dto_1.SetCourierFeeDto, Object]),
     __metadata("design:returntype", Promise)
 ], CourierController.prototype, "setCourierFee", null);
 exports.CourierController = CourierController = __decorate([

@@ -10,22 +10,26 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.CreateEntrepreneurLicenseDto = void 0;
+const class_transformer_1 = require("class-transformer");
 const class_validator_1 = require("class-validator");
 class CreateEntrepreneurLicenseDto {
     idEntrepreneurs;
     idLicenseTypes;
     issueDate;
     expirationDate;
-    documentUrl;
-    verificationNotes;
 }
 exports.CreateEntrepreneurLicenseDto = CreateEntrepreneurLicenseDto;
 __decorate([
+    (0, class_validator_1.IsOptional)(),
+    (0, class_transformer_1.Type)(() => Number),
     (0, class_validator_1.IsInt)(),
+    (0, class_validator_1.Min)(1),
     __metadata("design:type", Number)
 ], CreateEntrepreneurLicenseDto.prototype, "idEntrepreneurs", void 0);
 __decorate([
+    (0, class_transformer_1.Type)(() => Number),
     (0, class_validator_1.IsInt)(),
+    (0, class_validator_1.Min)(1),
     __metadata("design:type", Number)
 ], CreateEntrepreneurLicenseDto.prototype, "idLicenseTypes", void 0);
 __decorate([
@@ -38,14 +42,4 @@ __decorate([
     (0, class_validator_1.IsDateString)(),
     __metadata("design:type", String)
 ], CreateEntrepreneurLicenseDto.prototype, "expirationDate", void 0);
-__decorate([
-    (0, class_validator_1.IsOptional)(),
-    (0, class_validator_1.IsUrl)(),
-    __metadata("design:type", String)
-], CreateEntrepreneurLicenseDto.prototype, "documentUrl", void 0);
-__decorate([
-    (0, class_validator_1.IsOptional)(),
-    (0, class_validator_1.IsString)(),
-    __metadata("design:type", String)
-], CreateEntrepreneurLicenseDto.prototype, "verificationNotes", void 0);
 //# sourceMappingURL=create-entrepreneur-licenses.dto.js.map

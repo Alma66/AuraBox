@@ -10,4 +10,6 @@ export declare class CreateClubDto {
     clubStatus?: ClubStatus;
     milestones?: string;
     communityText?: string;
+    shippingWindowStartDay?: number;
+    shippingWindowEndDay?: number;
 }

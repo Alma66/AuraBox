@@ -25,10 +25,7 @@ let EntrepreneurClubController = class EntrepreneurClubController {
     constructor(service) {
         this.service = service;
     }
-    async create(dto, req) {
-        if (req.user.role !== 'admin' && req.user.id !== dto.idEntrepreneurs) {
-            throw new common_1.ForbiddenException('No autorizado para crear esta asociación');
-        }
+    async create(dto) {
         return this.service.create(dto);
     }
     async findAll() {
@@ -37,20 +34,13 @@ let EntrepreneurClubController = class EntrepreneurClubController {
     async findByClub(idClub) {
         return this.service.findByClub(idClub);
     }
-    async findByEntrepreneur(idEntrepreneur, req) {
-        if (req.user.id !== idEntrepreneur && req.user.role !== 'admin') {
-            throw new common_1.ForbiddenException('No autorizado para ver estas asociaciones');
-        }
+    async findByEntrepreneur(idEntrepreneur) {
         return this.service.findByEntrepreneur(idEntrepreneur);
     }
     async findOne(id) {
         return this.service.findOne(id);
     }
-    async update(id, dto, req) {
-        const existing = await this.service.findOne(id);
-        if (req.user.role !== 'admin' && req.user.id !== existing.idEntrepreneurs) {
-            throw new common_1.ForbiddenException('No autorizado para actualizar esta asociación');
-        }
+    async update(id, dto) {
         return this.service.update(id, dto);
     }
     async remove(id) {
@@ -59,16 +49,15 @@ let EntrepreneurClubController = class EntrepreneurClubController {
 };
 exports.EntrepreneurClubController = EntrepreneurClubController;
 __decorate([
+    (0, roles_decorator_1.Roles)('admin'),
     (0, common_1.Post)(),
     (0, common_1.UsePipes)(new common_1.ValidationPipe({ whitelist: true, transform: true })),
     __param(0, (0, common_1.Body)()),
-    __param(1, (0, common_1.Request)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [create_entrepreneur_club_dto_1.CreateEntrepreneurClubDto, Object]),
+    __metadata("design:paramtypes", [create_entrepreneur_club_dto_1.CreateEntrepreneurClubDto]),
     __metadata("design:returntype", Promise)
 ], EntrepreneurClubController.prototype, "create", null);
 __decorate([
-    (0, common_1.UseGuards)(roles_guard_1.RolesGuard),
     (0, roles_decorator_1.Roles)('admin'),
     (0, common_1.Get)(),
     __metadata("design:type", Function),
@@ -76,8 +65,7 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], EntrepreneurClubController.prototype, "findAll", null);
 __decorate([
-    (0, common_1.UseGuards)(roles_guard_1.RolesGuard),
-    (0, roles_decorator_1.Roles)('entrepreneur', 'admin'),
+    (0, roles_decorator_1.Roles)('admin'),
     (0, common_1.Get)('by-club/:idClub'),
     __param(0, (0, common_1.Param)('idClub', common_1.ParseIntPipe)),
     __metadata("design:type", Function),
@@ -85,14 +73,15 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], EntrepreneurClubController.prototype, "findByClub", null);
 __decorate([
+    (0, roles_decorator_1.Roles)('admin'),
     (0, common_1.Get)('by-entrepreneur/:idEntrepreneur'),
     __param(0, (0, common_1.Param)('idEntrepreneur', common_1.ParseIntPipe)),
-    __param(1, (0, common_1.Request)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Number, Object]),
+    __metadata("design:paramtypes", [Number]),
     __metadata("design:returntype", Promise)
 ], EntrepreneurClubController.prototype, "findByEntrepreneur", null);
 __decorate([
+    (0, roles_decorator_1.Roles)('admin'),
     (0, common_1.Get)(':id'),
     __param(0, (0, common_1.Param)('id', common_1.ParseIntPipe)),
     __metadata("design:type", Function),
@@ -100,17 +89,16 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], EntrepreneurClubController.prototype, "findOne", null);
 __decorate([
+    (0, roles_decorator_1.Roles)('admin'),
     (0, common_1.Patch)(':id'),
     (0, common_1.UsePipes)(new common_1.ValidationPipe({ whitelist: true, transform: true })),
     __param(0, (0, common_1.Param)('id', common_1.ParseIntPipe)),
     __param(1, (0, common_1.Body)()),
-    __param(2, (0, common_1.Request)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Number, update_entrepreneur_club_dto_1.UpdateEntrepreneurClubDto, Object]),
+    __metadata("design:paramtypes", [Number, update_entrepreneur_club_dto_1.UpdateEntrepreneurClubDto]),
     __metadata("design:returntype", Promise)
 ], EntrepreneurClubController.prototype, "update", null);
 __decorate([
-    (0, common_1.UseGuards)(roles_guard_1.RolesGuard),
     (0, roles_decorator_1.Roles)('admin'),
     (0, common_1.Delete)(':id'),
     __param(0, (0, common_1.Param)('id', common_1.ParseIntPipe)),
@@ -120,7 +108,7 @@ __decorate([
 ], EntrepreneurClubController.prototype, "remove", null);
 exports.EntrepreneurClubController = EntrepreneurClubController = __decorate([
     (0, common_1.Controller)('entrepreneur-club'),
-    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),
+    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard, roles_guard_1.RolesGuard),
     __metadata("design:paramtypes", [entrepreneur_club_service_1.EntrepreneurClubService])
 ], EntrepreneurClubController);
 //# sourceMappingURL=entrepreneur-club.controller.js.map

@@ -12,6 +12,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.CreateEntrepreneurDto = void 0;
 const class_validator_1 = require("class-validator");
 const client_1 = require("@prisma/client");
+const phone_1 = require("../../../common/utils/phone");
 class CreateEntrepreneurDto {
     firstName;
     lastName;
@@ -26,14 +27,24 @@ class CreateEntrepreneurDto {
     province;
     active;
     bio;
+    gender;
+    country;
+    streetAddress;
+    addressNumber;
+    floorNumber;
+    addressDetails;
+    postalCode;
+    showGenderPublicly;
 }
 exports.CreateEntrepreneurDto = CreateEntrepreneurDto;
 __decorate([
     (0, class_validator_1.IsString)(),
+    (0, class_validator_1.MinLength)(2),
     __metadata("design:type", String)
 ], CreateEntrepreneurDto.prototype, "firstName", void 0);
 __decorate([
     (0, class_validator_1.IsString)(),
+    (0, class_validator_1.MinLength)(2),
     __metadata("design:type", String)
 ], CreateEntrepreneurDto.prototype, "lastName", void 0);
 __decorate([
@@ -42,7 +53,11 @@ __decorate([
 ], CreateEntrepreneurDto.prototype, "email", void 0);
 __decorate([
     (0, class_validator_1.IsString)(),
-    (0, class_validator_1.MinLength)(6),
+    (0, class_validator_1.MinLength)(8),
+    (0, class_validator_1.MaxLength)(64),
+    (0, class_validator_1.Matches)(/(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/, {
+        message: 'La contraseña debe tener al menos una mayúscula, una minúscula y un número',
+    }),
     __metadata("design:type", String)
 ], CreateEntrepreneurDto.prototype, "password", void 0);
 __decorate([
@@ -60,8 +75,9 @@ __decorate([
 ], CreateEntrepreneurDto.prototype, "cuitCuil", void 0);
 __decorate([
     (0, class_validator_1.IsOptional)(),
-    (0, class_validator_1.IsInt)(),
-    __metadata("design:type", Number)
+    (0, phone_1.NormalizePhone)(),
+    (0, class_validator_1.Matches)(phone_1.PHONE_REGEX, { message: phone_1.PHONE_MESSAGE }),
+    __metadata("design:type", Object)
 ], CreateEntrepreneurDto.prototype, "phoneNumber", void 0);
 __decorate([
     (0, class_validator_1.IsDateString)(),
@@ -79,6 +95,7 @@ __decorate([
 ], CreateEntrepreneurDto.prototype, "province", void 0);
 __decorate([
     (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.IsBoolean)(),
     __metadata("design:type", Boolean)
 ], CreateEntrepreneurDto.prototype, "active", void 0);
 __decorate([
@@ -86,4 +103,44 @@ __decorate([
     (0, class_validator_1.IsString)(),
     __metadata("design:type", String)
 ], CreateEntrepreneurDto.prototype, "bio", void 0);
+__decorate([
+    (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.IsString)(),
+    __metadata("design:type", String)
+], CreateEntrepreneurDto.prototype, "gender", void 0);
+__decorate([
+    (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.IsString)(),
+    __metadata("design:type", String)
+], CreateEntrepreneurDto.prototype, "country", void 0);
+__decorate([
+    (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.IsString)(),
+    __metadata("design:type", String)
+], CreateEntrepreneurDto.prototype, "streetAddress", void 0);
+__decorate([
+    (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.IsInt)(),
+    __metadata("design:type", Number)
+], CreateEntrepreneurDto.prototype, "addressNumber", void 0);
+__decorate([
+    (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.IsString)(),
+    __metadata("design:type", String)
+], CreateEntrepreneurDto.prototype, "floorNumber", void 0);
+__decorate([
+    (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.IsString)(),
+    __metadata("design:type", String)
+], CreateEntrepreneurDto.prototype, "addressDetails", void 0);
+__decorate([
+    (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.IsString)(),
+    __metadata("design:type", String)
+], CreateEntrepreneurDto.prototype, "postalCode", void 0);
+__decorate([
+    (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.IsBoolean)(),
+    __metadata("design:type", Boolean)
+], CreateEntrepreneurDto.prototype, "showGenderPublicly", void 0);
 //# sourceMappingURL=create-entrepreneurs.dto.js.map

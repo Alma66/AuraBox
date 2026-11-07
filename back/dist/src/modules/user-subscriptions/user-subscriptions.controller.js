@@ -26,22 +26,33 @@ let UserSubscriptionsController = class UserSubscriptionsController {
         this.svc = svc;
     }
     async create(dto, req) {
-        return this.svc.create(dto, req.user?.id);
+        return this.svc.create(dto, req.user);
     }
-    async findAll(userId) {
-        if (userId)
-            return this.svc.findByUser(Number(userId));
+    async findAll(userId, req) {
+        if (userId) {
+            const targetId = Number(userId);
+            if (req.user.role !== 'admin' && (req.user.role !== 'customer' || req.user.id !== targetId)) {
+                throw new common_1.ForbiddenException('No autorizado para ver estas suscripciones');
+            }
+            return this.svc.findByUser(targetId);
+        }
+        if (req.user.role !== 'admin') {
+            throw new common_1.ForbiddenException('No autorizado para ver todas las suscripciones');
+        }
         return this.svc.findAll();
     }
-    async findOne(id) {
-        return this.svc.findById(id);
+    async findOne(id, req) {
+        return this.svc.findOneForRequester(id, req.user);
     }
     async update(id, dto, req) {
-        return this.svc.update(id, dto, req.user?.role);
+        return this.svc.updateForRequester(id, dto, req.user);
+    }
+    async patch(id, dto, req) {
+        return this.svc.updateForRequester(id, dto, req.user);
     }
     async cancel(id, body, req) {
         const sub = await this.svc.findById(id);
-        if (req.user?.id !== sub.idUser && req.user?.role !== 'admin') {
+        if (req.user?.role !== 'admin' && (req.user?.role !== 'customer' || req.user?.id !== sub.idUser)) {
             throw new common_1.ForbiddenException('No autorizado para cancelar esta suscripción');
         }
         return this.svc.cancel(id, body?.reason);
@@ -52,6 +63,8 @@ let UserSubscriptionsController = class UserSubscriptionsController {
 };
 exports.UserSubscriptionsController = UserSubscriptionsController;
 __decorate([
+    (0, common_1.UseGuards)(roles_guard_1.RolesGuard),
+    (0, roles_decorator_1.Roles)('customer', 'admin'),
     (0, common_1.Post)(),
     (0, common_1.UsePipes)(new common_1.ValidationPipe({ whitelist: true, transform: true })),
     __param(0, (0, common_1.Body)()),
@@ -63,15 +76,17 @@ __decorate([
 __decorate([
     (0, common_1.Get)(),
     __param(0, (0, common_1.Query)('userId')),
+    __param(1, (0, common_1.Request)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String]),
+    __metadata("design:paramtypes", [Object, Object]),
     __metadata("design:returntype", Promise)
 ], UserSubscriptionsController.prototype, "findAll", null);
 __decorate([
     (0, common_1.Get)(':id'),
     __param(0, (0, common_1.Param)('id', common_1.ParseIntPipe)),
+    __param(1, (0, common_1.Request)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Number]),
+    __metadata("design:paramtypes", [Number, Object]),
     __metadata("design:returntype", Promise)
 ], UserSubscriptionsController.prototype, "findOne", null);
 __decorate([
@@ -86,6 +101,18 @@ __decorate([
     __metadata("design:paramtypes", [Number, update_user_subscription_dto_1.UpdateUserSubscriptionDto, Object]),
     __metadata("design:returntype", Promise)
 ], UserSubscriptionsController.prototype, "update", null);
+__decorate([
+    (0, common_1.UseGuards)(roles_guard_1.RolesGuard),
+    (0, roles_decorator_1.Roles)('admin', 'entrepreneur'),
+    (0, common_1.Patch)(':id'),
+    (0, common_1.UsePipes)(new common_1.ValidationPipe({ whitelist: true, transform: true })),
+    __param(0, (0, common_1.Param)('id', common_1.ParseIntPipe)),
+    __param(1, (0, common_1.Body)()),
+    __param(2, (0, common_1.Request)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Number, update_user_subscription_dto_1.UpdateUserSubscriptionDto, Object]),
+    __metadata("design:returntype", Promise)
+], UserSubscriptionsController.prototype, "patch", null);
 __decorate([
     (0, common_1.Post)(':id/cancel'),
     __param(0, (0, common_1.Param)('id', common_1.ParseIntPipe)),

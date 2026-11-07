@@ -13,6 +13,7 @@ exports.CreateUserDto = void 0;
 const class_validator_1 = require("class-validator");
 const class_transformer_1 = require("class-transformer");
 const client_1 = require("@prisma/client");
+const phone_1 = require("../../../common/utils/phone");
 class CreateUserDto {
     firstName;
     lastName;
@@ -41,7 +42,11 @@ __decorate([
 ], CreateUserDto.prototype, "email", void 0);
 __decorate([
     (0, class_validator_1.IsString)(),
-    (0, class_validator_1.MinLength)(6),
+    (0, class_validator_1.MinLength)(8),
+    (0, class_validator_1.MaxLength)(64),
+    (0, class_validator_1.Matches)(/(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/, {
+        message: 'La contraseña debe tener al menos una mayúscula, una minúscula y un número',
+    }),
     __metadata("design:type", String)
 ], CreateUserDto.prototype, "password", void 0);
 __decorate([
@@ -55,9 +60,9 @@ __decorate([
 ], CreateUserDto.prototype, "documentNumber", void 0);
 __decorate([
     (0, class_validator_1.IsOptional)(),
-    (0, class_transformer_1.Transform)(({ value }) => (value === null || value === undefined ? value : parseInt(String(value), 10))),
-    (0, class_validator_1.IsInt)(),
-    __metadata("design:type", Number)
+    (0, phone_1.NormalizePhone)(),
+    (0, class_validator_1.Matches)(phone_1.PHONE_REGEX, { message: phone_1.PHONE_MESSAGE }),
+    __metadata("design:type", Object)
 ], CreateUserDto.prototype, "phoneNumber", void 0);
 __decorate([
     (0, class_validator_1.IsDateString)(),

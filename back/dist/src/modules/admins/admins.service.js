@@ -44,8 +44,23 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.AdminsService = void 0;
 const common_1 = require("@nestjs/common");
+const client_1 = require("@prisma/client");
 const prisma_service_1 = require("../../prisma/prisma.service");
 const bcrypt = __importStar(require("bcryptjs"));
+const SALT_ROUNDS = 10;
+const ADMIN_SELECT = {
+    id: true,
+    firstName: true,
+    lastName: true,
+    email: true,
+    documentType: true,
+    documentNumber: true,
+    phoneNumber: true,
+    active: true,
+    notes: true,
+    createdAt: true,
+    updatedAt: true,
+};
 function sanitize(admin) {
     if (!admin)
         return admin;
@@ -60,64 +75,120 @@ let AdminsService = class AdminsService {
     constructor(prisma) {
         this.prisma = prisma;
     }
-    SALT_ROUNDS = 10;
+    async emailTaken(email) {
+        const where = { email: { equals: email, mode: 'insensitive' } };
+        const [admin, user, entrepreneur] = await Promise.all([
+            this.prisma.admins.findFirst({ where, select: { id: true } }),
+            this.prisma.user.findFirst({ where, select: { id: true } }),
+            this.prisma.entrepreneurs.findFirst({ where, select: { id: true } }),
+        ]);
+        return !!(admin || user || entrepreneur);
+    }
     async create(dto) {
-        const exists = await this.prisma.admins.findUnique({ where: { email: dto.email } });
-        if (exists)
-            throw new common_1.BadRequestException('Ya existe un admin con ese email');
-        const passwordHash = await bcrypt.hash(dto.password, this.SALT_ROUNDS);
-        const created = await this.prisma.admins.create({
-            data: {
-                firstName: dto.firstName,
-                lastName: dto.lastName,
-                email: dto.email,
-                passwordHash,
-                documentType: dto.documentType,
-                documentNumber: dto.documentNumber,
-                phoneNumber: dto.phoneNumber,
-                notes: dto.notes ?? null,
-                active: dto.active ?? true,
-            },
+        const email = dto.email.trim().toLowerCase();
+        if (await this.emailTaken(email)) {
+            throw new common_1.BadRequestException('Ese email ya está registrado en la plataforma');
+        }
+        const documentTaken = await this.prisma.admins.findUnique({
+            where: { documentNumber: dto.documentNumber },
+            select: { id: true },
         });
-        return sanitize(created);
+        if (documentTaken)
+            throw new common_1.BadRequestException('Ya existe un admin con ese documento');
+        const passwordHash = await bcrypt.hash(dto.password, SALT_ROUNDS);
+        try {
+            const created = await this.prisma.admins.create({
+                data: {
+                    firstName: dto.firstName.trim(),
+                    lastName: dto.lastName.trim(),
+                    email,
+                    passwordHash,
+                    documentType: dto.documentType,
+                    documentNumber: dto.documentNumber,
+                    phoneNumber: dto.phoneNumber ?? null,
+                    notes: dto.notes?.trim() || null,
+                    active: true,
+                },
+                select: ADMIN_SELECT,
+            });
+            return sanitize(created);
+        }
+        catch (error) {
+            if (error instanceof client_1.Prisma.PrismaClientKnownRequestError && error.code === 'P2002') {
+                throw new common_1.BadRequestException('Ya existe un admin con ese email o documento');
+            }
+            throw error;
+        }
     }
     async findAll() {
-        const admins = await this.prisma.admins.findMany({ orderBy: { createdAt: 'desc' } });
+        const admins = await this.prisma.admins.findMany({
+            orderBy: { createdAt: 'desc' },
+            select: ADMIN_SELECT,
+        });
         return admins.map(sanitize);
     }
     async findOne(id) {
-        const item = await this.prisma.admins.findUnique({ where: { id } });
+        const item = await this.prisma.admins.findUnique({ where: { id }, select: ADMIN_SELECT });
         if (!item)
             throw new common_1.NotFoundException('Admin no encontrado');
         return sanitize(item);
     }
     async findByEmail(email) {
-        const item = await this.prisma.admins.findUnique({ where: { email } });
+        const item = await this.prisma.admins.findFirst({
+            where: { email: { equals: email.trim(), mode: 'insensitive' } },
+            select: ADMIN_SELECT,
+        });
         if (!item)
             throw new common_1.NotFoundException('Admin no encontrado por email');
         return sanitize(item);
     }
     async update(id, dto) {
-        const item = await this.prisma.admins.findUnique({ where: { id } });
-        if (!item)
+        const exists = await this.prisma.admins.findUnique({ where: { id }, select: { id: true } });
+        if (!exists)
             throw new common_1.NotFoundException('Admin no encontrado');
-        let data = { ...dto };
-        if (dto.password) {
-            data.passwordHash = await bcrypt.hash(dto.password, this.SALT_ROUNDS);
-            delete data.password;
-        }
         const updated = await this.prisma.admins.update({
             where: { id },
-            data,
+            data: {
+                ...(dto.firstName !== undefined ? { firstName: dto.firstName.trim() } : {}),
+                ...(dto.lastName !== undefined ? { lastName: dto.lastName.trim() } : {}),
+                ...(dto.phoneNumber !== undefined ? { phoneNumber: dto.phoneNumber } : {}),
+                ...(dto.notes !== undefined ? { notes: dto.notes.trim() || null } : {}),
+                updatedAt: new Date(),
+            },
+            select: ADMIN_SELECT,
         });
         return sanitize(updated);
     }
-    async remove(id) {
-        const item = await this.prisma.admins.findUnique({ where: { id } });
-        if (!item)
+    async setActive(id, active, requesterId) {
+        const target = await this.prisma.admins.findUnique({ where: { id }, select: { id: true, active: true } });
+        if (!target)
             throw new common_1.NotFoundException('Admin no encontrado');
-        await this.prisma.admins.delete({ where: { id } });
-        return { message: 'Admin eliminado correctamente' };
+        if (!active) {
+            if (id === requesterId) {
+                throw new common_1.BadRequestException('No podés desactivar tu propia cuenta');
+            }
+            const otherActive = await this.prisma.admins.count({ where: { active: true, id: { not: id } } });
+            if (otherActive === 0) {
+                throw new common_1.BadRequestException('Tiene que quedar al menos un administrador activo');
+            }
+        }
+        const updated = await this.prisma.admins.update({
+            where: { id },
+            data: { active, updatedAt: new Date() },
+            select: ADMIN_SELECT,
+        });
+        return sanitize(updated);
+    }
+    async setPassword(id, password) {
+        const exists = await this.prisma.admins.findUnique({ where: { id }, select: { id: true } });
+        if (!exists)
+            throw new common_1.NotFoundException('Admin no encontrado');
+        const passwordHash = await bcrypt.hash(password, SALT_ROUNDS);
+        await this.prisma.admins.update({
+            where: { id },
+            data: { passwordHash, updatedAt: new Date() },
+        });
+        return { message: 'Contraseña actualizada correctamente' };
     }
 };
 exports.AdminsService = AdminsService;

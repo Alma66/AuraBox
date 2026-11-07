@@ -43,8 +43,8 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.UsersService = void 0;
-const common_1 = require("@nestjs/common");
 const prisma_service_1 = require("../../prisma/prisma.service");
+const common_1 = require("@nestjs/common");
 const bcrypt = __importStar(require("bcryptjs"));
 const client_1 = require("@prisma/client");
 const USER_SELECT = {
@@ -67,6 +67,16 @@ const USER_SELECT = {
     postalCode: true,
     active: true,
     acceptsNewsletter: true,
+    gender: true,
+    country: true,
+    showGenderPublicly: true,
+    homeLatitude: true,
+    homeLongitude: true,
+};
+const NEWSLETTER_SELECT = {
+    id: true,
+    firstName: true,
+    lastName: true,
 };
 function sanitizeUser(user) {
     if (!user)
@@ -81,6 +91,18 @@ function sanitizeUser(user) {
     if (rest.balanceAvailable !== undefined && rest.balanceAvailable !== null) {
         try {
             rest.balanceAvailable = rest.balanceAvailable.toString();
+        }
+        catch { }
+    }
+    if (rest.homeLatitude !== undefined && rest.homeLatitude !== null) {
+        try {
+            rest.homeLatitude = rest.homeLatitude.toString();
+        }
+        catch { }
+    }
+    if (rest.homeLongitude !== undefined && rest.homeLongitude !== null) {
+        try {
+            rest.homeLongitude = rest.homeLongitude.toString();
         }
         catch { }
     }
@@ -127,7 +149,10 @@ let UsersService = class UsersService {
     async findByEmail(email) {
         return this.prisma.user.findUnique({ where: { email } });
     }
-    async update(id, dto) {
+    async update(id, dto, requireCurrentPassword = false) {
+        if (dto.password && requireCurrentPassword) {
+            await this.verifyPassword(id, dto.currentPassword);
+        }
         const data = {};
         if (dto.firstName !== undefined)
             data.firstName = dto.firstName;
@@ -159,24 +184,57 @@ let UsersService = class UsersService {
             data.postalCode = dto.postalCode;
         if (dto.acceptsNewsletter !== undefined)
             data.acceptsNewsletter = dto.acceptsNewsletter;
+        if (dto.gender !== undefined)
+            data.gender = dto.gender;
+        if (dto.country !== undefined)
+            data.country = dto.country;
+        if (dto.showGenderPublicly !== undefined)
+            data.showGenderPublicly = dto.showGenderPublicly;
+        if (dto.active !== undefined)
+            data.active = dto.active;
+        if (dto.latitude !== undefined)
+            data.homeLatitude = dto.latitude;
+        if (dto.longitude !== undefined)
+            data.homeLongitude = dto.longitude;
         try {
             const updated = await this.prisma.user.update({ where: { id }, data, select: USER_SELECT });
             return sanitizeUser(updated);
         }
         catch (err) {
-            if (err instanceof client_1.Prisma.PrismaClientKnownRequestError && err.code === 'P2025') {
-                throw new common_1.NotFoundException('Usuario no encontrado');
+            if (err instanceof client_1.Prisma.PrismaClientKnownRequestError) {
+                if (err.code === 'P2025')
+                    throw new common_1.NotFoundException('Usuario no encontrado');
+                if (err.code === 'P2002')
+                    throw new common_1.BadRequestException('El número de documento ya está registrado');
             }
             throw err;
         }
     }
     async verifyPassword(id, password) {
+        if (typeof password !== 'string' || password.length === 0) {
+            throw new common_1.BadRequestException('Contraseña requerida');
+        }
         const user = await this.prisma.user.findUnique({ where: { id } });
         if (!user)
             throw new common_1.NotFoundException('Usuario no encontrado');
         const ok = await bcrypt.compare(password, user.passwordHash);
         if (!ok)
             throw new common_1.UnauthorizedException('Contraseña incorrecta');
+        return { ok: true };
+    }
+    async deactivate(id, password) {
+        await this.verifyPassword(id, password);
+        await this.prisma.$transaction([
+            this.prisma.user_Subscriptions.updateMany({
+                where: { idUser: id, subscriptionStatus: { in: ['Activa', 'Pausada', 'Pendiente_Pago'] } },
+                data: {
+                    subscriptionStatus: 'Cancelada',
+                    cancellationReason: 'Cuenta desactivada por el usuario',
+                    cancellationDate: new Date(),
+                },
+            }),
+            this.prisma.user.update({ where: { id }, data: { active: false } }),
+        ]);
         return { ok: true };
     }
     async remove(id) {
@@ -211,9 +269,19 @@ let UsersService = class UsersService {
             return [];
         const users = await this.prisma.user.findMany({
             where: { id: { in: userIds }, acceptsNewsletter: true },
-            select: USER_SELECT,
+            select: NEWSLETTER_SELECT,
         });
         return users.map(sanitizeUser);
+    }
+    async findNewsletterRecipients(idClub, requester) {
+        if (requester.role !== 'admin') {
+            const link = await this.prisma.entrepreneur_Club.findFirst({
+                where: { idClub, idEntrepreneurs: requester.id },
+            });
+            if (!link)
+                throw new common_1.ForbiddenException('No tenés acceso a este club');
+        }
+        return this.findSubscribersByClub(idClub);
     }
 };
 exports.UsersService = UsersService;

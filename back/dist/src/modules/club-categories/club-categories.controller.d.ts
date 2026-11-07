@@ -4,7 +4,7 @@ import { UpdateClubCategoryDto } from './dto/update-club-category.dto';
 export declare class ClubCategoriesController {
     private readonly service;
     constructor(service: ClubCategoriesService);
-    create(dto: CreateClubCategoryDto): Promise<{
+    create(dto: CreateClubCategoryDto, req: any): Promise<{
         id: number;
         idCategories: number;
         idClub: number;

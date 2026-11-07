@@ -49,8 +49,6 @@ let ClubStatusHistoryController = class ClubStatusHistoryController {
 };
 exports.ClubStatusHistoryController = ClubStatusHistoryController;
 __decorate([
-    (0, common_1.UseGuards)(roles_guard_1.RolesGuard),
-    (0, roles_decorator_1.Roles)('admin'),
     (0, common_1.Post)(),
     (0, common_1.UsePipes)(new common_1.ValidationPipe({ whitelist: true, transform: true })),
     __param(0, (0, common_1.Body)()),
@@ -59,8 +57,6 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], ClubStatusHistoryController.prototype, "create", null);
 __decorate([
-    (0, common_1.UseGuards)(roles_guard_1.RolesGuard),
-    (0, roles_decorator_1.Roles)('admin'),
     (0, common_1.Get)(),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", []),
@@ -88,8 +84,6 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], ClubStatusHistoryController.prototype, "findOne", null);
 __decorate([
-    (0, common_1.UseGuards)(roles_guard_1.RolesGuard),
-    (0, roles_decorator_1.Roles)('admin'),
     (0, common_1.Put)(':id'),
     (0, common_1.UsePipes)(new common_1.ValidationPipe({ whitelist: true, transform: true })),
     __param(0, (0, common_1.Param)('id', common_1.ParseIntPipe)),
@@ -99,8 +93,6 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], ClubStatusHistoryController.prototype, "update", null);
 __decorate([
-    (0, common_1.UseGuards)(roles_guard_1.RolesGuard),
-    (0, roles_decorator_1.Roles)('admin'),
     (0, common_1.Delete)(':id'),
     __param(0, (0, common_1.Param)('id', common_1.ParseIntPipe)),
     __metadata("design:type", Function),
@@ -109,7 +101,8 @@ __decorate([
 ], ClubStatusHistoryController.prototype, "remove", null);
 exports.ClubStatusHistoryController = ClubStatusHistoryController = __decorate([
     (0, common_1.Controller)('club-status-history'),
-    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),
+    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard, roles_guard_1.RolesGuard),
+    (0, roles_decorator_1.Roles)('admin'),
     __metadata("design:paramtypes", [club_status_history_service_1.ClubStatusHistoryService])
 ], ClubStatusHistoryController);
 //# sourceMappingURL=club-status-history.controller.js.map

@@ -13,6 +13,11 @@ export declare class EntrepreneursController {
     }): Promise<{
         ok: boolean;
     }>;
+    deactivateMe(req: any, body: {
+        password: string;
+    }): Promise<{
+        ok: boolean;
+    }>;
     updateMe(req: any, dto: UpdateEntrepreneurDto): Promise<any>;
     getMyClub(req: any): Promise<any>;
     findAll(): Promise<any[]>;

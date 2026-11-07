@@ -3,9 +3,10 @@ export declare class UpdateUserDto {
     firstName?: string;
     lastName?: string;
     password?: string;
+    currentPassword?: string;
     documentType?: DocumentType;
     documentNumber?: number;
-    phoneNumber?: number;
+    phoneNumber?: string | null;
     birthDate?: string;
     streetAddress?: string;
     addressNumber?: number;
@@ -15,4 +16,10 @@ export declare class UpdateUserDto {
     province?: string;
     postalCode?: string;
     acceptsNewsletter?: boolean;
+    gender?: string;
+    country?: string;
+    showGenderPublicly?: boolean;
+    active?: boolean;
+    latitude?: number;
+    longitude?: number;
 }

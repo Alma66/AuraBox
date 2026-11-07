@@ -10,79 +10,79 @@ import { UpdateSupplyOrderDto } from './dto/update-supply-order.dto';
 export declare class InventoryController {
     private readonly svc;
     constructor(svc: InventoryService);
-    createCategory(dto: CreateSupplyCategoryDto): Promise<{
+    createCategory(dto: CreateSupplyCategoryDto, req: any): Promise<{
+        id: number;
         name: string;
         description: string | null;
-        createdAt: Date;
-        id: number;
         idClub: number;
+        createdAt: Date;
     }>;
-    findCategories(idClub: number): Promise<{
+    findCategories(idClub: number, req: any): Promise<{
+        id: number;
         name: string;
         description: string | null;
-        createdAt: Date;
-        id: number;
         idClub: number;
+        createdAt: Date;
     }[]>;
-    updateCategory(id: number, dto: UpdateSupplyCategoryDto): Promise<{
+    updateCategory(id: number, dto: UpdateSupplyCategoryDto, req: any): Promise<{
+        id: number;
         name: string;
         description: string | null;
-        createdAt: Date;
-        id: number;
         idClub: number;
+        createdAt: Date;
     }>;
-    removeCategory(id: number): Promise<{
+    removeCategory(id: number, req: any): Promise<{
         message: string;
     }>;
-    createSupplier(dto: CreateSupplierDto): Promise<{
+    createSupplier(dto: CreateSupplierDto, req: any): Promise<{
         categoryIds: number[];
-        name: string;
-        createdAt: Date;
         id: number;
-        active: boolean;
-        notes: string | null;
-        contactEmail: string | null;
+        name: string;
         idClub: number;
-        contactPhone: string | null;
+        contactEmail: string | null;
+        active: boolean;
+        createdAt: Date;
+        notes: string | null;
         address: string | null;
+        contactPhone: string | null;
     }>;
-    findSuppliers(idClub: number): Promise<{
+    findSuppliers(idClub: number, req: any): Promise<{
         categoryIds: number[];
-        name: string;
-        createdAt: Date;
         id: number;
-        active: boolean;
-        notes: string | null;
-        contactEmail: string | null;
+        name: string;
         idClub: number;
-        contactPhone: string | null;
+        contactEmail: string | null;
+        active: boolean;
+        createdAt: Date;
+        notes: string | null;
         address: string | null;
+        contactPhone: string | null;
     }[]>;
-    updateSupplier(id: number, dto: UpdateSupplierDto): Promise<{
+    updateSupplier(id: number, dto: UpdateSupplierDto, req: any): Promise<{
         categoryIds: number[];
-        name: string;
-        createdAt: Date;
         id: number;
-        active: boolean;
-        notes: string | null;
-        contactEmail: string | null;
+        name: string;
         idClub: number;
-        contactPhone: string | null;
+        contactEmail: string | null;
+        active: boolean;
+        createdAt: Date;
+        notes: string | null;
         address: string | null;
+        contactPhone: string | null;
     }>;
-    removeSupplier(id: number): Promise<{
+    removeSupplier(id: number, req: any): Promise<{
         message: string;
     }>;
-    createProduct(dto: CreateProductInventoryDto): Promise<any>;
-    findProducts(idClub: number): Promise<any[]>;
-    updateProduct(id: number, dto: UpdateProductInventoryDto): Promise<any>;
-    removeProduct(id: number): Promise<{
+    createProduct(dto: CreateProductInventoryDto, req: any): Promise<any>;
+    findProducts(idClub: number, req: any): Promise<any[]>;
+    updateProduct(id: number, dto: UpdateProductInventoryDto, req: any): Promise<any>;
+    removeProduct(id: number, req: any): Promise<{
         message: string;
     }>;
-    createOrder(dto: CreateSupplyOrderDto): Promise<any>;
-    findOrders(idClub: number): Promise<any[]>;
-    updateOrder(id: number, dto: UpdateSupplyOrderDto): Promise<any>;
-    removeOrder(id: number): Promise<{
+    createOrder(dto: CreateSupplyOrderDto, req: any): Promise<any>;
+    findOrders(idClub: number, req: any): Promise<any[]>;
+    updateOrder(id: number, dto: UpdateSupplyOrderDto, req: any): Promise<any>;
+    removeOrder(id: number, req: any): Promise<{
         message: string;
     }>;
 }

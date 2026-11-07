@@ -13,7 +13,6 @@ exports.CreateConversationDto = void 0;
 const class_validator_1 = require("class-validator");
 class CreateConversationDto {
     idClub;
-    idUser;
     idSubscriptionTypes;
     subject;
     content;
@@ -26,17 +25,17 @@ __decorate([
 __decorate([
     (0, class_validator_1.IsInt)(),
     __metadata("design:type", Number)
-], CreateConversationDto.prototype, "idUser", void 0);
-__decorate([
-    (0, class_validator_1.IsInt)(),
-    __metadata("design:type", Number)
 ], CreateConversationDto.prototype, "idSubscriptionTypes", void 0);
 __decorate([
     (0, class_validator_1.IsString)(),
+    (0, class_validator_1.IsNotEmpty)(),
+    (0, class_validator_1.MaxLength)(150),
     __metadata("design:type", String)
 ], CreateConversationDto.prototype, "subject", void 0);
 __decorate([
     (0, class_validator_1.IsString)(),
+    (0, class_validator_1.IsNotEmpty)(),
+    (0, class_validator_1.MaxLength)(2000),
     __metadata("design:type", String)
 ], CreateConversationDto.prototype, "content", void 0);
 //# sourceMappingURL=create-conversation.dto.js.map

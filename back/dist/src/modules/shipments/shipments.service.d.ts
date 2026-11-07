@@ -2,9 +2,14 @@ import { PrismaService } from '../../prisma/prisma.service';
 import { CreateShipmentDto } from './dto/create-shipment.dto';
 import { UpdateShipmentDto } from './dto/update-shipment.dto';
 import { AssignDeliveryDto, AssignNewShipmentDto } from './dto/assign-delivery.dto';
+type RequestUser = {
+    id: number;
+    role: string;
+};
 export declare class ShipmentsService {
     private readonly prisma;
     constructor(prisma: PrismaService);
+    assertClubAccess(idClub: number, user: RequestUser): Promise<void>;
     private validateCourierForClub;
     private validateRiderForClub;
     create(dto: CreateShipmentDto): Promise<any>;
@@ -20,7 +25,7 @@ export declare class ShipmentsService {
             firstName: string;
             lastName: string;
             email: string;
-            phoneNumber: number | null;
+            phoneNumber: string | null;
             address: {
                 street: string | null;
                 addressNumber: number | null;
@@ -48,3 +53,4 @@ export declare class ShipmentsService {
         message: string;
     }>;
 }
+export {};

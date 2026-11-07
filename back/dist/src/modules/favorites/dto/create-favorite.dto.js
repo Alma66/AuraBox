@@ -13,18 +13,19 @@ exports.CreateFavoriteDto = void 0;
 const class_validator_1 = require("class-validator");
 class CreateFavoriteDto {
     idUser;
-    idClub;
+    idSubscriptionTypes;
     dateAdded;
 }
 exports.CreateFavoriteDto = CreateFavoriteDto;
 __decorate([
+    (0, class_validator_1.IsOptional)(),
     (0, class_validator_1.IsInt)(),
     __metadata("design:type", Number)
 ], CreateFavoriteDto.prototype, "idUser", void 0);
 __decorate([
     (0, class_validator_1.IsInt)(),
     __metadata("design:type", Number)
-], CreateFavoriteDto.prototype, "idClub", void 0);
+], CreateFavoriteDto.prototype, "idSubscriptionTypes", void 0);
 __decorate([
     (0, class_validator_1.IsOptional)(),
     (0, class_validator_1.IsDateString)(),

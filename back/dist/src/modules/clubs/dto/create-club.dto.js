@@ -23,6 +23,8 @@ class CreateClubDto {
     clubStatus;
     milestones;
     communityText;
+    shippingWindowStartDay;
+    shippingWindowEndDay;
 }
 exports.CreateClubDto = CreateClubDto;
 __decorate([
@@ -73,4 +75,18 @@ __decorate([
     (0, class_validator_1.IsString)(),
     __metadata("design:type", String)
 ], CreateClubDto.prototype, "communityText", void 0);
+__decorate([
+    (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.IsInt)(),
+    (0, class_validator_1.Min)(1),
+    (0, class_validator_1.Max)(31),
+    __metadata("design:type", Number)
+], CreateClubDto.prototype, "shippingWindowStartDay", void 0);
+__decorate([
+    (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.IsInt)(),
+    (0, class_validator_1.Min)(1),
+    (0, class_validator_1.Max)(31),
+    __metadata("design:type", Number)
+], CreateClubDto.prototype, "shippingWindowEndDay", void 0);
 //# sourceMappingURL=create-club.dto.js.map

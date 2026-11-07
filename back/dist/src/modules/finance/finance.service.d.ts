@@ -15,6 +15,14 @@ export interface UnifiedMovement {
 export declare class FinanceService {
     private readonly prisma;
     constructor(prisma: PrismaService);
+    assertClubAccess(idClub: number, user: {
+        id: number;
+        role: string;
+    }): Promise<void>;
+    assertEntryAccess(entryId: number, user: {
+        id: number;
+        role: string;
+    }): Promise<void>;
     getMovements(idClub: number): Promise<{
         movements: UnifiedMovement[];
         monthlyTotals: Record<string, {
@@ -52,25 +60,25 @@ export declare class FinanceService {
         };
     }>;
     createEntry(dto: CreateFinancialEntryDto): Promise<{
-        description: string;
-        createdAt: Date;
         id: number;
-        idClub: number;
+        description: string;
         status: import("@prisma/client").$Enums.FinancialEntryStatus;
+        idClub: number;
+        createdAt: Date;
+        type: import("@prisma/client").$Enums.FinancialEntryType;
         amount: import("@prisma/client/runtime/library").Decimal;
         category: string;
-        type: import("@prisma/client").$Enums.FinancialEntryType;
         entryDate: Date;
     }>;
     updateEntry(id: number, dto: UpdateFinancialEntryDto): Promise<{
-        description: string;
-        createdAt: Date;
         id: number;
-        idClub: number;
+        description: string;
         status: import("@prisma/client").$Enums.FinancialEntryStatus;
+        idClub: number;
+        createdAt: Date;
+        type: import("@prisma/client").$Enums.FinancialEntryType;
         amount: import("@prisma/client/runtime/library").Decimal;
         category: string;
-        type: import("@prisma/client").$Enums.FinancialEntryType;
         entryDate: Date;
     }>;
     removeEntry(id: number): Promise<{
