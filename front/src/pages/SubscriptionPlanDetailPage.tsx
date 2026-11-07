@@ -34,7 +34,7 @@ const SubscriptionPlanDetailPage: React.FC = () => {
 
   const [subscribing, setSubscribing] = useState(false);
   const [subscribeError, setSubscribeError] = useState('');
-  const [subscribeSuccess, setSubscribeSuccess] = useState(false);
+
 
   const [addingToCart, setAddingToCart] = useState(false);
   const [cartError, setCartError] = useState('');
@@ -397,50 +397,35 @@ const SubscriptionPlanDetailPage: React.FC = () => {
                 {cartError}
               </div>
             )}
-            {subscribeSuccess && (
-              <div className="bg-emerald-50 border border-emerald-200 text-emerald-700 text-sm rounded-xl px-4 py-3 mb-4">
-                ¡Listo! Te suscribiste correctamente a {plan.name}. Podés ver el estado de tu suscripción en tu perfil.
-              </div>
-            )}
-            {addedToCart && !subscribeSuccess && (
+
+            {addedToCart && (
               <div className="bg-aurora-navy/5 border border-aurora-navy/15 text-aurora-navy text-sm rounded-xl px-4 py-3 mb-4">
                 Agregado a tu carrito. Podés seguir explorando o{' '}
                 <Link to="/cart" className="underline font-semibold">ir al carrito</Link>.
               </div>
             )}
 
-            <div className="flex flex-col sm:flex-row gap-3 pt-4 border-t border-aurora-navy/10">
+                        <div className="flex flex-col sm:flex-row gap-3 pt-4 border-t border-aurora-navy/10">
               <Link
                 to={`/club/${clubId}`}
                 className="btn-outline flex-1 !py-3 text-sm"
               >
                 Volver al club
               </Link>
-              {subscribeSuccess ? (
-                <Link
-                  to="/customer/profile"
-                  className="flex-1 text-center px-6 py-3 text-sm font-semibold text-white bg-emerald-600 rounded-full hover:bg-emerald-700 transition"
-                >
-                  Ver mi perfil
-                </Link>
-              ) : (
-                <>
-                  <button
-                    onClick={handleAddToCart}
-                    disabled={addingToCart || subscribing || !canSubscribe}
-                    className="flex-1 px-6 py-3 text-sm font-semibold text-aurora-navy border-2 border-aurora-navy/20 rounded-full hover:bg-aurora-cream disabled:opacity-50 disabled:cursor-not-allowed transition"
-                  >
-                    {addingToCart ? 'Agregando...' : addedToCart ? 'Agregado ✓' : 'Agregar al carrito'}
-                  </button>
-                  <button
-                    onClick={handleSubscribeNow}
-                    disabled={subscribing || addingToCart || !canSubscribe}
-                    className="btn-primary flex-1 !py-3 text-sm disabled:opacity-50 disabled:pointer-events-none"
-                  >
-                    {!canSubscribe ? 'Plan no disponible' : subscribing ? 'Procesando...' : 'Suscribirme ahora'}
-                  </button>
-                </>
-              )}
+              <button
+                onClick={handleAddToCart}
+                disabled={addingToCart || subscribing || !canSubscribe}
+                className="flex-1 px-6 py-3 text-sm font-semibold text-aurora-navy border-2 border-aurora-navy/20 rounded-full hover:bg-aurora-cream disabled:opacity-50 disabled:cursor-not-allowed transition"
+              >
+                {addingToCart ? 'Agregando...' : addedToCart ? 'Agregado ✓' : 'Agregar al carrito'}
+              </button>
+              <button
+                onClick={handleSubscribeNow}
+                disabled={subscribing || addingToCart || !canSubscribe}
+                className="btn-primary flex-1 !py-3 text-sm disabled:opacity-50 disabled:pointer-events-none"
+              >
+                {!canSubscribe ? 'Plan no disponible' : subscribing ? 'Redirigiendo...' : 'Suscribirme ahora'}
+              </button>
             </div>
           </div>
         </div>
