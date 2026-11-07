@@ -155,7 +155,7 @@ const SubscriptionPlanDetailPage: React.FC = () => {
     fetchEligibility();
   }, [fetchEligibility]);
 
-  const handleSubscribeNow = async () => {
+   const handleSubscribeNow = async () => {
     if (!isAuthenticated) {
       navigate(`/login?redirect=${encodeURIComponent(location.pathname)}`);
       return;
@@ -168,9 +168,8 @@ const SubscriptionPlanDetailPage: React.FC = () => {
     setSubscribing(true);
     setSubscribeError('');
     try {
-      await api.post('/user-subscriptions', { idSubscriptionTypes: Number(planId) });
-      setSubscribeSuccess(true);
-      fetchEligibility();
+      await api.post('/cart-items', { idSubscriptionTypes: Number(planId) });
+      navigate('/checkout');
     } catch (err: any) {
       const msg = err?.response?.data?.message;
       setSubscribeError(Array.isArray(msg) ? msg.join(', ') : (msg ?? 'Error al suscribirte. Intentá nuevamente.'));
@@ -178,7 +177,7 @@ const SubscriptionPlanDetailPage: React.FC = () => {
       setSubscribing(false);
     }
   };
-
+  
   const handleAddToCart = async () => {
     if (!isAuthenticated) {
       navigate(`/login?redirect=${encodeURIComponent(location.pathname)}`);

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import { useAuth } from '../../App';
@@ -88,36 +88,93 @@ interface CardData {
   cvv: string;
 }
 
+interface GeoResult {
+  lat: number;
+  lon: number;
+  label: string;
+}
+
+type GeoStatus = 'idle' | 'loading' | 'found' | 'notfound' | 'error';
+type GeoQuery = Pick<Address, 'street' | 'streetNumber' | 'locality' | 'city' | 'province'>;
+type AddressErrors = Partial<Record<keyof Address, string>>;
+type CardErrors = Partial<Record<keyof CardData, string>>;
+type IconName = 'pin' | 'truck' | 'card' | 'bank' | 'cash' | 'lock' | 'check' | 'box' | 'shield' | 'info';
+
 const POSTAL_CODE_PATTERN = /^(\d{4}|[A-Za-z]\d{4}[A-Za-z]{3})$/;
 
 const STEPS = ['Dirección', 'Envío', 'Pago', 'Revisión'];
 
-const PAYMENT_METHODS = [
-  { id: 'mercadopago', label: 'Mercado Pago', icon: '💳', hint: 'Tarjeta de crédito o débito' },
-  { id: 'tarjeta', label: 'Tarjeta de crédito o débito', icon: '💳', hint: 'Pagás con tu tarjeta' },
-  { id: 'transferencia', label: 'Transferencia bancaria', icon: '🏦', hint: 'Transferís a la cuenta del club' },
-  { id: 'efectivo', label: 'Efectivo contra entrega', icon: '💵', hint: 'Pagás al recibir tu caja' },
+const PROVINCES = [
+  'Ciudad Autónoma de Buenos Aires',
+  'Buenos Aires',
+  'Catamarca',
+  'Chaco',
+  'Chubut',
+  'Córdoba',
+  'Corrientes',
+  'Entre Ríos',
+  'Formosa',
+  'Jujuy',
+  'La Pampa',
+  'La Rioja',
+  'Mendoza',
+  'Misiones',
+  'Neuquén',
+  'Río Negro',
+  'Salta',
+  'San Juan',
+  'San Luis',
+  'Santa Cruz',
+  'Santa Fe',
+  'Santiago del Estero',
+  'Tierra del Fuego',
+  'Tucumán',
 ];
 
-const ADDRESS_FIELDS: { name: keyof Address; label: string; span?: string; autoComplete: string }[] = [
-  { name: 'street', label: 'Calle', span: 'sm:col-span-2', autoComplete: 'address-line1' },
-  { name: 'streetNumber', label: 'Número', autoComplete: 'off' },
-  { name: 'locality', label: 'Localidad o barrio', autoComplete: 'address-level3' },
-  { name: 'city', label: 'Ciudad', autoComplete: 'address-level2' },
-  { name: 'province', label: 'Provincia', autoComplete: 'address-level1' },
-  { name: 'postalCode', label: 'Código postal', autoComplete: 'postal-code' },
+const PAYMENT_METHODS: { id: string; label: string; icon: IconName; hint: string }[] = [
+  { id: 'mercadopago', label: 'Mercado Pago', icon: 'card', hint: 'Tarjeta de crédito o débito' },
+  { id: 'tarjeta', label: 'Tarjeta de crédito o débito', icon: 'card', hint: 'Visa, Mastercard y American Express' },
+  { id: 'transferencia', label: 'Transferencia bancaria', icon: 'bank', hint: 'Transferís a la cuenta del club' },
+  { id: 'efectivo', label: 'Efectivo contra entrega', icon: 'cash', hint: 'Pagás al recibir tu caja' },
 ];
 
-const fieldClass =
-  'w-full min-h-[44px] p-3 border border-aurora-navy/15 rounded-xl bg-white text-aurora-navy focus:outline-none focus:ring-2 focus:ring-aurora-terracotta focus:border-transparent';
+const ADDRESS_FIELDS: {
+  name: Exclude<keyof Address, 'instructions'>;
+  label: string;
+  span: string;
+  autoComplete: string;
+}[] = [
+  { name: 'street', label: 'Calle', span: 'sm:col-span-4', autoComplete: 'address-line1' },
+  { name: 'streetNumber', label: 'Número', span: 'sm:col-span-2', autoComplete: 'off' },
+  { name: 'locality', label: 'Localidad o barrio', span: 'sm:col-span-3', autoComplete: 'address-level3' },
+  { name: 'city', label: 'Ciudad', span: 'sm:col-span-3', autoComplete: 'address-level2' },
+  { name: 'province', label: 'Provincia', span: 'sm:col-span-3', autoComplete: 'address-level1' },
+  { name: 'postalCode', label: 'Código postal', span: 'sm:col-span-3', autoComplete: 'postal-code' },
+];
 
-const cardClass = 'bg-white rounded-xl shadow-aurora-sm border border-aurora-navy/10 p-6';
+const REQUIRED_MESSAGES: Record<Exclude<keyof Address, 'instructions' | 'postalCode'>, string> = {
+  street: 'Ingresá la calle.',
+  streetNumber: 'Ingresá el número.',
+  locality: 'Ingresá tu localidad o barrio.',
+  city: 'Ingresá la ciudad.',
+  province: 'Ingresá la provincia.',
+};
+
+const NOMINATIM_URL = 'https://nominatim.openstreetmap.org/search';
+
+const fieldBase =
+  'w-full min-h-[48px] px-4 py-3 border rounded-xl bg-white text-aurora-navy placeholder:text-aurora-navy/30 focus:outline-none focus:ring-2 focus:border-transparent';
+
+const inputClass = (error?: string) =>
+  `${fieldBase} ${error ? 'border-red-400 focus:ring-red-300' : 'border-aurora-navy/15 focus:ring-aurora-terracotta'}`;
+
+const cardClass = 'bg-white rounded-2xl shadow-aurora-sm border border-aurora-navy/10';
 
 const primaryButtonClass =
-  'min-h-[44px] bg-aurora-terracotta text-white px-6 py-3 rounded-xl hover:bg-aurora-terracottaDark transition-colors font-semibold disabled:opacity-50';
+  'min-h-[48px] bg-aurora-terracotta text-white px-8 py-3 rounded-xl hover:bg-aurora-terracottaDark transition-colors font-semibold disabled:opacity-50 disabled:cursor-not-allowed';
 
 const secondaryButtonClass =
-  'min-h-[44px] border border-aurora-navy/20 text-aurora-navy px-6 py-3 rounded-xl hover:bg-aurora-cream transition-colors font-semibold';
+  'min-h-[48px] border border-aurora-navy/20 text-aurora-navy px-6 py-3 rounded-xl hover:bg-white transition-colors font-semibold disabled:opacity-50';
 
 const discountFor = (plan: CartPlan, method: string) => {
   if (method === 'transferencia') return plan.transferDiscount ?? 0;
@@ -165,24 +222,209 @@ const cardBrand = (value: string) => {
   return 'Tarjeta';
 };
 
-const validateCard = (card: CardData): string | null => {
-  if (!luhnValid(card.number)) return 'El número de tarjeta no es válido.';
-  if (card.holder.trim().length < 3) return 'Ingresá el nombre del titular tal como figura en la tarjeta.';
+const validateCard = (card: CardData): CardErrors => {
+  const errors: CardErrors = {};
+  if (!luhnValid(card.number)) errors.number = 'Revisá el número de tarjeta.';
+  if (card.holder.trim().length < 3) errors.holder = 'Ingresá el nombre tal como figura en la tarjeta.';
   const match = /^(\d{2})\/(\d{2})$/.exec(card.expiry);
-  if (!match) return 'Ingresá el vencimiento con el formato MM/AA.';
-  const month = Number(match[1]);
-  const year = 2000 + Number(match[2]);
-  if (month < 1 || month > 12) return 'El mes de vencimiento no es válido.';
-  const now = new Date();
-  if (year < now.getFullYear() || (year === now.getFullYear() && month < now.getMonth() + 1)) {
-    return 'La tarjeta está vencida.';
+  if (!match) {
+    errors.expiry = 'Usá el formato MM/AA.';
+  } else {
+    const month = Number(match[1]);
+    const year = 2000 + Number(match[2]);
+    const now = new Date();
+    if (month < 1 || month > 12) errors.expiry = 'El mes no es válido.';
+    else if (year < now.getFullYear() || (year === now.getFullYear() && month < now.getMonth() + 1)) {
+      errors.expiry = 'La tarjeta está vencida.';
+    }
   }
   const cvvLength = cardBrand(card.number) === 'American Express' ? 4 : 3;
-  if (digitsOnly(card.cvv).length !== cvvLength) return `El código de seguridad debe tener ${cvvLength} dígitos.`;
-  return null;
+  if (digitsOnly(card.cvv).length !== cvvLength) errors.cvv = `Deben ser ${cvvLength} dígitos.`;
+  return errors;
 };
 
 const wait = (ms: number) => new Promise<void>((resolve) => setTimeout(resolve, ms));
+
+const fetchGeo = async (url: string, signal: AbortSignal): Promise<GeoResult | null> => {
+  const response = await fetch(url, { signal, headers: { 'Accept-Language': 'es' } });
+  if (!response.ok) throw new Error('geocoding failed');
+  const data = await response.json();
+  if (!Array.isArray(data) || data.length === 0) return null;
+  const lat = Number(data[0].lat);
+  const lon = Number(data[0].lon);
+  if (!Number.isFinite(lat) || !Number.isFinite(lon)) return null;
+  return { lat, lon, label: String(data[0].display_name || '') };
+};
+
+const geocodeAddress = async (query: GeoQuery, signal: AbortSignal): Promise<GeoResult | null> => {
+  const street = `${query.streetNumber.trim()} ${query.street.trim()}`;
+  const structured =
+    `${NOMINATIM_URL}?format=jsonv2&limit=1&countrycodes=ar` +
+    `&street=${encodeURIComponent(street)}` +
+    `&city=${encodeURIComponent(query.city.trim())}` +
+    `&state=${encodeURIComponent(query.province.trim())}` +
+    `&country=Argentina`;
+  const first = await fetchGeo(structured, signal);
+  if (first) return first;
+  const free = [
+    `${query.street.trim()} ${query.streetNumber.trim()}`,
+    query.locality.trim(),
+    query.city.trim(),
+    query.province.trim(),
+    'Argentina',
+  ]
+    .filter(Boolean)
+    .join(', ');
+  return fetchGeo(`${NOMINATIM_URL}?format=jsonv2&limit=1&countrycodes=ar&q=${encodeURIComponent(free)}`, signal);
+};
+
+const ICONS: Record<IconName, React.ReactNode> = {
+  pin: (
+    <>
+      <path d="M12 21s7-6.2 7-11a7 7 0 10-14 0c0 4.8 7 11 7 11z" />
+      <circle cx="12" cy="10" r="2.5" />
+    </>
+  ),
+  truck: (
+    <>
+      <path d="M3 7h11v9H3z" />
+      <path d="M14 10h4l3 3v3h-7z" />
+      <circle cx="7" cy="18" r="2" />
+      <circle cx="17" cy="18" r="2" />
+    </>
+  ),
+  card: (
+    <>
+      <rect x="2" y="5" width="20" height="14" rx="2" />
+      <path d="M2 10h20M6 15h4" />
+    </>
+  ),
+  bank: <path d="M3 10l9-6 9 6M5 10v8M9 10v8M15 10v8M19 10v8M3 20h18" />,
+  cash: (
+    <>
+      <rect x="2" y="6" width="20" height="12" rx="2" />
+      <circle cx="12" cy="12" r="3" />
+    </>
+  ),
+  lock: (
+    <>
+      <rect x="5" y="11" width="14" height="10" rx="2" />
+      <path d="M8 11V8a4 4 0 118 0v3" />
+    </>
+  ),
+  check: <path d="M5 13l4 4L19 7" />,
+  box: (
+    <>
+      <path d="M3 8l9-5 9 5v8l-9 5-9-5z" />
+      <path d="M3 8l9 5 9-5M12 13v8" />
+    </>
+  ),
+  shield: (
+    <>
+      <path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z" />
+      <path d="M9 12l2 2 4-4" />
+    </>
+  ),
+  info: (
+    <>
+      <circle cx="12" cy="12" r="9" />
+      <path d="M12 8h.01M11 12h1v5h1" />
+    </>
+  ),
+};
+
+const Icon: React.FC<{ name: IconName; className?: string }> = ({ name, className = 'h-5 w-5' }) => (
+  <svg
+    className={className}
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth={1.8}
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    aria-hidden="true"
+  >
+    {ICONS[name]}
+  </svg>
+);
+
+const SectionCard: React.FC<{ icon: IconName; title: string; subtitle?: string; children: React.ReactNode }> = ({
+  icon,
+  title,
+  subtitle,
+  children,
+}) => (
+  <section className={`${cardClass} p-5 sm:p-7`}>
+    <div className="mb-6 flex items-start gap-4">
+      <span className="flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-full bg-aurora-terracotta/10 text-aurora-terracotta">
+        <Icon name={icon} className="h-6 w-6" />
+      </span>
+      <div>
+        <h2 className="text-xl font-serif font-bold text-aurora-navy">{title}</h2>
+        {subtitle && <p className="mt-0.5 text-sm text-aurora-navy/60">{subtitle}</p>}
+      </div>
+    </div>
+    {children}
+  </section>
+);
+
+const Field: React.FC<{
+  id: string;
+  label: string;
+  error?: string;
+  className?: string;
+  children: React.ReactNode;
+}> = ({ id, label, error, className = '', children }) => (
+  <div className={className}>
+    <label htmlFor={id} className="mb-1 block text-sm font-medium text-aurora-navy/80">
+      {label}
+    </label>
+    {children}
+    {error && <p className="mt-1 text-xs text-red-600">{error}</p>}
+  </div>
+);
+
+const RadioCard: React.FC<{
+  id: string;
+  name: string;
+  checked: boolean;
+  onChange: () => void;
+  icon: IconName;
+  title: string;
+  hint: string;
+  aside?: string;
+  children?: React.ReactNode;
+}> = ({ id, name, checked, onChange, icon, title, hint, aside, children }) => (
+  <div
+    className={`rounded-xl border transition-colors ${
+      checked ? 'border-aurora-terracotta bg-aurora-terracotta/5' : 'border-aurora-navy/15 bg-white hover:bg-aurora-cream'
+    }`}
+  >
+    <label htmlFor={id} className="flex min-h-[64px] cursor-pointer items-center gap-4 p-4">
+      <input
+        id={id}
+        type="radio"
+        name={name}
+        checked={checked}
+        onChange={onChange}
+        className="h-4 w-4 flex-shrink-0 accent-aurora-terracotta"
+      />
+      <span
+        className={`flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full ${
+          checked ? 'bg-aurora-terracotta text-white' : 'bg-aurora-navy/5 text-aurora-navy/70'
+        }`}
+      >
+        <Icon name={icon} />
+      </span>
+      <span className="min-w-0 flex-1">
+        <span className="block font-semibold text-aurora-navy">{title}</span>
+        <span className="block text-xs text-aurora-navy/60">{hint}</span>
+      </span>
+      {aside && <span className="whitespace-nowrap text-sm font-semibold text-aurora-navy">{aside}</span>}
+    </label>
+    {checked && children && <div className="border-t border-aurora-navy/10 p-4">{children}</div>}
+  </div>
+);
 
 const CopyRow: React.FC<{ label: string; value: string }> = ({ label, value }) => {
   const copy = async () => {
@@ -202,7 +444,7 @@ const CopyRow: React.FC<{ label: string; value: string }> = ({ label, value }) =
       <button
         type="button"
         onClick={copy}
-        className="min-h-[44px] flex-shrink-0 rounded-lg border border-aurora-navy/15 px-3 text-xs font-semibold text-aurora-navy hover:bg-white"
+        className="min-h-[44px] flex-shrink-0 rounded-lg border border-aurora-navy/15 bg-white px-3 text-xs font-semibold text-aurora-navy hover:bg-aurora-cream"
       >
         Copiar
       </button>
@@ -211,11 +453,118 @@ const CopyRow: React.FC<{ label: string; value: string }> = ({ label, value }) =
 };
 
 const DemoNotice: React.FC = () => (
-  <div className="rounded-xl border border-aurora-gold/40 bg-aurora-gold/10 px-4 py-3 text-sm text-aurora-navy">
-    <span className="font-semibold">Entorno de demostración.</span> No se realiza ningún cobro real y no hace falta
-    usar datos reales.
+  <div className="flex items-start gap-3 rounded-xl border border-aurora-gold/40 bg-aurora-gold/10 px-4 py-3 text-sm text-aurora-navy">
+    <Icon name="info" className="mt-0.5 h-5 w-5 flex-shrink-0" />
+    <p>
+      <span className="font-semibold">Entorno de demostración.</span> No se realiza ningún cobro real y no hace falta
+      usar datos reales.
+    </p>
   </div>
 );
+
+const CardPreview: React.FC<{ card: CardData }> = ({ card }) => (
+  <div className="mx-auto mb-5 w-full max-w-sm rounded-2xl bg-gradient-to-br from-aurora-navy to-aurora-navy/80 p-5 text-white shadow-aurora-sm">
+    <div className="mb-8 flex items-center justify-between">
+      <span className="h-8 w-11 rounded-md bg-aurora-gold/80" />
+      <span className="text-sm font-semibold tracking-wide">{cardBrand(card.number)}</span>
+    </div>
+    <p className="mb-5 font-mono text-lg tracking-widest">{card.number || '•••• •••• •••• ••••'}</p>
+    <div className="flex items-end justify-between gap-4 text-xs">
+      <div className="min-w-0">
+        <p className="text-white/60">Titular</p>
+        <p className="truncate font-semibold">{card.holder || 'NOMBRE APELLIDO'}</p>
+      </div>
+      <div>
+        <p className="text-white/60">Vence</p>
+        <p className="font-semibold">{card.expiry || 'MM/AA'}</p>
+      </div>
+    </div>
+  </div>
+);
+
+const AddressMap: React.FC<{
+  geo: GeoResult | null;
+  status: GeoStatus;
+  onRetry: () => void;
+  heightClass?: string;
+}> = ({ geo, status, onRetry, heightClass = 'h-64' }) => {
+  if (status === 'found' && geo) {
+    const lat = geo.lat.toFixed(6);
+    const lon = geo.lon.toFixed(6);
+    const bbox = [
+      (geo.lon - 0.005).toFixed(6),
+      (geo.lat - 0.0035).toFixed(6),
+      (geo.lon + 0.005).toFixed(6),
+      (geo.lat + 0.0035).toFixed(6),
+    ].join(',');
+    const src = `https://www.openstreetmap.org/export/embed.html?bbox=${bbox}&layer=mapnik&marker=${lat},${lon}`;
+    const googleUrl = `https://www.google.com/maps/search/?api=1&query=${lat},${lon}`;
+    return (
+      <div className="overflow-hidden rounded-xl border border-aurora-navy/10 bg-white">
+        <iframe title="Mapa de la dirección de entrega" src={src} loading="lazy" className={`${heightClass} w-full border-0`} />
+        <div className="flex flex-wrap items-center justify-between gap-2 px-4 py-3 text-xs">
+          <span className="flex items-center gap-2 font-semibold text-green-700">
+            <Icon name="check" className="h-4 w-4 flex-shrink-0" />
+            Ubicación encontrada
+          </span>
+          <a
+            href={googleUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="font-semibold text-aurora-terracotta hover:underline"
+          >
+            Abrir en Google Maps
+          </a>
+        </div>
+        {geo.label && <p className="px-4 pb-3 text-xs text-aurora-navy/60">{geo.label}</p>}
+      </div>
+    );
+  }
+
+  const box = `flex ${heightClass} flex-col items-center justify-center gap-2 rounded-xl border border-dashed border-aurora-navy/20 bg-white px-6 text-center`;
+
+  if (status === 'loading') {
+    return (
+      <div className={box} role="status">
+        <div className="h-8 w-8 animate-spin rounded-full border-b-2 border-aurora-terracotta"></div>
+        <p className="text-sm text-aurora-navy/70">Ubicando tu dirección…</p>
+      </div>
+    );
+  }
+
+  if (status === 'notfound') {
+    return (
+      <div className={box}>
+        <Icon name="pin" className="h-8 w-8 text-aurora-navy/30" />
+        <p className="text-sm font-semibold text-aurora-navy">No encontramos esa dirección en el mapa</p>
+        <p className="text-xs text-aurora-navy/60">Revisá la calle, el número y la ciudad. Podés continuar igual.</p>
+      </div>
+    );
+  }
+
+  if (status === 'error') {
+    return (
+      <div className={box}>
+        <Icon name="pin" className="h-8 w-8 text-aurora-navy/30" />
+        <p className="text-sm font-semibold text-aurora-navy">No pudimos consultar el mapa</p>
+        <button
+          type="button"
+          onClick={onRetry}
+          className="min-h-[44px] rounded-lg border border-aurora-navy/20 px-4 text-sm font-semibold text-aurora-navy hover:bg-aurora-cream"
+        >
+          Reintentar
+        </button>
+      </div>
+    );
+  }
+
+  return (
+    <div className={box}>
+      <Icon name="pin" className="h-8 w-8 text-aurora-navy/30" />
+      <p className="text-sm text-aurora-navy/60">Completá tu dirección y te mostramos la ubicación en el mapa.</p>
+    </div>
+  );
+};
 
 const CheckoutPage: React.FC = () => {
   const { user } = useAuth() as { user: User | null };
@@ -229,13 +578,19 @@ const CheckoutPage: React.FC = () => {
   const [loadError, setLoadError] = useState<string | null>(null);
   const [step, setStep] = useState(1);
   const [stepError, setStepError] = useState<string | null>(null);
-  const [postalError, setPostalError] = useState<string | null>(null);
+  const [addressErrors, setAddressErrors] = useState<AddressErrors>({});
+  const [cardErrors, setCardErrors] = useState<CardErrors>({});
   const [isProcessing, setIsProcessing] = useState(false);
+  const [completed, setCompleted] = useState(false);
   const [receipt, setReceipt] = useState<Receipt | null>(null);
   const [paidInCash, setPaidInCash] = useState(false);
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState('');
   const [card, setCard] = useState<CardData>({ number: '', holder: '', expiry: '', cvv: '' });
   const [transferConfirmed, setTransferConfirmed] = useState(false);
+  const [geo, setGeo] = useState<GeoResult | null>(null);
+  const [geoStatus, setGeoStatus] = useState<GeoStatus>('idle');
+  const [geoNonce, setGeoNonce] = useState(0);
+  const geoCache = useRef<Map<string, GeoResult | null>>(new Map());
   const [address, setAddress] = useState<Address>({
     street: '',
     streetNumber: '',
@@ -300,10 +655,71 @@ const CheckoutPage: React.FC = () => {
     fetchData();
   }, [user]);
 
+  const geoQuery = useMemo<GeoQuery>(
+    () => ({
+      street: address.street,
+      streetNumber: address.streetNumber,
+      locality: address.locality,
+      city: address.city,
+      province: address.province,
+    }),
+    [address.street, address.streetNumber, address.locality, address.city, address.province],
+  );
+
+  useEffect(() => {
+    if (step !== 1 || loading) return undefined;
+    const ready = [geoQuery.street, geoQuery.streetNumber, geoQuery.city, geoQuery.province].every(
+      (value) => value.trim().length > 0,
+    );
+    if (!ready) {
+      setGeo(null);
+      setGeoStatus('idle');
+      return undefined;
+    }
+    const key = [
+      geoQuery.street,
+      geoQuery.streetNumber,
+      geoQuery.locality,
+      geoQuery.city,
+      geoQuery.province,
+      geoNonce,
+    ]
+      .join('|')
+      .toLowerCase();
+    const cached = geoCache.current.get(key);
+    if (cached !== undefined) {
+      setGeo(cached);
+      setGeoStatus(cached ? 'found' : 'notfound');
+      return undefined;
+    }
+    setGeoStatus('loading');
+    const controller = new AbortController();
+    const timer = window.setTimeout(async () => {
+      try {
+        const result = await geocodeAddress(geoQuery, controller.signal);
+        geoCache.current.set(key, result);
+        setGeo(result);
+        setGeoStatus(result ? 'found' : 'notfound');
+      } catch (err) {
+        if (!controller.signal.aborted) setGeoStatus('error');
+      }
+    }, 900);
+    return () => {
+      window.clearTimeout(timer);
+      controller.abort();
+    };
+  }, [step, loading, geoQuery, geoNonce]);
+
   const handleAddressChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    const { name, value } = e.target;
+    const name = e.target.name as keyof Address;
+    const value = e.target.value;
     setAddress((prev) => ({ ...prev, [name]: value }));
-    if (name === 'postalCode') setPostalError(null);
+    setAddressErrors((prev) => (prev[name] ? { ...prev, [name]: undefined } : prev));
+  };
+
+  const updateCard = (field: keyof CardData, value: string) => {
+    setCard((prev) => ({ ...prev, [field]: value }));
+    setCardErrors((prev) => (prev[field] ? { ...prev, [field]: undefined } : prev));
   };
 
   const feeForClub = (clubId: number) => {
@@ -332,14 +748,17 @@ const CheckoutPage: React.FC = () => {
   const maskedCard = `${cardBrand(card.number)} terminada en ${digitsOnly(card.number).slice(-4)}`;
 
   const validateAddress = () => {
-    const required = [address.street, address.streetNumber, address.locality, address.city, address.province];
-    if (required.some((value) => !value.trim())) {
-      setStepError('Completá todos los campos de la dirección.');
-      return false;
+    const errors: AddressErrors = {};
+    (Object.keys(REQUIRED_MESSAGES) as (keyof typeof REQUIRED_MESSAGES)[]).forEach((name) => {
+      if (!address[name].trim()) errors[name] = REQUIRED_MESSAGES[name];
+    });
+    if (!address.postalCode.trim()) errors.postalCode = 'Ingresá el código postal.';
+    else if (!POSTAL_CODE_PATTERN.test(address.postalCode.trim())) {
+      errors.postalCode = 'Código postal inválido. Ejemplos: 1425 o C1425ABC.';
     }
-    if (!POSTAL_CODE_PATTERN.test(address.postalCode.trim())) {
-      setPostalError('Ingresá un código postal válido, por ejemplo 1425 o C1425ABC.');
-      setStepError('Revisá el código postal.');
+    setAddressErrors(errors);
+    if (Object.keys(errors).length > 0) {
+      setStepError('Revisá los datos marcados en rojo.');
       return false;
     }
     return true;
@@ -360,9 +779,10 @@ const CheckoutPage: React.FC = () => {
       return false;
     }
     if (isCardMethod) {
-      const cardError = validateCard(card);
-      if (cardError) {
-        setStepError(cardError);
+      const errors = validateCard(card);
+      setCardErrors(errors);
+      if (Object.keys(errors).length > 0) {
+        setStepError('Revisá los datos de la tarjeta.');
         return false;
       }
     }
@@ -389,7 +809,8 @@ const CheckoutPage: React.FC = () => {
   const fillTestCard = () => {
     const fullName = user ? `${user.firstName} ${user.lastName}`.toUpperCase() : 'TITULAR DE PRUEBA';
     const year = String((new Date().getFullYear() + 3) % 100).padStart(2, '0');
-    setCard({ number: '4111 1111 1111 1111', holder: fullName, expiry: `12/${year}`, cvv: '123' });
+    setCard({ number: '4111 1111 1111 1111', holder: fullName.slice(0, 40), expiry: `12/${year}`, cvv: '123' });
+    setCardErrors({});
     setStepError(null);
   };
 
@@ -420,6 +841,7 @@ const CheckoutPage: React.FC = () => {
       const result = getResponseData(res);
       setPaidInCash(Boolean(result?.cashOnDelivery));
       setReceipt(result?.receipt ?? null);
+      setCompleted(true);
       window.scrollTo({ top: 0, behavior: 'smooth' });
     } catch (err: any) {
       console.error('Error processing payment:', err);
@@ -454,7 +876,7 @@ const CheckoutPage: React.FC = () => {
     );
   }
 
-  if (receipt || (!isProcessing && paidInCash && !receipt)) {
+  if (completed) {
     const pending = receipt?.pending ?? false;
     const title = paidInCash
       ? '¡Compra confirmada!'
@@ -462,37 +884,40 @@ const CheckoutPage: React.FC = () => {
         ? '¡Suscripción registrada!'
         : '¡Pago realizado con éxito!';
     const text = paidInCash
-      ? 'Tu suscripción ya está activa. Vas a pagar en efectivo cuando recibas tu caja y el club va a registrar el cobro.'
+      ? 'Tu suscripción ya está activa. Pagás en efectivo cuando recibas tu caja y el club registra el cobro.'
       : pending
         ? 'Tu suscripción queda pendiente de pago hasta que el club confirme tu transferencia.'
-        : 'Tu orden fue procesada. Podés seguir el estado de tus suscripciones desde tu cuenta.';
+        : 'Tu orden fue procesada correctamente. Podés seguir el estado de tus suscripciones desde tu cuenta.';
+    const timeline = [
+      pending && !paidInCash ? 'El club confirma tu transferencia.' : 'El club recibe tu pedido y prepara tu caja.',
+      'Se asigna la empresa de envío que elegiste.',
+      paidInCash ? 'Recibís tu caja y abonás en efectivo.' : 'Recibís tu caja en la dirección indicada.',
+    ];
 
     return (
       <div className="min-h-screen bg-aurora-cream py-8 px-4">
-        <div className="max-w-2xl mx-auto">
-          <div className="text-center mb-8">
-            <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-green-100 text-3xl text-green-700">
-              ✓
+        <div className="max-w-3xl mx-auto space-y-6">
+          <div className="text-center">
+            <div className="mx-auto mb-4 flex h-20 w-20 items-center justify-center rounded-full bg-green-100 text-green-700">
+              <Icon name="check" className="h-10 w-10" />
             </div>
             <h1 className="text-3xl font-serif font-bold text-aurora-navy mb-2">{title}</h1>
             <p className="text-aurora-navy/70 max-w-md mx-auto">{text}</p>
           </div>
 
           {receipt && (
-            <div className={cardClass}>
-              <div className="flex flex-wrap items-center justify-between gap-2 border-b border-aurora-navy/10 pb-4 mb-4">
+            <section className={`${cardClass} p-5 sm:p-7`}>
+              <div className="flex flex-wrap items-center justify-between gap-3 border-b border-aurora-navy/10 pb-4 mb-4">
                 <div>
                   <p className="text-xs text-aurora-navy/50">Número de orden</p>
-                  <p className="font-bold text-aurora-navy">{receipt.reference}</p>
+                  <p className="text-lg font-bold text-aurora-navy">{receipt.reference}</p>
                 </div>
-                <div className="text-right">
+                <div className="sm:text-right">
                   <p className="text-xs text-aurora-navy/50">Fecha</p>
-                  <p className="font-semibold text-aurora-navy">
-                    {new Date(receipt.date).toLocaleString('es-AR')}
-                  </p>
+                  <p className="font-semibold text-aurora-navy">{new Date(receipt.date).toLocaleString('es-AR')}</p>
                 </div>
               </div>
-              <ul className="space-y-3 mb-4">
+              <ul className="space-y-4 mb-4">
                 {receipt.items.map((item, index) => (
                   <li key={`${item.planName}-${index}`} className="flex justify-between gap-4 text-sm">
                     <div>
@@ -524,10 +949,34 @@ const CheckoutPage: React.FC = () => {
                 </div>
                 <p className="text-xs text-aurora-navy/50">Medio de pago: {methodLabel}</p>
               </div>
-            </div>
+            </section>
           )}
 
-          <div className="mt-6 flex flex-wrap justify-center gap-3">
+          <section className={`${cardClass} p-5 sm:p-7`}>
+            <h2 className="font-serif text-lg font-bold text-aurora-navy mb-3">Entrega</h2>
+            <p className="text-sm text-aurora-navy/80">
+              {address.street} {address.streetNumber}, {address.locality}
+            </p>
+            <p className="text-sm text-aurora-navy/80">
+              {address.city}, {address.province} ({address.postalCode.toUpperCase()})
+            </p>
+            <h2 className="font-serif text-lg font-bold text-aurora-navy mt-6 mb-3">Qué sigue</h2>
+            <ol className="space-y-3">
+              {timeline.map((entry, index) => (
+                <li key={entry} className="flex items-start gap-3 text-sm text-aurora-navy/80">
+                  <span className="flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full bg-aurora-terracotta text-xs font-bold text-white">
+                    {index + 1}
+                  </span>
+                  <span className="pt-0.5">{entry}</span>
+                </li>
+              ))}
+            </ol>
+          </section>
+
+          <div className="flex flex-wrap justify-center gap-3 print:hidden">
+            <button onClick={() => window.print()} className={secondaryButtonClass}>
+              Imprimir comprobante
+            </button>
             <button onClick={() => navigate('/')} className={secondaryButtonClass}>
               Volver al inicio
             </button>
@@ -540,22 +989,27 @@ const CheckoutPage: React.FC = () => {
     );
   }
 
-  const renderSummary = () => (
-    <aside className={`${cardClass} lg:sticky lg:top-24`}>
-      <h2 className="text-xl font-serif font-bold text-aurora-navy mb-4">Resumen de tu orden</h2>
+  const renderSummaryBody = () => (
+    <>
       <div className="space-y-3 mb-4">
         {cartItems.map((item) => {
           const discount = discountFor(item.plan, selectedPaymentMethod);
           const fee = feeForClub(item.club.id);
+          const courierName = courierNameForClub(item.club.id);
           return (
-            <div key={item.cartItemId} className="flex justify-between gap-3 py-2 border-b border-aurora-navy/10 last:border-b-0">
+            <div
+              key={item.cartItemId}
+              className="flex justify-between gap-3 py-2 border-b border-aurora-navy/10 last:border-b-0"
+            >
               <div className="min-w-0">
                 <p className="font-semibold text-aurora-navy truncate">{item.plan.name}</p>
                 <p className="text-xs text-aurora-navy/50">
                   {item.club.name} · {item.plan.deliveryFrequency}
                 </p>
-                {step > 1 && fee > 0 && (
-                  <p className="text-xs text-aurora-navy/50">Envío {money(fee)}</p>
+                {step > 1 && courierName && (
+                  <p className="text-xs text-aurora-navy/50">
+                    {courierName} · {fee > 0 ? money(fee) : 'Sin costo'}
+                  </p>
                 )}
               </div>
               <div className="text-right whitespace-nowrap">
@@ -573,49 +1027,61 @@ const CheckoutPage: React.FC = () => {
         </div>
         {savings > 0 && (
           <div className="flex justify-between text-green-700">
-            <span>Descuento</span>
+            <span>Descuento por medio de pago</span>
             <span>-{money(savings)}</span>
           </div>
         )}
         <div className="flex justify-between text-aurora-navy/70">
           <span>Envío</span>
-          <span>{step > 1 ? (shippingTotal > 0 ? money(shippingTotal) : 'Sin costo') : 'Se calcula en el paso 2'}</span>
+          <span>
+            {step > 2 || (step === 2 && shippingTotal > 0)
+              ? shippingTotal > 0
+                ? money(shippingTotal)
+                : 'Sin costo'
+              : 'Se calcula en el paso 2'}
+          </span>
         </div>
-        <div className="flex justify-between pt-2 text-lg font-bold text-aurora-navy">
+        <div className="flex justify-between pt-3 text-xl font-bold text-aurora-navy">
           <span>Total</span>
           <span>{money(grandTotal)}</span>
         </div>
       </div>
-    </aside>
+    </>
   );
 
   const renderAddress = () => (
-    <div className={cardClass}>
-      <h2 className="text-xl font-serif font-bold text-aurora-navy mb-1">¿Dónde recibís tu caja?</h2>
-      <p className="text-sm text-aurora-navy/60 mb-5">Esta dirección se usa para todos los envíos de tu orden.</p>
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+    <SectionCard icon="pin" title="¿Dónde recibís tu caja?" subtitle="Usamos esta dirección para todos los envíos de tu orden.">
+      <div className="grid grid-cols-1 sm:grid-cols-6 gap-4">
         {ADDRESS_FIELDS.map((field) => (
-          <div key={field.name} className={field.span}>
-            <label htmlFor={`addr-${field.name}`} className="block text-sm font-medium text-aurora-navy/80 mb-1">
-              {field.label}
-            </label>
+          <Field
+            key={field.name}
+            id={`addr-${field.name}`}
+            label={field.label}
+            error={addressErrors[field.name]}
+            className={`col-span-1 ${field.span}`}
+          >
             <input
               id={`addr-${field.name}`}
               name={field.name}
               value={address[field.name]}
               onChange={handleAddressChange}
               autoComplete={field.autoComplete}
-              className={fieldClass}
+              list={field.name === 'province' ? 'province-options' : undefined}
+              aria-invalid={Boolean(addressErrors[field.name])}
+              className={inputClass(addressErrors[field.name])}
             />
-            {field.name === 'postalCode' && postalError && (
-              <p className="text-red-600 text-xs mt-1">{postalError}</p>
-            )}
-          </div>
+          </Field>
         ))}
-        <div className="sm:col-span-2">
-          <label htmlFor="addr-instructions" className="block text-sm font-medium text-aurora-navy/80 mb-1">
-            Indicaciones para el repartidor (opcional)
-          </label>
+        <datalist id="province-options">
+          {PROVINCES.map((province) => (
+            <option key={province} value={province} />
+          ))}
+        </datalist>
+        <Field
+          id="addr-instructions"
+          label="Indicaciones para el repartidor (opcional)"
+          className="col-span-1 sm:col-span-6"
+        >
           <textarea
             id="addr-instructions"
             name="instructions"
@@ -623,281 +1089,301 @@ const CheckoutPage: React.FC = () => {
             onChange={handleAddressChange}
             rows={3}
             maxLength={500}
-            className={fieldClass}
+            placeholder="Timbre, piso, horario de atención, entre qué calles..."
+            className={inputClass()}
           />
-        </div>
+        </Field>
       </div>
-    </div>
+
+      <div className="mt-6">
+        <h3 className="mb-1 text-sm font-semibold text-aurora-navy">Confirmá la ubicación</h3>
+        <p className="mb-3 text-xs text-aurora-navy/60">
+          Verificá que el pin coincida con tu domicilio. Si no, corregí la dirección y se actualiza solo.
+        </p>
+        <AddressMap geo={geo} status={geoStatus} onRetry={() => setGeoNonce((value) => value + 1)} />
+      </div>
+    </SectionCard>
   );
 
   const renderShipping = () => (
     <div className="space-y-6">
-      {shippingClubs.map((club) => (
-        <div key={club.clubId} className={cardClass}>
-          <h2 className="text-xl font-serif font-bold text-aurora-navy mb-1">Envío de {club.clubName}</h2>
-          {club.couriers.length === 0 ? (
-            <p className="text-sm text-aurora-navy/70 mt-2">
-              Este club coordina el envío directamente con vos. No tiene costo adicional.
+      <div className={`${cardClass} flex items-start justify-between gap-3 p-4 sm:p-5`}>
+        <div className="flex items-start gap-3">
+          <Icon name="pin" className="mt-0.5 h-5 w-5 flex-shrink-0 text-aurora-terracotta" />
+          <div className="text-sm">
+            <p className="font-semibold text-aurora-navy">Enviar a</p>
+            <p className="text-aurora-navy/80">
+              {address.street} {address.streetNumber}, {address.locality}, {address.city}
             </p>
-          ) : (
-            <>
-              <p className="text-sm text-aurora-navy/60 mb-4">Elegí cómo querés recibir tus cajas.</p>
-              <div className="space-y-3" role="radiogroup" aria-label={`Envío de ${club.clubName}`}>
-                {club.couriers.map((courier) => {
-                  const checked = selectedCouriers[club.clubId] === courier.id;
-                  return (
-                    <label
-                      key={courier.id}
-                      htmlFor={`courier-${club.clubId}-${courier.id}`}
-                      className={`flex min-h-[56px] cursor-pointer items-center gap-3 rounded-xl border p-4 transition-colors ${
-                        checked ? 'border-aurora-terracotta bg-aurora-terracotta/5' : 'border-aurora-navy/15 hover:bg-aurora-cream'
-                      }`}
-                    >
-                      <input
-                        id={`courier-${club.clubId}-${courier.id}`}
-                        type="radio"
-                        name={`courier-${club.clubId}`}
-                        checked={checked}
-                        onChange={() => {
-                          setSelectedCouriers((prev) => ({ ...prev, [club.clubId]: courier.id }));
-                          setStepError(null);
-                        }}
-                        className="h-4 w-4 accent-aurora-terracotta"
-                      />
-                      <div className="flex-1">
-                        <p className="font-semibold text-aurora-navy">{courier.name}</p>
-                        <p className="text-xs text-aurora-navy/60">
-                          {courier.isInternal ? 'Reparto propio del club' : 'Servicio de mensajería'}
-                        </p>
-                      </div>
-                      <p className="font-semibold text-aurora-navy whitespace-nowrap">
-                        {courier.fee > 0 ? `${money(courier.fee)} por caja` : 'Sin costo'}
-                      </p>
-                    </label>
-                  );
-                })}
-              </div>
-            </>
-          )}
+          </div>
         </div>
-      ))}
+        <button
+          type="button"
+          onClick={() => goToStep(1)}
+          className="min-h-[44px] px-2 text-sm font-semibold text-aurora-terracotta hover:underline"
+        >
+          Cambiar
+        </button>
+      </div>
+
+      {shippingClubs.map((club) => {
+        const clubItems = cartItems.filter((item) => item.club.id === club.clubId);
+        return (
+          <SectionCard
+            key={club.clubId}
+            icon="truck"
+            title={`Envío de ${club.clubName}`}
+            subtitle={clubItems.map((item) => item.plan.name).join(' · ')}
+          >
+            {club.couriers.length === 0 ? (
+              <div className="flex items-start gap-3 rounded-xl bg-aurora-cream p-4 text-sm text-aurora-navy/80">
+                <Icon name="box" className="mt-0.5 h-5 w-5 flex-shrink-0" />
+                <p>Este club coordina el envío directamente con vos. No tiene costo adicional.</p>
+              </div>
+            ) : (
+              <div className="space-y-3" role="radiogroup" aria-label={`Envío de ${club.clubName}`}>
+                {club.couriers.map((courier) => (
+                  <RadioCard
+                    key={courier.id}
+                    id={`courier-${club.clubId}-${courier.id}`}
+                    name={`courier-${club.clubId}`}
+                    checked={selectedCouriers[club.clubId] === courier.id}
+                    onChange={() => {
+                      setSelectedCouriers((prev) => ({ ...prev, [club.clubId]: courier.id }));
+                      setStepError(null);
+                    }}
+                    icon="truck"
+                    title={courier.name}
+                    hint={courier.isInternal ? 'Reparto propio del club' : 'Servicio de mensajería'}
+                    aside={courier.fee > 0 ? `${money(courier.fee)} por caja` : 'Sin costo'}
+                  />
+                ))}
+              </div>
+            )}
+          </SectionCard>
+        );
+      })}
     </div>
   );
 
   const renderPayment = () => (
-    <div className="space-y-6">
-      <div className={cardClass}>
-        <h2 className="text-xl font-serif font-bold text-aurora-navy mb-1">¿Cómo querés pagar?</h2>
-        <p className="text-sm text-aurora-navy/60 mb-4">Estos son los medios que aceptan los clubes de tu carrito.</p>
-        {availableMethods.length === 0 ? (
-          <p className="text-sm text-red-600">
-            Los planes de tu carrito no comparten un medio de pago. Volvé al carrito y quitá alguno para continuar.
-          </p>
-        ) : (
-          <div className="space-y-3" role="radiogroup" aria-label="Medio de pago">
-            {availableMethods.map((method) => {
-              const checked = selectedPaymentMethod === method.id;
-              return (
-                <label
-                  key={method.id}
-                  htmlFor={`method-${method.id}`}
-                  className={`flex min-h-[56px] cursor-pointer items-center gap-3 rounded-xl border p-4 transition-colors ${
-                    checked ? 'border-aurora-terracotta bg-aurora-terracotta/5' : 'border-aurora-navy/15 hover:bg-aurora-cream'
-                  }`}
-                >
-                  <input
-                    id={`method-${method.id}`}
-                    type="radio"
-                    name="payment-method"
-                    checked={checked}
-                    onChange={() => {
-                      setSelectedPaymentMethod(method.id);
-                      setTransferConfirmed(false);
-                      setStepError(null);
-                    }}
-                    className="h-4 w-4 accent-aurora-terracotta"
-                  />
-                  <span className="text-2xl" aria-hidden="true">{method.icon}</span>
-                  <div>
-                    <p className="font-semibold text-aurora-navy">{method.label}</p>
-                    <p className="text-xs text-aurora-navy/60">{method.hint}</p>
-                  </div>
-                </label>
-              );
-            })}
-          </div>
-        )}
-      </div>
-
-      {isCardMethod && (
-        <div className={cardClass}>
-          <div className="flex flex-wrap items-center justify-between gap-2 mb-4">
-            <h3 className="text-lg font-serif font-bold text-aurora-navy">Datos de la tarjeta</h3>
-            <button
-              type="button"
-              onClick={fillTestCard}
-              className="min-h-[44px] rounded-lg border border-aurora-terracotta px-3 text-sm font-semibold text-aurora-terracotta hover:bg-aurora-terracotta/10"
+    <SectionCard icon="card" title="¿Cómo querés pagar?" subtitle="Estos son los medios que aceptan los clubes de tu carrito.">
+      {availableMethods.length === 0 ? (
+        <p className="text-sm text-red-600">
+          Los planes de tu carrito no comparten un medio de pago. Volvé al carrito y quitá alguno para continuar.
+        </p>
+      ) : (
+        <div className="space-y-3" role="radiogroup" aria-label="Medio de pago">
+          {availableMethods.map((method) => (
+            <RadioCard
+              key={method.id}
+              id={`method-${method.id}`}
+              name="payment-method"
+              checked={selectedPaymentMethod === method.id}
+              onChange={() => {
+                setSelectedPaymentMethod(method.id);
+                setTransferConfirmed(false);
+                setStepError(null);
+              }}
+              icon={method.icon}
+              title={method.label}
+              hint={method.hint}
             >
-              Completar con datos de prueba
-            </button>
-          </div>
-          <div className="mb-4"><DemoNotice /></div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div className="sm:col-span-2">
-              <label htmlFor="card-number" className="block text-sm font-medium text-aurora-navy/80 mb-1">
-                Número de tarjeta
-              </label>
-              <input
-                id="card-number"
-                inputMode="numeric"
-                autoComplete="off"
-                placeholder="0000 0000 0000 0000"
-                value={card.number}
-                onChange={(e) => setCard((prev) => ({ ...prev, number: formatCardNumber(e.target.value) }))}
-                className={fieldClass}
-              />
-            </div>
-            <div className="sm:col-span-2">
-              <label htmlFor="card-holder" className="block text-sm font-medium text-aurora-navy/80 mb-1">
-                Nombre del titular
-              </label>
-              <input
-                id="card-holder"
-                autoComplete="off"
-                value={card.holder}
-                onChange={(e) => setCard((prev) => ({ ...prev, holder: e.target.value.toUpperCase().slice(0, 40) }))}
-                className={fieldClass}
-              />
-            </div>
-            <div>
-              <label htmlFor="card-expiry" className="block text-sm font-medium text-aurora-navy/80 mb-1">
-                Vencimiento
-              </label>
-              <input
-                id="card-expiry"
-                inputMode="numeric"
-                autoComplete="off"
-                placeholder="MM/AA"
-                value={card.expiry}
-                onChange={(e) => setCard((prev) => ({ ...prev, expiry: formatExpiry(e.target.value) }))}
-                className={fieldClass}
-              />
-            </div>
-            <div>
-              <label htmlFor="card-cvv" className="block text-sm font-medium text-aurora-navy/80 mb-1">
-                Código de seguridad
-              </label>
-              <input
-                id="card-cvv"
-                inputMode="numeric"
-                autoComplete="off"
-                type="password"
-                placeholder="123"
-                value={card.cvv}
-                onChange={(e) => setCard((prev) => ({ ...prev, cvv: digitsOnly(e.target.value).slice(0, 4) }))}
-                className={fieldClass}
-              />
-            </div>
-          </div>
-          <p className="mt-3 text-xs text-aurora-navy/50">
-            Estos datos solo se validan en tu navegador. No se envían ni se guardan.
-          </p>
-        </div>
-      )}
+              {isCardMethod && (
+                <div>
+                  <div className="mb-4">
+                    <DemoNotice />
+                  </div>
+                  <CardPreview card={card} />
+                  <div className="mb-4 flex justify-end">
+                    <button
+                      type="button"
+                      onClick={fillTestCard}
+                      className="min-h-[44px] rounded-lg border border-aurora-terracotta px-3 text-sm font-semibold text-aurora-terracotta hover:bg-aurora-terracotta/10"
+                    >
+                      Completar con datos de prueba
+                    </button>
+                  </div>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <Field id="card-number" label="Número de tarjeta" error={cardErrors.number} className="sm:col-span-2">
+                      <input
+                        id="card-number"
+                        inputMode="numeric"
+                        autoComplete="off"
+                        placeholder="0000 0000 0000 0000"
+                        value={card.number}
+                        onChange={(e) => updateCard('number', formatCardNumber(e.target.value))}
+                        aria-invalid={Boolean(cardErrors.number)}
+                        className={inputClass(cardErrors.number)}
+                      />
+                    </Field>
+                    <Field id="card-holder" label="Nombre del titular" error={cardErrors.holder} className="sm:col-span-2">
+                      <input
+                        id="card-holder"
+                        autoComplete="off"
+                        placeholder="Como figura en la tarjeta"
+                        value={card.holder}
+                        onChange={(e) => updateCard('holder', e.target.value.toUpperCase().slice(0, 40))}
+                        aria-invalid={Boolean(cardErrors.holder)}
+                        className={inputClass(cardErrors.holder)}
+                      />
+                    </Field>
+                    <Field id="card-expiry" label="Vencimiento" error={cardErrors.expiry}>
+                      <input
+                        id="card-expiry"
+                        inputMode="numeric"
+                        autoComplete="off"
+                        placeholder="MM/AA"
+                        value={card.expiry}
+                        onChange={(e) => updateCard('expiry', formatExpiry(e.target.value))}
+                        aria-invalid={Boolean(cardErrors.expiry)}
+                        className={inputClass(cardErrors.expiry)}
+                      />
+                    </Field>
+                    <Field id="card-cvv" label="Código de seguridad" error={cardErrors.cvv}>
+                      <input
+                        id="card-cvv"
+                        inputMode="numeric"
+                        autoComplete="off"
+                        type="password"
+                        placeholder="123"
+                        value={card.cvv}
+                        onChange={(e) => updateCard('cvv', digitsOnly(e.target.value).slice(0, 4))}
+                        aria-invalid={Boolean(cardErrors.cvv)}
+                        className={inputClass(cardErrors.cvv)}
+                      />
+                    </Field>
+                  </div>
+                  <p className="mt-3 flex items-center gap-2 text-xs text-aurora-navy/50">
+                    <Icon name="lock" className="h-4 w-4 flex-shrink-0" />
+                    Estos datos solo se validan en tu navegador. No se envían ni se guardan.
+                  </p>
+                </div>
+              )}
 
-      {isTransfer && (
-        <div className={cardClass}>
-          <h3 className="text-lg font-serif font-bold text-aurora-navy mb-4">Datos para la transferencia</h3>
-          <div className="mb-4"><DemoNotice /></div>
-          <div className="space-y-5">
-            {options.banks.map((bank) => (
-              <div key={bank.clubId} className="rounded-xl border border-aurora-navy/10 bg-aurora-cream p-4 space-y-3">
-                <p className="font-semibold text-aurora-navy">{bank.clubName}</p>
-                {bank.holder && <CopyRow label="Titular" value={bank.holder} />}
-                {bank.cbu && <CopyRow label="CBU" value={bank.cbu} />}
-                {bank.alias && <CopyRow label="Alias" value={bank.alias} />}
-              </div>
-            ))}
-          </div>
-          <label htmlFor="transfer-confirmed" className="mt-4 flex min-h-[44px] cursor-pointer items-center gap-3">
-            <input
-              id="transfer-confirmed"
-              type="checkbox"
-              checked={transferConfirmed}
-              onChange={(e) => setTransferConfirmed(e.target.checked)}
-              className="h-4 w-4 accent-aurora-terracotta"
-            />
-            <span className="text-sm text-aurora-navy">Ya realicé la transferencia por {money(grandTotal)}</span>
-          </label>
-        </div>
-      )}
+              {isTransfer && (
+                <div>
+                  <div className="mb-4">
+                    <DemoNotice />
+                  </div>
+                  <div className="space-y-4">
+                    {options.banks.map((bank) => (
+                      <div key={bank.clubId} className="space-y-3 rounded-xl border border-aurora-navy/10 bg-white p-4">
+                        <p className="font-semibold text-aurora-navy">{bank.clubName}</p>
+                        {bank.holder && <CopyRow label="Titular" value={bank.holder} />}
+                        {bank.cbu && <CopyRow label="CBU" value={bank.cbu} />}
+                        {bank.alias && <CopyRow label="Alias" value={bank.alias} />}
+                      </div>
+                    ))}
+                  </div>
+                  <label htmlFor="transfer-confirmed" className="mt-4 flex min-h-[44px] cursor-pointer items-center gap-3">
+                    <input
+                      id="transfer-confirmed"
+                      type="checkbox"
+                      checked={transferConfirmed}
+                      onChange={(e) => setTransferConfirmed(e.target.checked)}
+                      className="h-4 w-4 accent-aurora-terracotta"
+                    />
+                    <span className="text-sm text-aurora-navy">Ya realicé la transferencia por {money(grandTotal)}</span>
+                  </label>
+                </div>
+              )}
 
-      {isCash && (
-        <div className={cardClass}>
-          <h3 className="text-lg font-serif font-bold text-aurora-navy mb-2">Pago en efectivo</h3>
-          <p className="text-sm text-aurora-navy/70">
-            No pagás nada ahora. Abonás {money(grandTotal)} cuando recibas tu caja, y el club registra el cobro.
-          </p>
+              {isCash && (
+                <p className="text-sm text-aurora-navy/70">
+                  No pagás nada ahora. Abonás {money(grandTotal)} cuando recibas tu caja y el club registra el cobro.
+                </p>
+              )}
+            </RadioCard>
+          ))}
         </div>
       )}
-    </div>
+    </SectionCard>
   );
 
   const renderReview = () => (
     <div className="space-y-6">
-      <div className={cardClass}>
-        <div className="flex items-start justify-between gap-3">
-          <div>
-            <h3 className="font-serif font-bold text-aurora-navy mb-1">Dirección de entrega</h3>
-            <p className="text-sm text-aurora-navy/80">
-              {address.street} {address.streetNumber}, {address.locality}
-            </p>
-            <p className="text-sm text-aurora-navy/80">
-              {address.city}, {address.province} ({address.postalCode.toUpperCase()})
-            </p>
-            {address.instructions && <p className="text-xs text-aurora-navy/50 mt-1">{address.instructions}</p>}
-          </div>
-          <button type="button" onClick={() => goToStep(1)} className="min-h-[44px] px-2 text-sm font-semibold text-aurora-terracotta hover:underline">
-            Editar
-          </button>
-        </div>
-      </div>
-
-      <div className={cardClass}>
-        <div className="flex items-start justify-between gap-3">
-          <div>
-            <h3 className="font-serif font-bold text-aurora-navy mb-1">Envío</h3>
-            {shippingClubs.map((club) => {
-              const name = courierNameForClub(club.clubId);
-              const fee = feeForClub(club.clubId);
-              return (
-                <p key={club.clubId} className="text-sm text-aurora-navy/80">
-                  {club.clubName}: {name ?? 'Coordinado por el club'}
-                  {name ? ` · ${fee > 0 ? `${money(fee)} por caja` : 'Sin costo'}` : ''}
+      <SectionCard icon="shield" title="Revisá tu compra" subtitle="Confirmá que todo esté bien antes de finalizar.">
+        <div className="divide-y divide-aurora-navy/10">
+          <div className="flex items-start justify-between gap-3 pb-5">
+            <div className="flex items-start gap-3">
+              <Icon name="pin" className="mt-0.5 h-5 w-5 flex-shrink-0 text-aurora-terracotta" />
+              <div className="text-sm">
+                <p className="font-semibold text-aurora-navy">Dirección de entrega</p>
+                <p className="text-aurora-navy/80">
+                  {address.street} {address.streetNumber}, {address.locality}
                 </p>
-              );
-            })}
+                <p className="text-aurora-navy/80">
+                  {address.city}, {address.province} ({address.postalCode.toUpperCase()})
+                </p>
+                {address.instructions && <p className="mt-1 text-xs text-aurora-navy/50">{address.instructions}</p>}
+              </div>
+            </div>
+            <button
+              type="button"
+              onClick={() => goToStep(1)}
+              className="min-h-[44px] px-2 text-sm font-semibold text-aurora-terracotta hover:underline"
+            >
+              Editar
+            </button>
           </div>
-          <button type="button" onClick={() => goToStep(2)} className="min-h-[44px] px-2 text-sm font-semibold text-aurora-terracotta hover:underline">
-            Editar
-          </button>
-        </div>
-      </div>
 
-      <div className={cardClass}>
-        <div className="flex items-start justify-between gap-3">
-          <div>
-            <h3 className="font-serif font-bold text-aurora-navy mb-1">Medio de pago</h3>
-            <p className="text-sm text-aurora-navy/80">{methodLabel}</p>
-            {isCardMethod && <p className="text-xs text-aurora-navy/50">{maskedCard}</p>}
-            {isTransfer && <p className="text-xs text-aurora-navy/50">Transferencia informada</p>}
-            {isCash && <p className="text-xs text-aurora-navy/50">Pagás al recibir tu caja</p>}
+          <div className="flex items-start justify-between gap-3 py-5">
+            <div className="flex items-start gap-3">
+              <Icon name="truck" className="mt-0.5 h-5 w-5 flex-shrink-0 text-aurora-terracotta" />
+              <div className="text-sm">
+                <p className="font-semibold text-aurora-navy">Envío</p>
+                {shippingClubs.map((club) => {
+                  const name = courierNameForClub(club.clubId);
+                  const fee = feeForClub(club.clubId);
+                  return (
+                    <p key={club.clubId} className="text-aurora-navy/80">
+                      {club.clubName}: {name ?? 'Coordinado por el club'}
+                      {name ? ` · ${fee > 0 ? `${money(fee)} por caja` : 'Sin costo'}` : ''}
+                    </p>
+                  );
+                })}
+              </div>
+            </div>
+            <button
+              type="button"
+              onClick={() => goToStep(2)}
+              className="min-h-[44px] px-2 text-sm font-semibold text-aurora-terracotta hover:underline"
+            >
+              Editar
+            </button>
           </div>
-          <button type="button" onClick={() => goToStep(3)} className="min-h-[44px] px-2 text-sm font-semibold text-aurora-terracotta hover:underline">
-            Editar
-          </button>
+
+          <div className="flex items-start justify-between gap-3 pt-5">
+            <div className="flex items-start gap-3">
+              <Icon
+                name={isTransfer ? 'bank' : isCash ? 'cash' : 'card'}
+                className="mt-0.5 h-5 w-5 flex-shrink-0 text-aurora-terracotta"
+              />
+              <div className="text-sm">
+                <p className="font-semibold text-aurora-navy">Medio de pago</p>
+                <p className="text-aurora-navy/80">{methodLabel}</p>
+                {isCardMethod && <p className="text-xs text-aurora-navy/50">{maskedCard}</p>}
+                {isTransfer && <p className="text-xs text-aurora-navy/50">Transferencia informada</p>}
+                {isCash && <p className="text-xs text-aurora-navy/50">Pagás al recibir tu caja</p>}
+              </div>
+            </div>
+            <button
+              type="button"
+              onClick={() => goToStep(3)}
+              className="min-h-[44px] px-2 text-sm font-semibold text-aurora-terracotta hover:underline"
+            >
+              Editar
+            </button>
+          </div>
         </div>
-      </div>
+
+        {geoStatus === 'found' && geo && (
+          <div className="mt-6">
+            <AddressMap geo={geo} status={geoStatus} onRetry={() => setGeoNonce((value) => value + 1)} heightClass="h-44" />
+          </div>
+        )}
+      </SectionCard>
 
       <DemoNotice />
     </div>
@@ -920,12 +1406,20 @@ const CheckoutPage: React.FC = () => {
       )}
 
       <div className="max-w-6xl mx-auto">
-        <div className="text-center mb-6">
-          <h1 className="text-4xl font-serif font-bold text-aurora-navy mb-2">Finalizar compra</h1>
+        <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
+          <h1 className="text-3xl sm:text-4xl font-serif font-bold text-aurora-navy">Finalizar compra</h1>
+          <span className="flex items-center gap-2 text-sm font-semibold text-aurora-navy/70">
+            <Icon name="lock" className="h-4 w-4" />
+            Conexión segura
+          </span>
+        </div>
+
+        <div className="mb-6">
+          <DemoNotice />
         </div>
 
         <nav aria-label="Pasos de la compra" className="mb-8 max-w-3xl mx-auto">
-          <ol className="flex items-center gap-2">
+          <ol className="flex items-start">
             {STEPS.map((label, index) => {
               const number = index + 1;
               const done = number < step;
@@ -933,36 +1427,50 @@ const CheckoutPage: React.FC = () => {
               return (
                 <li
                   key={label}
-                  className={`flex items-center gap-2 ${number < STEPS.length ? 'flex-1' : ''}`}
+                  className="relative flex flex-1 flex-col items-center"
                   aria-current={current ? 'step' : undefined}
                 >
+                  {index > 0 && (
+                    <span
+                      className={`absolute right-1/2 top-4 h-0.5 w-full -translate-y-1/2 ${
+                        number <= step ? 'bg-aurora-terracotta' : 'bg-aurora-navy/15'
+                      }`}
+                    />
+                  )}
                   <button
                     type="button"
                     disabled={!done}
                     onClick={() => goToStep(number)}
-                    className="flex min-h-[44px] items-center gap-2 disabled:cursor-default"
+                    className="relative z-10 flex min-h-[44px] flex-col items-center gap-1 disabled:cursor-default"
                   >
                     <span
-                      className={`flex h-8 w-8 items-center justify-center rounded-full text-sm font-bold ${
+                      className={`flex h-8 w-8 items-center justify-center rounded-full border text-sm font-bold ${
                         done
-                          ? 'bg-aurora-terracotta text-white'
+                          ? 'border-aurora-terracotta bg-aurora-terracotta text-white'
                           : current
-                            ? 'bg-aurora-navy text-white'
-                            : 'bg-aurora-navy/10 text-aurora-navy/50'
+                            ? 'border-aurora-navy bg-aurora-navy text-white'
+                            : 'border-aurora-navy/20 bg-white text-aurora-navy/50'
                       }`}
                     >
-                      {done ? '✓' : number}
+                      {done ? <Icon name="check" className="h-4 w-4" /> : number}
                     </span>
-                    <span className={`hidden text-sm font-semibold sm:inline ${current ? 'text-aurora-navy' : 'text-aurora-navy/50'}`}>
+                    <span className={`text-xs font-semibold ${current ? 'text-aurora-navy' : 'text-aurora-navy/50'}`}>
                       {label}
                     </span>
                   </button>
-                  {number < STEPS.length && <span className="h-px flex-1 bg-aurora-navy/15" />}
                 </li>
               );
             })}
           </ol>
         </nav>
+
+        <details className="lg:hidden mb-6 rounded-2xl border border-aurora-navy/10 bg-white shadow-aurora-sm">
+          <summary className="flex min-h-[52px] cursor-pointer items-center justify-between px-4 py-3 font-semibold text-aurora-navy">
+            <span>Resumen de tu orden</span>
+            <span>{money(grandTotal)}</span>
+          </summary>
+          <div className="px-4 pb-4">{renderSummaryBody()}</div>
+        </details>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
           <div className="lg:col-span-2 space-y-6">
@@ -977,18 +1485,28 @@ const CheckoutPage: React.FC = () => {
               </div>
             )}
 
-            <div className="flex flex-wrap justify-between gap-3">
+            <div className="flex flex-wrap items-center justify-between gap-3">
               {step === 1 ? (
                 <button type="button" onClick={() => navigate('/cart')} className={secondaryButtonClass}>
                   Volver al carrito
                 </button>
               ) : (
-                <button type="button" onClick={() => goToStep(step - 1)} disabled={isProcessing} className={secondaryButtonClass}>
+                <button
+                  type="button"
+                  onClick={() => goToStep(step - 1)}
+                  disabled={isProcessing}
+                  className={secondaryButtonClass}
+                >
                   Atrás
                 </button>
               )}
               {step < 4 ? (
-                <button type="button" onClick={handleContinue} disabled={step === 3 && availableMethods.length === 0} className={primaryButtonClass}>
+                <button
+                  type="button"
+                  onClick={handleContinue}
+                  disabled={step === 3 && availableMethods.length === 0}
+                  className={primaryButtonClass}
+                >
                   Continuar
                 </button>
               ) : (
@@ -997,9 +1515,17 @@ const CheckoutPage: React.FC = () => {
                 </button>
               )}
             </div>
+            {step === 4 && (
+              <p className="text-center text-xs text-aurora-navy/50">
+                Al confirmar aceptás los términos y condiciones de AuraBox.
+              </p>
+            )}
           </div>
 
-          <div className="lg:col-span-1">{renderSummary()}</div>
+          <aside className={`${cardClass} hidden p-6 lg:sticky lg:top-24 lg:block`}>
+            <h2 className="mb-4 text-xl font-serif font-bold text-aurora-navy">Resumen de tu orden</h2>
+            {renderSummaryBody()}
+          </aside>
         </div>
       </div>
     </div>
