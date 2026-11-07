@@ -3,6 +3,7 @@ import { PrismaService } from '../../prisma/prisma.service';
 import { CreateShipmentDto } from './dto/create-shipment.dto';
 import { UpdateShipmentDto } from './dto/update-shipment.dto';
 import { AssignDeliveryDto, AssignNewShipmentDto } from './dto/assign-delivery.dto';
+import { courierFee } from '../../common/utils/shipping';
 
 type RequestUser = { id: number; role: string };
 
@@ -41,7 +42,7 @@ export class ShipmentsService {
     if (!clubCourier) throw new BadRequestException('El courier seleccionado no está habilitado para este club');
     const courier = await this.prisma.courier.findUnique({ where: { id: idCourier } });
     if (!courier || !courier.active) throw new BadRequestException('Courier inválido');
-    return courier;
+    return { ...courier, fee: courierFee(courier.isInternal, clubCourier.baseFee) };
   }
 
   private async validateRiderForClub(idClub: number, idAssignedRider: number) {
@@ -131,12 +132,14 @@ export class ShipmentsService {
         idCourier: dto.idCourier,
         boxMonthYear,
         shipmentStatus: 'Asignado',
+        shippingCost: courier.fee,
         street: user.streetAddress,
         addressNumber: user.addressNumber ? String(user.addressNumber) : null,
         locality: user.addressDetails,
         city: user.city,
         postalCode: user.postalCode,
         province: user.province,
+        instructions: user.addressDetails,
         boxContent: boxContentEntry?.productName ?? null,
       },
     });
@@ -182,6 +185,7 @@ export class ShipmentsService {
       ? await this.prisma.courier.findMany({ where: { id: { in: courierIds }, active: true } })
       : [];
     const couriersById = new Map<number, (typeof couriers)[number]>(couriers.map((c) => [c.id, c] as [number, (typeof couriers)[number]]));
+    const baseFeeByCourier = new Map<number, unknown>(clubCouriers.map((c) => [c.idCourier, c.baseFee] as [number, unknown]));
 
     const userPreferences = await this.prisma.user_Courier_Preference.findMany({
       where: { idClub, idUser: { in: userIds }, active: true },
@@ -197,8 +201,9 @@ export class ShipmentsService {
       const user = usersById.get(sub.idUser);
       const subType = subTypesById.get(sub.idSubscriptionTypes);
       const userPrefs = preferencesByUser.get(sub.idUser);
-      const allowedCourierIds = userPrefs && userPrefs.length > 0
-        ? courierIds.filter((id) => userPrefs.includes(id))
+      const hasPreference = !!userPrefs && userPrefs.length > 0;
+      const allowedCourierIds = hasPreference
+        ? courierIds.filter((id) => userPrefs!.includes(id))
         : courierIds;
       const availableCouriers = allowedCourierIds.map((id) => couriersById.get(id)).filter((c): c is NonNullable<typeof c> => !!c);
       return {
@@ -207,6 +212,7 @@ export class ShipmentsService {
         idSubscriptionTypes: sub.idSubscriptionTypes,
         subscriptionName: subType?.name ?? null,
         boxMonthYear,
+        preferredCourierId: hasPreference && availableCouriers.length > 0 ? availableCouriers[0].id : null,
         user: user
           ? {
               id: user.id,
@@ -226,7 +232,11 @@ export class ShipmentsService {
             }
           : null,
         availableCouriers: availableCouriers.map((c) => ({
-          id: c.id, code: c.code, name: c.name, isInternal: c.isInternal,
+          id: c.id,
+          code: c.code,
+          name: c.name,
+          isInternal: c.isInternal,
+          fee: courierFee(c.isInternal, baseFeeByCourier.get(c.id)),
         })),
       };
     });
@@ -301,10 +311,12 @@ export class ShipmentsService {
 
     let idCourier = shipment.idCourier;
     let idAssignedRider = shipment.idAssignedRider;
+    let shippingCost: number | undefined;
 
     if (dto.idCourier !== undefined) {
       const courier = await this.validateCourierForClub(idClub, dto.idCourier);
       idCourier = dto.idCourier;
+      shippingCost = courier.fee;
       if (courier.isInternal) {
         if (dto.idAssignedRider) {
           await this.validateRiderForClub(idClub, dto.idAssignedRider);
@@ -320,7 +332,12 @@ export class ShipmentsService {
 
     const updated = await this.prisma.shipments.update({
       where: { id },
-      data: { idCourier, idAssignedRider, shipmentStatus: dto.shipmentStatus ?? shipment.shipmentStatus },
+      data: {
+        idCourier,
+        idAssignedRider,
+        shipmentStatus: dto.shipmentStatus ?? shipment.shipmentStatus,
+        ...(shippingCost !== undefined ? { shippingCost } : {}),
+      },
     });
     return sanitize(updated);
   }
