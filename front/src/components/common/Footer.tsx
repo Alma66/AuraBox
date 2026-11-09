@@ -92,8 +92,12 @@ const Footer: React.FC = () => {
                 </Link>
               </li>
             </ul>
-            <p className="text-white/60 text-sm">info@aurabox.com</p>
-            <p className="text-white/60 text-sm">+54 9 11 1234-5678</p>
+            <p className="text-white/60 text-sm">
+              <a href="mailto:auraboxcompany@gmail.com" className="hover:text-aurora-gold transition-colors duration-200">auraboxcompany@gmail.com</a>
+            </p>
+            <p className="text-white/60 text-sm">
+              <a href="tel:+5491157027399" className="hover:text-aurora-gold transition-colors duration-200">+54 9 11 5702-7399</a>
+            </p>
             <p className="text-sm mt-2">
               <Link to="/contact" className="text-aurora-gold hover:text-aurora-goldLight underline transition-colors duration-200">Envianos un mensaje</Link>
             </p>
