@@ -1,7 +1,7 @@
 import { BadRequestException, Injectable, Logger, ServiceUnavailableException } from '@nestjs/common';
 import { ChatMessageDto } from './dto/chat.dto';
 import { containsProfanity, moderateText } from './assistant.moderation';
-import { SYSTEM_PROMPT } from './assistant.prompt';
+import { STYLE_BRIEF, STYLE_DETAILED, SYSTEM_PROMPT } from './assistant.prompt';
 
 const DEFAULT_BASE_URL = 'https://api.deepseek.com';
 const DEFAULT_MODEL = 'deepseek-flash';
@@ -10,14 +10,11 @@ const MAX_REPLY_CHARS = 1500;
 const REQUEST_TIMEOUT_MS = 20000;
 const FALLBACK_REPLY = 'No pude armar una respuesta útil. ¿Podés reformular tu consulta sobre AuraBox?';
 
+export type ChatDetail = 'brief' | 'detailed';
+
 @Injectable()
 export class AssistantService {
   private readonly logger = new Logger(AssistantService.name);
-    constructor() {
-    const names = Object.keys(process.env).filter((name) => name.toUpperCase().includes('DEEPSEEK'));
-    this.logger.log(`Variables DeepSeek detectadas: ${JSON.stringify(names)}`);
-  }
-  
   private dailyKey = '';
   private dailyCount = 0;
 
@@ -33,7 +30,7 @@ export class AssistantService {
     return true;
   }
 
-  async chat(history: ChatMessageDto[]) {
+  async chat(history: ChatMessageDto[], detail: ChatDetail = 'brief') {
     const recent = history.slice(-MAX_HISTORY);
     const last = recent[recent.length - 1];
     if (!last || last.role !== 'user') {
@@ -60,6 +57,7 @@ export class AssistantService {
     const baseUrl = process.env.DEEPSEEK_BASE_URL || DEFAULT_BASE_URL;
     const model = process.env.DEEPSEEK_MODEL || DEFAULT_MODEL;
     const thinkingDisabled = (process.env.DEEPSEEK_THINKING ?? 'disabled') === 'disabled';
+    const style = detail === 'detailed' ? STYLE_DETAILED : STYLE_BRIEF;
 
     const controller = new AbortController();
     const timer = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
@@ -74,10 +72,10 @@ export class AssistantService {
         body: JSON.stringify({
           model,
           messages: [
-            { role: 'system', content: SYSTEM_PROMPT },
+            { role: 'system', content: `${SYSTEM_PROMPT}\n\n${style}` },
             ...cleanHistory.map((message) => ({ role: message.role, content: message.content })),
           ],
-          max_tokens: 450,
+          max_tokens: detail === 'detailed' ? 700 : 400,
           temperature: 0.3,
           stream: false,
           ...(thinkingDisabled ? { thinking: { type: 'disabled' } } : {}),

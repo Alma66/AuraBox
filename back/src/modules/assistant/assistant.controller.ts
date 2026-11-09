@@ -16,6 +16,6 @@ export class AssistantController {
   @Throttle({ default: { limit: 12, ttl: 60000 } })
   @UsePipes(new ValidationPipe({ whitelist: true, transform: true }))
   async chat(@Body() dto: ChatRequestDto) {
-    return this.assistantService.chat(dto.messages);
+    return this.assistantService.chat(dto.messages, dto.detail ?? 'brief');
   }
 }

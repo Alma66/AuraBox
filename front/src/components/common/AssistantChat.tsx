@@ -1,11 +1,12 @@
-import React, { useEffect, useRef, useState } from 'react';
-import { Link } from 'react-router-dom';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
+import { Link, useLocation } from 'react-router-dom';
 import api, { getResponseData } from '../../api/config';
 
 interface ChatMessage {
   id: number;
   role: 'user' | 'assistant';
   content: string;
+  blocked?: boolean;
 }
 
 interface AssistantChatProps {
@@ -13,26 +14,115 @@ interface AssistantChatProps {
   onClose: () => void;
 }
 
+type Detail = 'brief' | 'detailed';
+
 const MAX_INPUT = 400;
+const STORAGE_KEY = 'aurabox_assistant_chat';
+const LINK_PATTERN = /\[([^\]]{1,80})\]\((\/(?!\/)[a-zA-Z0-9\-_/?=&#%.]*)\)/g;
 
 const GREETING =
-  '¡Hola! Soy el asistente virtual de AuraBox. Puedo ayudarte con suscripciones, pagos, envíos y tu cuenta. ¿Qué necesitás saber?';
+  '¡Hola! 👋 Soy el asistente virtual de AuraBox. Puedo ayudarte con suscripciones, pagos, envíos y tu cuenta. ¿Qué necesitás saber?';
 
-const SUGGESTIONS = [
-  '¿Cómo me suscribo a una caja?',
-  '¿Qué medios de pago hay?',
-  '¿Cómo funcionan los envíos?',
-  '¿Dónde veo mis suscripciones?',
-];
+const getSuggestions = (path: string): string[] => {
+  if (path.startsWith('/checkout')) {
+    return [
+      '¿Qué medios de pago puedo usar?',
+      '¿Cómo elijo la empresa de envío?',
+      '¿Los pagos son reales?',
+      '¿Cómo funciona el efectivo contra entrega?',
+    ];
+  }
+  if (path.startsWith('/club/')) {
+    return [
+      '¿Cómo me suscribo a este plan?',
+      '¿Cómo funcionan las reseñas?',
+      '¿Cómo se envían las cajas?',
+      '¿Qué medios de pago acepta un club?',
+    ];
+  }
+  if (path.startsWith('/customer')) {
+    return [
+      '¿Dónde veo mis suscripciones?',
+      '¿Cómo cambio mi contraseña?',
+      '¿Cómo dejo una reseña?',
+      '¿Cómo desactivo mi cuenta?',
+    ];
+  }
+  if (path.startsWith('/entrepreneur')) {
+    return [
+      '¿Qué puedo gestionar desde mi panel?',
+      '¿Cómo se aprueba mi club?',
+      '¿Cómo funcionan los envíos del club?',
+      '¿Qué medios de pago puede aceptar mi club?',
+    ];
+  }
+  return [
+    '¿Cómo me suscribo a una caja?',
+    '¿Qué medios de pago hay?',
+    '¿Cómo funcionan los envíos?',
+    '¿Dónde veo mis suscripciones?',
+  ];
+};
+
+const loadMessages = (): ChatMessage[] => {
+  try {
+    const raw = sessionStorage.getItem(STORAGE_KEY);
+    if (!raw) return [];
+    const parsed = JSON.parse(raw);
+    if (!Array.isArray(parsed)) return [];
+    return parsed
+      .filter(
+        (item) =>
+          item &&
+          (item.role === 'user' || item.role === 'assistant') &&
+          typeof item.content === 'string' &&
+          typeof item.id === 'number',
+      )
+      .slice(-30);
+  } catch {
+    return [];
+  }
+};
+
+const cleanContent = (text: string) =>
+  text.replace(/\*\*/g, '').replace(/\[([^\]]{1,80})\]\((?!\/(?!\/))[^)]*\)/g, '$1');
+
+const renderContent = (text: string, onNavigate: () => void): React.ReactNode[] => {
+  const nodes: React.ReactNode[] = [];
+  const pattern = new RegExp(LINK_PATTERN.source, 'g');
+  const content = cleanContent(text);
+  let lastIndex = 0;
+  let match: RegExpExecArray | null = pattern.exec(content);
+  while (match !== null) {
+    if (match.index > lastIndex) nodes.push(content.slice(lastIndex, match.index));
+    nodes.push(
+      <Link
+        key={`link-${match.index}`}
+        to={match[2]}
+        onClick={onNavigate}
+        className="font-semibold text-aurora-terracotta underline"
+      >
+        {match[1]}
+      </Link>,
+    );
+    lastIndex = match.index + match[0].length;
+    match = pattern.exec(content);
+  }
+  if (lastIndex < content.length) nodes.push(content.slice(lastIndex));
+  return nodes;
+};
 
 const AssistantChat: React.FC<AssistantChatProps> = ({ open, onClose }) => {
-  const [messages, setMessages] = useState<ChatMessage[]>([]);
+  const location = useLocation();
+  const [messages, setMessages] = useState<ChatMessage[]>(loadMessages);
   const [input, setInput] = useState('');
   const [sending, setSending] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const nextId = useRef(1);
+  const nextId = useRef(messages.reduce((max, item) => Math.max(max, item.id), 0) + 1);
   const endRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+
+  const suggestions = useMemo(() => getSuggestions(location.pathname), [location.pathname]);
 
   useEffect(() => {
     if (open) inputRef.current?.focus();
@@ -42,7 +132,19 @@ const AssistantChat: React.FC<AssistantChatProps> = ({ open, onClose }) => {
     endRef.current?.scrollIntoView({ behavior: 'smooth', block: 'end' });
   }, [messages, sending, open]);
 
-  const send = async (text: string) => {
+  useEffect(() => {
+    try {
+      sessionStorage.setItem(STORAGE_KEY, JSON.stringify(messages));
+    } catch {
+      return;
+    }
+  }, [messages]);
+
+  const handleNavigate = () => {
+    if (window.matchMedia('(max-width: 640px)').matches) onClose();
+  };
+
+  const send = async (text: string, detail: Detail = 'brief') => {
     const content = text.trim();
     if (!content || sending) return;
     const userMessage: ChatMessage = { id: nextId.current++, role: 'user', content };
@@ -54,9 +156,13 @@ const AssistantChat: React.FC<AssistantChatProps> = ({ open, onClose }) => {
     try {
       const response = await api.post('/assistant/chat', {
         messages: nextMessages.slice(-8).map((message) => ({ role: message.role, content: message.content })),
+        detail,
       });
-      const data = getResponseData(response) as { reply: string };
-      setMessages((prev) => [...prev, { id: nextId.current++, role: 'assistant', content: data.reply }]);
+      const data = getResponseData(response) as { reply: string; blocked?: boolean };
+      setMessages((prev) => [
+        ...prev,
+        { id: nextId.current++, role: 'assistant', content: data.reply, blocked: Boolean(data.blocked) },
+      ]);
     } catch (err: any) {
       if (err?.response?.status === 429) {
         setError('Estás enviando muchos mensajes. Esperá un momento y probá de nuevo.');
@@ -76,6 +182,9 @@ const AssistantChat: React.FC<AssistantChatProps> = ({ open, onClose }) => {
 
   if (!open) return null;
 
+  const lastMessage = messages[messages.length - 1];
+  const canExpand = !sending && lastMessage && lastMessage.role === 'assistant' && !lastMessage.blocked;
+
   return (
     <div
       role="dialog"
@@ -83,7 +192,7 @@ const AssistantChat: React.FC<AssistantChatProps> = ({ open, onClose }) => {
       onKeyDown={(e) => {
         if (e.key === 'Escape') onClose();
       }}
-      className="fixed bottom-4 right-4 z-[90] flex h-[32rem] max-h-[calc(100vh-7rem)] w-[calc(100vw-2rem)] max-w-sm flex-col overflow-hidden rounded-2xl border border-aurora-navy/10 bg-white shadow-xl"
+      className="fixed bottom-4 right-4 z-[90] flex h-[34rem] max-h-[calc(100vh-2rem)] w-[calc(100vw-2rem)] max-w-sm flex-col overflow-hidden rounded-2xl border border-aurora-navy/10 bg-white shadow-xl"
     >
       <div className="flex items-center justify-between bg-aurora-navy px-4 py-3 text-white">
         <div>
@@ -116,7 +225,7 @@ const AssistantChat: React.FC<AssistantChatProps> = ({ open, onClose }) => {
 
         {messages.length === 0 && (
           <div className="flex flex-wrap gap-2">
-            {SUGGESTIONS.map((suggestion) => (
+            {suggestions.map((suggestion) => (
               <button
                 key={suggestion}
                 type="button"
@@ -138,9 +247,19 @@ const AssistantChat: React.FC<AssistantChatProps> = ({ open, onClose }) => {
                 : 'rounded-tl-sm bg-white text-aurora-navy shadow-sm'
             }`}
           >
-            {message.content}
+            {message.role === 'assistant' ? renderContent(message.content, handleNavigate) : message.content}
           </div>
         ))}
+
+        {canExpand && (
+          <button
+            type="button"
+            onClick={() => send('Explicame con más detalle, paso a paso.', 'detailed')}
+            className="min-h-[44px] rounded-full border border-aurora-navy/20 bg-white px-4 py-2 text-xs font-semibold text-aurora-navy hover:bg-aurora-navy/5"
+          >
+            Explicame más
+          </button>
+        )}
 
         {sending && (
           <div className="max-w-[85%] animate-pulse rounded-2xl rounded-tl-sm bg-white px-4 py-3 text-sm text-aurora-navy/60 shadow-sm">
@@ -183,8 +302,12 @@ const AssistantChat: React.FC<AssistantChatProps> = ({ open, onClose }) => {
         </form>
         <p className="mt-2 text-center text-[11px] leading-snug text-aurora-navy/50">
           No compartas datos personales ni de pago. Tus mensajes se procesan con un servicio externo de IA.{' '}
-          <Link to="/faq" onClick={onClose} className="font-semibold underline">
-            Ver preguntas frecuentes
+          <Link to="/faq" onClick={handleNavigate} className="font-semibold underline">
+            Preguntas frecuentes
+          </Link>
+          {' · '}
+          <Link to="/contact" onClick={handleNavigate} className="font-semibold underline">
+            Hablar con una persona
           </Link>
         </p>
       </div>
