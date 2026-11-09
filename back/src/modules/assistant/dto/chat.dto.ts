@@ -8,7 +8,7 @@ export class ChatMessageDto {
   @Transform(({ value }) => (typeof value === 'string' ? value.trim() : value))
   @IsString()
   @MinLength(1)
-  @MaxLength(500)
+  @MaxLength(1600)
   content!: string;
 }
 
