@@ -39,6 +39,7 @@ import ClubDetailPage from './pages/entrepreneur/club/myClub/ClubDetailPage';
 import HistoryPage from './pages/entrepreneur/club/myClub/HistoryPage';
 import TermsAndConditionsPage from './pages/entrepreneur/club/legal/TermsAndConditionsPage';
 import PrivacyAndSecurityPolicyPage from './pages/entrepreneur/club/legal/PrivacyAndSecurityPolicyPage';
+import NewsletterUnsubscribePage from './pages/NewsletterUnsubscribePage';
 
 import EntrepreneurDashboardPage from './pages/entrepreneur/EntrepreneurDashboardPage';
 import EntrepreneurProfilePage from './pages/entrepreneur/EntrepreneurProfilePage';
@@ -240,7 +241,8 @@ const AppContent: React.FC = () => {
       <Route path="/club/:clubId/privacy-and-security" element={<PrivacyAndSecurityPolicyPage />} />
       <Route path="/club/:clubId/plan/:planId" element={<SubscriptionPlanDetailPage />} />
       <Route path="/club/:clubId/reviews" element={<ClubReviewsPage />} />
-      
+      <Route path="/newsletter/unsubscribe" element={<NewsletterUnsubscribePage />} />
+
       <Route path="/login" element={<LoginPage onLogin={login} />} />
       <Route path="/logout" element={<Logout />} />
       <Route path="/register" element={<RegisterPage />} />

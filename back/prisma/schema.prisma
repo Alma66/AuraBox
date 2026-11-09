@@ -22,6 +22,17 @@ model Newsletter_Send {
   @@map("Newsletter_Send")
 }
 
+model Newsletter_Subscriber {
+  id               Int       @id @default(autoincrement()) @map("ID")
+  email            String    @unique @map("Email")
+  isActive         Boolean   @default(true) @map("Is_Active")
+  unsubscribeToken String    @unique @map("Unsubscribe_Token")
+  createdAt        DateTime  @default(now()) @map("Created_At")
+  unsubscribedAt   DateTime? @map("Unsubscribed_At")
+
+  @@map("Newsletter_Subscriber")
+}
+
 enum NewsletterStatus {
   Enviando    @map("Enviando")
   Completado  @map("Completado")

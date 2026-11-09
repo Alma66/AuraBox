@@ -1,16 +1,23 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
+import api from '../../api/config';
 
 const Footer: React.FC = () => {
   const [newsletterEmail, setNewsletterEmail] = useState('');
-  const [newsletterSent, setNewsletterSent] = useState(false);
+  const [newsletterStatus, setNewsletterStatus] = useState<'idle' | 'sending' | 'done' | 'error'>('idle');
 
-  const handleNewsletterSubmit = (e: React.FormEvent) => {
+  const handleNewsletterSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!newsletterEmail.trim()) return;
-    window.location.href = `mailto:info@aurabox.com?subject=${encodeURIComponent('Quiero recibir novedades de AuraBox')}&body=${encodeURIComponent(`Mi email es: ${newsletterEmail}`)}`;
-    setNewsletterSent(true);
-    setNewsletterEmail('');
+    const email = newsletterEmail.trim();
+    if (!email || newsletterStatus === 'sending') return;
+    setNewsletterStatus('sending');
+    try {
+      await api.post('/newsletter/subscribe', { email });
+      setNewsletterStatus('done');
+      setNewsletterEmail('');
+    } catch {
+      setNewsletterStatus('error');
+    }
   };
 
   return (
@@ -96,26 +103,39 @@ const Footer: React.FC = () => {
             <p className="text-white/60 text-sm mb-4">
               Enterate de clubes nuevos y promos exclusivas antes que nadie.
             </p>
-            {newsletterSent ? (
-              <p className="text-aurora-gold text-sm font-semibold">
-                Se abrió tu correo con el mensaje listo. Enviálo para completar tu suscripción.
+            {newsletterStatus === 'done' ? (
+              <p role="status" className="text-aurora-gold text-sm font-semibold">
+                ¡Listo! Revisá tu bandeja de entrada: te mandamos un correo de bienvenida.
               </p>
             ) : (
-              <form onSubmit={handleNewsletterSubmit} className="flex gap-2">
-                <label htmlFor="footer-newsletter-email" className="sr-only">Tu email para recibir novedades</label>
-                <input
-                  id="footer-newsletter-email"
-                  type="email"
-                  required
-                  placeholder="tu@email.com"
-                  value={newsletterEmail}
-                  onChange={(e) => setNewsletterEmail(e.target.value)}
-                  className="flex-grow min-w-0 px-3 py-2 rounded-lg bg-white/10 border border-white/15 text-white placeholder-white/40 text-sm focus:outline-none focus:ring-2 focus:ring-aurora-gold/50"
-                />
-                <button type="submit" className="bg-aurora-terracotta hover:bg-aurora-terracottaLight text-white px-4 py-2 rounded-lg text-sm font-semibold transition-colors duration-200 flex-shrink-0">
-                  Unirme
-                </button>
-              </form>
+              <>
+                <form onSubmit={handleNewsletterSubmit} className="flex gap-2">
+                  <label htmlFor="footer-newsletter-email" className="sr-only">Tu email para recibir novedades</label>
+                  <input
+                    id="footer-newsletter-email"
+                    type="email"
+                    required
+                    maxLength={120}
+                    placeholder="tu@email.com"
+                    value={newsletterEmail}
+                    onChange={(e) => setNewsletterEmail(e.target.value)}
+                    className="flex-grow min-w-0 px-3 py-2 rounded-lg bg-white/10 border border-white/15 text-white placeholder-white/40 text-sm focus:outline-none focus:ring-2 focus:ring-aurora-gold/50"
+                  />
+                  <button
+                    type="submit"
+                    disabled={newsletterStatus === 'sending'}
+                    className="bg-aurora-terracotta hover:bg-aurora-terracottaLight text-white px-4 py-2 rounded-lg text-sm font-semibold transition-colors duration-200 flex-shrink-0 disabled:opacity-50"
+                  >
+                    {newsletterStatus === 'sending' ? 'Enviando...' : 'Unirme'}
+                  </button>
+                </form>
+                {newsletterStatus === 'error' && (
+                  <p role="alert" className="mt-2 text-xs text-red-300">
+                    No pudimos suscribirte. Revisá el correo e intentá de nuevo.
+                  </p>
+                )}
+                <p className="mt-2 text-xs text-white/40">Podés darte de baja cuando quieras.</p>
+              </>
             )}
           </div>
         </div>
