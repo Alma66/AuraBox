@@ -25,6 +25,7 @@ import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
 import CompleteProfilePage from './pages/CompleteProfilePage';
 import CompleteClubPage from './pages/CompleteClubPage';
+import PendingTermsGate from './components/common/PendingTermsGate';
 
 import UserProfilePage from './pages/client/UserProfilePage';
 import UserSubscriptionsPage from './pages/client/UserSubscriptionsPage';
@@ -331,10 +332,11 @@ const AppContent: React.FC = () => {
     </a>
   );
 
-  if (isPanel) {
+   if (isPanel) {
     return (
       <>
         {skipLink}
+        <PendingTermsGate />
         <EntrepreneurLayout onLogout={logout}>{routes}</EntrepreneurLayout>
       </>
     );
@@ -351,7 +353,8 @@ const AppContent: React.FC = () => {
 
   return (
     <>
-      {skipLink}
+      {skipLink} 
+      <PendingTermsGate />
       <Navbar userRole={userRole} isAuthenticated={isAuthenticated} onLogout={logout} />
       <main id="main-content" className="min-h-[calc(100vh-100px)]">
         {routes}

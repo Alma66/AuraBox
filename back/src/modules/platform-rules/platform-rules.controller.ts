@@ -1,11 +1,12 @@
 import {
   Body, Controller, Get, Post, Put, Patch, Delete,
-  Param, ParseIntPipe, UseGuards, UsePipes, ValidationPipe,
+  Param, ParseIntPipe, Request, UseGuards, UsePipes, ValidationPipe,
 } from '@nestjs/common';
 import { PlatformRulesService } from './platform-rules.service';
 import { CreatePlatformRuleDto } from './dto/create-platform-rule.dto';
 import { UpdatePlatformRuleDto } from './dto/update-platform-rule.dto';
 import { SetRuleActiveDto } from './dto/set-rule-active.dto';
+import { AcceptRulesDto } from './dto/accept-rules.dto';
 import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
 import { RolesGuard } from '../auth/roles.guard';
 import { Roles } from '../auth/roles.decorator';
@@ -27,6 +28,18 @@ export class PlatformRulesController {
   @Get('required/:audience')
   async findRequiredForSignup(@Param('audience') audience: string) {
     return this.svc.findRequiredForSignup(audience);
+  }
+
+  @Roles('customer', 'entrepreneur')
+  @Get('pending')
+  async findPending(@Request() req) {
+    return this.svc.findPendingForAccount(req.user.role, req.user.id);
+  }
+
+  @Roles('customer', 'entrepreneur')
+  @Post('accept')
+  async accept(@Body() dto: AcceptRulesDto, @Request() req) {
+    return this.svc.acceptRules(req.user.role, req.user.id, dto.ruleIds);
   }
 
   @Roles('admin')

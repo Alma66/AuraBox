@@ -83,6 +83,45 @@ export class PlatformRulesService {
     return rules.map(publicShape);
   }
 
+    private scopesFor(accountType: string): RuleAcceptanceScope[] {
+    return [
+      RuleAcceptanceScope.TODOS,
+      accountType === 'customer' ? RuleAcceptanceScope.CLIENTES : RuleAcceptanceScope.EMPRENDEDORES,
+    ];
+  }
+
+  async findPendingForAccount(accountType: string, idAccount: number) {
+    if (accountType !== 'customer' && accountType !== 'entrepreneur') return [];
+    const required = await this.prisma.platform_Rules.findMany({
+      where: { active: true, acceptanceScope: { in: this.scopesFor(accountType) } },
+      orderBy: { ruleType: 'asc' },
+    });
+    if (required.length === 0) return [];
+    const accepted = await this.prisma.terms_Acceptance.findMany({
+      where: { accountType, idAccount, idPlatformRule: { in: required.map((rule) => rule.id) } },
+      select: { idPlatformRule: true },
+    });
+    const acceptedIds = new Set(accepted.map((entry) => entry.idPlatformRule));
+    return required.filter((rule) => !acceptedIds.has(rule.id)).map(publicShape);
+  }
+
+  async acceptRules(accountType: string, idAccount: number, ruleIds: number[]) {
+    const pending = await this.findPendingForAccount(accountType, idAccount);
+    const toAccept = pending.filter((rule: any) => ruleIds.includes(rule.id));
+    if (toAccept.length > 0) {
+      await this.prisma.terms_Acceptance.createMany({
+        data: toAccept.map((rule: any) => ({
+          accountType,
+          idAccount,
+          idPlatformRule: rule.id,
+          ruleVersion: rule.version,
+        })),
+        skipDuplicates: true,
+      });
+    }
+    return this.findPendingForAccount(accountType, idAccount);
+  }
+  
   async findOne(id: number) {
     const item = await this.prisma.platform_Rules.findUnique({ where: { id } });
     if (!item) throw new NotFoundException('Regla de plataforma no encontrada');
