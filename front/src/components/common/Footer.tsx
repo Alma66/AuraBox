@@ -79,6 +79,7 @@ const Footer: React.FC = () => {
               <li><Link to="/register" className="text-white/60 hover:text-aurora-gold transition-colors duration-200 text-sm">Registrate como Cliente</Link></li>
               <li><Link to="/faq" className="text-white/60 hover:text-aurora-gold transition-colors duration-200 text-sm">Preguntas Frecuentes</Link></li>
               <li><Link to="/about-us" className="text-white/60 hover:text-aurora-gold transition-colors duration-200 text-sm">Sobre Nosotros</Link></li>
+              <li><Link to="/work-with-us" className="text-white/60 hover:text-aurora-gold transition-colors duration-200 text-sm">Trabajá con nosotros</Link></li>
             </ul>
           </div>
 

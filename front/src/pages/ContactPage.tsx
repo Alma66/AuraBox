@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
+import api from '../api/config';
 
 const CONTACT_EMAIL = 'info@aurabox.com.ar';
 
@@ -10,18 +11,38 @@ const ContactPage: React.FC = () => {
     subject: '',
     message: '',
   });
-  const [sent, setSent] = useState(false);
+  const [website, setWebsite] = useState('');
+  const [status, setStatus] = useState<'idle' | 'sending' | 'sent'>('idle');
+  const [errorText, setErrorText] = useState('');
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const body = `Nombre: ${formData.name}\nEmail: ${formData.email}\n\n${formData.message}`;
-    const mailtoUrl = `mailto:${CONTACT_EMAIL}?subject=${encodeURIComponent(formData.subject || 'Consulta desde AuraBox')}&body=${encodeURIComponent(body)}`;
-    window.location.href = mailtoUrl;
-    setSent(true);
+    if (status === 'sending') return;
+    setErrorText('');
+    setStatus('sending');
+    try {
+      await api.post('/inbound/contact', {
+        fullName: formData.name,
+        email: formData.email,
+        subject: formData.subject,
+        message: formData.message,
+        website,
+      });
+      setFormData({ name: '', email: '', subject: '', message: '' });
+      setStatus('sent');
+    } catch (err: any) {
+      const message = err.response?.data?.message;
+      setErrorText(
+        Array.isArray(message)
+          ? 'Revisá los datos: el mensaje debe tener al menos 10 caracteres y el correo ser válido.'
+          : message || 'No pudimos enviar tu mensaje. Intentá de nuevo en un rato.',
+      );
+      setStatus('idle');
+    }
   };
 
   return (
@@ -46,6 +67,10 @@ const ContactPage: React.FC = () => {
               Envianos un Mensaje
             </h2>
             <form onSubmit={handleSubmit} className="space-y-5">
+               <div className="absolute -left-[9999px] h-0 w-0 overflow-hidden" aria-hidden="true">
+                <label htmlFor="contact-website">No completar</label>
+                <input id="contact-website" type="text" tabIndex={-1} autoComplete="off" value={website} onChange={(e) => setWebsite(e.target.value)} />
+              </div>
               <div>
                 <label htmlFor="name" className="block text-sm font-medium text-aurora-navy/70">
                   Nombre Completo
@@ -102,15 +127,17 @@ const ContactPage: React.FC = () => {
                   className="input-aurora mt-1 resize-none"
                 ></textarea>
               </div>
-              <button type="submit" className="btn-primary w-full">
-                Enviar Mensaje
+               <button type="submit" disabled={status === 'sending'} className="btn-primary w-full disabled:opacity-50">
+                {status === 'sending' ? 'Enviando...' : 'Enviar Mensaje'}
               </button>
-              <p className="text-xs text-aurora-navy/40 text-center">
-                Se abrirá tu aplicación de correo con el mensaje ya redactado hacia {CONTACT_EMAIL}.
-              </p>
-              {sent && (
-                <p className="text-green-600 text-center font-medium">
-                  Se abrió tu cliente de correo con el mensaje listo para enviar. Si no se abrió, escribinos directamente a {CONTACT_EMAIL}.
+              {errorText && (
+                <p role="alert" className="text-red-600 text-sm text-center bg-red-50 border border-red-100 rounded-lg py-2 px-3">
+                  {errorText}
+                </p>
+              )}
+              {status === 'sent' && (
+                <p role="status" className="text-green-700 text-center font-medium bg-green-50 border border-green-100 rounded-lg py-2 px-3">
+                  ¡Mensaje enviado! Te respondemos por correo lo antes posible.
                 </p>
               )}
             </form>

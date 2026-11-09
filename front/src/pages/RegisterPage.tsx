@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { Link, useNavigate, useSearchParams } from 'react-router-dom';
+import { Link, Navigate, useNavigate, useSearchParams } from 'react-router-dom';
 import api, { getResponseData } from '../api/config';
 import { PROVINCES } from '../constants/provinces';
 
@@ -16,18 +16,27 @@ type RulesStatus = 'loading' | 'ready' | 'error';
 
 const MIN_AGE: Record<AccountType, number> = { customer: 16, entrepreneur: 18 };
 
-const ACCOUNT_OPTIONS: { id: AccountType; title: string; hint: string }[] = [
-  { id: 'customer', title: 'Soy cliente', hint: 'Quiero suscribirme a clubes' },
-  { id: 'entrepreneur', title: 'Soy emprendedor', hint: 'Quiero registrar mi club' },
-];
+const COPY: Record<AccountType, { title: string; eyebrow: string; subtitle: string; submit: string }> = {
+  customer: {
+    eyebrow: 'Cuenta de cliente',
+    title: 'Creá tu cuenta en AuraBox',
+    subtitle: 'Suscribite a clubes y recibí cajas sorpresa en tu casa.',
+    submit: 'Crear cuenta',
+  },
+  entrepreneur: {
+    eyebrow: 'Cuenta de emprendedor',
+    title: 'Sumá tu club a AuraBox',
+    subtitle: 'Creá tu cuenta de emprendedor y registrá tu club. Nuestro equipo lo revisa antes de publicarlo.',
+    submit: 'Crear cuenta de emprendedor',
+  },
+};
 
+interface RegisterPageProps {
+  accountType?: AccountType;
+}
 
-
-const RegisterPage: React.FC = () => {
+const RegisterPage: React.FC<RegisterPageProps> = ({ accountType = 'customer' }) => {
   const [searchParams] = useSearchParams();
-  const [accountType, setAccountType] = useState<AccountType>(
-    searchParams.get('role') === 'entrepreneur' ? 'entrepreneur' : 'customer',
-  );
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
   const [email, setEmail] = useState('');
@@ -45,6 +54,7 @@ const RegisterPage: React.FC = () => {
   const [rules, setRules] = useState<LegalRule[]>([]);
   const [rulesStatus, setRulesStatus] = useState<RulesStatus>('loading');
   const [acceptedTerms, setAcceptedTerms] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
 
   const loadRules = useCallback(async () => {
@@ -63,6 +73,12 @@ const RegisterPage: React.FC = () => {
   useEffect(() => {
     loadRules();
   }, [loadRules]);
+
+  if (accountType === 'customer' && searchParams.get('role') === 'entrepreneur') {
+    return <Navigate to="/register/entrepreneur" replace />;
+  }
+
+  const copy = COPY[accountType];
 
   const passwordChecks = {
     length: password.length >= 8,
@@ -179,9 +195,9 @@ const RegisterPage: React.FC = () => {
           <div className="flex justify-center mb-4">
             <img src="/aurabox-logo.png" alt="AuraBox" className="h-14 w-auto" />
           </div>
-          <h2 className="text-center font-display text-3xl font-bold text-aurora-navy">
-            Creá tu cuenta en AuraBox
-          </h2>
+          <span className="section-eyebrow block text-center">{copy.eyebrow}</span>
+          <h1 className="text-center font-display text-3xl font-bold text-aurora-navy">{copy.title}</h1>
+          <p className="mt-2 text-center text-sm text-aurora-navy/60">{copy.subtitle}</p>
           <p className="mt-2 text-center text-sm text-aurora-navy/60">
             ¿Ya tenés una cuenta?{' '}
             <Link to="/login" className="font-semibold text-aurora-terracotta hover:text-aurora-terracottaDark">
@@ -190,7 +206,7 @@ const RegisterPage: React.FC = () => {
           </p>
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2" aria-hidden="true">
           <div className={`h-1.5 flex-1 rounded-full transition-colors duration-300 ${step >= 1 ? 'bg-aurora-terracotta' : 'bg-aurora-navy/10'}`} />
           <div className={`h-1.5 flex-1 rounded-full transition-colors duration-300 ${step >= 2 ? 'bg-aurora-terracotta' : 'bg-aurora-navy/10'}`} />
         </div>
@@ -199,33 +215,14 @@ const RegisterPage: React.FC = () => {
         <form className="space-y-4" onSubmit={handleSubmit}>
           {step === 1 && (
             <>
-              <div role="group" aria-label="Tipo de cuenta" className="grid grid-cols-2 gap-2">
-                {ACCOUNT_OPTIONS.map((option) => (
-                  <button
-                    key={option.id}
-                    type="button"
-                    aria-pressed={accountType === option.id}
-                    onClick={() => setAccountType(option.id)}
-                    className={`min-h-[64px] rounded-xl border px-3 py-2 text-left transition-colors ${
-                      accountType === option.id
-                        ? 'border-aurora-terracotta bg-aurora-terracotta/10'
-                        : 'border-aurora-navy/15 bg-white hover:border-aurora-navy/30'
-                    }`}
-                  >
-                    <span className="block text-sm font-semibold text-aurora-navy">{option.title}</span>
-                    <span className="block text-xs text-aurora-navy/60">{option.hint}</span>
-                  </button>
-                ))}
-              </div>
-
               <div className="grid grid-cols-2 gap-3">
                 <div>
                   <label htmlFor="first-name" className="block text-xs font-medium text-aurora-navy/70 mb-1">Nombre</label>
-                  <input id="first-name" type="text" required className="input-aurora" placeholder="Nombre" value={firstName} onChange={(e) => setFirstName(e.target.value)} />
+                  <input id="first-name" type="text" required autoComplete="given-name" className="input-aurora" placeholder="Nombre" value={firstName} onChange={(e) => setFirstName(e.target.value)} />
                 </div>
                 <div>
                   <label htmlFor="last-name" className="block text-xs font-medium text-aurora-navy/70 mb-1">Apellido</label>
-                  <input id="last-name" type="text" required className="input-aurora" placeholder="Apellido" value={lastName} onChange={(e) => setLastName(e.target.value)} />
+                  <input id="last-name" type="text" required autoComplete="family-name" className="input-aurora" placeholder="Apellido" value={lastName} onChange={(e) => setLastName(e.target.value)} />
                 </div>
               </div>
               <div>
@@ -234,10 +231,10 @@ const RegisterPage: React.FC = () => {
               </div>
               <div>
                 <label htmlFor="birth-date" className="block text-xs font-medium text-aurora-navy/70 mb-1">Fecha de Nacimiento</label>
-                <input id="birth-date" type="date" required className="input-aurora" value={birthDate} onChange={(e) => setBirthDate(e.target.value)} />
+                <input id="birth-date" type="date" required autoComplete="bday" className="input-aurora" value={birthDate} onChange={(e) => setBirthDate(e.target.value)} />
               </div>
 
-              {error && <p className="text-red-600 text-sm text-center bg-red-50 border border-red-100 rounded-lg py-2 px-3">{error}</p>}
+              {error && <p role="alert" className="text-red-600 text-sm text-center bg-red-50 border border-red-100 rounded-lg py-2 px-3">{error}</p>}
 
               <button type="button" onClick={goToStep2} className="btn-primary w-full">
                 Continuar
@@ -259,12 +256,12 @@ const RegisterPage: React.FC = () => {
                 </div>
                 <div>
                   <label htmlFor="document-number" className="block text-xs font-medium text-aurora-navy/70 mb-1">Número</label>
-                  <input id="document-number" type="number" required className="input-aurora" placeholder="12345678" value={documentNumber} onChange={(e) => setDocumentNumber(e.target.value)} />
+                  <input id="document-number" type="number" inputMode="numeric" required className="input-aurora" placeholder="12345678" value={documentNumber} onChange={(e) => setDocumentNumber(e.target.value)} />
                 </div>
               </div>
               <div>
                 <label htmlFor="phone-number" className="block text-xs font-medium text-aurora-navy/70 mb-1">Teléfono (opcional)</label>
-                <input id="phone-number" type="tel" className="input-aurora" placeholder="11 1234-5678" value={phoneNumber} onChange={(e) => setPhoneNumber(e.target.value)} />
+                <input id="phone-number" type="tel" autoComplete="tel" className="input-aurora" placeholder="11 1234-5678" value={phoneNumber} onChange={(e) => setPhoneNumber(e.target.value)} />
               </div>
 
               {accountType === 'entrepreneur' && (
@@ -285,9 +282,19 @@ const RegisterPage: React.FC = () => {
 
               <div>
                 <label htmlFor="password" className="block text-xs font-medium text-aurora-navy/70 mb-1">Contraseña</label>
-                <input id="password" type="password" autoComplete="new-password" required className="input-aurora" placeholder="Mínimo 8 caracteres" value={password} onChange={(e) => setPassword(e.target.value)} />
+                <div className="relative">
+                  <input id="password" type={showPassword ? 'text' : 'password'} autoComplete="new-password" required className="input-aurora pr-16" placeholder="Mínimo 8 caracteres" value={password} onChange={(e) => setPassword(e.target.value)} />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword((prev) => !prev)}
+                    aria-pressed={showPassword}
+                    className="absolute inset-y-0 right-0 px-3 text-xs font-semibold text-aurora-navy/60 hover:text-aurora-terracotta"
+                  >
+                    {showPassword ? 'Ocultar' : 'Mostrar'}
+                  </button>
+                </div>
                 {password && (
-                  <div className="flex gap-1 mt-1.5">
+                  <div className="flex gap-1 mt-1.5" aria-hidden="true">
                     {[0, 1, 2, 3].map((i) => (
                       <div key={i} className={`h-1 flex-1 rounded-full transition-colors duration-300 ${
                         passwordStrength > i
@@ -301,11 +308,11 @@ const RegisterPage: React.FC = () => {
               </div>
               <div>
                 <label htmlFor="confirm-password" className="block text-xs font-medium text-aurora-navy/70 mb-1">Confirmar Contraseña</label>
-                <input id="confirm-password" type="password" autoComplete="new-password" required className="input-aurora" placeholder="Repetí tu contraseña" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} />
+                <input id="confirm-password" type={showPassword ? 'text' : 'password'} autoComplete="new-password" required className="input-aurora" placeholder="Repetí tu contraseña" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} />
               </div>
 
               {rulesStatus === 'error' && (
-                <div className="rounded-lg border border-red-100 bg-red-50 px-3 py-2 text-sm text-red-600">
+                <div role="alert" className="rounded-lg border border-red-100 bg-red-50 px-3 py-2 text-sm text-red-600">
                   No pudimos cargar los términos de uso.{' '}
                   <button type="button" onClick={loadRules} className="font-semibold underline">
                     Reintentar
@@ -342,19 +349,37 @@ const RegisterPage: React.FC = () => {
                 </div>
               )}
 
-              {error && <p className="text-red-600 text-sm text-center bg-red-50 border border-red-100 rounded-lg py-2 px-3">{error}</p>}
+              {error && <p role="alert" className="text-red-600 text-sm text-center bg-red-50 border border-red-100 rounded-lg py-2 px-3">{error}</p>}
 
               <div className="flex gap-3">
                 <button type="button" onClick={() => setStep(1)} className="btn-outline flex-1">
                   Atrás
                 </button>
                 <button type="submit" disabled={submitDisabled} className="btn-primary flex-1 disabled:opacity-50">
-                  {loading ? 'Registrando...' : 'Crear cuenta'}
+                  {loading ? 'Registrando...' : copy.submit}
                 </button>
               </div>
             </>
           )}
         </form>
+
+        <div className="border-t border-aurora-navy/10 pt-4 text-center text-sm text-aurora-navy/60">
+          {accountType === 'customer' ? (
+            <>
+              ¿Tenés un emprendimiento?{' '}
+              <Link to="/work-with-us" className="font-semibold text-aurora-terracotta hover:text-aurora-terracottaDark">
+                Trabajá con nosotros
+              </Link>
+            </>
+          ) : (
+            <>
+              ¿Querés comprar cajas?{' '}
+              <Link to="/register" className="font-semibold text-aurora-terracotta hover:text-aurora-terracottaDark">
+                Creá tu cuenta de cliente
+              </Link>
+            </>
+          )}
+        </div>
       </div>
     </div>
   );

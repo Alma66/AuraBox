@@ -55,6 +55,7 @@ import { ClubLegalContentModule } from './modules/club-legal-content/club-legal-
 import { JwtAuthGuard } from './common/guards/jwt-auth.guard';
 import { TransformInterceptor } from './common/interceptors/transform.interceptor';
 import { AllExceptionsFilter } from './common/filters/all-exceptions.filter';
+import { InboundRequestsModule } from './modules/inbound-requests/inbound-requests.module';
 
 const jwtSecret = process.env.JWT_SECRET;
 if (!jwtSecret) {
@@ -95,6 +96,7 @@ if (!jwtSecret) {
     EntrepreneursModule,
     FavoritesModule,
     ImageClubModule,
+    InboundRequestsModule,
     LicenseTypesModule,
     PaymentMethodsModule,
     PaymentsModule,

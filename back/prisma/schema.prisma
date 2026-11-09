@@ -881,3 +881,33 @@ enum VerificationChannel {
   Email @map("Email")
   SMS   @map("SMS")
 }
+
+enum InboundRequestType {
+  Consulta @map("Consulta")
+  Trabajo  @map("Trabajo")
+}
+
+enum InboundRequestStatus {
+  Nuevo       @map("Nuevo")
+  En_Revision @map("En_Revision")
+  Respondido  @map("Respondido")
+  Archivado   @map("Archivado")
+}
+
+model Inbound_Request {
+  id        Int                  @id @default(autoincrement()) @map("ID")
+  type      InboundRequestType   @map("Type")
+  status    InboundRequestStatus @default(Nuevo) @map("Status")
+  fullName  String               @map("Full_Name")
+  email     String               @map("Email")
+  phone     String?              @map("Phone")
+  subject   String?              @map("Subject")
+  area      String?              @map("Area")
+  profileUrl String?             @map("Profile_URL")
+  message   String               @map("Message")
+  createdAt DateTime             @default(now()) @map("Created_At")
+  handledAt DateTime?            @map("Handled_At")
+
+  @@index([type, status, createdAt])
+  @@map("Inbound_Request")
+}

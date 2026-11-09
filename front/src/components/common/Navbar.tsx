@@ -205,6 +205,9 @@ const Navbar: React.FC<NavbarProps> = ({ userRole, isAuthenticated, onLogout }) 
             <Link to="/about-us" className={btnClass} onClick={closeAllDropdowns}>
               Sobre Nosotros
             </Link>
+            <Link to="/work-with-us" className={btnClass} onClick={closeAllDropdowns}>
+              Trabajá con nosotros
+            </Link>
           </div>
 
           <div className="flex items-center gap-x-2 pr-2">
@@ -258,6 +261,9 @@ const Navbar: React.FC<NavbarProps> = ({ userRole, isAuthenticated, onLogout }) 
             )}
             <Link to="/about-us" className={mobileLinkClass} onClick={closeAllDropdowns}>
               Sobre Nosotros
+            </Link>
+            <Link to="/work-with-us" className={mobileLinkClass} onClick={closeAllDropdowns}>
+              Trabajá con nosotros
             </Link>
             {isAuthenticated ? (
               <>

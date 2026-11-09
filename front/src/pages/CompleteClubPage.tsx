@@ -31,7 +31,7 @@ const CompleteClubPage: React.FC = () => {
       navigate('/entrepreneur/dashboard', { replace: true });
       return;
     }
-    navigate('/register?role=entrepreneur', { replace: true });
+    navigate('/register/entrepreneur', { replace: true });
   }, [done, sessionMode, hasPendingToken, isAuthenticated, userRole, navigate]);
 
   const handleSubmit = async (e: React.FormEvent) => {

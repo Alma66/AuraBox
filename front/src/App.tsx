@@ -27,6 +27,9 @@ import CompleteProfilePage from './pages/CompleteProfilePage';
 import CompleteClubPage from './pages/CompleteClubPage';
 import PendingTermsGate from './components/common/PendingTermsGate';
 
+import WorkWithUsPage from './pages/WorkWithUsPage';
+import JobApplicationPage from './pages/JobApplicationPage';
+
 import UserProfilePage from './pages/client/UserProfilePage';
 import UserSubscriptionsPage from './pages/client/UserSubscriptionsPage';
 import OrderHistoryPage from './pages/client/OrderHistoryPage';
@@ -245,7 +248,10 @@ const AppContent: React.FC = () => {
 
       <Route path="/login" element={<LoginPage onLogin={login} />} />
       <Route path="/logout" element={<Logout />} />
-      <Route path="/register" element={<RegisterPage />} />
+      <Route path="/register" element={<RegisterPage accountType="customer" />} />
+      <Route path="/register/entrepreneur" element={<RegisterPage accountType="entrepreneur" />} />
+      <Route path="/work-with-us" element={<WorkWithUsPage />} />
+      <Route path="/work-with-us/job-application" element={<JobApplicationPage />} />
       <Route path="/register/complete-profile" element={<CompleteProfilePage />} />
       <Route path="/register/complete-club" element={<CompleteClubPage />} />
 
