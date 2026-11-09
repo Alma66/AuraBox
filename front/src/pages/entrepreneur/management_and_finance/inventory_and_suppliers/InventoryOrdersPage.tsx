@@ -1,9 +1,11 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import toast from 'react-hot-toast';
 import api, { getResponseData } from '../../../../api/config';
 import { useAuth } from '../../../../App';
+import ConfirmDialog from '../../../../components/admin/ConfirmDialog';
+import LoadError from '../../../../components/entrepreneur/LoadError';
 import { SupplyOrderItem, ProductInventoryItem, SupplierItem, SupplyOrderStatus } from '../../../../types/inventory';
-import toast from 'react-hot-toast';
 
 const STATUS_LABELS: Record<SupplyOrderStatus, string> = {
   Pendiente: 'Pendiente',
@@ -21,8 +23,15 @@ const emptyForm = {
   notes: '',
 };
 
+const MAX_VALUE = 99999999;
+
 const fieldClass =
   'px-3 py-2 border border-aurora-navy/15 rounded-lg text-sm text-aurora-navy bg-white focus:outline-none focus:ring-2 focus:ring-aurora-terracotta/40 focus:border-aurora-terracotta';
+
+interface StatusChange {
+  order: SupplyOrderItem;
+  status: SupplyOrderStatus;
+}
 
 const InventoryOrdersPage: React.FC = () => {
   const { user, userRole, loading: authLoading } = useAuth();
@@ -33,6 +42,12 @@ const InventoryOrdersPage: React.FC = () => {
   const [products, setProducts] = useState<ProductInventoryItem[]>([]);
   const [suppliers, setSuppliers] = useState<SupplierItem[]>([]);
   const [loading, setLoading] = useState(true);
+  const [failed, setFailed] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [busyId, setBusyId] = useState<number | null>(null);
+  const [statusChange, setStatusChange] = useState<StatusChange | null>(null);
+  const [deleteTarget, setDeleteTarget] = useState<SupplyOrderItem | null>(null);
+  const [deleting, setDeleting] = useState(false);
 
   const [form, setForm] = useState(emptyForm);
   const [filterStatus, setFilterStatus] = useState('all');
@@ -44,6 +59,7 @@ const InventoryOrdersPage: React.FC = () => {
   const fetchAll = useCallback(async () => {
     if (!idClub) return;
     setLoading(true);
+    setFailed(false);
     try {
       const [ordsRes, prodsRes, supsRes] = await Promise.all([
         api.get(`/inventory/orders/by-club/${idClub}`),
@@ -53,8 +69,8 @@ const InventoryOrdersPage: React.FC = () => {
       setOrders(getResponseData(ordsRes) || []);
       setProducts(getResponseData(prodsRes) || []);
       setSuppliers(getResponseData(supsRes) || []);
-    } catch (err) {
-      console.error(err);
+    } catch {
+      setFailed(true);
     } finally {
       setLoading(false);
     }
@@ -79,80 +95,95 @@ const InventoryOrdersPage: React.FC = () => {
   );
 
   const createOrder = async () => {
-    if (!form.idSupplier || !form.idProductInventory || !form.quantity || !form.totalCost) {
+    if (saving) return;
+    if (!form.idSupplier || !form.idProductInventory || !form.quantity || form.totalCost === '') {
       toast.error('Completá proveedor, producto, cantidad y costo total');
       return;
     }
+    const quantity = Number(form.quantity);
+    const totalCost = Number(form.totalCost);
+    if (!Number.isFinite(quantity) || quantity <= 0 || quantity > MAX_VALUE) {
+      toast.error('La cantidad debe ser mayor a 0');
+      return;
+    }
+    if (!Number.isFinite(totalCost) || totalCost < 0 || totalCost > MAX_VALUE) {
+      toast.error('El costo total no es válido');
+      return;
+    }
+    setSaving(true);
     try {
       await api.post('/inventory/orders', {
         idClub,
         idSupplier: Number(form.idSupplier),
         idProductInventory: Number(form.idProductInventory),
-        quantity: Number(form.quantity),
-        totalCost: Number(form.totalCost),
+        quantity,
+        totalCost,
         estimatedArrival: form.estimatedArrival || undefined,
-        notes: form.notes || undefined,
+        notes: form.notes.trim() || undefined,
       });
       setForm(emptyForm);
+      toast.success('Pedido creado');
       fetchAll();
-    } catch (err) {
-      console.error(err);
-      toast.error('Error al crear el pedido');
+    } catch (err: any) {
+      const message = err?.response?.data?.message;
+      toast.error(typeof message === 'string' ? message : 'No se pudo crear el pedido.');
+    } finally {
+      setSaving(false);
     }
   };
 
-  const updateStatus = async (id: number, status: SupplyOrderStatus) => {
+  const applyStatus = async (order: SupplyOrderItem, status: SupplyOrderStatus) => {
+    setBusyId(order.id);
     try {
-      await api.put(`/inventory/orders/${id}`, { status });
+      await api.put(`/inventory/orders/${order.id}`, { status });
+      toast.success(status === 'Recibido' ? 'Pedido recibido. Stock actualizado.' : 'Pedido actualizado');
+      setStatusChange(null);
       fetchAll();
-    } catch (err) {
-      console.error(err);
-      toast.error('Error al actualizar el pedido');
+    } catch (err: any) {
+      toast.error(err?.response?.data?.message ?? 'No se pudo actualizar el pedido.');
+      setStatusChange(null);
+      fetchAll();
+    } finally {
+      setBusyId(null);
     }
   };
 
-  const removeOrder = (id: number) => {
-    toast(
-      (t) => (
-        <div className="flex flex-col gap-3">
-          <p className="text-sm font-medium">¿Eliminar este pedido?</p>
-          <div className="flex gap-2 justify-end">
-            <button
-              onClick={() => toast.dismiss(t.id)}
-              className="px-3 py-1 text-sm border border-aurora-cream/40 rounded-lg hover:bg-white/10"
-            >
-              Cancelar
-            </button>
-            <button
-              onClick={async () => {
-                toast.dismiss(t.id);
-                try {
-                  await api.delete(`/inventory/orders/${id}`);
-                  fetchAll();
-                } catch (err) {
-                  console.error(err);
-                  toast.error('Error al eliminar el pedido');
-                }
-              }}
-              className="px-3 py-1 text-sm bg-red-600 text-white rounded-lg hover:bg-red-700"
-            >
-              Eliminar
-            </button>
-          </div>
-        </div>
-      ),
-      { duration: Infinity }
-    );
+  const requestStatus = (order: SupplyOrderItem, status: SupplyOrderStatus) => {
+    if (busyId !== null) return;
+    if (status === 'En_Camino') {
+      applyStatus(order, status);
+      return;
+    }
+    setStatusChange({ order, status });
+  };
+
+  const confirmRemove = async () => {
+    if (!deleteTarget) return;
+    setDeleting(true);
+    try {
+      await api.delete(`/inventory/orders/${deleteTarget.id}`);
+      toast.success('Pedido eliminado');
+      setDeleteTarget(null);
+      fetchAll();
+    } catch (err: any) {
+      toast.error(err?.response?.data?.message ?? 'No se pudo eliminar el pedido.');
+      setDeleteTarget(null);
+    } finally {
+      setDeleting(false);
+    }
   };
 
   const filtered = useMemo(() => {
+    const from = dateFrom ? new Date(`${dateFrom}T00:00:00`).getTime() : null;
+    const to = dateTo ? new Date(`${dateTo}T23:59:59`).getTime() : null;
     return orders
       .filter((o) => {
+        const time = new Date(o.orderDate).getTime();
         if (filterStatus !== 'all' && o.status !== filterStatus) return false;
         if (filterSupplier !== 'all' && String(o.idSupplier) !== filterSupplier) return false;
         if (filterProduct !== 'all' && String(o.idProductInventory) !== filterProduct) return false;
-        if (dateFrom && new Date(o.orderDate) < new Date(dateFrom)) return false;
-        if (dateTo && new Date(o.orderDate) > new Date(dateTo)) return false;
+        if (from !== null && time < from) return false;
+        if (to !== null && time > to) return false;
         return true;
       })
       .sort((a, b) => new Date(b.orderDate).getTime() - new Date(a.orderDate).getTime());
@@ -186,8 +217,40 @@ const InventoryOrdersPage: React.FC = () => {
     return topId ? productName(Number(topId)) : '—';
   }, [orders, productName]);
 
-  if (authLoading || loading) {
-    return <div className="text-center py-20 text-aurora-navy/60">Cargando pedidos...</div>;
+  const dialogCopy = (change: StatusChange) => {
+    const product = productName(change.order.idProductInventory);
+    if (change.status === 'Recibido') {
+      return {
+        title: 'Marcar pedido como recibido',
+        description: `Se van a sumar ${change.order.quantity} unidades al stock de "${product}". Esta acción no se puede deshacer.`,
+        confirmLabel: 'Marcar recibido',
+        danger: false,
+      };
+    }
+    return {
+      title: 'Cancelar pedido',
+      description: `El pedido de "${product}" va a quedar cancelado y no va a sumar stock.`,
+      confirmLabel: 'Cancelar pedido',
+      danger: true,
+    };
+  };
+
+  if (authLoading || (loading && orders.length === 0 && !failed)) {
+    return (
+      <div className="animate-pulse space-y-6 px-4 py-6 lg:px-8" aria-busy="true">
+        <div className="h-8 w-64 rounded bg-aurora-navy/10" />
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+          {[0, 1, 2].map((item) => (
+            <div key={item} className="h-24 rounded-xl bg-aurora-navy/10" />
+          ))}
+        </div>
+        <div className="h-64 rounded-xl bg-aurora-navy/10" />
+      </div>
+    );
+  }
+
+  if (failed) {
+    return <LoadError title="No pudimos cargar tus pedidos." onRetry={fetchAll} />;
   }
 
   if (!idClub) {
@@ -214,16 +277,23 @@ const InventoryOrdersPage: React.FC = () => {
         </div>
       </div>
 
-      <div className="bg-white rounded-xl shadow-aurora-sm border border-aurora-navy/10 p-6">
-        <div className="border border-aurora-navy/10 rounded-xl p-5 mb-8 space-y-3">
+      <div className={`bg-white rounded-xl shadow-aurora-sm border border-aurora-navy/10 p-6 transition-opacity ${loading ? 'opacity-60' : ''}`}>
+        <form
+          onSubmit={(event) => {
+            event.preventDefault();
+            createOrder();
+          }}
+          noValidate
+          className="border border-aurora-navy/10 rounded-xl p-5 mb-8 space-y-3"
+        >
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-            <select value={form.idSupplier} onChange={(e) => setForm({ ...form, idSupplier: e.target.value })} className={fieldClass}>
+            <select aria-label="Proveedor" value={form.idSupplier} onChange={(e) => setForm({ ...form, idSupplier: e.target.value })} className={fieldClass}>
               <option value="">Proveedor</option>
-              {suppliers.map((s) => (
+              {suppliers.filter((s) => s.active).map((s) => (
                 <option key={s.id} value={s.id}>{s.name}</option>
               ))}
             </select>
-            <select value={form.idProductInventory} onChange={(e) => setForm({ ...form, idProductInventory: e.target.value })} className={fieldClass}>
+            <select aria-label="Producto" value={form.idProductInventory} onChange={(e) => setForm({ ...form, idProductInventory: e.target.value })} className={fieldClass}>
               <option value="">Producto</option>
               {products.map((p) => (
                 <option key={p.id} value={p.id}>{p.name}</option>
@@ -231,30 +301,30 @@ const InventoryOrdersPage: React.FC = () => {
             </select>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-            <input type="number" placeholder="Cantidad" value={form.quantity} onChange={(e) => setForm({ ...form, quantity: e.target.value })} className={fieldClass} />
-            <input type="number" placeholder="Costo total" value={form.totalCost} onChange={(e) => setForm({ ...form, totalCost: e.target.value })} className={fieldClass} />
+            <input type="number" min="0.01" step="any" aria-label="Cantidad" placeholder="Cantidad" value={form.quantity} onChange={(e) => setForm({ ...form, quantity: e.target.value })} className={fieldClass} />
+            <input type="number" min="0" step="any" aria-label="Costo total" placeholder="Costo total" value={form.totalCost} onChange={(e) => setForm({ ...form, totalCost: e.target.value })} className={fieldClass} />
             <input type="date" aria-label="Llegada estimada" value={form.estimatedArrival} onChange={(e) => setForm({ ...form, estimatedArrival: e.target.value })} className={fieldClass} />
           </div>
-          <input type="text" placeholder="Notas (opcional)" value={form.notes} onChange={(e) => setForm({ ...form, notes: e.target.value })} className={`w-full ${fieldClass}`} />
-          <button onClick={createOrder} className="px-4 py-2 bg-aurora-terracotta text-white text-sm font-medium rounded-lg hover:bg-aurora-terracottaDark">
-            Crear pedido
+          <input type="text" aria-label="Notas" maxLength={500} placeholder="Notas (opcional)" value={form.notes} onChange={(e) => setForm({ ...form, notes: e.target.value })} className={`w-full ${fieldClass}`} />
+          <button type="submit" disabled={saving} className="px-4 py-2 bg-aurora-terracotta text-white text-sm font-medium rounded-lg hover:bg-aurora-terracottaDark disabled:cursor-not-allowed disabled:opacity-60">
+            {saving ? 'Creando...' : 'Crear pedido'}
           </button>
-        </div>
+        </form>
 
         <div className="flex flex-wrap gap-3 mb-4">
-          <select value={filterStatus} onChange={(e) => setFilterStatus(e.target.value)} className={fieldClass}>
+          <select aria-label="Filtrar por estado" value={filterStatus} onChange={(e) => setFilterStatus(e.target.value)} className={fieldClass}>
             <option value="all">Todos los estados</option>
             {Object.entries(STATUS_LABELS).map(([value, label]) => (
               <option key={value} value={value}>{label}</option>
             ))}
           </select>
-          <select value={filterSupplier} onChange={(e) => setFilterSupplier(e.target.value)} className={fieldClass}>
+          <select aria-label="Filtrar por proveedor" value={filterSupplier} onChange={(e) => setFilterSupplier(e.target.value)} className={fieldClass}>
             <option value="all">Todos los proveedores</option>
             {suppliers.map((s) => (
               <option key={s.id} value={s.id}>{s.name}</option>
             ))}
           </select>
-          <select value={filterProduct} onChange={(e) => setFilterProduct(e.target.value)} className={fieldClass}>
+          <select aria-label="Filtrar por producto" value={filterProduct} onChange={(e) => setFilterProduct(e.target.value)} className={fieldClass}>
             <option value="all">Todos los productos</option>
             {products.map((p) => (
               <option key={p.id} value={p.id}>{p.name}</option>
@@ -264,17 +334,17 @@ const InventoryOrdersPage: React.FC = () => {
           <input type="date" aria-label="Hasta" value={dateTo} onChange={(e) => setDateTo(e.target.value)} className={fieldClass} />
         </div>
 
-        <div className="space-y-3">
+        <ul className="space-y-3">
           {filtered.map((order) => (
-            <div key={order.id} className="border border-aurora-navy/10 rounded-xl p-4">
-              <div className="flex justify-between items-start mb-2">
-                <div>
-                  <p className="font-semibold text-aurora-navy">{productName(order.idProductInventory)}</p>
+            <li key={order.id} className="border border-aurora-navy/10 rounded-xl p-4">
+              <div className="flex justify-between items-start gap-3 mb-2">
+                <div className="min-w-0">
+                  <p className="font-semibold text-aurora-navy truncate">{productName(order.idProductInventory)}</p>
                   <p className="text-xs text-aurora-navy/60">
                     {supplierName(order.idSupplier)} · Pedido el {new Date(order.orderDate).toLocaleDateString('es-AR')}
                   </p>
                 </div>
-                <span className={`px-2 py-1 text-xs font-semibold rounded-full ${statusColor(order.status)}`}>
+                <span className={`px-2 py-1 text-xs font-semibold rounded-full flex-shrink-0 ${statusColor(order.status)}`}>
                   {STATUS_LABELS[order.status]}
                 </span>
               </div>
@@ -285,31 +355,60 @@ const InventoryOrdersPage: React.FC = () => {
                 {order.receivedDate && <span>Recibido el: {new Date(order.receivedDate).toLocaleDateString('es-AR')}</span>}
                 {order.notes && <span>Notas: {order.notes}</span>}
               </div>
-              <div className="flex gap-2">
+              <div className="flex flex-wrap gap-2">
                 {order.status === 'Pendiente' && (
-                  <button onClick={() => updateStatus(order.id, 'En_Camino')} className="text-xs font-medium px-3 py-1 rounded bg-aurora-terracotta/10 text-aurora-terracottaDark hover:bg-aurora-terracotta/20">
+                  <button type="button" disabled={busyId === order.id} onClick={() => requestStatus(order, 'En_Camino')} className="text-xs font-medium px-3 py-1 rounded bg-aurora-terracotta/10 text-aurora-terracottaDark hover:bg-aurora-terracotta/20 disabled:opacity-60">
                     Marcar en camino
                   </button>
                 )}
                 {order.status !== 'Recibido' && order.status !== 'Cancelado' && (
-                  <button onClick={() => updateStatus(order.id, 'Recibido')} className="text-xs font-medium px-3 py-1 rounded bg-emerald-50 text-emerald-700 hover:bg-emerald-100">
+                  <button type="button" disabled={busyId === order.id} onClick={() => requestStatus(order, 'Recibido')} className="text-xs font-medium px-3 py-1 rounded bg-emerald-50 text-emerald-700 hover:bg-emerald-100 disabled:opacity-60">
                     Marcar recibido
                   </button>
                 )}
                 {order.status !== 'Cancelado' && order.status !== 'Recibido' && (
-                  <button onClick={() => updateStatus(order.id, 'Cancelado')} className="text-xs font-medium px-3 py-1 rounded bg-aurora-navy/10 text-aurora-navy hover:bg-aurora-navy/15">
+                  <button type="button" disabled={busyId === order.id} onClick={() => requestStatus(order, 'Cancelado')} className="text-xs font-medium px-3 py-1 rounded bg-aurora-navy/10 text-aurora-navy hover:bg-aurora-navy/15 disabled:opacity-60">
                     Cancelar
                   </button>
                 )}
-                <button onClick={() => removeOrder(order.id)} className="text-xs font-medium px-3 py-1 rounded bg-red-50 text-red-600 hover:bg-red-100">
+                <button type="button" onClick={() => setDeleteTarget(order)} aria-label={`Eliminar pedido de ${productName(order.idProductInventory)}`} className="text-xs font-medium px-3 py-1 rounded bg-red-50 text-red-600 hover:bg-red-100">
                   Eliminar
                 </button>
               </div>
-            </div>
+            </li>
           ))}
-          {filtered.length === 0 && <p className="text-center py-8 text-aurora-navy/60">No hay pedidos para mostrar.</p>}
-        </div>
+        </ul>
+        {filtered.length === 0 && (
+          <p className="text-center py-8 text-aurora-navy/60">
+            {orders.length === 0 ? 'Todavía no registraste pedidos.' : 'No hay pedidos que coincidan con los filtros.'}
+          </p>
+        )}
       </div>
+
+      {statusChange && (
+        <ConfirmDialog
+          {...dialogCopy(statusChange)}
+          saving={busyId === statusChange.order.id}
+          onConfirm={() => applyStatus(statusChange.order, statusChange.status)}
+          onCancel={() => setStatusChange(null)}
+        />
+      )}
+
+      {deleteTarget && (
+        <ConfirmDialog
+          title="Eliminar pedido"
+          description={
+            deleteTarget.status === 'Recibido'
+              ? 'Se va a eliminar el registro del pedido. El stock que ya se sumó no se modifica.'
+              : 'Se va a eliminar el pedido. Esta acción no se puede deshacer.'
+          }
+          confirmLabel="Eliminar"
+          danger
+          saving={deleting}
+          onConfirm={confirmRemove}
+          onCancel={() => setDeleteTarget(null)}
+        />
+      )}
     </div>
   );
 };

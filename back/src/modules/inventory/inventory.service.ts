@@ -74,7 +74,10 @@ export class InventoryService {
     await this.assertClubAccess(cat.idClub, user);
     const inUse = await this.prisma.product_Inventory.findFirst({ where: { idSupplyCategory: id } });
     if (inUse) throw new BadRequestException('No se puede eliminar: hay productos usando esta categoría');
-    await this.prisma.supply_Category.delete({ where: { id } });
+    await this.prisma.$transaction([
+      this.prisma.supplier_Category.deleteMany({ where: { idSupplyCategory: id } }),
+      this.prisma.supply_Category.delete({ where: { id } }),
+    ]);
     return { message: 'Categoría eliminada correctamente' };
   }
 
@@ -155,8 +158,15 @@ export class InventoryService {
     const supplier = await this.prisma.supplier.findUnique({ where: { id } });
     if (!supplier) throw new NotFoundException('Proveedor no encontrado');
     await this.assertClubAccess(supplier.idClub, user);
-    await this.prisma.supplier_Category.deleteMany({ where: { idSupplier: id } });
-    await this.prisma.supplier.delete({ where: { id } });
+    const hasOrders = await this.prisma.supply_Order.findFirst({ where: { idSupplier: id } });
+    if (hasOrders) {
+      throw new BadRequestException('No se puede eliminar: el proveedor tiene pedidos registrados. Desactivalo en su lugar.');
+    }
+    await this.prisma.$transaction([
+      this.prisma.product_Inventory.updateMany({ where: { idSupplier: id }, data: { idSupplier: null } }),
+      this.prisma.supplier_Category.deleteMany({ where: { idSupplier: id } }),
+      this.prisma.supplier.delete({ where: { id } }),
+    ]);
     return { message: 'Proveedor eliminado correctamente' };
   }
 

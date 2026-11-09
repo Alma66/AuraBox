@@ -30,21 +30,21 @@ export class CreateProductInventoryDto {
   unitType!: string;
 
   @IsOptional()
-  @IsNumber({ maxDecimalPlaces: 3 })
+  @IsNumber({ maxDecimalPlaces: 2 })
   @Min(0, { message: 'El stock no puede ser negativo' })
-  @Max(100000000)
+  @Max(99999999)
   currentStock?: number;
 
   @IsOptional()
-  @IsNumber({ maxDecimalPlaces: 3 })
+  @IsNumber({ maxDecimalPlaces: 2 })
   @Min(0, { message: 'El stock mínimo no puede ser negativo' })
-  @Max(100000000)
+  @Max(99999999)
   minStock?: number;
 
   @IsOptional()
   @IsNumber({ maxDecimalPlaces: 2 })
   @Min(0, { message: 'El costo no puede ser negativo' })
-  @Max(100000000)
+  @Max(99999999)
   costPerUnit?: number;
 
   @IsOptional()

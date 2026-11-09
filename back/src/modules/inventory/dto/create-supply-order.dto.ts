@@ -11,14 +11,14 @@ export class CreateSupplyOrderDto {
   @IsInt()
   idProductInventory!: number;
 
-  @IsNumber({ maxDecimalPlaces: 3 })
+  @IsNumber({ maxDecimalPlaces: 2 })
   @Min(0.01, { message: 'La cantidad debe ser mayor a 0' })
-  @Max(100000000)
+  @Max(99999999)
   quantity!: number;
 
   @IsNumber({ maxDecimalPlaces: 2 })
   @Min(0, { message: 'El costo no puede ser negativo' })
-  @Max(100000000)
+  @Max(99999999)
   totalCost!: number;
 
   @IsOptional()

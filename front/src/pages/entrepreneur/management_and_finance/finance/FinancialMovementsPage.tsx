@@ -8,7 +8,7 @@ import api, { getResponseData } from '../../../../api/config';
 import { FinancialMovement, MonthlyTotal, FinanceSummary } from '../../../../types/financial';
 
 const CATEGORY_OPTIONS = ['Sueldos', 'Alquiler', 'Impuestos', 'Marketing', 'Servicios', 'Reembolsos', 'Otros'];
-const MAX_AMOUNT = 100000000;
+const MAX_AMOUNT = 99999999;
 
 const emptyForm = {
   type: 'Egreso' as 'Ingreso' | 'Egreso',

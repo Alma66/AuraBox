@@ -25,7 +25,7 @@ export class CreateFinancialEntryDto {
 
   @IsNumber({ maxDecimalPlaces: 2 }, { message: 'El monto debe ser un número con hasta 2 decimales' })
   @Min(0.01, { message: 'El monto debe ser mayor a 0' })
-  @Max(100000000, { message: 'El monto es demasiado alto' })
+  @Max(99999999, { message: 'El monto es demasiado alto' })
   amount!: number;
 
   @IsOptional()
