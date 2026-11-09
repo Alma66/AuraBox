@@ -2,11 +2,24 @@ import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import api, { getResponseData } from '../../api/config';
 
+interface ClubCard {
+  id: number;
+  name: string;
+  logoUrl: string | null;
+  slogan: string | null;
+  rating: number | null;
+  totalReviews: number;
+  fromPrice: number;
+  frequencies: string[];
+  categories: string[];
+}
+
 interface ChatMessage {
   id: number;
   role: 'user' | 'assistant';
   content: string;
   blocked?: boolean;
+  clubs?: ClubCard[];
 }
 
 interface AssistantChatProps {
@@ -20,8 +33,14 @@ const MAX_INPUT = 400;
 const STORAGE_KEY = 'aurabox_assistant_chat';
 const LINK_PATTERN = /\[([^\]]{1,80})\]\((\/(?!\/)[a-zA-Z0-9\-_/?=&#%.]*)\)/g;
 
+const priceFormatter = new Intl.NumberFormat('es-AR', {
+  style: 'currency',
+  currency: 'ARS',
+  maximumFractionDigits: 0,
+});
+
 const GREETING =
-  '¡Hola! 👋 Soy el asistente virtual de AuraBox. Puedo ayudarte con suscripciones, pagos, envíos y tu cuenta. ¿Qué necesitás saber?';
+  '¡Hola! 👋 Soy el asistente virtual de AuraBox. Puedo ayudarte con suscripciones, pagos, envíos y tu cuenta, y también a encontrar un club. ¿Qué necesitás?';
 
 const getSuggestions = (path: string): string[] => {
   if (path.startsWith('/checkout')) {
@@ -30,6 +49,14 @@ const getSuggestions = (path: string): string[] => {
       '¿Cómo elijo la empresa de envío?',
       '¿Los pagos son reales?',
       '¿Cómo funciona el efectivo contra entrega?',
+    ];
+  }
+  if (path.startsWith('/explore')) {
+    return [
+      'Busco una caja de café hasta $20.000 al mes',
+      'Ayudame a encontrar un club',
+      '¿Cómo funcionan los envíos?',
+      '¿Qué medios de pago hay?',
     ];
   }
   if (path.startsWith('/club/')) {
@@ -57,10 +84,10 @@ const getSuggestions = (path: string): string[] => {
     ];
   }
   return [
+    'Ayudame a encontrar un club',
     '¿Cómo me suscribo a una caja?',
     '¿Qué medios de pago hay?',
     '¿Cómo funcionan los envíos?',
-    '¿Dónde veo mis suscripciones?',
   ];
 };
 
@@ -78,6 +105,7 @@ const loadMessages = (): ChatMessage[] => {
           typeof item.content === 'string' &&
           typeof item.id === 'number',
       )
+      .map((item) => ({ ...item, clubs: Array.isArray(item.clubs) ? item.clubs : undefined }))
       .slice(-30);
   } catch {
     return [];
@@ -111,6 +139,49 @@ const renderContent = (text: string, onNavigate: () => void): React.ReactNode[] 
   if (lastIndex < content.length) nodes.push(content.slice(lastIndex));
   return nodes;
 };
+
+const ClubResultCard: React.FC<{ club: ClubCard; onNavigate: () => void }> = ({ club, onNavigate }) => (
+  <div className="rounded-xl border border-aurora-navy/10 bg-white p-3 shadow-sm">
+    <div className="flex items-start gap-3">
+      {club.logoUrl ? (
+        <img src={club.logoUrl} alt="" loading="lazy" className="h-12 w-12 flex-shrink-0 rounded-lg object-cover" />
+      ) : (
+        <div
+          aria-hidden="true"
+          className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-lg bg-aurora-cream font-bold text-aurora-navy"
+        >
+          {club.name.charAt(0).toUpperCase()}
+        </div>
+      )}
+      <div className="min-w-0 flex-1">
+        <p className="truncate font-semibold text-aurora-navy">{club.name}</p>
+        <p className="text-xs text-aurora-navy/60">
+          {club.rating !== null && club.totalReviews > 0
+            ? `★ ${club.rating.toFixed(1)} (${club.totalReviews} ${club.totalReviews === 1 ? 'reseña' : 'reseñas'})`
+            : 'Sin reseñas todavía'}
+        </p>
+        {club.slogan && <p className="mt-1 truncate text-xs text-aurora-navy/70">{club.slogan}</p>}
+      </div>
+    </div>
+    <div className="mt-2 flex flex-wrap items-center gap-1">
+      <span className="mr-1 text-sm font-semibold text-aurora-terracotta">
+        Desde {priceFormatter.format(club.fromPrice)}
+      </span>
+      {club.frequencies.map((frequency) => (
+        <span key={frequency} className="rounded-full bg-aurora-cream px-2 py-0.5 text-[11px] text-aurora-navy">
+          {frequency}
+        </span>
+      ))}
+    </div>
+    <Link
+      to={`/club/${club.id}`}
+      onClick={onNavigate}
+      className="mt-3 flex min-h-[44px] items-center justify-center rounded-xl bg-aurora-terracotta px-3 text-sm font-semibold text-white transition-colors hover:bg-aurora-terracottaDark"
+    >
+      Ver club
+    </Link>
+  </div>
+);
 
 const AssistantChat: React.FC<AssistantChatProps> = ({ open, onClose }) => {
   const location = useLocation();
@@ -158,10 +229,16 @@ const AssistantChat: React.FC<AssistantChatProps> = ({ open, onClose }) => {
         messages: nextMessages.slice(-8).map((message) => ({ role: message.role, content: message.content })),
         detail,
       });
-      const data = getResponseData(response) as { reply: string; blocked?: boolean };
+      const data = getResponseData(response) as { reply: string; blocked?: boolean; clubs?: ClubCard[] };
       setMessages((prev) => [
         ...prev,
-        { id: nextId.current++, role: 'assistant', content: data.reply, blocked: Boolean(data.blocked) },
+        {
+          id: nextId.current++,
+          role: 'assistant',
+          content: data.reply,
+          blocked: Boolean(data.blocked),
+          clubs: Array.isArray(data.clubs) ? data.clubs : undefined,
+        },
       ]);
     } catch (err: any) {
       if (err?.response?.status === 429) {
@@ -183,7 +260,8 @@ const AssistantChat: React.FC<AssistantChatProps> = ({ open, onClose }) => {
   if (!open) return null;
 
   const lastMessage = messages[messages.length - 1];
-  const canExpand = !sending && lastMessage && lastMessage.role === 'assistant' && !lastMessage.blocked;
+  const canExpand =
+    !sending && lastMessage && lastMessage.role === 'assistant' && !lastMessage.blocked && !lastMessage.clubs;
 
   return (
     <div
@@ -239,15 +317,23 @@ const AssistantChat: React.FC<AssistantChatProps> = ({ open, onClose }) => {
         )}
 
         {messages.map((message) => (
-          <div
-            key={message.id}
-            className={`max-w-[85%] whitespace-pre-line rounded-2xl px-4 py-3 text-sm ${
-              message.role === 'user'
-                ? 'ml-auto rounded-tr-sm bg-aurora-terracotta text-white'
-                : 'rounded-tl-sm bg-white text-aurora-navy shadow-sm'
-            }`}
-          >
-            {message.role === 'assistant' ? renderContent(message.content, handleNavigate) : message.content}
+          <div key={message.id} className="space-y-2">
+            <div
+              className={`max-w-[85%] whitespace-pre-line rounded-2xl px-4 py-3 text-sm ${
+                message.role === 'user'
+                  ? 'ml-auto rounded-tr-sm bg-aurora-terracotta text-white'
+                  : 'rounded-tl-sm bg-white text-aurora-navy shadow-sm'
+              }`}
+            >
+              {message.role === 'assistant' ? renderContent(message.content, handleNavigate) : message.content}
+            </div>
+            {message.clubs && message.clubs.length > 0 && (
+              <div className="space-y-2">
+                {message.clubs.map((club) => (
+                  <ClubResultCard key={club.id} club={club} onNavigate={handleNavigate} />
+                ))}
+              </div>
+            )}
           </div>
         ))}
 
