@@ -36,7 +36,7 @@ export class AssistantService {
     }
 
     const moderation = moderateText(last.content);
-    if (!moderation.allowed) return { reply: moderation.reply, blocked: true };
+    if (!moderation.allowed) return { reply: moderation.reply ?? FALLBACK_REPLY, blocked: true };
 
     const cleanHistory = recent.filter(
       (message) => message.role === 'assistant' || moderateText(message.content).allowed,

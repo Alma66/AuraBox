@@ -1,8 +1,10 @@
 export type ModerationReason = 'profanity' | 'image' | 'code' | 'injection' | 'selfharm';
 
-export type ModerationResult =
-  | { allowed: true }
-  | { allowed: false; reason: ModerationReason; reply: string };
+export interface ModerationResult {
+  allowed: boolean;
+  reason?: ModerationReason;
+  reply?: string;
+}
 
 const LEET: Record<string, string> = {
   '0': 'o',
