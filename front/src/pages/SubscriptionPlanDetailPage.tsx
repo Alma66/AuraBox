@@ -74,7 +74,7 @@ const SubscriptionPlanDetailPage: React.FC = () => {
             description: rawPlan.description ?? '',
             price: Number(rawPlan.basePrice ?? rawPlan.price ?? 0),
             currency: 'ARS',
-            image: rawPlan.imageUrl ?? rawPlan.image ?? '/assets/default-plan.jpg',
+            image: rawPlan.imageUrl ?? rawPlan.image ?? '/assets/default-plan.svg',
             deliveryFrequency: rawPlan.frequency ?? rawPlan.deliveryFrequency ?? '',
             includes: rawPlan.includes ?? [],
             shippingAreas: rawPlan.shippingAreas ?? '',

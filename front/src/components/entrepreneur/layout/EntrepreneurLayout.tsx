@@ -146,7 +146,7 @@ const EntrepreneurLayout: React.FC<EntrepreneurLayoutProps> = ({ children, onLog
       >
         <div className={`flex h-16 flex-shrink-0 items-center gap-3 border-b border-white/10 px-4 ${collapsed ? 'justify-center' : ''}`}>
           <Link to="/entrepreneur/dashboard" className="flex items-center gap-3" aria-label="Ir al resumen">
-            <img src="/logo192.png" alt="AuraBox" className="h-9 w-9 rounded-lg" />
+            <img src="/aurabox-mark.svg" alt="AuraBox" className="h-9 w-9 rounded-lg" />
             {!collapsed && (
               <span className="leading-tight">
                 <span className="block font-display text-lg font-bold text-white">AuraBox</span>
@@ -206,7 +206,7 @@ const EntrepreneurLayout: React.FC<EntrepreneurLayoutProps> = ({ children, onLog
         <header className="sticky top-0 z-30 flex h-14 items-center justify-between gap-3 border-b border-aurora-navy/10 bg-aurora-cream/90 px-4 backdrop-blur lg:px-8">
           <div className="flex min-w-0 items-center gap-3">
             <Link to="/entrepreneur/dashboard" className="lg:hidden" aria-label="Ir al resumen">
-              <img src="/logo192.png" alt="AuraBox" className="h-8 w-8 rounded-lg" />
+              <img src="/aurabox-mark.svg" alt="AuraBox" className="h-8 w-8 rounded-lg" />
             </Link>
             <p className="truncate font-display text-lg font-bold text-aurora-navy">{title}</p>
           </div>

@@ -193,7 +193,7 @@ const OrderHistoryPage: React.FC = () => {
                   return (
                     <div key={payment.id} className="p-5 flex items-center gap-4">
                       <img
-                        src={club?.logoUrl || '/assets/default-club.jpg'}
+                        src={club?.logoUrl || '/assets/default-club.svg'}
                         alt={club?.name || 'Club'}
                         className="w-12 h-12 rounded-full object-cover border border-aurora-navy/10 flex-shrink-0"
                       />
@@ -230,7 +230,7 @@ const OrderHistoryPage: React.FC = () => {
                   return (
                     <div key={shipment.id} className="p-5 flex items-center gap-4">
                       <img
-                        src={club?.logoUrl || '/assets/default-club.jpg'}
+                        src={club?.logoUrl || '/assets/default-club.svg'}
                         alt={club?.name || 'Club'}
                         className="w-12 h-12 rounded-full object-cover border border-aurora-navy/10 flex-shrink-0"
                       />

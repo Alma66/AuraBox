@@ -37,7 +37,7 @@ const WelcomeModal: React.FC<WelcomeModalProps> = ({ name, onClose }) => {
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
           </svg>
         </button>
-        <img src="/aurabox-logo.png" alt="AuraBox" className="h-12 w-auto mb-4" />
+        <img src="/aurabox-mark.svg" alt="AuraBox" className="h-12 w-12 rounded-xl mb-4" />
         <h2 className="text-xl font-bold text-aurora-navy mb-1">
           ¡Bienvenido de nuevo{name ? `, ${name}` : ''}!
         </h2>

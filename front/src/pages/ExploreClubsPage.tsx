@@ -237,7 +237,7 @@ const ExploreClubsPage: React.FC = () => {
                   name={club.name}
                   slogan={club.slogan || ''}
                   description={club.shortDescription || club.slogan || ''}
-                  image={club.logoUrl || '/assets/default-club.jpg'}
+                  image={club.logoUrl || '/assets/default-club.svg'}
                   rating={Number(club.averageRating) || 0}
                   reviewsCount={club.totalReviews || 0}
                 />
@@ -262,7 +262,7 @@ const ExploreClubsPage: React.FC = () => {
           <p className="text-lg mb-8 max-w-2xl mx-auto text-white/75">
             Unite a AuraBox y profesionalizá tu negocio. Llegá a miles de nuevos suscriptores y gestioná todo de forma sencilla.
           </p>
-          <Link to="/register" className="btn-primary !px-10 !py-4 !text-xl">
+          <Link to="/register/entrepreneur" className="btn-primary !px-10 !py-4 !text-xl">
             Registrá tu Club Hoy
           </Link>
         </section>

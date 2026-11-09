@@ -193,7 +193,7 @@ const RegisterPage: React.FC<RegisterPageProps> = ({ accountType = 'customer' })
       <div className="max-w-md w-full space-y-6 p-10 card-surface shadow-aurora relative animate-fadeInUp">
         <div>
           <div className="flex justify-center mb-4">
-            <img src="/aurabox-logo.png" alt="AuraBox" className="h-14 w-auto" />
+            <img src="/aurabox-mark.svg" alt="AuraBox" className="h-14 w-14 rounded-xl" />
           </div>
           <span className="section-eyebrow block text-center">{copy.eyebrow}</span>
           <h1 className="text-center font-display text-3xl font-bold text-aurora-navy">{copy.title}</h1>

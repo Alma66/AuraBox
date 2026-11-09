@@ -182,7 +182,7 @@ const Navbar: React.FC<NavbarProps> = ({ userRole, isAuthenticated, onLogout }) 
         <div className="flex h-16 items-center justify-between">
           <div className="flex-shrink-0 pl-2">
             <Link to="/" onClick={closeAllDropdowns} className="flex items-center gap-2">
-              <img className="h-9 w-auto" src="/logo192.png" alt="AuraBox" />
+              <img className="h-9 w-9 rounded-lg" src="/aurabox-mark.svg" alt="AuraBox" />
               <span className="hidden font-display text-xl font-bold tracking-tight text-aurora-navy sm:block">AuraBox</span>
             </Link>
           </div>

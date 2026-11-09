@@ -11,6 +11,8 @@ import Slider from 'react-slick';
 import 'slick-carousel/slick/slick.css';
 import 'slick-carousel/slick/slick-theme.css';
 import { Club } from '../types/club';
+import SafeImage from '../components/common/SafeImage';
+import { useSiteContent } from '../utils/useSiteContent';
 
 const testimonialsData = [
   {
@@ -18,28 +20,28 @@ const testimonialsData = [
     quote: "AuraBox transformó mi club. La gestión es sencilla y mis ventas se duplicaron. ¡Mis clientes están felices y yo también!",
     author: "Sofía G.",
     role: "Emprendedora, Club de Plantas",
-    image: "/assets/testimonial-sofia.jpg"
+    image: ""
   },
   {
     id: 't2',
     quote: "Descubrí clubes increíbles que nunca hubiera encontrado. La experiencia es fluida y me encanta el seguimiento de mis cajas.",
     author: "Lucía R.",
     role: "Suscriptora, Amante de los Libros",
-    image: "/assets/testimonial-lucia.jpg"
+    image: ""
   },
   {
     id: 't3',
     quote: "La mejor plataforma para gestionar mis suscripciones. Todo en un solo lugar, pagos seguros y siempre sé cuándo llega mi caja.",
     author: "Tomás M.",
     role: "Suscriptor, Fan del Café",
-    image: "/assets/testimonial-tomas.jpg"
+    image: ""
   },
   {
     id: 't4',
     quote: "Mi club de vinos creció exponencialmente gracias a la visibilidad y las herramientas de AuraBox. ¡Un antes y un después!",
     author: "Martín P.",
     role: "Emprendedor, Club de Vinos",
-    image: "/assets/testimonial-martin.jpg"
+    image: ""
   },
 ];
 
@@ -63,8 +65,8 @@ const FeaturedClubCard: React.FC<FeaturedClubCardProps> = ({ id, name, slogan, l
       <div className="flex justify-center mb-4">
         <div className="w-24 h-24 rounded-full overflow-hidden border-4 border-aurora-gold/30
                         group-hover:border-aurora-gold transition-colors duration-300 shadow-sm">
-          <img
-            src={logoUrl || '/assets/default-club.jpg'}
+         <SafeImage
+            src={logoUrl}
             alt={name}
             className="w-full h-full object-cover"
           />
@@ -95,6 +97,7 @@ const HomePage: React.FC = () => {
   const [quizAnswer, setQuizAnswer] = useState<string | null>(null);
   const location = useLocation();
   const navigate = useNavigate();
+  const siteContent = useSiteContent();
   const isLoggedIn = !!localStorage.getItem('access_token');
 
   const quizOptions = [
@@ -170,12 +173,12 @@ const HomePage: React.FC = () => {
       {showWelcome && (
         <WelcomeModal name={welcomeName} onClose={() => setShowWelcome(false)} />
       )}
-      <HeroBanner
-        title="Descubrí la Magia de los Clubes de Suscripción en Argentina"
-        subtitle="Experiencias únicas, curadas con pasión, entregadas en tu puerta."
+     <HeroBanner
+        title={siteContent.hero_title || 'Descubrí la Magia de los Clubes de Suscripción en Argentina'}
+        subtitle={siteContent.hero_subtitle || 'Experiencias únicas, curadas con pasión, entregadas en tu puerta.'}
         ctaText="Explorar Clubes Ahora"
         ctaLink="/explore"
-        backgroundImage="/assets/hero-background.jpg"
+        backgroundImage={siteContent.hero_image}
       />
 
       <section className="bg-white border-b border-aurora-navy/5">
@@ -269,14 +272,13 @@ const HomePage: React.FC = () => {
           <AlternatingContent
             title="Experiencias Curadas, Directo a Tu Puerta"
             description="Olvidate de la búsqueda. Nuestros clubes seleccionan lo mejor para vos, desde libros fascinantes hasta delicias gourmet, entregados con la comodidad que merecés. Cada caja es una sorpresa cuidadosamente preparada para deleitar tus sentidos."
-            imageUrl="/assets/content-image-1.jpg"
-            imageAlt="Caja sorpresa de AuraBox"
+            imageUrl={siteContent.home_image_1}            imageAlt="Caja sorpresa de AuraBox"
             reverse={false}
           />
           <AlternatingContent
             title="Apoyá Emprendedores Locales con Pasión"
             description="Cada suscripción en AuraBox impulsa a pequeños y medianos emprendedores argentinos, quienes ponen su corazón en cada caja. Descubrí sus historias, sus valores y sé parte de su crecimiento, fomentando la economía local."
-            imageUrl="/assets/content-image-2.jpg"
+            imageUrl={siteContent.home_image_2}
             imageAlt="Emprendedora preparando cajas"
             reverse={true}
           />
@@ -287,8 +289,9 @@ const HomePage: React.FC = () => {
         </section>
 
         <section className="mb-20 bg-white py-16 rounded-2xl shadow-aurora-sm border border-aurora-navy/5">
-          <span className="section-eyebrow block text-center">Voces reales</span>
+          <span className="section-eyebrow block text-center">Opiniones</span>
           <h2 className="font-display text-4xl font-bold text-aurora-navy mb-12 text-center animate-fadeInUp">Lo que dicen nuestros usuarios</h2>
+                    <p className="text-center text-xs text-aurora-navy/45 -mt-8 mb-10">Testimonios ilustrativos de ejemplo.</p>
           <Slider {...testimonialCarouselSettings}>
             {testimonialsData.map((testimonial) => (
               <div key={testimonial.id} className="px-4">
@@ -310,7 +313,7 @@ const HomePage: React.FC = () => {
             Profesionalizá tu club de suscripción con AuraBox. Centralizá tu gestión, ampliá tu visibilidad y conectá con una comunidad apasionada.
             Te brindamos las herramientas para escalar tu negocio sin complicaciones.
           </p>
-          <Link to="/register" className="btn-primary !px-10 !py-4 !text-xl">
+          <Link to="/register/entrepreneur" className="btn-primary !px-10 !py-4 !text-xl">
             Registrá tu Club Ahora
           </Link>
         </section>

@@ -238,7 +238,7 @@ const FAQPage: React.FC = () => {
           <div className="bg-white p-6 rounded-xl shadow-aurora-sm border border-aurora-navy/5 hover:shadow-aurora transition-all duration-300 transform hover:-translate-y-1 animate-fadeInUp" style={{ animationDelay: '100ms' }}>
             <h3 className="text-xl font-semibold text-aurora-terracotta mb-3">Registrá tu Club</h3>
             <p className="text-aurora-navy/70 mb-4">Descubrí cómo AuraBox puede potenciar y profesionalizar tu club de suscripción.</p>
-            <Link to="/register" className="text-aurora-terracotta hover:underline font-medium">Empezar →</Link>
+            <Link to="/register/entrepreneur" className="text-aurora-terracotta hover:underline font-medium">Empezar →</Link>
           </div>
           <div className="bg-white p-6 rounded-xl shadow-aurora-sm border border-aurora-navy/5 hover:shadow-aurora transition-all duration-300 transform hover:-translate-y-1 animate-fadeInUp" style={{ animationDelay: '200ms' }}>
             <h3 className="text-xl font-semibold text-aurora-terracotta mb-3">Sobre Nosotros</h3>

@@ -911,3 +911,13 @@ model Inbound_Request {
   @@index([type, status, createdAt])
   @@map("Inbound_Request")
 }
+
+model Site_Content {
+  id        Int      @id @default(autoincrement()) @map("ID")
+  key       String   @unique @map("Key")
+  value     String   @map("Value")
+  updatedAt DateTime @default(now()) @map("Updated_At")
+  updatedBy Int?     @map("Updated_By")
+
+  @@map("Site_Content")
+}

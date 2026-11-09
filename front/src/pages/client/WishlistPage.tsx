@@ -183,7 +183,7 @@ const WishlistPage: React.FC = () => {
                   onClick={() => navigate(`/club/${group.club.id}`)}
                 >
                   <img
-                    src={group.club.logoUrl || '/assets/default-club.jpg'}
+                    src={group.club.logoUrl || '/assets/default-club.svg'}
                     alt={group.club.name}
                     className="w-14 h-14 rounded-full object-cover border border-aurora-navy/10"
                   />

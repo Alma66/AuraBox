@@ -399,7 +399,7 @@ const UserSubscriptionsPage: React.FC = () => {
                 <div key={sub.id} className="bg-white rounded-2xl shadow-md overflow-hidden">
                   <div className="p-5 flex gap-4 items-start border-b border-aurora-navy/10">
                     <img
-                      src={clubInfo?.logoUrl || '/assets/default-club.jpg'}
+                      src={clubInfo?.logoUrl || '/assets/default-club.svg'}
                       alt={clubInfo?.name || 'Club'}
                       className="w-16 h-16 rounded-full object-cover border border-aurora-navy/10 flex-shrink-0"
                     />

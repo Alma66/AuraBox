@@ -56,6 +56,7 @@ import { JwtAuthGuard } from './common/guards/jwt-auth.guard';
 import { TransformInterceptor } from './common/interceptors/transform.interceptor';
 import { AllExceptionsFilter } from './common/filters/all-exceptions.filter';
 import { InboundRequestsModule } from './modules/inbound-requests/inbound-requests.module';
+import { SiteContentModule } from './modules/site-content/site-content.module';
 
 const jwtSecret = process.env.JWT_SECRET;
 if (!jwtSecret) {
@@ -107,6 +108,7 @@ if (!jwtSecret) {
     RoleModule,
     RolePermissionsModule,
     ShipmentsModule,
+    SiteContentModule,
     SubscriptionTypesModule,
     TransactionHistoryModule,
     UserClubPreferencesModule,

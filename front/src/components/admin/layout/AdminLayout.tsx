@@ -52,7 +52,7 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children, onLogout }) => {
       <aside className="fixed inset-y-0 left-0 z-40 hidden w-64 flex-col bg-aurora-navy text-aurora-cream lg:flex">
         <div className="flex h-16 flex-shrink-0 items-center gap-3 border-b border-white/10 px-4">
           <Link to="/admin/dashboard" className="flex items-center gap-3" aria-label="Ir al resumen">
-            <img src="/logo192.png" alt="AuraBox" className="h-9 w-9 rounded-lg" />
+            <img src="/aurabox-mark.svg" alt="AuraBox" className="h-9 w-9 rounded-lg" />
             <span className="leading-tight">
               <span className="block font-display text-lg font-bold text-white">AuraBox</span>
               <span className="block text-[11px] uppercase tracking-widest text-aurora-gold">Administración</span>
@@ -95,7 +95,7 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children, onLogout }) => {
         <header className="sticky top-0 z-30 flex h-14 items-center justify-between gap-3 border-b border-aurora-navy/10 bg-aurora-cream/90 px-4 backdrop-blur lg:px-8">
           <div className="flex min-w-0 items-center gap-3">
             <Link to="/admin/dashboard" className="lg:hidden" aria-label="Ir al resumen">
-              <img src="/logo192.png" alt="AuraBox" className="h-8 w-8 rounded-lg" />
+              <img src="/aurabox-mark.svg" alt="AuraBox" className="h-8 w-8 rounded-lg" />
             </Link>
             <p className="truncate font-display text-lg font-bold text-aurora-navy">{active ? active.label : 'Administración'}</p>
           </div>

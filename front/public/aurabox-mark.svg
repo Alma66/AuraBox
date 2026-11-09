@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="260 150 420 420" role="img" aria-label="AuraBox">
+  <defs>
+    <radialGradient id="aura" cx="463" cy="338" r="190" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#E3A23E" stop-opacity="0.6"/>
+      <stop offset="0.55" stop-color="#E3A23E" stop-opacity="0.2"/>
+      <stop offset="1" stop-color="#E3A23E" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <circle cx="463" cy="338" r="190" fill="url(#aura)"/>
+  <path d="M458 181V313L437 392H458V469H429L406 552H361Z" fill="#C1672B"/>
+  <path d="M472 204C540 204 590 230 590 278C590 318 570 342 548 350C582 360 602 394 602 428C602 484 560 521 472 521Z" fill="#2B3A55"/>
+  <circle cx="463.5" cy="335" r="18" fill="#E3A23E"/>
+</svg>

@@ -82,7 +82,7 @@ const LoginPage: React.FC<LoginPageProps> = ({ onLogin }) => {
       <div className="max-w-md w-full space-y-8 p-10 card-surface shadow-aurora relative animate-fadeInUp">
         <div className="space-y-3">
           <div className="flex justify-center mb-4">
-            <img src="/aurabox-logo.png" alt="AuraBox" className="h-14 w-auto" />
+            <img src="/aurabox-mark.svg" alt="AuraBox" className="h-14 w-14 rounded-xl" />
           </div>
           <h2 className="text-center font-display text-3xl font-bold text-aurora-navy">
             Bienvenido de nuevo

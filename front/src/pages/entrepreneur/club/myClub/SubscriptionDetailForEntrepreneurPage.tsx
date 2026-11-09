@@ -201,7 +201,7 @@ const SubscriptionDetailForEntrepreneurPage: React.FC = () => {
       <div className="bg-white rounded-xl shadow-aurora-sm border border-aurora-navy/10 p-8 mb-8">
         <div className="flex flex-col md:flex-row items-center md:items-start gap-8">
           <img
-            src={plan?.image || '/assets/default-plan.jpg'}
+            src={plan?.image || '/assets/default-plan.svg'}
             alt={plan?.name || 'Plan'}
             className="w-48 h-48 object-cover rounded-lg shadow-md bg-aurora-cream"
           />

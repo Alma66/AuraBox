@@ -65,7 +65,7 @@ const AboutUsPage: React.FC = () => {
               Explorar clubes
             </Link>
             <Link
-              to="/register"
+              to="/register/entrepreneur"
               className="border-2 border-white/60 text-white px-8 py-3 rounded-full font-bold hover:bg-white/10 transition-colors"
             >
               Registrar mi club
@@ -169,7 +169,7 @@ const AboutUsPage: React.FC = () => {
             Sumate a AuraBox y llegá a miles de suscriptores en toda Argentina.
           </p>
           <Link
-            to="/register"
+            to="/register/entrepreneur"
             className="inline-block bg-white text-aurora-navy px-10 py-3.5 rounded-full font-bold hover:bg-aurora-cream transition-colors shadow-lg"
           >
             Registrá tu club hoy

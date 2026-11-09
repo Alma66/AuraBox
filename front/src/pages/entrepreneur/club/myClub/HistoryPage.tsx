@@ -527,7 +527,7 @@ const HistoryPage: React.FC = () => {
 
       <div className="relative h-80 md:h-96 overflow-hidden shadow-xl">
         <img
-          src={club.logoUrl || '/assets/default-history-banner.jpg'}
+          src={club.logoUrl || '/assets/default-history-banner.svg'}
           alt={`Historia de ${club.name}`}
           className="w-full h-full object-cover object-center transform scale-105 transition-transform duration-1000 ease-out"
         />

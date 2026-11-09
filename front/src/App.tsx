@@ -58,6 +58,7 @@ import SettingsPage from './pages/entrepreneur/administration_tools/SettingsPage
 import FinancePage from './pages/entrepreneur/management_and_finance/FinancePage';
 import InventoryPage from './pages/entrepreneur/management_and_finance/InventoryPage';
 
+import AdminSiteContentPage from './pages/admin/AdminSiteContentPage';
 import AdminInboxPage from './pages/admin/AdminInboxPage';
 import AdminDashboardPage from './pages/admin/AdminDashboardPage';
 import AdminClubsPage from './pages/admin/AdminClubsPage';
@@ -318,9 +319,10 @@ const AppContent: React.FC = () => {
       <Route path="/entrepreneur/club/:clubId/legal-compliance" element={pr(['entrepreneur'], <ClubRedirect to="settings" search="?tab=compliance" />)} />
       <Route path="/entrepreneur/club/:clubId/manage-users-roles" element={pr(['entrepreneur'], <ClubRedirect to="settings" search="?tab=team" />)} />
 
+      <Route path="/admin/content" element={pr(['admin'], <AdminSiteContentPage />)} />
       <Route path="/admin" element={<Navigate to="/admin/dashboard" replace />} />
       <Route path="/admin/dashboard" element={pr(['admin'], <AdminDashboardPage />)} />
-            <Route path="/admin/inbox" element={pr(['admin'], <AdminInboxPage />)} />
+      <Route path="/admin/inbox" element={pr(['admin'], <AdminInboxPage />)} />
       <Route path="/admin/clubs" element={pr(['admin'], <AdminClubsPage />)} />
       <Route path="/admin/licenses" element={pr(['admin'], <AdminLicensesPage />)} />
       <Route path="/admin/users" element={pr(['admin'], <AdminUsersPage />)} />
