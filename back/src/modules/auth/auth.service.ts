@@ -1,4 +1,4 @@
-import { Injectable, UnauthorizedException, BadRequestException } from '@nestjs/common';
+import { Injectable, UnauthorizedException, BadRequestException, HttpException, HttpStatus } from '@nestjs/common';
 import { RuleAcceptanceScope } from '@prisma/client';
 import { UsersService } from '../users/users.service';
 import * as bcrypt from 'bcryptjs';
@@ -13,6 +13,18 @@ import {
 } from './dto/register.dto';
 
 type AccountAudience = 'customer' | 'entrepreneur';
+
+const MAX_FAILED_LOGINS = 5;
+const LOGIN_WINDOW_MS = 15 * 60 * 1000;
+const MAX_TRACKED_EMAILS = 5000;
+const DUMMY_HASH = bcrypt.hashSync('aurabox-dummy-password', 10);
+const PASSWORD_HASH_ROUNDS = 12;
+
+interface LoginAttempt {
+  failures: number;
+  windowStart: number;
+  lockedUntil: number;
+}
 
 const ageOn = (birth: Date, today: Date = new Date()) => {
   let age = today.getUTCFullYear() - birth.getUTCFullYear();
@@ -29,6 +41,46 @@ export class AuthService {
     private prisma: PrismaService,
   ) {}
 
+  private readonly loginAttempts = new Map<string, LoginAttempt>();
+
+  private pruneLoginAttempts(now: number) {
+    if (this.loginAttempts.size < MAX_TRACKED_EMAILS) return;
+    for (const [key, attempt] of this.loginAttempts) {
+      if (attempt.lockedUntil < now && now - attempt.windowStart > LOGIN_WINDOW_MS) {
+        this.loginAttempts.delete(key);
+      }
+    }
+  }
+
+  private assertNotLocked(key: string) {
+    const attempt = this.loginAttempts.get(key);
+    const now = Date.now();
+    if (attempt && attempt.lockedUntil > now) {
+      const minutes = Math.max(1, Math.ceil((attempt.lockedUntil - now) / 60000));
+      throw new HttpException(
+        `Demasiados intentos fallidos. Probá de nuevo en ${minutes} minuto${minutes === 1 ? '' : 's'}.`,
+        HttpStatus.TOO_MANY_REQUESTS,
+      );
+    }
+  }
+
+  private registerFailedLogin(key: string) {
+    const now = Date.now();
+    this.pruneLoginAttempts(now);
+    const current = this.loginAttempts.get(key);
+    const attempt: LoginAttempt =
+      current && now - current.windowStart <= LOGIN_WINDOW_MS
+        ? current
+        : { failures: 0, windowStart: now, lockedUntil: 0 };
+    attempt.failures += 1;
+    if (attempt.failures >= MAX_FAILED_LOGINS) {
+      attempt.lockedUntil = now + LOGIN_WINDOW_MS;
+      attempt.failures = 0;
+      attempt.windowStart = now;
+    }
+    this.loginAttempts.set(key, attempt);
+  }
+  
   async validateUser(email: string, pass: string): Promise<any> {
     const lookup = { equals: email.trim(), mode: 'insensitive' as const };
     let user: any = null;
@@ -56,7 +108,10 @@ export class AuthService {
       }
     }
 
-    if (!user) return null;
+    if (!user) {
+      await bcrypt.compare(pass, DUMMY_HASH);
+      return null;
+    }
 
     const ok = await bcrypt.compare(pass, user.passwordHash);
     if (!ok) return null;
@@ -70,8 +125,14 @@ export class AuthService {
   }
 
   async loginWithCredentials(email: string, password: string) {
+    const key = email.trim().toLowerCase();
+    this.assertNotLocked(key);
     const user = await this.validateUser(email, password);
-    if (!user) throw new UnauthorizedException('Credenciales inválidas');
+    if (!user) {
+      this.registerFailedLogin(key);
+      throw new UnauthorizedException('Credenciales inválidas');
+    }
+    this.loginAttempts.delete(key);
     return this.buildToken(user);
   }
 
@@ -164,7 +225,7 @@ export class AuthService {
 
     const requiredRules = await this.resolveRequiredRules('customer', dto.acceptedRuleIds);
 
-    const hashed = await bcrypt.hash(dto.password, 10);
+    const hashed = await bcrypt.hash(dto.password, PASSWORD_HASH_ROUNDS);
 
     const user = await this.prisma.$transaction(async (tx) => {
       const created = await tx.user.create({
@@ -233,7 +294,7 @@ export class AuthService {
 
     const requiredRules = await this.resolveRequiredRules('entrepreneur', dto.acceptedRuleIds);
 
-    const hashed = await bcrypt.hash(dto.password, 10);
+    const hashed = await bcrypt.hash(dto.password, PASSWORD_HASH_ROUNDS);
 
     const entrepreneur = await this.prisma.$transaction(async (tx) => {
       const created = await tx.entrepreneurs.create({
