@@ -1,5 +1,6 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import api, { getResponseData } from '../../../../api/config';
+import LicenseDocumentLink from '../../../../components/common/LicenseDocumentLink';
 
 type RequirementState = 'FALTANTE' | 'PENDIENTE' | 'APROBADA' | 'RECHAZADA' | 'VENCIDA';
 
@@ -9,7 +10,7 @@ interface Requirement {
   description: string | null;
   entrepreneurLicenseId: number | null;
   state: RequirementState;
-  documentUrl: string | null;
+  hasDocument: boolean;
   issueDate: string | null;
   expirationDate: string | null;
   verificationNotes: string | null;
@@ -162,18 +163,11 @@ const RequirementCard: React.FC<{
             <dt className="text-xs text-aurora-navy/50">Vencimiento</dt>
             <dd className="text-aurora-navy">{formatDate(requirement.expirationDate)}</dd>
           </div>
-          {requirement.documentUrl && (
+           {requirement.hasDocument && requirement.entrepreneurLicenseId !== null && (
             <div>
               <dt className="text-xs text-aurora-navy/50">Documento</dt>
               <dd>
-                <a
-                  href={requirement.documentUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-aurora-terracotta underline hover:text-aurora-terracottaDark"
-                >
-                  Ver archivo
-                </a>
+                <LicenseDocumentLink licenseId={requirement.entrepreneurLicenseId} label="Ver archivo" />
               </dd>
             </div>
           )}

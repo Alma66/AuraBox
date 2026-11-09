@@ -1,10 +1,11 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import api, { getResponseData } from '../../api/config';
+import LicenseDocumentLink from '../../components/common/LicenseDocumentLink';
 
 interface LicenseRow {
   id: number;
   verificationStatus: 'PENDIENTE' | 'APROBADO' | 'RECHAZADO';
-  documentUrl: string | null;
+  hasDocument: boolean;
   issueDate: string | null;
   expirationDate: string | null;
   verificationDate: string | null;
@@ -181,15 +182,8 @@ const AdminLicensesPage: React.FC = () => {
                   <div>
                     <dt className="text-xs text-aurora-navy/50">Documento</dt>
                     <dd>
-                      {row.documentUrl ? (
-                        <a
-                          href={row.documentUrl}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="text-aurora-terracotta underline hover:text-aurora-terracottaDark"
-                        >
-                          Abrir archivo
-                        </a>
+                      {row.hasDocument ? (
+                        <LicenseDocumentLink licenseId={row.id} label="Abrir archivo" />
                       ) : (
                         '—'
                       )}
@@ -241,7 +235,7 @@ const AdminLicensesPage: React.FC = () => {
                       <button
                         type="button"
                         onClick={() => review(row, 'APROBADO')}
-                        disabled={isBusy || !row.documentUrl}
+                        disabled={isBusy || !row.hasDocument}
                         className="min-h-[44px] rounded-lg bg-green-600 px-4 text-sm font-semibold text-white hover:bg-green-700 disabled:opacity-50"
                       >
                         {isBusy ? 'Guardando...' : 'Aprobar'}

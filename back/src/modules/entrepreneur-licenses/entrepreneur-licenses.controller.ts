@@ -1,10 +1,11 @@
 import {
   Body, Controller, Get, Post, Delete, Patch,
-  Param, ParseIntPipe, UseGuards, Request, UsePipes, Query,
+  Param, ParseIntPipe, UseGuards, Request, UsePipes, Query, Res,
   ValidationPipe, ForbiddenException, BadRequestException, UseInterceptors, UploadedFile,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { memoryStorage } from 'multer';
+import type { Response } from 'express';
 import { EntrepreneurLicensesService } from './entrepreneur-licenses.service';
 import { CreateEntrepreneurLicenseDto } from './dto/create-entrepreneur-licenses.dto';
 import { UpdateEntrepreneurLicenseDto } from './dto/update-entrepreneur-licenses.dto';
@@ -65,6 +66,18 @@ export class EntrepreneurLicensesController {
   @Get('required-for-club/:idClub')
   async findRequiredForClub(@Param('idClub', ParseIntPipe) idClub: number, @Request() req) {
     return this.service.findRequiredForClub(idClub, req.user.id, req.user.role);
+  }
+
+  @Get(':id/document')
+  async getDocument(@Param('id', ParseIntPipe) id: number, @Request() req, @Res() res: Response) {
+    const { buffer, contentType } = await this.service.getDocument(id, req.user);
+    res.set({
+      'Content-Type': contentType,
+      'Content-Disposition': 'inline',
+      'Cache-Control': 'private, no-store',
+      'X-Content-Type-Options': 'nosniff',
+    });
+    res.send(buffer);
   }
 
   @Get(':id')

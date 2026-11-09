@@ -1,4 +1,12 @@
-import { Injectable, NotFoundException, BadRequestException, ForbiddenException, ConflictException } from '@nestjs/common';
+import {
+  Injectable,
+  Logger,
+  NotFoundException,
+  BadRequestException,
+  ForbiddenException,
+  ConflictException,
+  OnApplicationBootstrap,
+} from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
 import { CreateEntrepreneurLicenseDto } from './dto/create-entrepreneur-licenses.dto';
 import { UpdateEntrepreneurLicenseDto } from './dto/update-entrepreneur-licenses.dto';
@@ -16,15 +24,52 @@ function sanitize(license: any) {
   if (license.issueDate instanceof Date) license.issueDate = license.issueDate.toISOString();
   if (license.expirationDate instanceof Date) license.expirationDate = license.expirationDate.toISOString();
   if (license.verificationDate instanceof Date) license.verificationDate = license.verificationDate.toISOString();
+  license.hasDocument = Boolean(license.documentUrl);
+  delete license.documentUrl;
   return license;
 }
 
 @Injectable()
-export class EntrepreneurLicensesService {
+export class EntrepreneurLicensesService implements OnApplicationBootstrap {
+  private readonly logger = new Logger(EntrepreneurLicensesService.name);
+
   constructor(
     private readonly prisma: PrismaService,
     private readonly cloudinary: CloudinaryService,
   ) {}
+
+  onApplicationBootstrap() {
+    this.secureExistingDocuments()
+      .then((result) => {
+        if (result.total > 0) {
+          this.logger.log(`Documentos de licencia protegidos: ${result.secured} de ${result.total}`);
+        }
+      })
+      .catch((error) => this.logger.error(`No se pudieron proteger los documentos: ${(error as Error).message}`));
+  }
+
+  async secureExistingDocuments() {
+    const legacy = await this.prisma.entrepreneur_Licenses.findMany({
+      where: { documentUrl: { contains: '/raw/upload/' } },
+      select: { id: true, documentUrl: true },
+    });
+    let secured = 0;
+    for (const license of legacy) {
+      try {
+        const newUrl = await this.cloudinary.secureDocument(license.documentUrl as string);
+        if (newUrl) {
+          await this.prisma.entrepreneur_Licenses.update({
+            where: { id: license.id },
+            data: { documentUrl: newUrl },
+          });
+          secured += 1;
+        }
+      } catch (error) {
+        this.logger.error(`No se pudo proteger la licencia ${license.id}: ${(error as Error).message}`);
+      }
+    }
+    return { total: legacy.length, secured };
+  }
 
   private assertDates(issueDate: Date | null, expirationDate: Date | null, requireFutureExpiry: boolean) {
     if (issueDate && expirationDate && expirationDate.getTime() <= issueDate.getTime()) {
@@ -122,7 +167,7 @@ export class EntrepreneurLicensesService {
       return {
         id: license.id,
         verificationStatus: license.verificationStatus,
-        documentUrl: license.documentUrl,
+        hasDocument: Boolean(license.documentUrl),
         issueDate: license.issueDate ? license.issueDate.toISOString() : null,
         expirationDate: license.expirationDate ? license.expirationDate.toISOString() : null,
         verificationDate: license.verificationDate ? license.verificationDate.toISOString() : null,
@@ -153,6 +198,16 @@ export class EntrepreneurLicensesService {
     return sanitize(item);
   }
 
+  async getDocument(id: number, user: RequestUser) {
+    const license = await this.prisma.entrepreneur_Licenses.findUnique({ where: { id } });
+    if (!license) throw new NotFoundException('Licencia no encontrada');
+    if (user.role !== 'admin' && license.idEntrepreneurs !== user.id) {
+      throw new ForbiddenException('No autorizado para ver este documento');
+    }
+    if (!license.documentUrl) throw new NotFoundException('La licencia no tiene documento');
+    return this.cloudinary.fetchDocument(license.documentUrl);
+  }
+
   async update(id: number, dto: UpdateEntrepreneurLicenseDto, user: RequestUser, documentFile?: Express.Multer.File) {
     const existing = await this.prisma.entrepreneur_Licenses.findUnique({ where: { id } });
     if (!existing) throw new NotFoundException('Licencia no encontrada');
@@ -173,9 +228,10 @@ export class EntrepreneurLicensesService {
       const newUrl = await this.cloudinary.uploadDocument(documentFile, 'aurabox/licenses');
       if (existing.documentUrl) {
         try {
-          const publicId = this.cloudinary.extractPublicId(existing.documentUrl);
-          await this.cloudinary.deleteImage(publicId);
-        } catch {}
+          await this.cloudinary.deleteDocument(existing.documentUrl);
+        } catch (error) {
+          this.logger.warn(`No se pudo borrar el documento anterior de la licencia ${id}: ${(error as Error).message}`);
+        }
       }
       documentUrl = newUrl;
     }
@@ -232,7 +288,7 @@ export class EntrepreneurLicensesService {
       description: item.description,
       entrepreneurLicenseId: item.entrepreneurLicenseId,
       verificationStatus: item.verificationStatus,
-      documentUrl: item.documentUrl,
+      hasDocument: Boolean(item.documentUrl),
       issueDate: item.issueDate,
       expirationDate: item.expirationDate,
       verificationNotes: item.verificationNotes,
@@ -266,7 +322,7 @@ export class EntrepreneurLicensesService {
       club,
       statusReason: lastChange?.changeReason ?? null,
       statusChangedAt: lastChange ? lastChange.changeDate.toISOString() : null,
-      requirements: items,
+      requirements: items.map(({ documentUrl, ...rest }) => ({ ...rest, hasDocument: Boolean(documentUrl) })),
       summary,
     };
   }
@@ -276,9 +332,10 @@ export class EntrepreneurLicensesService {
     if (!existing) throw new NotFoundException('Licencia no encontrada');
     if (existing.documentUrl) {
       try {
-        const publicId = this.cloudinary.extractPublicId(existing.documentUrl);
-        await this.cloudinary.deleteImage(publicId);
-      } catch {}
+        await this.cloudinary.deleteDocument(existing.documentUrl);
+      } catch (error) {
+        this.logger.warn(`No se pudo borrar el documento de la licencia ${id}: ${(error as Error).message}`);
+      }
     }
     await this.prisma.entrepreneur_Licenses.delete({ where: { id } });
     return { message: 'Licencia eliminada correctamente' };
