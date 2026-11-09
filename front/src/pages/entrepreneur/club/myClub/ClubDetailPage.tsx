@@ -983,9 +983,9 @@ const ClubDetailPage: React.FC = () => {
             <ClubPaymentShippingInfo paymentMethods={club.paymentMethods} shippingInfo={club.shippingInfo} />
           </div>
         )}
-        {club.featuredReviews && club.featuredReviews.length > 0 && (
+        {club.id && (
           <div className="mb-10">
-            <ClubFeaturedReviews reviews={club.featuredReviews} clubName={club.name} clubId={String(club.id)} />
+    <ClubFeaturedReviews clubName={club.name} clubId={String(club.id)} />
           </div>
         )}
         {(legalContent.termsAndConditions.length > 0 || legalContent.privacyAndSecurityPolicy.length > 0) && (
