@@ -41,6 +41,13 @@ export class InventoryService {
     if (!assoc) throw new ForbiddenException('No tenés acceso a este club');
   }
 
+  private async assertCategoriesInClub(ids: number[], idClub: number) {
+    const unique = Array.from(new Set(ids));
+    if (unique.length === 0) return unique;
+    const found = await this.prisma.supply_Category.count({ where: { id: { in: unique }, idClub } });
+    if (found !== unique.length) throw new BadRequestException('Alguna categoría no pertenece a este club');
+    return unique;
+  }
   async createCategory(dto: CreateSupplyCategoryDto, user: RequestUser) {
     const club = await this.prisma.club.findUnique({ where: { id: dto.idClub } });
     if (!club) throw new NotFoundException('Club no encontrado');
@@ -71,29 +78,32 @@ export class InventoryService {
     return { message: 'Categoría eliminada correctamente' };
   }
 
-  async createSupplier(dto: CreateSupplierDto, user: RequestUser) {
+   async createSupplier(dto: CreateSupplierDto, user: RequestUser) {
     const club = await this.prisma.club.findUnique({ where: { id: dto.idClub } });
     if (!club) throw new NotFoundException('Club no encontrado');
     await this.assertClubAccess(dto.idClub, user);
+    const categoryIds = await this.assertCategoriesInClub(dto.categoryIds ?? [], dto.idClub);
 
-    const created = await this.prisma.supplier.create({
-      data: {
-        idClub: dto.idClub,
-        name: dto.name,
-        contactEmail: dto.contactEmail ?? null,
-        contactPhone: dto.contactPhone ?? null,
-        address: dto.address ?? null,
-        notes: dto.notes ?? null,
-        active: dto.active ?? true,
-      },
-    });
-
-    if (dto.categoryIds && dto.categoryIds.length > 0) {
-      await this.prisma.supplier_Category.createMany({
-        data: dto.categoryIds.map((idSupplyCategory) => ({ idSupplier: created.id, idSupplyCategory })),
-        skipDuplicates: true,
+    const created = await this.prisma.$transaction(async (tx) => {
+      const supplier = await tx.supplier.create({
+        data: {
+          idClub: dto.idClub,
+          name: dto.name,
+          contactEmail: dto.contactEmail ?? null,
+          contactPhone: dto.contactPhone ?? null,
+          address: dto.address ?? null,
+          notes: dto.notes ?? null,
+          active: dto.active ?? true,
+        },
       });
-    }
+      if (categoryIds.length > 0) {
+        await tx.supplier_Category.createMany({
+          data: categoryIds.map((idSupplyCategory) => ({ idSupplier: supplier.id, idSupplyCategory })),
+          skipDuplicates: true,
+        });
+      }
+      return supplier;
+    });
 
     return this.findSupplierById(created.id);
   }
@@ -123,17 +133,20 @@ export class InventoryService {
     await this.assertClubAccess(supplier.idClub, user);
 
     const { categoryIds, idClub, ...rest } = dto as any;
-    await this.prisma.supplier.update({ where: { id }, data: rest });
+    const validIds = categoryIds !== undefined ? await this.assertCategoriesInClub(categoryIds, supplier.idClub) : null;
 
-    if (categoryIds !== undefined) {
-      await this.prisma.supplier_Category.deleteMany({ where: { idSupplier: id } });
-      if (categoryIds.length > 0) {
-        await this.prisma.supplier_Category.createMany({
-          data: categoryIds.map((idSupplyCategory: number) => ({ idSupplier: id, idSupplyCategory })),
-          skipDuplicates: true,
-        });
+    await this.prisma.$transaction(async (tx) => {
+      await tx.supplier.update({ where: { id }, data: rest });
+      if (validIds) {
+        await tx.supplier_Category.deleteMany({ where: { idSupplier: id } });
+        if (validIds.length > 0) {
+          await tx.supplier_Category.createMany({
+            data: validIds.map((idSupplyCategory) => ({ idSupplier: id, idSupplyCategory })),
+            skipDuplicates: true,
+          });
+        }
       }
-    }
+    });
 
     return this.findSupplierById(id);
   }
@@ -189,8 +202,29 @@ export class InventoryService {
     const product = await this.prisma.product_Inventory.findUnique({ where: { id } });
     if (!product) throw new NotFoundException('Producto no encontrado');
     await this.assertClubAccess(product.idClub, user);
-    const { idClub, ...rest } = dto as any;
-    const updated = await this.prisma.product_Inventory.update({ where: { id }, data: rest });
+
+    const { idClub, idSupplyCategory, idSupplier, ...rest } = dto as any;
+    const data: any = { ...rest };
+
+    if (idSupplyCategory !== undefined && idSupplyCategory !== null) {
+      const category = await this.prisma.supply_Category.findUnique({ where: { id: idSupplyCategory } });
+      if (!category) throw new NotFoundException('Categoría no encontrada');
+      if (category.idClub !== product.idClub) throw new BadRequestException('La categoría no pertenece a este club');
+      data.idSupplyCategory = idSupplyCategory;
+    }
+
+    if (idSupplier !== undefined) {
+      if (idSupplier === null) {
+        data.idSupplier = null;
+      } else {
+        const supplier = await this.prisma.supplier.findUnique({ where: { id: idSupplier } });
+        if (!supplier) throw new NotFoundException('Proveedor no encontrado');
+        if (supplier.idClub !== product.idClub) throw new BadRequestException('El proveedor no pertenece a este club');
+        data.idSupplier = idSupplier;
+      }
+    }
+
+    const updated = await this.prisma.product_Inventory.update({ where: { id }, data });
     return sanitizeDecimal(sanitizeDates(updated, ['createdAt']), ['currentStock', 'minStock', 'costPerUnit']);
   }
 
@@ -244,20 +278,46 @@ export class InventoryService {
     await this.assertClubAccess(order.idClub, user);
 
     const { idClub, ...rest } = dto as any;
+
+    if (order.status === 'Recibido') {
+      const touchesMore = Object.keys(rest).some((key) => key !== 'notes' && rest[key] !== undefined);
+      if (touchesMore) throw new BadRequestException('Un pedido recibido ya no se puede modificar');
+    }
+
+    if (rest.idSupplier !== undefined) {
+      const supplier = await this.prisma.supplier.findUnique({ where: { id: rest.idSupplier } });
+      if (!supplier || supplier.idClub !== order.idClub) throw new BadRequestException('El proveedor no pertenece a este club');
+    }
+    if (rest.idProductInventory !== undefined) {
+      const product = await this.prisma.product_Inventory.findUnique({ where: { id: rest.idProductInventory } });
+      if (!product || product.idClub !== order.idClub) throw new BadRequestException('El producto no pertenece a este club');
+    }
+
     const data: any = { ...rest };
     if (dto.estimatedArrival !== undefined) data.estimatedArrival = dto.estimatedArrival ? new Date(dto.estimatedArrival) : null;
     if (dto.receivedDate !== undefined) data.receivedDate = dto.receivedDate ? new Date(dto.receivedDate) : null;
 
-    if (dto.status === 'Recibido' && order.status !== 'Recibido') {
-      data.receivedDate = data.receivedDate ?? new Date();
-      await this.prisma.product_Inventory.update({
-        where: { id: order.idProductInventory },
-        data: { currentStock: { increment: Number(order.quantity) } },
-      });
+    if (dto.status !== 'Recibido') {
+      const updated = await this.prisma.supply_Order.update({ where: { id }, data });
+      return sanitizeDecimal(sanitizeDates(updated, ['orderDate', 'estimatedArrival', 'receivedDate']), ['quantity', 'totalCost']);
     }
 
-    const updated = await this.prisma.supply_Order.update({ where: { id }, data });
-    return sanitizeDecimal(sanitizeDates(updated, ['orderDate', 'estimatedArrival', 'receivedDate']), ['quantity', 'totalCost']);
+    const received = await this.prisma.$transaction(async (tx) => {
+      const claimed = await tx.supply_Order.updateMany({
+        where: { id, status: { not: 'Recibido' } },
+        data: { ...data, receivedDate: data.receivedDate ?? new Date() },
+      });
+      if (claimed.count === 0) throw new BadRequestException('Este pedido ya fue recibido');
+
+      const current = await tx.supply_Order.findUniqueOrThrow({ where: { id } });
+      await tx.product_Inventory.update({
+        where: { id: current.idProductInventory },
+        data: { currentStock: { increment: Number(current.quantity) } },
+      });
+      return current;
+    });
+
+    return sanitizeDecimal(sanitizeDates(received, ['orderDate', 'estimatedArrival', 'receivedDate']), ['quantity', 'totalCost']);
   }
 
   async removeOrder(id: number, user: RequestUser) {

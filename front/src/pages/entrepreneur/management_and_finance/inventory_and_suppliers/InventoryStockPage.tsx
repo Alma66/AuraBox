@@ -1,9 +1,11 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import toast from 'react-hot-toast';
 import api, { getResponseData } from '../../../../api/config';
 import { useAuth } from '../../../../App';
+import ConfirmDialog from '../../../../components/admin/ConfirmDialog';
+import LoadError from '../../../../components/entrepreneur/LoadError';
 import { SupplyCategory, SupplierItem, ProductInventoryItem } from '../../../../types/inventory';
-import toast from 'react-hot-toast';
 
 const UNIT_OPTIONS = ['unidad', 'kg', 'gramos', 'litro', 'ml', 'paquete', 'metro', 'cm'];
 
@@ -34,6 +36,10 @@ const InventoryStockPage: React.FC = () => {
   const [suppliers, setSuppliers] = useState<SupplierItem[]>([]);
   const [products, setProducts] = useState<ProductInventoryItem[]>([]);
   const [loading, setLoading] = useState(true);
+  const [failed, setFailed] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [deleteTarget, setDeleteTarget] = useState<ProductInventoryItem | null>(null);
+  const [deleting, setDeleting] = useState(false);
 
   const [form, setForm] = useState(emptyForm);
   const [editingId, setEditingId] = useState<number | null>(null);
@@ -45,6 +51,7 @@ const InventoryStockPage: React.FC = () => {
   const fetchAll = useCallback(async () => {
     if (!idClub) return;
     setLoading(true);
+    setFailed(false);
     try {
       const [catsRes, supsRes, prodsRes] = await Promise.all([
         api.get(`/inventory/categories/by-club/${idClub}`),
@@ -54,8 +61,8 @@ const InventoryStockPage: React.FC = () => {
       setCategories(getResponseData(catsRes) || []);
       setSuppliers(getResponseData(supsRes) || []);
       setProducts(getResponseData(prodsRes) || []);
-    } catch (err) {
-      console.error(err);
+    } catch {
+      setFailed(true);
     } finally {
       setLoading(false);
     }
@@ -76,67 +83,64 @@ const InventoryStockPage: React.FC = () => {
   };
 
   const handleSubmit = async () => {
-    if (!form.name.trim() || !form.idSupplyCategory) {
+    if (saving) return;
+    const name = form.name.trim();
+    if (!name || !form.idSupplyCategory) {
       toast.error('Nombre y categoría son obligatorios');
+      return;
+    }
+    const currentStock = Number(form.currentStock);
+    const minStock = Number(form.minStock);
+    const costPerUnit = Number(form.costPerUnit);
+    if ([currentStock, minStock, costPerUnit].some((value) => !Number.isFinite(value) || value < 0)) {
+      toast.error('El stock, el mínimo y el costo no pueden ser negativos');
       return;
     }
     const payload = {
       idClub,
       idSupplyCategory: Number(form.idSupplyCategory),
-      idSupplier: form.idSupplier ? Number(form.idSupplier) : undefined,
-      name: form.name,
-      description: form.description || undefined,
+      idSupplier: form.idSupplier ? Number(form.idSupplier) : null,
+      name,
+      description: form.description.trim() || null,
       unitType: form.unitType,
-      currentStock: Number(form.currentStock),
-      minStock: Number(form.minStock),
-      costPerUnit: Number(form.costPerUnit),
+      currentStock,
+      minStock,
+      costPerUnit,
     };
+    setSaving(true);
     try {
       if (editingId) {
         await api.put(`/inventory/products/${editingId}`, payload);
+        toast.success('Insumo actualizado');
       } else {
         await api.post('/inventory/products', payload);
+        toast.success('Insumo agregado');
       }
       resetForm();
       fetchAll();
-    } catch (err) {
-      console.error(err);
-      toast.error('Error al guardar el producto');
+    } catch (err: any) {
+      const message = err?.response?.data?.message;
+      toast.error(typeof message === 'string' ? message : 'No se pudo guardar el insumo.');
+    } finally {
+      setSaving(false);
     }
   };
 
-  const removeProduct = (id: number) => {
-    toast(
-      (t) => (
-        <div className="flex flex-col gap-3">
-          <p className="text-sm font-medium">¿Eliminar este insumo del inventario?</p>
-          <div className="flex gap-2 justify-end">
-            <button
-              onClick={() => toast.dismiss(t.id)}
-              className="px-3 py-1 text-sm border border-aurora-cream/40 rounded-lg hover:bg-white/10"
-            >
-              Cancelar
-            </button>
-            <button
-              onClick={async () => {
-                toast.dismiss(t.id);
-                try {
-                  await api.delete(`/inventory/products/${id}`);
-                  fetchAll();
-                } catch (err: any) {
-                  console.error(err);
-                  toast.error(err?.response?.data?.message ?? 'Error al eliminar el insumo');
-                }
-              }}
-              className="px-3 py-1 text-sm bg-red-600 text-white rounded-lg hover:bg-red-700"
-            >
-              Eliminar
-            </button>
-          </div>
-        </div>
-      ),
-      { duration: Infinity }
-    );
+  const confirmRemove = async () => {
+    if (!deleteTarget) return;
+    setDeleting(true);
+    try {
+      await api.delete(`/inventory/products/${deleteTarget.id}`);
+      toast.success('Insumo eliminado');
+      if (editingId === deleteTarget.id) resetForm();
+      setDeleteTarget(null);
+      fetchAll();
+    } catch (err: any) {
+      toast.error(err?.response?.data?.message ?? 'No se pudo eliminar el insumo.');
+      setDeleteTarget(null);
+    } finally {
+      setDeleting(false);
+    }
   };
 
   const loadForEdit = (p: ProductInventoryItem) => {
@@ -187,7 +191,7 @@ const InventoryStockPage: React.FC = () => {
       p.costPerUnit,
     ]);
     const csv = [header, ...rows].map((r) => r.map((v) => `"${String(v).replace(/"/g, '""')}"`).join(',')).join('\n');
-    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
     link.href = url;
@@ -196,8 +200,22 @@ const InventoryStockPage: React.FC = () => {
     URL.revokeObjectURL(url);
   };
 
-  if (authLoading || loading) {
-    return <div className="text-center py-20 text-aurora-navy/60">Cargando stock e insumos...</div>;
+  if (authLoading || (loading && products.length === 0 && !failed)) {
+    return (
+      <div className="animate-pulse space-y-6 px-4 py-6 lg:px-8" aria-busy="true">
+        <div className="h-8 w-64 rounded bg-aurora-navy/10" />
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+          {[0, 1, 2].map((item) => (
+            <div key={item} className="h-24 rounded-xl bg-aurora-navy/10" />
+          ))}
+        </div>
+        <div className="h-64 rounded-xl bg-aurora-navy/10" />
+      </div>
+    );
+  }
+
+  if (failed) {
+    return <LoadError title="No pudimos cargar tu inventario." onRetry={fetchAll} />;
   }
 
   if (!idClub) {
@@ -224,17 +242,23 @@ const InventoryStockPage: React.FC = () => {
         </div>
       </div>
 
-      <div className="bg-white rounded-xl shadow-aurora-sm border border-aurora-navy/10 p-6">
-        <div className="border border-aurora-navy/10 rounded-xl p-5 mb-8 space-y-3">
+      <div className={`bg-white rounded-xl shadow-aurora-sm border border-aurora-navy/10 p-6 transition-opacity ${loading ? 'opacity-60' : ''}`}>
+        <form
+          onSubmit={(event) => {
+            event.preventDefault();
+            handleSubmit();
+          }}
+          className="border border-aurora-navy/10 rounded-xl p-5 mb-8 space-y-3"
+        >
           <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-            <input type="text" placeholder="Nombre del insumo" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} className={fieldClass} />
-            <select value={form.idSupplyCategory} onChange={(e) => setForm({ ...form, idSupplyCategory: e.target.value })} className={fieldClass}>
+            <input type="text" aria-label="Nombre del insumo" maxLength={120} placeholder="Nombre del insumo" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} className={fieldClass} />
+            <select aria-label="Categoría" value={form.idSupplyCategory} onChange={(e) => setForm({ ...form, idSupplyCategory: e.target.value })} className={fieldClass}>
               <option value="">Categoría</option>
               {categories.map((c) => (
                 <option key={c.id} value={c.id}>{c.name}</option>
               ))}
             </select>
-            <select value={form.idSupplier} onChange={(e) => setForm({ ...form, idSupplier: e.target.value })} className={fieldClass}>
+            <select aria-label="Proveedor habitual" value={form.idSupplier} onChange={(e) => setForm({ ...form, idSupplier: e.target.value })} className={fieldClass}>
               <option value="">Proveedor habitual (opcional)</option>
               {suppliers.map((s) => (
                 <option key={s.id} value={s.id}>{s.name}</option>
@@ -242,37 +266,37 @@ const InventoryStockPage: React.FC = () => {
             </select>
           </div>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-            <select value={form.unitType} onChange={(e) => setForm({ ...form, unitType: e.target.value })} className={fieldClass}>
+            <select aria-label="Unidad" value={form.unitType} onChange={(e) => setForm({ ...form, unitType: e.target.value })} className={fieldClass}>
               {UNIT_OPTIONS.map((u) => (
                 <option key={u} value={u}>{u}</option>
               ))}
             </select>
-            <input type="number" placeholder="Stock actual" value={form.currentStock} onChange={(e) => setForm({ ...form, currentStock: e.target.value })} className={fieldClass} />
-            <input type="number" placeholder="Stock mínimo" value={form.minStock} onChange={(e) => setForm({ ...form, minStock: e.target.value })} className={fieldClass} />
-            <input type="number" placeholder="Costo por unidad" value={form.costPerUnit} onChange={(e) => setForm({ ...form, costPerUnit: e.target.value })} className={fieldClass} />
+            <input type="number" min="0" step="any" aria-label="Stock actual" placeholder="Stock actual" value={form.currentStock} onChange={(e) => setForm({ ...form, currentStock: e.target.value })} className={fieldClass} />
+            <input type="number" min="0" step="any" aria-label="Stock mínimo" placeholder="Stock mínimo" value={form.minStock} onChange={(e) => setForm({ ...form, minStock: e.target.value })} className={fieldClass} />
+            <input type="number" min="0" step="any" aria-label="Costo por unidad" placeholder="Costo por unidad" value={form.costPerUnit} onChange={(e) => setForm({ ...form, costPerUnit: e.target.value })} className={fieldClass} />
           </div>
-          <input type="text" placeholder="Descripción (opcional)" value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} className={`w-full ${fieldClass}`} />
+          <input type="text" aria-label="Descripción" maxLength={300} placeholder="Descripción (opcional)" value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} className={`w-full ${fieldClass}`} />
           <div className="flex gap-3">
-            <button onClick={handleSubmit} className="px-4 py-2 bg-aurora-terracotta text-white text-sm font-medium rounded-lg hover:bg-aurora-terracottaDark">
-              {editingId ? 'Guardar cambios' : 'Agregar insumo'}
+            <button type="submit" disabled={saving} className="px-4 py-2 bg-aurora-terracotta text-white text-sm font-medium rounded-lg hover:bg-aurora-terracottaDark disabled:cursor-not-allowed disabled:opacity-60">
+              {saving ? 'Guardando...' : editingId ? 'Guardar cambios' : 'Agregar insumo'}
             </button>
             {editingId && (
-              <button onClick={resetForm} className="px-4 py-2 bg-aurora-navy/10 text-aurora-navy text-sm font-medium rounded-lg hover:bg-aurora-navy/15">
+              <button type="button" onClick={resetForm} className="px-4 py-2 bg-aurora-navy/10 text-aurora-navy text-sm font-medium rounded-lg hover:bg-aurora-navy/15">
                 Cancelar
               </button>
             )}
           </div>
-        </div>
+        </form>
 
         <div className="flex flex-wrap items-center gap-3 mb-4">
-          <input type="text" placeholder="Buscar por nombre..." value={search} onChange={(e) => setSearch(e.target.value)} className={`${fieldClass} flex-1 min-w-[180px]`} />
-          <select value={filterCategory} onChange={(e) => setFilterCategory(e.target.value)} className={fieldClass}>
+          <input type="search" aria-label="Buscar por nombre" placeholder="Buscar por nombre..." value={search} onChange={(e) => setSearch(e.target.value)} className={`${fieldClass} flex-1 min-w-[180px]`} />
+          <select aria-label="Filtrar por categoría" value={filterCategory} onChange={(e) => setFilterCategory(e.target.value)} className={fieldClass}>
             <option value="all">Todas las categorías</option>
             {categories.map((c) => (
               <option key={c.id} value={c.id}>{c.name}</option>
             ))}
           </select>
-          <select value={sortKey} onChange={(e) => setSortKey(e.target.value as SortKey)} className={fieldClass}>
+          <select aria-label="Ordenar por" value={sortKey} onChange={(e) => setSortKey(e.target.value as SortKey)} className={fieldClass}>
             <option value="name">Ordenar: Nombre</option>
             <option value="stock">Ordenar: Stock</option>
             <option value="cost">Ordenar: Costo</option>
@@ -281,7 +305,7 @@ const InventoryStockPage: React.FC = () => {
             <input type="checkbox" checked={filterLowStock} onChange={(e) => setFilterLowStock(e.target.checked)} className="mr-2 h-4 w-4 rounded border-aurora-navy/25 text-aurora-terracotta focus:ring-aurora-terracotta" />
             Solo stock bajo
           </label>
-          <button onClick={exportCsv} className="ml-auto px-4 py-2 bg-aurora-navy/10 text-aurora-navy text-sm font-medium rounded-lg hover:bg-aurora-navy/15">
+          <button type="button" onClick={exportCsv} disabled={filtered.length === 0} className="ml-auto px-4 py-2 bg-aurora-navy/10 text-aurora-navy text-sm font-medium rounded-lg hover:bg-aurora-navy/15 disabled:cursor-not-allowed disabled:opacity-50">
             Exportar CSV
           </button>
         </div>
@@ -290,13 +314,13 @@ const InventoryStockPage: React.FC = () => {
           <table className="min-w-full divide-y divide-aurora-navy/10">
             <thead className="bg-aurora-cream">
               <tr>
-                <th className={`${thClass} text-left`}>Nombre</th>
-                <th className={`${thClass} text-left`}>Categoría</th>
-                <th className={`${thClass} text-left`}>Proveedor</th>
-                <th className={`${thClass} text-right`}>Stock</th>
-                <th className={`${thClass} text-right`}>Mínimo</th>
-                <th className={`${thClass} text-right`}>Costo/u</th>
-                <th className={`${thClass} text-center`}>Acciones</th>
+                <th scope="col" className={`${thClass} text-left`}>Nombre</th>
+                <th scope="col" className={`${thClass} text-left`}>Categoría</th>
+                <th scope="col" className={`${thClass} text-left`}>Proveedor</th>
+                <th scope="col" className={`${thClass} text-right`}>Stock</th>
+                <th scope="col" className={`${thClass} text-right`}>Mínimo</th>
+                <th scope="col" className={`${thClass} text-right`}>Costo/u</th>
+                <th scope="col" className={`${thClass} text-center`}>Acciones</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-aurora-navy/10">
@@ -304,17 +328,20 @@ const InventoryStockPage: React.FC = () => {
                 const low = Number(p.currentStock) <= Number(p.minStock);
                 return (
                   <tr key={p.id} className={low ? 'bg-red-50' : ''}>
-                    <td className="px-4 py-3 text-sm font-medium text-aurora-navy">{p.name}</td>
+                    <td className="px-4 py-3 text-sm font-medium text-aurora-navy">
+                      {p.name}
+                      {low && <span className="ml-2 rounded-full bg-red-100 px-2 py-0.5 text-xs font-semibold text-red-700">Stock bajo</span>}
+                    </td>
                     <td className="px-4 py-3 text-sm text-aurora-navy/70">{categoryName(p.idSupplyCategory)}</td>
                     <td className="px-4 py-3 text-sm text-aurora-navy/70">{supplierName(p.idSupplier)}</td>
                     <td className="px-4 py-3 text-sm text-aurora-navy text-right">{p.currentStock} {p.unitType}</td>
                     <td className="px-4 py-3 text-sm text-aurora-navy/70 text-right">{p.minStock}</td>
                     <td className="px-4 py-3 text-sm text-aurora-navy/70 text-right">${Number(p.costPerUnit).toLocaleString('es-AR')}</td>
-                    <td className="px-4 py-3 text-center">
-                      <button onClick={() => loadForEdit(p)} className="text-xs font-medium px-2 py-1 rounded bg-aurora-terracotta/10 text-aurora-terracottaDark hover:bg-aurora-terracotta/20 mr-1">
+                    <td className="px-4 py-3 text-center whitespace-nowrap">
+                      <button type="button" onClick={() => loadForEdit(p)} aria-label={`Editar ${p.name}`} className="text-xs font-medium px-2 py-1 rounded bg-aurora-terracotta/10 text-aurora-terracottaDark hover:bg-aurora-terracotta/20 mr-1">
                         Editar
                       </button>
-                      <button onClick={() => removeProduct(p.id)} className="text-xs font-medium px-2 py-1 rounded bg-red-50 text-red-600 hover:bg-red-100">
+                      <button type="button" onClick={() => setDeleteTarget(p)} aria-label={`Eliminar ${p.name}`} className="text-xs font-medium px-2 py-1 rounded bg-red-50 text-red-600 hover:bg-red-100">
                         Eliminar
                       </button>
                     </td>
@@ -323,9 +350,25 @@ const InventoryStockPage: React.FC = () => {
               })}
             </tbody>
           </table>
-          {filtered.length === 0 && <p className="text-center py-8 text-aurora-navy/60">No hay insumos para mostrar.</p>}
+          {filtered.length === 0 && (
+            <p className="text-center py-8 text-aurora-navy/60">
+              {products.length === 0 ? 'Todavía no cargaste insumos.' : 'No hay insumos que coincidan con los filtros.'}
+            </p>
+          )}
         </div>
       </div>
+
+      {deleteTarget && (
+        <ConfirmDialog
+          title="Eliminar insumo"
+          description={`Se va a eliminar "${deleteTarget.name}" del inventario. Si tiene pedidos asociados, no se va a poder eliminar.`}
+          confirmLabel="Eliminar"
+          danger
+          saving={deleting}
+          onConfirm={confirmRemove}
+          onCancel={() => setDeleteTarget(null)}
+        />
+      )}
     </div>
   );
 };

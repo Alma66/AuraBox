@@ -1,4 +1,4 @@
-import { IsInt, IsNumber, Min, IsOptional, IsDateString, IsString, IsEnum } from 'class-validator';
+import { IsInt, IsNumber, Min, Max, IsOptional, IsDateString, IsString, IsEnum, MaxLength } from 'class-validator';
 import { SupplyOrderStatus } from '@prisma/client';
 
 export class CreateSupplyOrderDto {
@@ -11,12 +11,14 @@ export class CreateSupplyOrderDto {
   @IsInt()
   idProductInventory!: number;
 
-  @IsNumber()
-  @Min(0.01)
+  @IsNumber({ maxDecimalPlaces: 3 })
+  @Min(0.01, { message: 'La cantidad debe ser mayor a 0' })
+  @Max(100000000)
   quantity!: number;
 
-  @IsNumber()
-  @Min(0)
+  @IsNumber({ maxDecimalPlaces: 2 })
+  @Min(0, { message: 'El costo no puede ser negativo' })
+  @Max(100000000)
   totalCost!: number;
 
   @IsOptional()
@@ -29,5 +31,6 @@ export class CreateSupplyOrderDto {
 
   @IsOptional()
   @IsString()
+  @MaxLength(500)
   notes?: string;
 }
