@@ -84,6 +84,10 @@ export class UpdateUserDto {
 
   @IsOptional()
   @IsString()
+  locality?: string;
+
+  @IsOptional()
+  @IsString()
   postalCode?: string;
 
   @IsOptional()

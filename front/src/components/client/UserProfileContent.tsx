@@ -129,7 +129,7 @@ const UserProfileContent: React.FC<UserProfileContentProps> = ({ activeSection, 
         floorNumber: locationData.floor,
         addressDetails: locationData.details,
         city: locationData.city,
-        province: locationData.locality || locationData.city,
+        locality: locationData.locality,
         postalCode: locationData.postalCode,
         country: locationData.country,
       });
@@ -236,7 +236,7 @@ const UserProfileContent: React.FC<UserProfileContentProps> = ({ activeSection, 
             <LocationSection
               country={user.country || ''}
               city={user.city || ''}
-              locality={user.province || user.locality || ''}
+              locality={user.locality || user.province || ''}
               postalCode={user.postalCode || ''}
               street={user.streetAddress || user.street || ''}
               streetNumber={user.addressNumber ? String(user.addressNumber) : (user.streetNumber || '')}

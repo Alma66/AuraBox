@@ -363,6 +363,7 @@ export class CartItemService {
           addressNumber: Number.isNaN(streetNumber) ? undefined : streetNumber,
           city: dto.address.city,
           province: dto.address.province,
+          locality: dto.address.locality,          
           postalCode: dto.address.postalCode,
           addressDetails: dto.address.instructions || null,
         },

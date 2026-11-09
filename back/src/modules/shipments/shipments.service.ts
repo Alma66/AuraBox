@@ -135,7 +135,7 @@ export class ShipmentsService {
         shippingCost: courier.fee,
         street: user.streetAddress,
         addressNumber: user.addressNumber ? String(user.addressNumber) : null,
-        locality: user.addressDetails,
+         locality: user.locality ?? user.city,
         city: user.city,
         postalCode: user.postalCode,
         province: user.province,
@@ -173,7 +173,7 @@ export class ShipmentsService {
       select: {
         id: true, firstName: true, lastName: true, email: true, phoneNumber: true,
         streetAddress: true, addressNumber: true, floorNumber: true, addressDetails: true,
-        city: true, postalCode: true, province: true,
+        city: true, postalCode: true, province: true, locality: true,
       },
     });
     const usersById = new Map<number, (typeof users)[number]>(users.map((u) => [u.id, u] as [number, (typeof users)[number]]));

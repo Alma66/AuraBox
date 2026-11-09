@@ -132,6 +132,7 @@ const LocationSection: React.FC<LocationSectionProps> = ({
   }, [coordinates, street, streetNumber, city, locality, country, isEntrepreneurProfile]);
 
   const endpoint = userRole === 'entrepreneur' ? '/entrepreneurs/me' : '/users/me';
+  const localityField = userRole === 'entrepreneur' ? 'province' : 'locality';
   const verifyEndpoint = userRole === 'entrepreneur' ? '/entrepreneurs/me/verify-password' : '/users/me/verify-password';
 
   const showFeedback = (success?: string, error?: string) => {
@@ -190,7 +191,7 @@ const LocationSection: React.FC<LocationSectionProps> = ({
         streetAddress: nextStreet,
         addressNumber: nextStreetNumber ? parseInt(nextStreetNumber) : null,
         city: nextCity,
-        province: nextLocality,
+        [localityField]: nextLocality,
         postalCode: nextPostalCode,
       });
       onSave({
@@ -258,7 +259,7 @@ const LocationSection: React.FC<LocationSectionProps> = ({
           {availableLocalities.map((c) => <option key={c} value={c} />)}
         </datalist>
         <button onClick={async () => {
-          await persistLocation({ province: editedLocality });
+          await persistLocation({ [localityField]: editedLocality });
           setIsEditingLocality(false);
         }} className="mt-3 bg-aurora-terracotta text-white px-4 py-2 rounded-lg hover:bg-aurora-terracottaDark transition-colors duration-200 text-sm font-semibold">
           Guardar Localidad

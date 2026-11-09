@@ -22,6 +22,7 @@ const USER_SELECT = {
   addressDetails: true,
   city: true,
   province: true,
+  locality: true,
   postalCode: true,
   active: true,
   acceptsNewsletter: true,
@@ -119,6 +120,7 @@ export class UsersService {
     if (dto.addressDetails !== undefined) data.addressDetails = dto.addressDetails;
     if (dto.city !== undefined)          data.city          = dto.city;
     if (dto.province !== undefined)      data.province      = dto.province;
+    if (dto.locality !== undefined)      data.locality      = dto.locality;   
     if (dto.postalCode !== undefined)    data.postalCode    = dto.postalCode;
     if (dto.acceptsNewsletter !== undefined) data.acceptsNewsletter = dto.acceptsNewsletter;
     if (dto.gender !== undefined)        data.gender        = dto.gender;

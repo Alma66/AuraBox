@@ -599,6 +599,7 @@ model User {
   addressDetails    String?      @map("Address_Details")
   city              String?      @map("City")
   province          String?      @map("Province")
+  locality          String?      @map("Locality")
   postalCode        String?      @map("Postal_Code")
   active            Boolean      @default(true) @map("Active")
   birthDate         DateTime?    @map("Birth_Date")
