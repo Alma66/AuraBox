@@ -58,6 +58,7 @@ import SettingsPage from './pages/entrepreneur/administration_tools/SettingsPage
 import FinancePage from './pages/entrepreneur/management_and_finance/FinancePage';
 import InventoryPage from './pages/entrepreneur/management_and_finance/InventoryPage';
 
+import AdminInboxPage from './pages/admin/AdminInboxPage';
 import AdminDashboardPage from './pages/admin/AdminDashboardPage';
 import AdminClubsPage from './pages/admin/AdminClubsPage';
 import AdminLicensesPage from './pages/admin/AdminLicensesPage';
@@ -319,6 +320,7 @@ const AppContent: React.FC = () => {
 
       <Route path="/admin" element={<Navigate to="/admin/dashboard" replace />} />
       <Route path="/admin/dashboard" element={pr(['admin'], <AdminDashboardPage />)} />
+            <Route path="/admin/inbox" element={pr(['admin'], <AdminInboxPage />)} />
       <Route path="/admin/clubs" element={pr(['admin'], <AdminClubsPage />)} />
       <Route path="/admin/licenses" element={pr(['admin'], <AdminLicensesPage />)} />
       <Route path="/admin/users" element={pr(['admin'], <AdminUsersPage />)} />
