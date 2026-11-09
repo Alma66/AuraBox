@@ -16,11 +16,13 @@ const ProfitabilityPage: React.FC = () => {
   const [breakdown, setBreakdown] = useState<ProfitabilityBreakdownItem[]>([]);
   const [totals, setTotals] = useState<ProfitabilityTotals | null>(null);
   const [loading, setLoading] = useState(true);
+  const [failed, setFailed] = useState(false);
   const [sortKey, setSortKey] = useState<SortKey>('revenue');
 
   const fetchData = useCallback(async () => {
     if (!actualClubId) return;
     setLoading(true);
+    setFailed(false);
     try {
       const [clubResponse, profitResponse] = await Promise.all([
         api.get(`/clubs/${actualClubId}`),
@@ -60,6 +62,24 @@ const ProfitabilityPage: React.FC = () => {
     return <div className="text-center py-20 text-aurora-navy/60">Cargando costos y rentabilidad...</div>;
   }
 
+  if (failed) {
+    return (
+      <div className="px-4 py-6 lg:px-8">
+        <div role="alert" className="rounded-2xl border border-red-200 bg-red-50 p-6 text-sm text-red-700">
+          <p className="font-semibold">No pudimos calcular tu rentabilidad.</p>
+          <p className="mt-1">Revisá tu conexión e intentá de nuevo.</p>
+          <button
+            type="button"
+            onClick={fetchData}
+            className="mt-4 min-h-[44px] rounded-lg bg-red-600 px-4 text-sm font-semibold text-white hover:bg-red-700"
+          >
+            Reintentar
+          </button>
+        </div>
+      </div>
+    );
+  }
+  
   return (
     <div className="px-4 py-6 lg:px-8">
       <h1 className="text-2xl font-serif font-bold text-aurora-navy mb-2">Costos y Rentabilidad — {clubName}</h1>
@@ -93,7 +113,7 @@ const ProfitabilityPage: React.FC = () => {
       <div className="bg-white rounded-xl shadow-aurora-sm border border-aurora-navy/10 p-6">
         <div className="flex justify-between items-center mb-4">
           <h2 className="text-lg font-serif font-bold text-aurora-navy">Margen por suscripción</h2>
-          <select value={sortKey} onChange={(e) => setSortKey(e.target.value as SortKey)} className="px-3 py-2 border border-aurora-navy/15 rounded-lg text-sm">
+          <select aria-label="Ordenar por" value={sortKey} onChange={(e) => setSortKey(e.target.value as SortKey)} className="px-3 py-2 border border-aurora-navy/15 rounded-lg text-sm">
             <option value="revenue">Ordenar: Ingresos</option>
             <option value="margin">Ordenar: Margen neto</option>
             <option value="marginPercent">Ordenar: Margen %</option>
