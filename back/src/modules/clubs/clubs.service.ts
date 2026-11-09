@@ -369,7 +369,7 @@ export class ClubsService {
         floorNumber: true,
         addressDetails: true,
         city: true,
-        province: true,
+        locality: true,
         postalCode: true,
         active: true,
         registrationDate: true,
@@ -392,6 +392,7 @@ export class ClubsService {
         addressDetails: current ? u.addressDetails : null,
         city: u.city,
         province: u.province,
+        locality: current ? u.locality : null,
         postalCode: current ? u.postalCode : null,
       };
     });
