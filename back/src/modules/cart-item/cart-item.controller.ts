@@ -8,6 +8,7 @@ import { CheckoutCartDto } from './dto/checkout-cart.dto';
 import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
 import { RolesGuard } from '../auth/roles.guard';
 import { Roles } from '../auth/roles.decorator';
+import { Throttle } from '@nestjs/throttler';
 
 @Controller('cart-items')
 @UseGuards(JwtAuthGuard, RolesGuard)
@@ -32,6 +33,7 @@ export class CartItemController {
   }
 
   @Post('checkout')
+  @Throttle({ default: { limit: 10, ttl: 60000 } })
   @UsePipes(new ValidationPipe({ whitelist: true, transform: true }))
   async checkout(@Body() dto: CheckoutCartDto, @Request() req) {
     return this.cartItemService.checkout(req.user.id, dto);

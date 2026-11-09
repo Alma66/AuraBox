@@ -306,6 +306,13 @@ export class CartItemService {
     const streetNumber = parseInt(dto.address.streetNumber, 10);
 
     const created = await this.prisma.$transaction(async (tx) => {
+      const cleared = await tx.cart_Item.deleteMany({
+        where: { idUser, idSubscriptionTypes: { in: toCreate.map((entry) => entry.plan.id) } },
+      });
+      if (cleared.count !== toCreate.length) {
+        throw new BadRequestException('Tu carrito cambió mientras comprabas. Recargalo e intentá de nuevo.');
+      }
+
       const results: any[] = [];
 
       for (const { plan, amount } of toCreate) {
@@ -369,7 +376,7 @@ export class CartItemService {
         },
       });
 
-      await tx.cart_Item.deleteMany({ where: { idUser } });
+
       return results;
     });
 
