@@ -15,7 +15,7 @@ const FREQUENCIES = Object.values(Frequency) as string[];
 
 export type ChatDetail = 'brief' | 'detailed';
 
-interface ChatResult {
+export interface ChatResult {
   reply: string;
   blocked: boolean;
   clubs?: ClubCard[];
