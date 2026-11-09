@@ -12,6 +12,7 @@ import ClubLegalInfo from '../../../../components/club/ClubLegalInfo';
 import ClubPaymentShippingInfo from '../../../../components/club/ClubPaymentShippingInfo';
 import ClubFeaturedReviews from '../../../../components/club/ClubFeaturedReviews';
 import { LegalSection } from '../../../../types/legalSection';
+import SafeImage from '../../../../components/common/SafeImage';
 
 const bannerSliderSettings = {
   dots: true,
@@ -188,16 +189,20 @@ const ClubDetailPage: React.FC = () => {
     setTimeout(() => setToast(null), 3500);
   };
 
+  const loadedClubId = useRef<string | undefined>(undefined);
+
   const fetchClub = useCallback(async () => {
     try {
-      setLoading(true);
+      if (loadedClubId.current !== clubId) setLoading(true);
+      setError('');
       const response = await api.get(`/clubs/${clubId}`);
       const data: ClubData = getResponseData(response);
       setClub(data);
       setEditDescription(data.shortDescription || '');
       setSocialNetworks(data.socialNetworksRaw || []);
-    } catch {
-      setError('Error al cargar el club.');
+      loadedClubId.current = clubId;
+    } catch (err: any) {
+      setError(err?.response?.status === 404 ? 'not-found' : 'load');
     } finally {
       setLoading(false);
     }
@@ -206,6 +211,15 @@ const ClubDetailPage: React.FC = () => {
   useEffect(() => {
     if (clubId) fetchClub();
   }, [clubId, fetchClub]);
+
+  useEffect(() => {
+    if (!club?.name) return;
+    const previousTitle = document.title;
+    document.title = `${club.name} — AuraBox`;
+    return () => {
+      document.title = previousTitle;
+    };
+  }, [club?.name]);
 
   useEffect(() => {
     const checkFavorites = async () => {
@@ -461,14 +475,26 @@ const ClubDetailPage: React.FC = () => {
     );
   }
 
-  if (error || !club) {
+    if (error || !club) {
+    const notFound = error !== 'load';
     return (
-      <div className="container mx-auto px-4 py-16 text-center">
-        <h1 className="text-3xl font-serif font-bold text-aurora-navy mb-3">Club no encontrado</h1>
-        <p className="text-aurora-navy/60 mb-8">El club que buscás no existe o fue eliminado.</p>
-        <button onClick={() => navigate('/')} className="bg-aurora-terracotta text-white px-6 py-3 rounded-xl font-semibold hover:bg-aurora-terracottaDark transition-colors shadow-sm">
-          Volver al inicio
-        </button>
+      <div role="alert" className="container mx-auto px-4 py-16 text-center">
+        <h1 className="text-3xl font-serif font-bold text-aurora-navy mb-3">
+          {notFound ? 'Club no encontrado' : 'No pudimos cargar el club'}
+        </h1>
+        <p className="text-aurora-navy/60 mb-8">
+          {notFound ? 'El club que buscás no existe o fue eliminado.' : 'Revisá tu conexión e intentá de nuevo.'}
+        </p>
+        <div className="flex flex-wrap justify-center gap-3">
+          {!notFound && (
+            <button type="button" onClick={fetchClub} className="btn-primary">
+              Reintentar
+            </button>
+          )}
+          <button type="button" onClick={() => navigate('/explore')} className={notFound ? 'btn-primary' : 'btn-outline'}>
+            Explorar clubes
+          </button>
+        </div>
       </div>
     );
   }
@@ -628,7 +654,7 @@ const ClubDetailPage: React.FC = () => {
             <Slider {...bannerSliderSettings}>
               {bannerList.map((imgSrc, index) => (
                 <div key={index}>
-                  <img src={imgSrc} alt={`Banner ${index + 1}`} className="w-full h-72 md:h-96 object-cover object-center" />
+                  <SafeImage src={imgSrc} alt={`Banner ${index + 1}`} fallbackIcon="📦" className="w-full h-72 md:h-96 object-cover object-center" />
                 </div>
               ))}
             </Slider>
@@ -641,7 +667,7 @@ const ClubDetailPage: React.FC = () => {
           <div className="relative flex-shrink-0 -mb-16">
             <div className="w-28 h-28 md:w-32 md:h-32 rounded-full border-4 border-white shadow-2xl overflow-hidden bg-white">
               {logoSrc ? (
-                <img src={logoSrc} alt={`${club.name} logo`} className="w-full h-full object-cover" />
+                <SafeImage src={logoSrc} alt={`${club.name} logo`} className="w-full h-full object-cover" />
               ) : (
                 <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-aurora-navy to-aurora-terracotta">
                   <span className="text-white text-3xl font-serif font-bold">{club.name?.charAt(0)}</span>
@@ -964,8 +990,10 @@ const ClubDetailPage: React.FC = () => {
                         className={`absolute top-3 right-3 z-10 p-2 rounded-full shadow-md transition-colors disabled:opacity-50 ${
                           isPlanFavorite ? 'bg-red-500 text-white' : 'bg-white/90 text-aurora-navy/40 hover:text-red-500'
                         }`}
-                        title={isPlanFavorite ? 'Quitar de favoritos' : 'Guardar en favoritos'}
-                      >
+                         title={isPlanFavorite ? 'Quitar de favoritos' : 'Guardar en favoritos'}
+                        aria-label={isPlanFavorite ? `Quitar ${plan.name} de favoritos` : `Guardar ${plan.name} en favoritos`}
+                        aria-pressed={isPlanFavorite}
+                     >
                         <svg className="h-4 w-4" viewBox="0 0 20 20" fill={isPlanFavorite ? 'currentColor' : 'none'} stroke="currentColor">
                           <path strokeWidth={isPlanFavorite ? 0 : 1.5} fillRule="evenodd" d="M3.172 5.172a4.5 4.5 0 015.656 0L10 6.343l1.172-1.171a4.5 4.5 0 115.656 5.656L10 17.657l-6.828-6.829a4.5 4.5 0 010-5.656z" clipRule="evenodd" />
                         </svg>
