@@ -6,6 +6,7 @@ import { ValidationPipe } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { AdminPanelModule } from './modules/admin-panel/admin-panel.module';
+import { AssistantModule } from './modules/assistant/assistant.module';
 import { ConfigModule } from '@nestjs/config';
 import { CloudinaryModule } from './modules/cloudinary/cloudinary.module';
 import { PrismaModule } from './prisma/prisma.module';
@@ -79,6 +80,7 @@ if (!jwtSecret) {
     AdminPanelModule,
     AdminsModule,
     AuthModule,
+    AssistantModule,
     BoxContentHistoryModule,
     BillingModule,
     ClubBillingModule,
