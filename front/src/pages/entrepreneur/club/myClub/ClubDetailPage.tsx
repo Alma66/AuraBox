@@ -174,8 +174,7 @@ const ClubDetailPage: React.FC = () => {
   const [confirmDeleteBannerId, setConfirmDeleteBannerId] = useState<number | null>(null);
   const [confirmDeleteSocialId, setConfirmDeleteSocialId] = useState<number | null>(null);
   const [toast, setToast] = useState<{ msg: string; type: 'success' | 'error' } | null>(null);
-  const [favoritePlanIds, setFavoritePlanIds] = useState<Set<number>>(new Set());
-  const [favoriteLoadingId, setFavoriteLoadingId] = useState<number | null>(null);
+
   const [legalContent, setLegalContent] = useState<{ termsAndConditions: LegalSection[]; privacyAndSecurityPolicy: LegalSection[] }>({ termsAndConditions: [], privacyAndSecurityPolicy: [] });
   const logoInputRef = useRef<HTMLInputElement>(null);
   const bannerInputRef = useRef<HTMLInputElement>(null);
@@ -221,23 +220,7 @@ const ClubDetailPage: React.FC = () => {
     };
   }, [club?.name]);
 
-  useEffect(() => {
-    const checkFavorites = async () => {
-      if (userRole !== 'customer' || !club?.subscriptionPlans?.length) return;
-      try {
-        const results = await Promise.all(
-          club.subscriptionPlans.map((plan) =>
-            api.get(`/favorites/check/${plan.planId}`).then((res) => ({
-              planId: Number(plan.planId),
-              isFavorite: getResponseData(res)?.isFavorite ?? false,
-            })),
-          ),
-        );
-        setFavoritePlanIds(new Set(results.filter((r) => r.isFavorite).map((r) => r.planId)));
-      } catch {}
-    };
-    checkFavorites();
-  }, [club, userRole]);
+
 
   useEffect(() => {
     const fetchLegalContent = async () => {
@@ -444,23 +427,7 @@ const ClubDetailPage: React.FC = () => {
     }
   };
 
-  const handleTogglePlanFavorite = async (planId: number) => {
-    setFavoriteLoadingId(planId);
-    try {
-      const res = await api.post(`/favorites/toggle/${planId}`);
-      const isFav = getResponseData(res)?.isFavorite ?? false;
-      setFavoritePlanIds((prev) => {
-        const next = new Set(prev);
-        if (isFav) next.add(planId);
-        else next.delete(planId);
-        return next;
-      });
-    } catch {
-      showToast('No se pudo actualizar favoritos', 'error');
-    } finally {
-      setFavoriteLoadingId(null);
-    }
-  };
+
 
   if (loading) {
     return (
@@ -979,26 +946,8 @@ const ClubDetailPage: React.FC = () => {
                   cashDiscount: plan.cashDiscount,
                   transferDiscount: plan.transferDiscount,
                 };
-                const numericPlanId = Number(plan.planId);
-                const isPlanFavorite = favoritePlanIds.has(numericPlanId);
-                return (
+               return (
                   <div key={plan.planId} className="relative">
-                    {!isOwner && userRole === 'customer' && (
-                      <button
-                        onClick={() => handleTogglePlanFavorite(numericPlanId)}
-                        disabled={favoriteLoadingId === numericPlanId}
-                        className={`absolute top-3 right-3 z-10 p-2 rounded-full shadow-md transition-colors disabled:opacity-50 ${
-                          isPlanFavorite ? 'bg-red-500 text-white' : 'bg-white/90 text-aurora-navy/40 hover:text-red-500'
-                        }`}
-                         title={isPlanFavorite ? 'Quitar de favoritos' : 'Guardar en favoritos'}
-                        aria-label={isPlanFavorite ? `Quitar ${plan.name} de favoritos` : `Guardar ${plan.name} en favoritos`}
-                        aria-pressed={isPlanFavorite}
-                     >
-                        <svg className="h-4 w-4" viewBox="0 0 20 20" fill={isPlanFavorite ? 'currentColor' : 'none'} stroke="currentColor">
-                          <path strokeWidth={isPlanFavorite ? 0 : 1.5} fillRule="evenodd" d="M3.172 5.172a4.5 4.5 0 015.656 0L10 6.343l1.172-1.171a4.5 4.5 0 115.656 5.656L10 17.657l-6.828-6.829a4.5 4.5 0 010-5.656z" clipRule="evenodd" />
-                        </svg>
-                      </button>
-                    )}
                     <SubscriptionPlanCard plan={planForCard} clubName={club.name} detailsLink={`/club/${club.id}/plan/${plan.planId}`} />
                   </div>
                 );

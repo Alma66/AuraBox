@@ -4,9 +4,11 @@ import api, { getResponseData } from '../api/config';
 import { useAuth } from '../App';
 import { Club, SubscriptionPlan } from '../types/club';
 import { Review, ReviewEligibility, ReviewSummary } from '../types/review';
+import SafeImage from '../components/common/SafeImage';
 
 const REVIEWS_PAGE_SIZE = 5;
 const MAX_MEDIA = 5;
+const money = (value: number) => `ARS ${value.toLocaleString('es-AR', { maximumFractionDigits: 0 })}`;
 
 const StarsDisplay: React.FC<{ rating: number; size?: string }> = ({ rating, size = 'w-4 h-4' }) => (
   <div className="flex">
@@ -31,6 +33,8 @@ const SubscriptionPlanDetailPage: React.FC = () => {
   const [club, setClub] = useState<Club | null>(null);
   const [plan, setPlan] = useState<SubscriptionPlan | null>(null);
   const [loading, setLoading] = useState(true);
+  const [loadFailed, setLoadFailed] = useState(false);
+  const [reloadKey, setReloadKey] = useState(0);
 
   const [subscribing, setSubscribing] = useState(false);
   const [subscribeError, setSubscribeError] = useState('');
@@ -59,6 +63,8 @@ const SubscriptionPlanDetailPage: React.FC = () => {
 
   useEffect(() => {
     const fetch = async () => {
+      setLoading(true);
+      setLoadFailed(false);
       try {
         const [cr, pr] = await Promise.all([
           api.get(`/clubs/${clubId}`),
@@ -67,7 +73,7 @@ const SubscriptionPlanDetailPage: React.FC = () => {
         const clubData = getResponseData(cr);
         const rawPlan = getResponseData(pr);
         setClub(clubData);
-        if (rawPlan) {
+        if (rawPlan && String(rawPlan.idClub ?? clubId) === String(clubId)) {
           setPlan({
             planId: String(rawPlan.id),
             name: rawPlan.name ?? '',
@@ -84,14 +90,14 @@ const SubscriptionPlanDetailPage: React.FC = () => {
             activo: rawPlan.active ?? true,
           });
         }
-      } catch (e) {
-        console.error(e);
+      } catch (e: any) {
+        if (e?.response?.status !== 404) setLoadFailed(true);
       } finally {
         setLoading(false);
       }
     };
     if (clubId && planId) fetch();
-  }, [clubId, planId]);
+  }, [clubId, planId, reloadKey]);
 
   const fetchReviewsPage = useCallback(async (offset: number) => {
     if (!planId) return;
@@ -267,6 +273,18 @@ const SubscriptionPlanDetailPage: React.FC = () => {
     </div>
   );
 
+  if (loadFailed) return (
+    <div role="alert" className="min-h-screen flex items-center justify-center text-center px-4 bg-aurora-cream">
+      <div>
+        <p className="text-2xl font-display font-bold text-aurora-navy mb-2">No pudimos cargar el plan</p>
+        <p className="text-aurora-navy/60 mb-6">Revisá tu conexión e intentá de nuevo.</p>
+        <button type="button" onClick={() => setReloadKey((current) => current + 1)} className="btn-primary">
+          Reintentar
+        </button>
+      </div>
+    </div>
+  );
+
   if (!club || !plan) return (
     <div className="min-h-screen flex items-center justify-center text-center px-4 bg-aurora-cream">
       <div>
@@ -277,7 +295,7 @@ const SubscriptionPlanDetailPage: React.FC = () => {
   );
 
   const descuento = Math.max(plan.descuentoTransferencia ?? 0, plan.descuentoEfectivo ?? 0);
-  const precioFinal = plan.price * (1 - descuento / 100);
+
   const canSubscribe = plan.activo !== false;
   const canShowReviewForm = eligibility?.eligible && !showReviewForm && !reviewSuccess;
 
@@ -299,7 +317,7 @@ const SubscriptionPlanDetailPage: React.FC = () => {
       <div className="container mx-auto px-4 py-10 max-w-4xl">
         <div className="card-surface overflow-hidden">
           <div className="relative">
-            <img src={plan.image} alt={plan.name} className="w-full h-72 object-cover" />
+            <SafeImage src={plan.image} alt={plan.name} fallbackIcon="📦" className="w-full h-72 object-cover" />
             {!plan.activo && (
               <div className="absolute top-4 left-4 bg-red-500 text-white text-xs font-bold px-3 py-1 rounded-full">
                 Inactivo
@@ -307,7 +325,7 @@ const SubscriptionPlanDetailPage: React.FC = () => {
             )}
             {descuento > 0 && (
               <div className="absolute top-4 right-4 bg-aurora-terracotta text-white text-sm font-bold px-3 py-1.5 rounded-full shadow-aurora-sm">
-                -{descuento}% OFF
+                Hasta -{descuento}%
               </div>
             )}
           </div>
@@ -317,17 +335,20 @@ const SubscriptionPlanDetailPage: React.FC = () => {
                 <h2 className="font-display text-3xl font-bold text-aurora-navy mb-1">{plan.name}</h2>
                 <p className="text-sm text-aurora-terracotta font-medium">{plan.deliveryFrequency}</p>
               </div>
-              <div className="text-right shrink-0">
-                {descuento > 0 ? (
-                  <>
-                    <p className="text-aurora-navy/40 line-through text-lg">ARS {plan.price.toLocaleString('es-AR')}</p>
-                    <p className="font-display text-3xl font-bold text-green-600">ARS {precioFinal.toLocaleString('es-AR')}</p>
-                    <p className="text-xs text-aurora-navy/50">Ahorrás {descuento}%</p>
-                  </>
-                ) : (
-                  <p className="font-display text-3xl font-bold text-aurora-navy">ARS {plan.price.toLocaleString('es-AR')}</p>
+               <div className="text-right shrink-0">
+                <p className="font-display text-3xl font-bold text-aurora-navy">{money(plan.price)}</p>
+                {(plan.descuentoEfectivo ?? 0) > 0 && (
+                  <p className="text-xs text-green-700">
+                    Efectivo (-{plan.descuentoEfectivo}%): {money(plan.price * (1 - (plan.descuentoEfectivo ?? 0) / 100))}
+                  </p>
+                )}
+                {(plan.descuentoTransferencia ?? 0) > 0 && (
+                  <p className="text-xs text-green-700">
+                    Transferencia (-{plan.descuentoTransferencia}%): {money(plan.price * (1 - (plan.descuentoTransferencia ?? 0) / 100))}
+                  </p>
                 )}
               </div>
+
             </div>
             {reviewSummary && reviewSummary.count > 0 && (
               <div className="flex items-center gap-2 mb-6">
