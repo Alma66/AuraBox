@@ -13,6 +13,11 @@ const FALLBACK_REPLY = 'No pude armar una respuesta útil. ¿Podés reformular t
 @Injectable()
 export class AssistantService {
   private readonly logger = new Logger(AssistantService.name);
+    constructor() {
+    const names = Object.keys(process.env).filter((name) => name.toUpperCase().includes('DEEPSEEK'));
+    this.logger.log(`Variables DeepSeek detectadas: ${JSON.stringify(names)}`);
+  }
+  
   private dailyKey = '';
   private dailyCount = 0;
 
@@ -42,7 +47,7 @@ export class AssistantService {
       (message) => message.role === 'assistant' || moderateText(message.content).allowed,
     );
 
-    const apiKey = process.env.DEEPSEEK_API_KEY;
+    const apiKey = (process.env.DEEPSEEK_API_KEY || process.env.DEEPSEEK_API || '').trim();
     if (!apiKey) {
       this.logger.error('DEEPSEEK_API_KEY no está configurada');
       throw new ServiceUnavailableException('El asistente no está disponible en este momento.');
