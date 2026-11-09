@@ -358,7 +358,7 @@ export class ClubsService {
 
     const users = await this.prisma.user.findMany({
       where: { id: { in: userIds } },
-      select: {
+            select: {
         id: true,
         firstName: true,
         lastName: true,
@@ -369,6 +369,7 @@ export class ClubsService {
         floorNumber: true,
         addressDetails: true,
         city: true,
+        province: true,
         locality: true,
         postalCode: true,
         active: true,
