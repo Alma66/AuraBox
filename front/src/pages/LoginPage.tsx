@@ -32,7 +32,7 @@ const LoginPage: React.FC<LoginPageProps> = ({ onLogin }) => {
     setLoading(true);
 
     try {
-      const response = await api.post('/auth/login', { email, password });
+      const response = await api.post('/auth/login', { email: email.trim(), password });
       const data = response.data?.data ?? response.data;
       const { access_token } = data;
 
@@ -153,24 +153,12 @@ const LoginPage: React.FC<LoginPageProps> = ({ onLogin }) => {
             <p role="alert" className="text-red-600 text-sm text-center bg-red-50 border border-red-100 rounded-lg py-2 px-3">{error}</p>
           )}
 
-          <div className="flex items-center justify-between">
-            <div className="flex items-center">
-              <input
-                id="remember-me"
-                name="remember-me"
-                type="checkbox"
-                className="h-4 w-4 text-aurora-terracotta focus:ring-aurora-terracotta border-aurora-navy/20 rounded"
-              />
-              <label htmlFor="remember-me" className="ml-2 block text-sm text-aurora-navy/70">
-                Recordarme
-              </label>
-            </div>
-            <div className="text-sm">
-              <button type="button" className="font-medium text-aurora-terracotta hover:text-aurora-terracottaDark">
-                ¿Olvidaste tu contraseña?
-              </button>
-            </div>
-          </div>
+          <p className="text-center text-sm text-aurora-navy/60">
+            ¿Olvidaste tu contraseña?{' '}
+            <Link to="/contact" className="font-semibold text-aurora-terracotta hover:text-aurora-terracottaDark">
+              Escribinos
+            </Link>
+          </p>
 
           <button
             type="submit"

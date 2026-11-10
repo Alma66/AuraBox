@@ -43,6 +43,8 @@ import NativeAccountPage from './pages/native/NativeAccountPage';
 import NativeAccountSectionPage from './pages/native/NativeAccountSectionPage';
 import NativeWishlistPage from './pages/native/NativeWishlistPage';
 import NativeReviewsPage from './pages/native/NativeReviewsPage';
+import NativeLoginPage from './pages/native/NativeLoginPage';
+import NativeRegisterPage from './pages/native/NativeRegisterPage';
 
 import UserProfilePage from './pages/client/UserProfilePage';
 import UserSubscriptionsPage from './pages/client/UserSubscriptionsPage';
@@ -271,10 +273,16 @@ const AppContent: React.FC = () => {
       <Route path="/club/:clubId/reviews" element={<ClubReviewsPage />} />
       <Route path="/newsletter/unsubscribe" element={<NewsletterUnsubscribePage />} />
 
-      <Route path="/login" element={<LoginPage onLogin={login} />} />
+      <Route path="/login" element={isNativeApp() ? <NativeLoginPage onLogin={login} /> : <LoginPage onLogin={login} />} />
       <Route path="/logout" element={<Logout />} />
-      <Route path="/register" element={<RegisterPage accountType="customer" />} />
-      <Route path="/register/entrepreneur" element={<RegisterPage accountType="entrepreneur" />} />
+      <Route
+        path="/register"
+        element={isNativeApp() ? <NativeRegisterPage accountType="customer" /> : <RegisterPage accountType="customer" />}
+      />
+      <Route
+        path="/register/entrepreneur"
+        element={isNativeApp() ? <NativeRegisterPage accountType="entrepreneur" /> : <RegisterPage accountType="entrepreneur" />}
+      />
       <Route path="/work-with-us" element={<WorkWithUsPage />} />
       <Route path="/work-with-us/job-application" element={<JobApplicationPage />} />
       <Route path="/register/complete-profile" element={<CompleteProfilePage />} />
