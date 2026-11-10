@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import api, { getResponseData } from '../../api/config';
 import { UserRole } from '../../types/user';
+import { onCartChanged } from '../../utils/cartEvents';
 import { tapFeedback } from '../../utils/native';
 import { TabKey, tabForPath } from './nativeRoutes';
 
@@ -28,8 +29,11 @@ const ICONS: Record<TabKey, string> = {
 const BottomTabBar: React.FC<BottomTabBarProps> = ({ isAuthenticated, userRole }) => {
   const { pathname } = useLocation();
   const [cartCount, setCartCount] = useState(0);
+  const [refreshKey, setRefreshKey] = useState(0);
   const isCustomer = isAuthenticated && userRole === 'customer';
   const activeTab = tabForPath(pathname);
+
+  useEffect(() => onCartChanged(() => setRefreshKey((value) => value + 1)), []);
 
   useEffect(() => {
     if (!isCustomer) {
@@ -47,7 +51,7 @@ const BottomTabBar: React.FC<BottomTabBarProps> = ({ isAuthenticated, userRole }
     return () => {
       active = false;
     };
-  }, [isCustomer, pathname]);
+  }, [isCustomer, pathname, refreshKey]);
 
   const tabs: TabDefinition[] = [
     { key: 'home', label: 'Inicio', to: '/', icon: ICONS.home },

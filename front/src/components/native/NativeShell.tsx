@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import { UserRole } from '../../types/user';
 import { useNetworkStatus } from '../../utils/useNetworkStatus';
@@ -18,11 +18,15 @@ const NativeShell: React.FC<NativeShellProps> = ({ isAuthenticated, userRole, ch
   const showTabs = !hidesTabBar(pathname);
   const isCustomer = isAuthenticated && userRole === 'customer';
 
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [pathname]);
+
   return (
     <div className="flex min-h-screen flex-col bg-aurora-cream">
       <NativeHeader isCustomer={isCustomer} />
       {!online && (
-        <div role="status" className="bg-aurora-gold px-4 py-2 text-center text-sm font-semibold text-aurora-navyDark safe-x">
+        <div role="status" className="bg-aurora-gold px-4 py-2 text-center text-sm font-semibold text-aurora-navyDark">
           Sin conexión. Revisá tu internet para ver información actualizada.
         </div>
       )}

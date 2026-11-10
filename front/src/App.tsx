@@ -18,7 +18,6 @@ import EntrepreneurLayout from './components/entrepreneur/layout/EntrepreneurLay
 import AdminLayout from './components/admin/layout/AdminLayout';
 
 import HomePage from './pages/HomePage';
-import NativeHomePage from './pages/native/NativeHomePage';
 import ExploreClubsPage from './pages/ExploreClubsPage';
 import FAQPage from './pages/FAQPage';
 import AboutUsPage from './pages/AboutUsPage';
@@ -33,7 +32,11 @@ import CompleteClubPage from './pages/CompleteClubPage';
 import WorkWithUsPage from './pages/WorkWithUsPage';
 import JobApplicationPage from './pages/JobApplicationPage';
 import NewsletterUnsubscribePage from './pages/NewsletterUnsubscribePage';
+
+import NativeHomePage from './pages/native/NativeHomePage';
 import NativeExplorePage from './pages/native/NativeExplorePage';
+import NativeClubDetailPage from './pages/native/NativeClubDetailPage';
+import NativePlanDetailPage from './pages/native/NativePlanDetailPage';
 
 import UserProfilePage from './pages/client/UserProfilePage';
 import UserSubscriptionsPage from './pages/client/UserSubscriptionsPage';
@@ -251,11 +254,14 @@ const AppContent: React.FC = () => {
       <Route path="/contact" element={<ContactPage />} />
       <Route path="/platform-rules" element={<PlatformRulesPage />} />
 
-      <Route path="/club/:clubId" element={<ClubDetailPage />} />
+      <Route path="/club/:clubId" element={isNativeApp() ? <NativeClubDetailPage /> : <ClubDetailPage />} />
       <Route path="/club/:clubId/history" element={<HistoryPage />} />
       <Route path="/club/:clubId/terms-and-conditions" element={<TermsAndConditionsPage />} />
       <Route path="/club/:clubId/privacy-and-security" element={<PrivacyAndSecurityPolicyPage />} />
-      <Route path="/club/:clubId/plan/:planId" element={<SubscriptionPlanDetailPage />} />
+      <Route
+        path="/club/:clubId/plan/:planId"
+        element={isNativeApp() ? <NativePlanDetailPage /> : <SubscriptionPlanDetailPage />}
+      />
       <Route path="/club/:clubId/reviews" element={<ClubReviewsPage />} />
       <Route path="/newsletter/unsubscribe" element={<NewsletterUnsubscribePage />} />
 

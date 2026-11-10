@@ -55,7 +55,9 @@ const BottomSheet: React.FC<BottomSheetProps> = ({ open, title, onClose, childre
         <div className="flex-1 overflow-y-auto px-5 pb-4">{children}</div>
         {footer && (
           <div className="border-t border-aurora-navy/5 px-5 pt-3">
-            <div className="safe-bottom pb-3">{footer}</div>
+            <div className="safe-bottom">
+              <div className="pb-3">{footer}</div>
+            </div>
           </div>
         )}
       </div>
