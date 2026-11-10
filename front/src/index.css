@@ -229,3 +229,12 @@ html.native-app .selectable {
   -webkit-user-select: text;
   user-select: text;
 }
+
+.no-scrollbar {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}

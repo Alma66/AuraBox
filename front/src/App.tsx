@@ -18,6 +18,7 @@ import EntrepreneurLayout from './components/entrepreneur/layout/EntrepreneurLay
 import AdminLayout from './components/admin/layout/AdminLayout';
 
 import HomePage from './pages/HomePage';
+import NativeHomePage from './pages/native/NativeHomePage';
 import ExploreClubsPage from './pages/ExploreClubsPage';
 import FAQPage from './pages/FAQPage';
 import AboutUsPage from './pages/AboutUsPage';
@@ -239,7 +240,10 @@ const AppContent: React.FC = () => {
 
   const routes = (
     <Routes>
-      <Route path="/" element={isPanel ? <Navigate to="/entrepreneur/dashboard" replace /> : <HomePage />} />
+      <Route
+        path="/"
+        element={isPanel ? <Navigate to="/entrepreneur/dashboard" replace /> : isNativeApp() ? <NativeHomePage /> : <HomePage />}
+      />
       <Route path="/explore" element={<ExploreClubsPage />} />
       <Route path="/faq" element={<FAQPage />} />
       <Route path="/about-us" element={<AboutUsPage />} />
