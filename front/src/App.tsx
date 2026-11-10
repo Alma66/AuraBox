@@ -37,6 +37,7 @@ import NativeHomePage from './pages/native/NativeHomePage';
 import NativeExplorePage from './pages/native/NativeExplorePage';
 import NativeClubDetailPage from './pages/native/NativeClubDetailPage';
 import NativePlanDetailPage from './pages/native/NativePlanDetailPage';
+import NativeCartPage from './pages/native/NativeCartPage';
 
 import UserProfilePage from './pages/client/UserProfilePage';
 import UserSubscriptionsPage from './pages/client/UserSubscriptionsPage';
@@ -279,7 +280,7 @@ const AppContent: React.FC = () => {
       <Route path="/customer/orders" element={pr(['customer'], <OrderHistoryPage />)} />
       <Route path="/customer/reviews" element={pr(['customer'], <MisReviewsPage />)} />
       <Route path="/customer/wishlist" element={pr(['customer'], <WishlistPage />)} />
-      <Route path="/cart" element={pr(['customer'], <CartPage />)} />
+      <Route path="/cart" element={pr(['customer'], isNativeApp() ? <NativeCartPage /> : <CartPage />)} />
       <Route path="/checkout" element={pr(['customer'], <CheckoutPage />)} />
 
       <Route path="/entrepreneur/dashboard" element={pr(['entrepreneur'], <EntrepreneurDashboardPage />)} />

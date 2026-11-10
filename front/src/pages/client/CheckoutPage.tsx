@@ -4,6 +4,8 @@ import toast from 'react-hot-toast';
 import { useAuth } from '../../App';
 import api, { getResponseData } from '../../api/config';
 import { User } from '../../types/user';
+import { notifyCartChanged } from '../../utils/cartEvents';
+import { isNativeApp } from '../../utils/native';
 
 interface CartPlan {
   planId: number;
@@ -830,6 +832,7 @@ const CheckoutPage: React.FC = () => {
       setPaidInCash(Boolean(result?.cashOnDelivery));
       setReceipt(result?.receipt ?? null);
       setCompleted(true);
+      notifyCartChanged();
       window.scrollTo({ top: 0, behavior: 'smooth' });
     } catch (err: any) {
       console.error('Error processing payment:', err);
@@ -962,9 +965,11 @@ const CheckoutPage: React.FC = () => {
           </section>
 
           <div className="flex flex-wrap justify-center gap-3 print:hidden">
-            <button onClick={() => window.print()} className={secondaryButtonClass}>
-              Imprimir comprobante
-            </button>
+            {!isNativeApp() && (
+              <button onClick={() => window.print()} className={secondaryButtonClass}>
+                Imprimir comprobante
+              </button>
+            )}
             <button onClick={() => navigate('/')} className={secondaryButtonClass}>
               Volver al inicio
             </button>
@@ -1126,7 +1131,7 @@ const CheckoutPage: React.FC = () => {
             {club.couriers.length === 0 ? (
               <div className="flex items-start gap-3 rounded-xl bg-aurora-cream p-4 text-sm text-aurora-navy/80">
                 <Icon name="box" className="mt-0.5 h-5 w-5 flex-shrink-0" />
-                <p>                    Podés usar cualquier número de prueba. Estos datos solo se validan en tu navegador y no se envían ni se guardan.</p>
+                <p>Este club coordina el envío con vos una vez confirmada la compra. No tiene costo adicional por ahora.</p>
               </div>
             ) : (
               <div className="space-y-3" role="radiogroup" aria-label={`Envío de ${club.clubName}`}>
@@ -1473,7 +1478,18 @@ const CheckoutPage: React.FC = () => {
               </div>
             )}
 
-            <div className="flex flex-wrap items-center justify-between gap-3">
+            <div
+              className={
+                isNativeApp()
+                  ? 'sticky bottom-0 z-30 -mx-4 flex items-center justify-between gap-3 border-t border-aurora-navy/10 bg-white/95 px-4 pt-3 backdrop-blur-md'
+                  : 'flex flex-wrap items-center justify-between gap-3'
+              }
+              style={
+                isNativeApp()
+                  ? { paddingBottom: 'calc(0.75rem + var(--safe-area-inset-bottom, env(safe-area-inset-bottom, 0px)))' }
+                  : undefined
+              }
+            >
               {step === 1 ? (
                 <button type="button" onClick={() => navigate('/cart')} className={secondaryButtonClass}>
                   Volver al carrito
