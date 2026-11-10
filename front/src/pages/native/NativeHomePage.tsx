@@ -224,7 +224,7 @@ const NativeHomePage: React.FC = () => {
                 type="button"
                 onClick={() => {
                   tapFeedback();
-                  navigate(`/explore?category=${category.key}`);
+                  navigate(`/explore?group=${category.key}`);
                 }}
                 className={`relative flex h-28 flex-col justify-between overflow-hidden rounded-3xl bg-gradient-to-br p-4 text-left shadow-aurora-sm transition-transform duration-200 active:scale-[0.96] ${category.tone}`}
               >

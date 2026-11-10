@@ -33,6 +33,7 @@ import CompleteClubPage from './pages/CompleteClubPage';
 import WorkWithUsPage from './pages/WorkWithUsPage';
 import JobApplicationPage from './pages/JobApplicationPage';
 import NewsletterUnsubscribePage from './pages/NewsletterUnsubscribePage';
+import NativeExplorePage from './pages/native/NativeExplorePage';
 
 import UserProfilePage from './pages/client/UserProfilePage';
 import UserSubscriptionsPage from './pages/client/UserSubscriptionsPage';
@@ -244,7 +245,7 @@ const AppContent: React.FC = () => {
         path="/"
         element={isPanel ? <Navigate to="/entrepreneur/dashboard" replace /> : isNativeApp() ? <NativeHomePage /> : <HomePage />}
       />
-      <Route path="/explore" element={<ExploreClubsPage />} />
+      <Route path="/explore" element={isNativeApp() ? <NativeExplorePage /> : <ExploreClubsPage />} />
       <Route path="/faq" element={<FAQPage />} />
       <Route path="/about-us" element={<AboutUsPage />} />
       <Route path="/contact" element={<ContactPage />} />

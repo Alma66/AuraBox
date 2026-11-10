@@ -1,7 +1,8 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
 import ExploreClubCard from '../components/shared/ExploreClubCard';
 import api, { getResponseData } from '../api/config';
-import { Link } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
+import { categoryIdsForGroup } from '../utils/categoryGroups';
 import { Club } from '../types/club';
 
 interface Category {
@@ -37,6 +38,9 @@ const SORT_OPTIONS: { label: string; value: SortOption }[] = [
 ];
 
 const ExploreClubsPage: React.FC = () => {
+  const [searchParams] = useSearchParams();
+  const groupParam = searchParams.get('group') ?? searchParams.get('category');
+  const appliedGroup = useRef<string | null | undefined>(undefined);  
   const [clubs, setClubs] = useState<ClubWithCategories[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
@@ -66,6 +70,13 @@ const ExploreClubsPage: React.FC = () => {
     };
     fetchCategories();
   }, []);
+
+  useEffect(() => {
+    if (categories.length === 0 || appliedGroup.current === groupParam) return;
+    appliedGroup.current = groupParam;
+    const ids = categoryIdsForGroup(groupParam, categories);
+    if (ids.length > 0) setSelectedCategoryIds(ids);
+  }, [categories, groupParam]);
 
   const categoryKey = useMemo(
     () => selectedCategoryIds.slice().sort((a, b) => a - b).join(','),
