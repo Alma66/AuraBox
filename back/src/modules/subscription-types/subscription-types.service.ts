@@ -44,6 +44,9 @@ export class SubscriptionTypesService {
     if (!Number.isFinite(base) || base <= AURABOX_COMMISSION) {
       throw new BadRequestException(`El precio debe ser mayor a $${AURABOX_COMMISSION}`);
     }
+    if (base > 99999999) {
+      throw new BadRequestException('El precio es demasiado alto');
+    }
     for (const discount of [cash, transfer]) {
       if (discount === undefined || discount === null) continue;
       const value = Number(discount);
@@ -94,7 +97,7 @@ export class SubscriptionTypesService {
       active: dto.active ?? true,
       shippingAreas: dto.shippingAreas ?? null,
       includes: includesStr,
-      imageUrl: dto.imageUrl ?? null,
+      imageUrl: requesterRole === 'admin' ? dto.imageUrl ?? null : null,
     };
 
     const created = await this.prisma.subscription_Types.create({ data });
@@ -209,7 +212,7 @@ export class SubscriptionTypesService {
         ? JSON.stringify(dto.includes)
         : dto.includes;
     }
-    if (dto.imageUrl !== undefined) data.imageUrl = dto.imageUrl;
+    if (dto.imageUrl !== undefined && requesterRole === 'admin') data.imageUrl = dto.imageUrl;
 
     const updated = await this.prisma.subscription_Types.update({ where: { id }, data });
     return sanitize(updated);

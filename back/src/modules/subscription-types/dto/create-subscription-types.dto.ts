@@ -1,5 +1,5 @@
 import {
-  IsBoolean, IsInt, IsOptional, IsString, MinLength, IsEnum,
+  IsBoolean, IsInt, IsOptional, IsString, MinLength, MaxLength, IsEnum,
 } from 'class-validator';
 import { Transform } from 'class-transformer';
 import { Frequency } from '@prisma/client';
@@ -12,12 +12,15 @@ export class CreateSubscriptionTypeDto {
   })
   idClub!: number;
 
+  @Transform(({ value }) => (typeof value === 'string' ? value.trim() : value))
   @IsString()
-  @MinLength(2)
+  @MinLength(2, { message: 'El nombre debe tener al menos 2 caracteres' })
+  @MaxLength(80, { message: 'El nombre puede tener hasta 80 caracteres' })
   name!: string;
 
   @IsOptional()
   @IsString()
+  @MaxLength(1000, { message: 'La descripción puede tener hasta 1000 caracteres' })
   description?: string;
 
   @IsOptional()
@@ -73,13 +76,16 @@ export class CreateSubscriptionTypeDto {
 
   @IsOptional()
   @IsString()
+  @MaxLength(200, { message: 'Las zonas de envío pueden tener hasta 200 caracteres' })
   shippingAreas?: string;
 
   @IsOptional()
   @IsString()
+  @MaxLength(2000, { message: 'La lista de lo que incluye es demasiado larga' })
   includes?: string;
 
   @IsOptional()
   @IsString()
+  @MaxLength(500)
   imageUrl?: string;
 }
