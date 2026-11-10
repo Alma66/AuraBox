@@ -330,6 +330,15 @@ export class ShipmentsService {
       idAssignedRider = dto.idAssignedRider;
     }
 
+    if (shipment.shipmentStatus === 'Entregado' || shipment.shipmentStatus === 'Devuelto') {
+      throw new BadRequestException('Este envío ya está cerrado y no se puede modificar');
+    }
+    const nextStatus = dto.shipmentStatus ?? shipment.shipmentStatus;
+    const needsCourier = nextStatus === 'Asignado' || nextStatus === 'En_Camino' || nextStatus === 'Entregado';
+    if (needsCourier && !idCourier) {
+      throw new BadRequestException('Asigná un courier antes de avanzar el estado del envío');
+    }
+
     const updated = await this.prisma.shipments.update({
       where: { id },
       data: {
