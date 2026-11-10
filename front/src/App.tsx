@@ -5,11 +5,15 @@ import { Toaster } from 'react-hot-toast';
 import api from './api/config';
 import { User, UserRole } from './types/user';
 import { userFromToken } from './utils/session';
+import { isNativeApp } from './utils/native';
 
 import Navbar from './components/common/Navbar';
 import Footer from './components/common/Footer';
 import FloatingButtons from './components/common/FloatingButtons';
 import PrivateRoute from './components/common/PrivateRoute';
+import PendingTermsGate from './components/common/PendingTermsGate';
+import NativeShell from './components/native/NativeShell';
+import NativeRoleNotice from './components/native/NativeRoleNotice';
 import EntrepreneurLayout from './components/entrepreneur/layout/EntrepreneurLayout';
 import AdminLayout from './components/admin/layout/AdminLayout';
 
@@ -25,10 +29,9 @@ import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
 import CompleteProfilePage from './pages/CompleteProfilePage';
 import CompleteClubPage from './pages/CompleteClubPage';
-import PendingTermsGate from './components/common/PendingTermsGate';
-
 import WorkWithUsPage from './pages/WorkWithUsPage';
 import JobApplicationPage from './pages/JobApplicationPage';
+import NewsletterUnsubscribePage from './pages/NewsletterUnsubscribePage';
 
 import UserProfilePage from './pages/client/UserProfilePage';
 import UserSubscriptionsPage from './pages/client/UserSubscriptionsPage';
@@ -42,7 +45,6 @@ import ClubDetailPage from './pages/entrepreneur/club/myClub/ClubDetailPage';
 import HistoryPage from './pages/entrepreneur/club/myClub/HistoryPage';
 import TermsAndConditionsPage from './pages/entrepreneur/club/legal/TermsAndConditionsPage';
 import PrivacyAndSecurityPolicyPage from './pages/entrepreneur/club/legal/PrivacyAndSecurityPolicyPage';
-import NewsletterUnsubscribePage from './pages/NewsletterUnsubscribePage';
 
 import EntrepreneurDashboardPage from './pages/entrepreneur/EntrepreneurDashboardPage';
 import EntrepreneurProfilePage from './pages/entrepreneur/EntrepreneurProfilePage';
@@ -218,6 +220,10 @@ const AppContent: React.FC = () => {
     );
   }
 
+  if (isNativeApp() && isAuthenticated && (userRole === 'entrepreneur' || userRole === 'admin')) {
+    return <NativeRoleNotice role={userRole} onLogout={logout} />;
+  }
+
   const entrepreneurWithoutClub = isAuthenticated && userRole === 'entrepreneur' && !user?.managedClubId;
 
   if (entrepreneurWithoutClub && !CLUB_SETUP_ALLOWED_PATHS.includes(pathname)) {
@@ -344,7 +350,7 @@ const AppContent: React.FC = () => {
     </a>
   );
 
-   if (isPanel) {
+  if (isPanel) {
     return (
       <>
         {skipLink}
@@ -363,9 +369,18 @@ const AppContent: React.FC = () => {
     );
   }
 
+  if (isNativeApp()) {
+    return (
+      <NativeShell isAuthenticated={isAuthenticated} userRole={userRole}>
+        <PendingTermsGate />
+        {routes}
+      </NativeShell>
+    );
+  }
+
   return (
     <>
-      {skipLink} 
+      {skipLink}
       <PendingTermsGate />
       <Navbar userRole={userRole} isAuthenticated={isAuthenticated} onLogout={logout} />
       <main id="main-content" className="min-h-[calc(100vh-100px)]">
@@ -383,7 +398,8 @@ const App: React.FC = () => (
       <AppContent />
     </AuthProvider>
     <Toaster
-      position="top-right"
+      position={isNativeApp() ? 'top-center' : 'top-right'}
+      containerStyle={isNativeApp() ? { top: 'calc(var(--safe-area-inset-top, 0px) + 64px)' } : undefined}
       toastOptions={{
         duration: 4000,
         style: {
