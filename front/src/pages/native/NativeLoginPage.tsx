@@ -84,6 +84,11 @@ const NativeLoginPage: React.FC<NativeLoginPageProps> = ({ onLogin }) => {
             Tu cuenta fue deshabilitada. Si creés que es un error, contactá al equipo de AuraBox.
           </p>
         )}
+        {reason === 'registered' && (
+          <p role="status" className="mb-4 rounded-2xl bg-green-50 px-4 py-3 text-sm text-green-800 ring-1 ring-green-200">
+            ¡Cuenta creada! Iniciá sesión para empezar a explorar.
+          </p>
+        )}
         {reason === 'expired' && (
           <p role="status" className="mb-4 rounded-2xl bg-aurora-gold/15 px-4 py-3 text-sm text-aurora-navy ring-1 ring-aurora-gold/30">
             Tu sesión expiró. Iniciá sesión de nuevo para continuar.

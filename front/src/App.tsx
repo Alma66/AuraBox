@@ -45,6 +45,7 @@ import NativeWishlistPage from './pages/native/NativeWishlistPage';
 import NativeReviewsPage from './pages/native/NativeReviewsPage';
 import NativeLoginPage from './pages/native/NativeLoginPage';
 import NativeRegisterPage from './pages/native/NativeRegisterPage';
+import NativeCompleteProfilePage from './pages/native/NativeCompleteProfilePage';
 
 import UserProfilePage from './pages/client/UserProfilePage';
 import UserSubscriptionsPage from './pages/client/UserSubscriptionsPage';
@@ -285,7 +286,10 @@ const AppContent: React.FC = () => {
       />
       <Route path="/work-with-us" element={<WorkWithUsPage />} />
       <Route path="/work-with-us/job-application" element={<JobApplicationPage />} />
-      <Route path="/register/complete-profile" element={<CompleteProfilePage />} />
+      <Route
+        path="/register/complete-profile"
+        element={isNativeApp() ? <NativeCompleteProfilePage /> : <CompleteProfilePage />}
+      />
       <Route path="/register/complete-club" element={<CompleteClubPage />} />
 
       <Route path="/customer/profile" element={pr(['customer'], isNativeApp() ? <NativeAccountPage /> : <UserProfilePage />)} />
