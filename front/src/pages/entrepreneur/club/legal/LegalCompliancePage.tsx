@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import api, { getResponseData } from '../../../../api/config';
 import LicenseDocumentLink from '../../../../components/common/LicenseDocumentLink';
+import toast from 'react-hot-toast';
 
 type RequirementState = 'FALTANTE' | 'PENDIENTE' | 'APROBADA' | 'RECHAZADA' | 'VENCIDA';
 
@@ -113,6 +114,10 @@ const RequirementCard: React.FC<{
       setError('Adjuntá el documento.');
       return;
     }
+    if (issueDate && expirationDate && expirationDate <= issueDate) {
+      setError('El vencimiento debe ser posterior a la fecha de emisión.');
+      return;
+    }
     if (!isNew && !file && issueDate === toInputDate(requirement.issueDate) && expirationDate === toInputDate(requirement.expirationDate)) {
       setError('No hay cambios para guardar.');
       return;
@@ -133,6 +138,7 @@ const RequirementCard: React.FC<{
       }
       setOpen(false);
       setFile(null);
+      toast.success('Matrícula enviada. Un administrador la va a revisar.');
       onChanged();
     } catch (err) {
       setError(errorMessage(err, 'No se pudo guardar la matrícula.'));
@@ -198,7 +204,7 @@ const RequirementCard: React.FC<{
               onClick={() => setOpen(true)}
               className="min-h-[44px] rounded-lg border border-aurora-terracotta/40 px-4 text-sm font-semibold text-aurora-terracotta hover:bg-aurora-terracotta/10"
             >
-              {isNew ? 'Subir matrícula' : 'Actualizar o renovar'}
+              {isNew ? 'Subir matrícula' : requirement.state === 'RECHAZADA' ? 'Corregir y reenviar' : 'Actualizar o renovar'}
             </button>
           ) : (
             <form onSubmit={handleSubmit} className="space-y-3 rounded-xl bg-aurora-cream p-4">
@@ -227,7 +233,7 @@ const RequirementCard: React.FC<{
               {!isNew && (
                 <p className="text-xs text-aurora-navy/60">Al guardar cambios, la matrícula vuelve a quedar en revisión.</p>
               )}
-              {error && <p className="text-sm text-red-600">{error}</p>}
+              {error && <p role="alert" className="text-sm text-red-600">{error}</p>}
               <div className="flex gap-2">
                 <button
                   type="submit"
@@ -287,7 +293,18 @@ const LegalCompliancePage: React.FC = () => {
   }
 
   if (error) {
-    return <div className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-center text-sm text-red-700">{error}</div>;
+    return (
+      <div role="alert" className="rounded-xl border border-red-200 bg-red-50 px-4 py-5 text-center text-sm text-red-700">
+        <p>{error}</p>
+        <button
+          type="button"
+          onClick={load}
+          className="mt-3 min-h-[44px] rounded-lg bg-red-600 px-4 text-sm font-semibold text-white hover:bg-red-700"
+        >
+          Reintentar
+        </button>
+      </div>
+    );
   }
 
   if (!data || !data.hasClub || !data.club) {
@@ -330,9 +347,24 @@ const LegalCompliancePage: React.FC = () => {
             <p className="text-sm text-aurora-navy/60">Las que necesita tu rubro para operar en AuraBox.</p>
           </div>
           {data.summary && data.summary.required > 0 && (
-            <p className="text-sm font-semibold text-aurora-navy">
-              {data.summary.approved} de {data.summary.required} aprobadas
-            </p>
+            <div className="w-full sm:w-56">
+              <p className="mb-1 text-right text-sm font-semibold text-aurora-navy">
+                {data.summary.approved} de {data.summary.required} aprobadas
+              </p>
+              <div
+                role="progressbar"
+                aria-valuemin={0}
+                aria-valuemax={data.summary.required}
+                aria-valuenow={data.summary.approved}
+                aria-label="Matrículas aprobadas"
+                className="h-2 overflow-hidden rounded-full bg-aurora-navy/10"
+              >
+                <div
+                  className="h-full rounded-full bg-green-500 transition-all"
+                  style={{ width: `${Math.round((data.summary.approved / data.summary.required) * 100)}%` }}
+                />
+              </div>
+            </div>
           )}
         </div>
 

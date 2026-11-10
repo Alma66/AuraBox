@@ -88,6 +88,9 @@ export class CloudinaryService {
   }
 
   async uploadDocument(file: Express.Multer.File, folder: string = 'aurabox'): Promise<string> {
+    if (!file?.buffer || detectContentType(file.buffer) === 'application/octet-stream') {
+      throw new BadRequestException('El archivo no es un PDF, JPG o PNG válido');
+    }
     ensureConfigured();
     return new Promise((resolve, reject) => {
       const uploadStream = cloudinary.uploader.upload_stream(
