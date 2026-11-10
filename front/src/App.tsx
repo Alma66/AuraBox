@@ -39,6 +39,10 @@ import NativeClubDetailPage from './pages/native/NativeClubDetailPage';
 import NativePlanDetailPage from './pages/native/NativePlanDetailPage';
 import NativeCartPage from './pages/native/NativeCartPage';
 import NativeOrdersPage from './pages/native/NativeOrdersPage';
+import NativeAccountPage from './pages/native/NativeAccountPage';
+import NativeAccountSectionPage from './pages/native/NativeAccountSectionPage';
+import NativeWishlistPage from './pages/native/NativeWishlistPage';
+import NativeReviewsPage from './pages/native/NativeReviewsPage';
 
 import UserProfilePage from './pages/client/UserProfilePage';
 import UserSubscriptionsPage from './pages/client/UserSubscriptionsPage';
@@ -276,14 +280,18 @@ const AppContent: React.FC = () => {
       <Route path="/register/complete-profile" element={<CompleteProfilePage />} />
       <Route path="/register/complete-club" element={<CompleteClubPage />} />
 
-      <Route path="/customer/profile" element={pr(['customer'], <UserProfilePage />)} />
+      <Route path="/customer/profile" element={pr(['customer'], isNativeApp() ? <NativeAccountPage /> : <UserProfilePage />)} />
+      <Route
+        path="/customer/account/:section"
+        element={pr(['customer'], isNativeApp() ? <NativeAccountSectionPage /> : <Navigate to="/customer/profile" replace />)}
+      />
       <Route
         path="/customer/subscriptions"
         element={pr(['customer'], isNativeApp() ? <NativeOrdersPage /> : <UserSubscriptionsPage />)}
       />
       <Route path="/customer/orders" element={pr(['customer'], isNativeApp() ? <NativeOrdersPage /> : <OrderHistoryPage />)} />
-      <Route path="/customer/reviews" element={pr(['customer'], <MisReviewsPage />)} />
-      <Route path="/customer/wishlist" element={pr(['customer'], <WishlistPage />)} />
+      <Route path="/customer/reviews" element={pr(['customer'], isNativeApp() ? <NativeReviewsPage /> : <MisReviewsPage />)} />
+      <Route path="/customer/wishlist" element={pr(['customer'], isNativeApp() ? <NativeWishlistPage /> : <WishlistPage />)} />
       <Route path="/cart" element={pr(['customer'], isNativeApp() ? <NativeCartPage /> : <CartPage />)} />
       <Route path="/checkout" element={pr(['customer'], <CheckoutPage />)} />
 

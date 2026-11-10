@@ -4,34 +4,7 @@ import ProfileSidebar from '../../components/client/UserProfileSidebar';
 import UserProfileContent from '../../components/client/UserProfileContent';
 import api, { getResponseData } from '../../api/config';
 import { User } from '../../types/user';
-
-function mapApiUserToUser(data: any): User {
-  return {
-    id: Number(data.id),
-    firstName: data.firstName || '',
-    lastName: data.lastName || '',
-    email: data.email || '',
-    role: 'customer',
-    registeredDate: data.registrationDate || new Date().toISOString(),
-    lastLogin: new Date().toISOString(),
-    birthDate: data.birthDate ? data.birthDate.split('T')[0] : '',
-    documentType: data.documentType || '',
-    documentNumber: data.documentNumber ? Number(data.documentNumber) : undefined,
-    phoneNumber: data.phoneNumber ? String(data.phoneNumber) : null,
-    streetAddress: data.streetAddress || '',
-    addressNumber: data.addressNumber,
-    floorNumber: data.floorNumber || '',
-    addressDetails: data.addressDetails || '',
-    city: data.city || '',
-    province: data.province || '',
-    postalCode: data.postalCode || '',
-    street: data.streetAddress || '',
-    streetNumber: data.addressNumber ? String(data.addressNumber) : '',
-    floor: data.floorNumber || '',
-    details: data.addressDetails || '',
-    balanceAvailable: data.balanceAvailable || '0',
-  };
-}
+import { mapApiUserToUser } from '../../utils/userMapper';
 
 const UserProfilePage: React.FC = () => {
   const [activeSection, setActiveSection] = useState<string>('profile');

@@ -17,6 +17,7 @@ export const tabForPath = (pathname: string): TabKey | null => {
   if (pathname === '/customer/orders' || pathname === '/customer/subscriptions') return 'orders';
   if (
     pathname === '/customer/profile' ||
+    pathname.startsWith('/customer/account/') ||
     pathname === '/customer/wishlist' ||
     pathname === '/customer/reviews' ||
     pathname === '/login' ||
@@ -48,8 +49,17 @@ const STATIC_TITLES: Record<string, string> = {
   '/work-with-us': 'Trabajá con nosotros',
 };
 
+const ACCOUNT_SECTION_TITLES: Record<string, string> = {
+  profile: 'Mis datos',
+  location: 'Ubicación',
+  security: 'Seguridad y privacidad',
+  settings: 'Configuración',
+};
+
 export const getHeaderTitle = (pathname: string): string => {
   if (STATIC_TITLES[pathname]) return STATIC_TITLES[pathname];
+  const accountSection = /^\/customer\/account\/([^/]+)$/.exec(pathname);
+  if (accountSection) return ACCOUNT_SECTION_TITLES[accountSection[1]] ?? 'Mi cuenta';
   if (/^\/club\/[^/]+\/plan\//.test(pathname)) return 'Detalle del plan';
   if (/^\/club\/[^/]+\/reviews/.test(pathname)) return 'Reseñas';
   if (/^\/club\/[^/]+\/history/.test(pathname)) return 'Nuestra historia';
