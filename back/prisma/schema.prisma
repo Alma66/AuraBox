@@ -921,3 +921,18 @@ model Site_Content {
 
   @@map("Site_Content")
 }
+
+model Notification {
+  id        Int       @id @default(autoincrement()) @map("ID")
+  idUser    Int       @map("ID_User")
+  type      String    @map("Type")
+  title     String    @map("Title")
+  message   String    @map("Message")
+  link      String?   @map("Link")
+  dedupeKey String?   @unique @map("Dedupe_Key")
+  readAt    DateTime? @map("Read_At")
+  createdAt DateTime  @default(now()) @map("Created_At")
+
+  @@index([idUser, readAt])
+  @@map("Notification")
+}

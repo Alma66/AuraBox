@@ -57,6 +57,7 @@ import { TransformInterceptor } from './common/interceptors/transform.intercepto
 import { AllExceptionsFilter } from './common/filters/all-exceptions.filter';
 import { InboundRequestsModule } from './modules/inbound-requests/inbound-requests.module';
 import { SiteContentModule } from './modules/site-content/site-content.module';
+import { NotificationsModule } from './modules/notifications/notifications.module';
 import { validationExceptionFactory } from './common/pipes/validation-exception.factory';
 
 const jwtSecret = process.env.JWT_SECRET;
@@ -124,6 +125,7 @@ if (!jwtSecret) {
     UserCategoryPreferencesModule,
     ClubLegalContentModule,
     NewsletterModule,
+    NotificationsModule,
   ],
   controllers: [AppController],
 

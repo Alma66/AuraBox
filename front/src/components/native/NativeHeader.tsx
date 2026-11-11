@@ -3,6 +3,8 @@ import { Link, useLocation, useNavigate } from 'react-router-dom';
 import AssistantChat from '../common/AssistantChat';
 import { tapFeedback } from '../../utils/native';
 import { getHeaderTitle, isRootPath } from './nativeRoutes';
+import { useUnreadNotifications } from '../../utils/useUnreadNotifications';
+import NotificationBell from '../common/NotificationBell';
 
 interface NativeHeaderProps {
   isCustomer: boolean;
@@ -15,6 +17,7 @@ const NativeHeader: React.FC<NativeHeaderProps> = ({ isCustomer }) => {
   const atRoot = isRootPath(pathname);
   const atHome = pathname === '/';
   const title = getHeaderTitle(pathname);
+  const unreadCount = useUnreadNotifications(isCustomer);
 
   const goBack = () => {
     tapFeedback();
@@ -49,6 +52,7 @@ const NativeHeader: React.FC<NativeHeaderProps> = ({ isCustomer }) => {
           )}
 
           <div className="ml-auto flex items-center">
+           {isCustomer && <NotificationBell count={unreadCount} className={iconButton} onClick={() => tapFeedback()} />}
             {isCustomer && (
               <Link to="/customer/wishlist" aria-label="Mis favoritos" onClick={() => tapFeedback()} className={iconButton}>
                 <svg className="h-6 w-6" fill="none" stroke="currentColor" strokeWidth={1.8} viewBox="0 0 24 24" aria-hidden="true">

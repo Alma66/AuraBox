@@ -19,6 +19,7 @@ export const tabForPath = (pathname: string): TabKey | null => {
     pathname === '/customer/profile' ||
     pathname.startsWith('/customer/account/') ||
     pathname === '/customer/wishlist' ||
+    pathname === '/customer/notifications' ||
     pathname === '/customer/reviews' ||
     pathname === '/login' ||
     pathname.startsWith('/register')
@@ -38,6 +39,7 @@ const STATIC_TITLES: Record<string, string> = {
   '/customer/profile': 'Mi cuenta',
   '/customer/reviews': 'Mis reseñas',
   '/customer/wishlist': 'Mis favoritos',
+  '/customer/notifications': 'Notificaciones',
   '/faq': 'Preguntas frecuentes',
   '/contact': 'Contacto',
   '/about-us': 'Sobre AuraBox',

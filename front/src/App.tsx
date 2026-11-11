@@ -22,6 +22,7 @@ import ExploreClubsPage from './pages/ExploreClubsPage';
 import FAQPage from './pages/FAQPage';
 import AboutUsPage from './pages/AboutUsPage';
 import ContactPage from './pages/ContactPage';
+import NotificationsPage from './pages/NotificationsPage';
 import ClubReviewsPage from './pages/ClubReviewsPage';
 import PlatformRulesPage from './pages/PlatformRulesPage';
 import SubscriptionPlanDetailPage from './pages/SubscriptionPlanDetailPage';
@@ -303,6 +304,7 @@ const AppContent: React.FC = () => {
       />
       <Route path="/customer/orders" element={pr(['customer'], isNativeApp() ? <NativeOrdersPage /> : <OrderHistoryPage />)} />
       <Route path="/customer/reviews" element={pr(['customer'], isNativeApp() ? <NativeReviewsPage /> : <MisReviewsPage />)} />
+      <Route path="/customer/notifications" element={pr(['customer'], <NotificationsPage />)} />
       <Route path="/customer/wishlist" element={pr(['customer'], isNativeApp() ? <NativeWishlistPage /> : <WishlistPage />)} />
       <Route path="/cart" element={pr(['customer'], isNativeApp() ? <NativeCartPage /> : <CartPage />)} />
       <Route path="/checkout" element={pr(['customer'], <CheckoutPage />)} />

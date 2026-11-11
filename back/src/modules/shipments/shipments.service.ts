@@ -4,6 +4,7 @@ import { CreateShipmentDto } from './dto/create-shipment.dto';
 import { UpdateShipmentDto } from './dto/update-shipment.dto';
 import { AssignDeliveryDto, AssignNewShipmentDto } from './dto/assign-delivery.dto';
 import { courierFee } from '../../common/utils/shipping';
+import { NotificationsService } from '../notifications/notifications.service';
 
 type RequestUser = { id: number; role: string };
 
@@ -18,6 +19,38 @@ function sanitize(shipment: any) {
   return shipment;
 }
 
+const MONTH_NAMES = [
+  'enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio',
+  'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre',
+];
+
+const SHIPMENT_NOTICES: Record<string, { title: string; message: (box: string) => string }> = {
+  En_Camino: {
+    title: 'Tu caja está en camino',
+    message: (box) => `Tu caja${box} ya salió y está en camino a tu domicilio.`,
+  },
+  Entregado: {
+    title: 'Tu caja fue entregada',
+    message: (box) => `Tu caja${box} fue entregada. ¡Esperamos que la disfrutes! Contanos qué te pareció dejando una reseña.`,
+  },
+  Problema: {
+    title: 'Hubo un problema con tu envío',
+    message: (box) => `Tuvimos un inconveniente con la entrega de tu caja${box}. El club se va a comunicar con vos.`,
+  },
+  Devuelto: {
+    title: 'Tu caja fue devuelta',
+    message: (box) => `Tu caja${box} fue devuelta al club. Comunicate con ellos para coordinar un nuevo envío.`,
+  },
+};
+
+function boxLabel(boxMonthYear?: string | null) {
+  const match = /^(\d{4})-(\d{2})$/.exec(boxMonthYear ?? '');
+  if (!match) return '';
+  const month = Number(match[2]);
+  if (month < 1 || month > 12) return '';
+  return ` de ${MONTH_NAMES[month - 1]} ${match[1]}`;
+}
+
 function currentBoxMonthYear() {
   const now = new Date();
   return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
@@ -25,7 +58,28 @@ function currentBoxMonthYear() {
 
 @Injectable()
 export class ShipmentsService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly notifications: NotificationsService,
+  ) {}
+
+  private notifyStatusChange(
+    shipment: { id: number; idUser: number; boxMonthYear?: string | null },
+    previous: string,
+    next: string,
+  ) {
+    if (previous === next) return;
+    const notice = SHIPMENT_NOTICES[next];
+    if (!notice) return;
+    void this.notifications.notify({
+      idUser: shipment.idUser,
+      type: 'shipment',
+      title: notice.title,
+      message: notice.message(boxLabel(shipment.boxMonthYear)),
+      link: '/customer/orders',
+      dedupeKey: `shipment:${shipment.id}:${next}`,
+    });
+  }
 
   async assertClubAccess(idClub: number, user: RequestUser) {
     if (user.role === 'admin') return;
@@ -301,6 +355,7 @@ export class ShipmentsService {
         actualDeliveryDate: dto.actualDeliveryDate ? new Date(dto.actualDeliveryDate) : shipment.actualDeliveryDate,
       },
     });
+        this.notifyStatusChange(updated, shipment.shipmentStatus, updated.shipmentStatus);
     return sanitize(updated);
   }
 
@@ -348,6 +403,7 @@ export class ShipmentsService {
         ...(shippingCost !== undefined ? { shippingCost } : {}),
       },
     });
+        this.notifyStatusChange(updated, shipment.shipmentStatus, updated.shipmentStatus);
     return sanitize(updated);
   }
 

@@ -17,6 +17,10 @@ const config: CapacitorConfig = {
       backgroundColor: '#1F3350',
       showSpinner: false,
     },
+    LocalNotifications: {
+      smallIcon: 'ic_stat_aurabox',
+      iconColor: '#C1622B',
+    },
     SystemBars: {
       insetsHandling: 'css',
       style: 'DARK',

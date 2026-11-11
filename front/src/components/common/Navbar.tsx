@@ -2,6 +2,8 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { UserRole } from '../../types/user';
 import { useAuth } from '../../App';
+import { useUnreadNotifications } from '../../utils/useUnreadNotifications';
+import NotificationBell from './NotificationBell';
 
 interface NavbarProps {
   userRole: UserRole | null;
@@ -40,6 +42,7 @@ const Navbar: React.FC<NavbarProps> = ({ userRole, isAuthenticated, onLogout }) 
   const helpMenuRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
   const { user } = useAuth();
+  const unreadCount = useUnreadNotifications(isAuthenticated && userRole === 'customer');
 
   const closeAllDropdowns = useCallback(() => {
     setIsMobileMenuOpen(false);
@@ -100,7 +103,8 @@ const Navbar: React.FC<NavbarProps> = ({ userRole, isAuthenticated, onLogout }) 
     if (!(isAuthenticated && userRole === 'customer')) return null;
     return (
       <>
-        <Link to="/customer/wishlist" className={iconLinkClass} onClick={closeAllDropdowns} aria-label="Mi Lista de Deseos">
+        <NotificationBell count={unreadCount} className={iconLinkClass} onClick={closeAllDropdowns} />
+          <Link to="/customer/wishlist" className={iconLinkClass} onClick={closeAllDropdowns} aria-label="Mi Lista de Deseos">
           <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
           </svg>
