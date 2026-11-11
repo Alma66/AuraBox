@@ -1,3 +1,9 @@
 node_modules/
 front/node_modules/
 .env
+
+*.dump
+back/*.sql
+back/Enter
+back/GitHub
+back/curl
