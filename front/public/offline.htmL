@@ -1,0 +1,130 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="theme-color" content="#1F3350" />
+    <title>AuraBox - Sin conexión</title>
+    <style>
+      * { box-sizing: border-box; }
+      html, body { margin: 0; height: 100%; }
+      body {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 24px;
+        background: #FBF4E9;
+        color: #1F3350;
+        font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+        -webkit-tap-highlight-color: transparent;
+        user-select: none;
+      }
+      main { width: 100%; max-width: 360px; text-align: center; }
+      .logo { width: 96px; height: 96px; margin: 0 auto 24px; display: block; }
+      h1 { margin: 0 0 8px; font-size: 26px; line-height: 1.2; }
+      p { margin: 0 0 28px; font-size: 16px; line-height: 1.5; color: rgba(31, 51, 80, 0.7); }
+      button {
+        width: 100%;
+        min-height: 52px;
+        border: 0;
+        border-radius: 999px;
+        background: #C1622B;
+        color: #fff;
+        font-size: 17px;
+        font-weight: 700;
+        font-family: inherit;
+        cursor: pointer;
+      }
+      button:active { background: #9E4D20; }
+      button:disabled { opacity: 0.6; }
+      .status {
+        margin: 18px 0 0;
+        min-height: 22px;
+        font-size: 14px;
+        color: rgba(31, 51, 80, 0.55);
+      }
+      .dot {
+        display: inline-block;
+        width: 8px;
+        height: 8px;
+        margin-right: 8px;
+        border-radius: 50%;
+        background: #E3A73C;
+        animation: pulse 1.2s ease-in-out infinite;
+      }
+      @keyframes pulse {
+        0%, 100% { opacity: 0.25; transform: scale(0.8); }
+        50% { opacity: 1; transform: scale(1); }
+      }
+      @media (prefers-reduced-motion: reduce) {
+        .dot { animation: none; }
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <img class="logo" src="aurabox-mark.svg" alt="AuraBox" />
+      <h1>Sin conexión</h1>
+      <p>No pudimos conectarnos a AuraBox. Revisá tu internet y volvemos a intentar solos en cuanto lo recuperes.</p>
+      <button id="retry" type="button">Reintentar</button>
+      <div class="status" id="status" role="status" aria-live="polite"><span class="dot"></span>Esperando conexión...</div>
+    </main>
+    <script>
+      (function () {
+        var TARGET = 'https://aura-box-blond.vercel.app/';
+        var button = document.getElementById('retry');
+        var status = document.getElementById('status');
+        var checking = false;
+        var manualAt = 0;
+
+        function setStatus(html) {
+          status.innerHTML = html;
+        }
+
+        function check(manual) {
+          if (checking) return;
+          checking = true;
+          button.disabled = true;
+          if (manual) {
+            manualAt = Date.now();
+            setStatus('<span class="dot"></span>Probando conexión...');
+          }
+          var controller = typeof AbortController === 'function' ? new AbortController() : null;
+          var timer = setTimeout(function () {
+            if (controller) controller.abort();
+          }, 6000);
+          fetch(TARGET + '?_=' + Date.now(), { mode: 'no-cors', cache: 'no-store', signal: controller ? controller.signal : undefined })
+            .then(function () {
+              clearTimeout(timer);
+              setStatus('<span class="dot"></span>Conectado, abriendo AuraBox...');
+              window.location.replace(TARGET);
+            })
+            .catch(function () {
+              clearTimeout(timer);
+              checking = false;
+              button.disabled = false;
+              if (manual) {
+                manualAt = Date.now();
+                setStatus('Todavía no hay conexión. Probá de nuevo en unos segundos.');
+              } else if (Date.now() - manualAt > 6000) {
+                setStatus('<span class="dot"></span>Esperando conexión...');
+              }
+            });
+        }
+
+        button.addEventListener('click', function () {
+          check(true);
+        });
+        window.addEventListener('online', function () {
+          check(false);
+        });
+        document.addEventListener('visibilitychange', function () {
+          if (!document.hidden) check(false);
+        });
+        setInterval(function () {
+          if (!document.hidden) check(false);
+        }, 4000);
+      })();
+    </script>
+  </body>
+</html>

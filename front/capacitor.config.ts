@@ -9,7 +9,7 @@ const config: CapacitorConfig = {
   appName: 'AuraBox',
   webDir: 'build',
   backgroundColor: '#FBF4E9',
-  server: liveUrl ? { url: liveUrl } : undefined,
+  server: liveUrl ? { url: liveUrl, errorPath: 'offline.html' } : undefined,
   plugins: {
     SplashScreen: {
       launchAutoHide: true,
