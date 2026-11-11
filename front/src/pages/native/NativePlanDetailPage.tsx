@@ -59,7 +59,7 @@ const NativePlanDetailPage: React.FC = () => {
   const [reviewSuccess, setReviewSuccess] = useState(false);
 
   const [sheetOpen, setSheetOpen] = useState(false);
-  const [reviewRating, setReviewRating] = useState(5);
+  const [reviewRating, setReviewRating] = useState(0);
   const [reviewTitle, setReviewTitle] = useState('');
   const [reviewComment, setReviewComment] = useState('');
   const [reviewFiles, setReviewFiles] = useState<File[]>([]);
@@ -296,6 +296,10 @@ const NativePlanDetailPage: React.FC = () => {
 
   const handleSubmitReview = async () => {
     if (!planId || submitting) return;
+    if (reviewRating < 1) {
+      setReviewError('Elegí una calificación de 1 a 5 estrellas para publicar tu reseña.');
+      return;
+    }
     setSubmitting(true);
     setReviewError('');
     try {
@@ -318,7 +322,7 @@ const NativePlanDetailPage: React.FC = () => {
       setReviewTitle('');
       setReviewComment('');
       setReviewFiles([]);
-      setReviewRating(5);
+      setReviewRating(0);
       toast.success('¡Gracias por tu reseña!');
       fetchEligibility();
       setReviewsReloadKey((value) => value + 1);
@@ -661,7 +665,10 @@ const NativePlanDetailPage: React.FC = () => {
           </p>
         )}
         <fieldset className="mb-5">
-          <legend className="mb-2 text-sm font-bold text-aurora-navy">Calificación</legend>
+          <legend className="mb-2 text-sm font-bold text-aurora-navy">
+            Calificación <span className="text-aurora-terracotta" aria-hidden="true">*</span>
+          </legend>
+          
           <div className="flex gap-1">
             {[1, 2, 3, 4, 5].map((value) => (
               <button
@@ -672,6 +679,7 @@ const NativePlanDetailPage: React.FC = () => {
                 onClick={() => {
                   tapFeedback();
                   setReviewRating(value);
+                  setReviewError('');
                 }}
                 className="flex h-11 w-11 items-center justify-center"
               >

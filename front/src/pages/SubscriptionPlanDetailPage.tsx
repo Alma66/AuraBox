@@ -53,7 +53,7 @@ const SubscriptionPlanDetailPage: React.FC = () => {
 
   const [eligibility, setEligibility] = useState<ReviewEligibility | null>(null);
   const [showReviewForm, setShowReviewForm] = useState(false);
-  const [reviewRating, setReviewRating] = useState(5);
+  const [reviewRating, setReviewRating] = useState(0);
   const [reviewTitle, setReviewTitle] = useState('');
   const [reviewComment, setReviewComment] = useState('');
   const [reviewFiles, setReviewFiles] = useState<File[]>([]);
@@ -224,6 +224,10 @@ const SubscriptionPlanDetailPage: React.FC = () => {
 
   const handleSubmitReview = async () => {
     if (!planId) return;
+    if (reviewRating < 1) {
+      setReviewError('Elegí una calificación de 1 a 5 estrellas para publicar tu reseña.');
+      return;
+    }
     setSubmittingReview(true);
     setReviewError('');
     try {
@@ -248,7 +252,7 @@ const SubscriptionPlanDetailPage: React.FC = () => {
       setReviewTitle('');
       setReviewComment('');
       setReviewFiles([]);
-      setReviewRating(5);
+      setReviewRating(0);
       fetchEligibility();
 
       const summaryRes = await api.get(`/reviews/summary/by-subscription-type/${planId}`);
@@ -499,10 +503,22 @@ const SubscriptionPlanDetailPage: React.FC = () => {
                 </div>
               )}
               <div className="mb-4">
-                <label className="block text-sm font-semibold text-aurora-navy mb-2">Calificación</label>
-                <div className="flex gap-1">
+                <label className="block text-sm font-semibold text-aurora-navy mb-2">
+                  Calificación <span className="text-aurora-terracotta" aria-hidden="true">*</span>
+                </label>
+                <div className="flex items-center gap-1">
                   {[1, 2, 3, 4, 5].map((n) => (
-                    <button key={n} type="button" onClick={() => setReviewRating(n)}>
+                    <button
+                      key={n}
+                      type="button"
+                      aria-label={`${n} ${n === 1 ? 'estrella' : 'estrellas'}`}
+                      aria-pressed={n === reviewRating}
+                      onClick={() => {
+                        setReviewRating(n);
+                        setReviewError('');
+                      }}
+                      className="transition-transform hover:scale-110"
+                    >
                       <svg
                         className={`w-8 h-8 ${n <= reviewRating ? 'text-aurora-gold fill-current' : 'text-aurora-navy/15'}`}
                         fill="currentColor"
@@ -512,6 +528,9 @@ const SubscriptionPlanDetailPage: React.FC = () => {
                       </svg>
                     </button>
                   ))}
+                  <span className="ml-2 text-sm text-aurora-navy/50">
+                    {reviewRating > 0 ? `${reviewRating} de 5` : 'Tocá una estrella'}
+                  </span>
                 </div>
               </div>
               <div className="mb-4">
