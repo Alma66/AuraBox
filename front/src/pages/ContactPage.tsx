@@ -1,11 +1,54 @@
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import api from '../api/config';
 
 const CONTACT_EMAIL = 'auraboxcompany@gmail.com';
+const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+
+const LIMITS = {
+  name: { min: 2, max: 100 },
+  subject: { min: 3, max: 150 },
+  message: { min: 10, max: 2000 },
+};
+
+type FieldName = 'name' | 'email' | 'subject' | 'message';
+type FieldErrors = Partial<Record<FieldName, string>>;
+
+const FIELD_ORDER: FieldName[] = ['name', 'email', 'subject', 'message'];
+
+const validate = (data: Record<FieldName, string>): FieldErrors => {
+  const errors: FieldErrors = {};
+  const name = data.name.trim();
+  const email = data.email.trim();
+  const subject = data.subject.trim();
+  const message = data.message.trim();
+
+  if (!name) errors.name = 'Ingresá tu nombre.';
+  else if (name.length < LIMITS.name.min) errors.name = `El nombre debe tener al menos ${LIMITS.name.min} caracteres.`;
+
+  if (!email) errors.email = 'Ingresá tu correo.';
+  else if (!EMAIL_REGEX.test(email)) errors.email = 'Ingresá un correo válido, por ejemplo tu@email.com.';
+
+  if (!subject) errors.subject = 'Ingresá un asunto.';
+  else if (subject.length < LIMITS.subject.min) errors.subject = `El asunto debe tener al menos ${LIMITS.subject.min} caracteres.`;
+
+  if (!message) errors.message = 'Escribí tu mensaje.';
+  else if (message.length < LIMITS.message.min) {
+    errors.message = `El mensaje debe tener al menos ${LIMITS.message.min} caracteres (escribiste ${message.length}).`;
+  }
+
+  return errors;
+};
+
+const FieldError: React.FC<{ id: string; message?: string }> = ({ id, message }) =>
+  message ? (
+    <p id={id} role="alert" className="mt-1 text-xs text-red-600">
+      {message}
+    </p>
+  ) : null;
 
 const ContactPage: React.FC = () => {
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<Record<FieldName, string>>({
     name: '',
     email: '',
     subject: '',
@@ -14,33 +57,71 @@ const ContactPage: React.FC = () => {
   const [website, setWebsite] = useState('');
   const [status, setStatus] = useState<'idle' | 'sending' | 'sent'>('idle');
   const [errorText, setErrorText] = useState('');
+  const [fieldErrors, setFieldErrors] = useState<FieldErrors>({});
+  const feedbackRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if ((status === 'sent' || errorText) && feedbackRef.current) {
+      feedbackRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+  }, [status, errorText]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+    const field = e.target.name as FieldName;
+    setFormData((prev) => ({ ...prev, [field]: e.target.value }));
+    setFieldErrors((prev) => {
+      if (!prev[field]) return prev;
+      const next = { ...prev };
+      delete next[field];
+      return next;
+    });
+    if (status === 'sent') setStatus('idle');
   };
+
+  const inputClass = (field: FieldName, extra = '') =>
+    `input-aurora mt-1 ${extra} ${fieldErrors[field] ? 'border-red-400 focus:border-red-400 focus:ring-red-300/60' : ''}`.trim();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (status === 'sending') return;
     setErrorText('');
+
+    const errors = validate(formData);
+    setFieldErrors(errors);
+    const firstInvalid = FIELD_ORDER.find((field) => errors[field]);
+    if (firstInvalid) {
+      document.getElementById(firstInvalid)?.focus();
+      return;
+    }
+
     setStatus('sending');
     try {
-      await api.post('/inbound/contact', {
-        fullName: formData.name,
-        email: formData.email,
-        subject: formData.subject,
-        message: formData.message,
-        website,
-      });
+      await api.post(
+        '/inbound/contact',
+        {
+          fullName: formData.name.trim(),
+          email: formData.email.trim(),
+          subject: formData.subject.trim(),
+          message: formData.message.trim(),
+          website,
+        },
+        { timeout: 20000 },
+      );
       setFormData({ name: '', email: '', subject: '', message: '' });
       setStatus('sent');
     } catch (err: any) {
       const message = err.response?.data?.message;
-      setErrorText(
-        Array.isArray(message)
-          ? 'Revisá los datos: el mensaje debe tener al menos 10 caracteres y el correo ser válido.'
-          : message || 'No pudimos enviar tu mensaje. Intentá de nuevo en un rato.',
-      );
+      if (err.code === 'ECONNABORTED') {
+        setErrorText('El envío tardó demasiado. Revisá tu conexión e intentá de nuevo.');
+      } else if (!err.response) {
+        setErrorText('No pudimos conectarnos con el servidor. Revisá tu conexión e intentá de nuevo.');
+      } else {
+        setErrorText(
+          Array.isArray(message)
+            ? message.join('. ')
+            : message || 'No pudimos enviar tu mensaje. Intentá de nuevo en un rato.',
+        );
+      }
       setStatus('idle');
     }
   };
@@ -66,80 +147,114 @@ const ContactPage: React.FC = () => {
               </svg>
               Envianos un Mensaje
             </h2>
-            <form onSubmit={handleSubmit} className="space-y-5">
-               <div className="absolute -left-[9999px] h-0 w-0 overflow-hidden" aria-hidden="true">
+            <form onSubmit={handleSubmit} noValidate className="space-y-5">
+              <div className="absolute -left-[9999px] h-0 w-0 overflow-hidden" aria-hidden="true">
                 <label htmlFor="contact-website">No completar</label>
                 <input id="contact-website" type="text" tabIndex={-1} autoComplete="off" value={website} onChange={(e) => setWebsite(e.target.value)} />
               </div>
+              <p className="text-xs text-aurora-navy/50">
+                Los campos con <span className="font-semibold text-aurora-terracotta">*</span> son obligatorios.
+              </p>
               <div>
                 <label htmlFor="name" className="block text-sm font-medium text-aurora-navy/70">
-                  Nombre Completo
+                  Nombre Completo <span className="text-aurora-terracotta" aria-hidden="true">*</span>
                 </label>
                 <input
                   type="text"
                   name="name"
                   id="name"
+                  autoComplete="name"
+                  maxLength={LIMITS.name.max}
                   value={formData.name}
                   onChange={handleChange}
-                  required
-                  className="input-aurora mt-1"
+                  aria-invalid={!!fieldErrors.name}
+                  aria-describedby={fieldErrors.name ? 'name-error' : undefined}
+                  className={inputClass('name')}
                 />
+                <FieldError id="name-error" message={fieldErrors.name} />
               </div>
               <div>
                 <label htmlFor="email" className="block text-sm font-medium text-aurora-navy/70">
-                  Correo Electrónico
+                  Correo Electrónico <span className="text-aurora-terracotta" aria-hidden="true">*</span>
                 </label>
                 <input
                   type="email"
                   name="email"
                   id="email"
+                  autoComplete="email"
+                  maxLength={120}
                   value={formData.email}
                   onChange={handleChange}
-                  required
-                  className="input-aurora mt-1"
+                  aria-invalid={!!fieldErrors.email}
+                  aria-describedby={fieldErrors.email ? 'email-error' : undefined}
+                  className={inputClass('email')}
                 />
+                <FieldError id="email-error" message={fieldErrors.email} />
               </div>
               <div>
                 <label htmlFor="subject" className="block text-sm font-medium text-aurora-navy/70">
-                  Asunto
+                  Asunto <span className="text-aurora-terracotta" aria-hidden="true">*</span>
                 </label>
                 <input
                   type="text"
                   name="subject"
                   id="subject"
+                  maxLength={LIMITS.subject.max}
                   value={formData.subject}
                   onChange={handleChange}
-                  required
-                  className="input-aurora mt-1"
+                  aria-invalid={!!fieldErrors.subject}
+                  aria-describedby={fieldErrors.subject ? 'subject-error' : undefined}
+                  className={inputClass('subject')}
                 />
+                <FieldError id="subject-error" message={fieldErrors.subject} />
               </div>
               <div>
                 <label htmlFor="message" className="block text-sm font-medium text-aurora-navy/70">
-                  Tu Mensaje
+                  Tu Mensaje <span className="text-aurora-terracotta" aria-hidden="true">*</span>
                 </label>
                 <textarea
                   name="message"
                   id="message"
                   rows={5}
+                  maxLength={LIMITS.message.max}
                   value={formData.message}
                   onChange={handleChange}
-                  required
-                  className="input-aurora mt-1 resize-none"
+                  aria-invalid={!!fieldErrors.message}
+                  aria-describedby={fieldErrors.message ? 'message-error' : 'message-hint'}
+                  className={inputClass('message', 'resize-none')}
                 ></textarea>
+                <div className="mt-1 flex items-start justify-between gap-3">
+                  <div className="flex-1">
+                    {fieldErrors.message ? (
+                      <FieldError id="message-error" message={fieldErrors.message} />
+                    ) : (
+                      <p id="message-hint" className="text-xs text-aurora-navy/45">
+                        Mínimo {LIMITS.message.min} caracteres.
+                      </p>
+                    )}
+                  </div>
+                  <p className="text-xs text-aurora-navy/45 tabular-nums">
+                    {formData.message.length}/{LIMITS.message.max}
+                  </p>
+                </div>
               </div>
-               <button type="submit" disabled={status === 'sending'} className="btn-primary w-full disabled:opacity-50">
+
+              <div ref={feedbackRef}>
+                {errorText && (
+                  <p role="alert" className="text-red-600 text-sm text-center bg-red-50 border border-red-100 rounded-lg py-2 px-3">
+                    {errorText}
+                  </p>
+                )}
+                {status === 'sent' && (
+                  <p role="status" className="text-green-700 text-center font-medium bg-green-50 border border-green-100 rounded-lg py-2 px-3">
+                    ¡Mensaje enviado! Te respondemos por correo lo antes posible.
+                  </p>
+                )}
+              </div>
+
+              <button type="submit" disabled={status === 'sending'} className="btn-primary w-full disabled:opacity-50">
                 {status === 'sending' ? 'Enviando...' : 'Enviar Mensaje'}
               </button>
-              {errorText && (
-                <p role="alert" className="text-red-600 text-sm text-center bg-red-50 border border-red-100 rounded-lg py-2 px-3">
-                  {errorText}
-                </p>
-              )}
-              {status === 'sent' && (
-                <p role="status" className="text-green-700 text-center font-medium bg-green-50 border border-green-100 rounded-lg py-2 px-3">
-                  ¡Mensaje enviado! Te respondemos por correo lo antes posible.
-                </p>
-              )}
             </form>
           </div>
 

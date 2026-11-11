@@ -13,6 +13,34 @@ interface LegalRule {
 }
 
 type RulesStatus = 'loading' | 'ready' | 'error';
+type FieldErrors = Record<string, string>;
+
+const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+
+const FIELD_IDS: Record<string, string> = {
+  firstName: 'first-name',
+  lastName: 'last-name',
+  email: 'email-address',
+  birthDate: 'birth-date',
+  documentNumber: 'document-number',
+  phoneNumber: 'phone-number',
+  password: 'password',
+  confirmPassword: 'confirm-password',
+  terms: 'accept-terms',
+};
+
+const FieldError: React.FC<{ id: string; message?: string }> = ({ id, message }) =>
+  message ? (
+    <p id={id} role="alert" className="mt-1 text-xs text-red-600">
+      {message}
+    </p>
+  ) : null;
+
+const RequiredMark: React.FC = () => (
+  <span className="text-aurora-terracotta" aria-hidden="true">
+    {' '}*
+  </span>
+);
 
 const MIN_AGE: Record<AccountType, number> = { customer: 16, entrepreneur: 18 };
 
@@ -49,6 +77,7 @@ const RegisterPage: React.FC<RegisterPageProps> = ({ accountType = 'customer' })
   const [city, setCity] = useState('');
   const [province, setProvince] = useState('');
   const [error, setError] = useState('');
+  const [fieldErrors, setFieldErrors] = useState<FieldErrors>({});
   const [loading, setLoading] = useState(false);
   const [step, setStep] = useState(1);
   const [rules, setRules] = useState<LegalRule[]>([]);
@@ -88,69 +117,140 @@ const RegisterPage: React.FC<RegisterPageProps> = ({ accountType = 'customer' })
   };
   const passwordStrength = Object.values(passwordChecks).filter(Boolean).length;
 
+  const inputClass = (name: string, extra = '') =>
+    `input-aurora ${extra} ${fieldErrors[name] ? 'border-red-400 focus:border-red-400 focus:ring-red-300/60' : ''}`.trim();
+
+  const clearFieldError = (name: string) => {
+    setFieldErrors((prev) => {
+      if (!prev[name]) return prev;
+      const next = { ...prev };
+      delete next[name];
+      return next;
+    });
+  };
+
+  const focusField = (name: string) => {
+    const id = FIELD_IDS[name];
+    if (!id) return;
+    window.setTimeout(() => document.getElementById(id)?.focus(), 0);
+  };
+
+  const showFieldErrors = (errors: FieldErrors) => {
+    setFieldErrors(errors);
+    const first = Object.keys(errors)[0];
+    if (first) focusField(first);
+  };
+
   const validateStep1 = () => {
-    if (!firstName.trim() || !lastName.trim() || !email.trim() || !birthDate) {
-      setError('Completá todos los campos obligatorios.');
-      return false;
+    const errors: FieldErrors = {};
+    if (!firstName.trim()) errors.firstName = 'Ingresá tu nombre.';
+    if (!lastName.trim()) errors.lastName = 'Ingresá tu apellido.';
+    if (!email.trim()) {
+      errors.email = 'Ingresá tu email.';
+    } else if (!EMAIL_REGEX.test(email.trim())) {
+      errors.email = 'Ingresá un email válido, por ejemplo tu@email.com.';
     }
-    const birth = new Date(birthDate);
-    const today = new Date();
-    let age = today.getFullYear() - birth.getFullYear();
-    const monthDiff = today.getMonth() - birth.getMonth();
-    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birth.getDate())) age--;
-    if (age < MIN_AGE[accountType]) {
-      setError(
-        accountType === 'entrepreneur'
-          ? 'Debés ser mayor de 18 años para registrarte como emprendedor.'
-          : 'Debés tener al menos 16 años para registrarte.',
-      );
-      return false;
+    if (!birthDate) {
+      errors.birthDate = 'Ingresá tu fecha de nacimiento.';
+    } else {
+      const birth = new Date(birthDate);
+      const today = new Date();
+      if (Number.isNaN(birth.getTime()) || birth > today) {
+        errors.birthDate = 'Ingresá una fecha de nacimiento válida.';
+      } else {
+        let age = today.getFullYear() - birth.getFullYear();
+        const monthDiff = today.getMonth() - birth.getMonth();
+        if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birth.getDate())) age--;
+        if (age < MIN_AGE[accountType]) {
+          errors.birthDate =
+            accountType === 'entrepreneur'
+              ? 'Debés ser mayor de 18 años para registrarte como emprendedor.'
+              : 'Debés tener al menos 16 años para registrarte.';
+        } else if (age > 120) {
+          errors.birthDate = 'Ingresá una fecha de nacimiento válida.';
+        }
+      }
     }
     setError('');
-    return true;
+    showFieldErrors(errors);
+    return Object.keys(errors).length === 0;
   };
 
   const goToStep2 = () => {
     if (validateStep1()) setStep(2);
   };
 
+  const applyServerError = (text: string) => {
+    if (/email/i.test(text)) {
+      setStep(1);
+      setError('');
+      showFieldErrors({ email: text });
+      return;
+    }
+    if (/documento/i.test(text)) {
+      setError('');
+      showFieldErrors({ documentNumber: text });
+      return;
+    }
+    if (/tel[eé]fono/i.test(text)) {
+      setError('');
+      showFieldErrors({ phoneNumber: text });
+      return;
+    }
+    setError(text);
+  };
+
+  const confirmMismatch = confirmPassword.length > 0 && confirmPassword !== password;
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (step === 1) {
+      goToStep2();
+      return;
+    }
     setError('');
-    if (!documentNumber.trim()) {
-      setError('El número de documento es obligatorio.');
-      return;
-    }
-    if (password !== confirmPassword) {
-      setError('Las contraseñas no coinciden.');
-      return;
-    }
-    if (passwordStrength < 4) {
-      setError('La contraseña debe tener al menos 8 caracteres, una mayúscula, una minúscula y un número.');
-      return;
+    const errors: FieldErrors = {};
+    const documentDigits = documentNumber.replace(/\D/g, '');
+    if (!documentDigits) {
+      errors.documentNumber = 'Ingresá tu número de documento.';
+    } else if (documentDigits.length < 6 || documentDigits.length > 9) {
+      errors.documentNumber = 'El documento debe tener entre 6 y 9 dígitos.';
     }
     const phoneDigits = phoneNumber.replace(/\D/g, '');
     if (phoneDigits && (phoneDigits.length < 8 || phoneDigits.length > 15)) {
-      setError('El teléfono debe tener entre 8 y 15 dígitos.');
+      errors.phoneNumber = 'El teléfono debe tener entre 8 y 15 dígitos.';
+    }
+    if (!password) {
+      errors.password = 'Ingresá una contraseña.';
+    } else if (passwordStrength < 4) {
+      errors.password = 'La contraseña debe tener al menos 8 caracteres, una mayúscula, una minúscula y un número.';
+    }
+    if (!confirmPassword) {
+      errors.confirmPassword = 'Repetí tu contraseña.';
+    } else if (password !== confirmPassword) {
+      errors.confirmPassword = 'Las contraseñas no coinciden.';
+    }
+    if (rules.length > 0 && !acceptedTerms) {
+      errors.terms = 'Tenés que aceptar los términos para crear tu cuenta.';
+    }
+    if (Object.keys(errors).length > 0) {
+      showFieldErrors(errors);
       return;
     }
     if (rulesStatus === 'error') {
       setError('No pudimos cargar los términos de uso. Recargá la página e intentá de nuevo.');
       return;
     }
-    if (rules.length > 0 && !acceptedTerms) {
-      setError('Tenés que aceptar los términos para crear tu cuenta.');
-      return;
-    }
+    setFieldErrors({});
     setLoading(true);
     try {
       const dto: Record<string, unknown> = {
-        firstName,
-        lastName,
-        email,
+        firstName: firstName.trim(),
+        lastName: lastName.trim(),
+        email: email.trim(),
         password,
         documentType,
-        documentNumber,
+        documentNumber: documentDigits,
         phoneNumber: phoneDigits || null,
         birthDate,
         acceptedRuleIds: rules.map((rule) => rule.id),
@@ -173,8 +273,10 @@ const RegisterPage: React.FC<RegisterPageProps> = ({ accountType = 'customer' })
       }
     } catch (err: any) {
       const msg = err.response?.data?.message;
-      const text = Array.isArray(msg) ? msg.join('. ') : msg || 'Error al registrarse. Intentá de nuevo.';
-      setError(text);
+      const text = Array.isArray(msg)
+        ? msg.join('. ')
+        : msg || (err.response ? 'Error al registrarse. Intentá de nuevo.' : 'No pudimos conectarnos. Revisá tu conexión e intentá de nuevo.');
+      applyServerError(text);
       if (typeof text === 'string' && text.includes('Falta tu aceptación')) {
         loadRules();
       }
@@ -183,7 +285,7 @@ const RegisterPage: React.FC<RegisterPageProps> = ({ accountType = 'customer' })
     }
   };
 
-  const submitDisabled = loading || rulesStatus === 'loading' || (rules.length > 0 && !acceptedTerms);
+  const submitDisabled = loading || rulesStatus === 'loading';
 
   return (
     <div className="min-h-[calc(100vh-64px)] flex items-center justify-center bg-aurora-cream py-12 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
@@ -211,27 +313,86 @@ const RegisterPage: React.FC<RegisterPageProps> = ({ accountType = 'customer' })
           <div className={`h-1.5 flex-1 rounded-full transition-colors duration-300 ${step >= 2 ? 'bg-aurora-terracotta' : 'bg-aurora-navy/10'}`} />
         </div>
         <p className="text-xs text-center text-aurora-navy/50 font-medium">Paso {step} de 2</p>
+        <p className="text-xs text-center text-aurora-navy/50">Los campos con <span className="text-aurora-terracotta font-semibold">*</span> son obligatorios.</p>
 
-        <form className="space-y-4" onSubmit={handleSubmit}>
+        <form className="space-y-4" onSubmit={handleSubmit} noValidate>
           {step === 1 && (
             <>
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label htmlFor="first-name" className="block text-xs font-medium text-aurora-navy/70 mb-1">Nombre</label>
-                  <input id="first-name" type="text" required autoComplete="given-name" className="input-aurora" placeholder="Nombre" value={firstName} onChange={(e) => setFirstName(e.target.value)} />
+                  <label htmlFor="first-name" className="block text-xs font-medium text-aurora-navy/70 mb-1">Nombre<RequiredMark /></label>
+                  <input
+                    id="first-name"
+                    type="text"
+                    autoComplete="given-name"
+                    maxLength={60}
+                    aria-invalid={!!fieldErrors.firstName}
+                    aria-describedby={fieldErrors.firstName ? 'first-name-error' : undefined}
+                    className={inputClass('firstName')}
+                    placeholder="Nombre"
+                    value={firstName}
+                    onChange={(e) => {
+                      setFirstName(e.target.value);
+                      clearFieldError('firstName');
+                    }}
+                  />
+                  <FieldError id="first-name-error" message={fieldErrors.firstName} />
                 </div>
                 <div>
-                  <label htmlFor="last-name" className="block text-xs font-medium text-aurora-navy/70 mb-1">Apellido</label>
-                  <input id="last-name" type="text" required autoComplete="family-name" className="input-aurora" placeholder="Apellido" value={lastName} onChange={(e) => setLastName(e.target.value)} />
+                  <label htmlFor="last-name" className="block text-xs font-medium text-aurora-navy/70 mb-1">Apellido<RequiredMark /></label>
+                  <input
+                    id="last-name"
+                    type="text"
+                    autoComplete="family-name"
+                    maxLength={60}
+                    aria-invalid={!!fieldErrors.lastName}
+                    aria-describedby={fieldErrors.lastName ? 'last-name-error' : undefined}
+                    className={inputClass('lastName')}
+                    placeholder="Apellido"
+                    value={lastName}
+                    onChange={(e) => {
+                      setLastName(e.target.value);
+                      clearFieldError('lastName');
+                    }}
+                  />
+                  <FieldError id="last-name-error" message={fieldErrors.lastName} />
                 </div>
               </div>
               <div>
-                <label htmlFor="email-address" className="block text-xs font-medium text-aurora-navy/70 mb-1">Email</label>
-                <input id="email-address" type="email" autoComplete="email" required className="input-aurora" placeholder="tu@email.com" value={email} onChange={(e) => setEmail(e.target.value)} />
+                <label htmlFor="email-address" className="block text-xs font-medium text-aurora-navy/70 mb-1">Email<RequiredMark /></label>
+                <input
+                  id="email-address"
+                  type="email"
+                  autoComplete="email"
+                  maxLength={120}
+                  aria-invalid={!!fieldErrors.email}
+                  aria-describedby={fieldErrors.email ? 'email-error' : undefined}
+                  className={inputClass('email')}
+                  placeholder="tu@email.com"
+                  value={email}
+                  onChange={(e) => {
+                    setEmail(e.target.value);
+                    clearFieldError('email');
+                  }}
+                />
+                <FieldError id="email-error" message={fieldErrors.email} />
               </div>
               <div>
-                <label htmlFor="birth-date" className="block text-xs font-medium text-aurora-navy/70 mb-1">Fecha de Nacimiento</label>
-                <input id="birth-date" type="date" required autoComplete="bday" className="input-aurora" value={birthDate} onChange={(e) => setBirthDate(e.target.value)} />
+                <label htmlFor="birth-date" className="block text-xs font-medium text-aurora-navy/70 mb-1">Fecha de Nacimiento<RequiredMark /></label>
+                <input
+                  id="birth-date"
+                  type="date"
+                  autoComplete="bday"
+                  aria-invalid={!!fieldErrors.birthDate}
+                  aria-describedby={fieldErrors.birthDate ? 'birth-date-error' : undefined}
+                  className={inputClass('birthDate')}
+                  value={birthDate}
+                  onChange={(e) => {
+                    setBirthDate(e.target.value);
+                    clearFieldError('birthDate');
+                  }}
+                />
+                <FieldError id="birth-date-error" message={fieldErrors.birthDate} />
               </div>
 
               {error && <p role="alert" className="text-red-600 text-sm text-center bg-red-50 border border-red-100 rounded-lg py-2 px-3">{error}</p>}
@@ -246,8 +407,8 @@ const RegisterPage: React.FC<RegisterPageProps> = ({ accountType = 'customer' })
             <>
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label htmlFor="document-type" className="block text-xs font-medium text-aurora-navy/70 mb-1">Tipo de Documento</label>
-                  <select id="document-type" required className="input-aurora" value={documentType} onChange={(e) => setDocumentType(e.target.value)}>
+                  <label htmlFor="document-type" className="block text-xs font-medium text-aurora-navy/70 mb-1">Tipo de Documento<RequiredMark /></label>
+                  <select id="document-type" className="input-aurora" value={documentType} onChange={(e) => setDocumentType(e.target.value)}>
                     <option value="DNI">DNI</option>
                     <option value="Pasaporte">Pasaporte</option>
                     <option value="LC">LC</option>
@@ -255,13 +416,44 @@ const RegisterPage: React.FC<RegisterPageProps> = ({ accountType = 'customer' })
                   </select>
                 </div>
                 <div>
-                  <label htmlFor="document-number" className="block text-xs font-medium text-aurora-navy/70 mb-1">Número</label>
-                  <input id="document-number" type="number" inputMode="numeric" required className="input-aurora" placeholder="12345678" value={documentNumber} onChange={(e) => setDocumentNumber(e.target.value)} />
+                  <label htmlFor="document-number" className="block text-xs font-medium text-aurora-navy/70 mb-1">Número<RequiredMark /></label>
+                  <input
+                    id="document-number"
+                    type="text"
+                    inputMode="numeric"
+                    maxLength={9}
+                    aria-invalid={!!fieldErrors.documentNumber}
+                    aria-describedby={fieldErrors.documentNumber ? 'document-number-error' : undefined}
+                    className={inputClass('documentNumber')}
+                    placeholder="12345678"
+                    value={documentNumber}
+                    onChange={(e) => {
+                      setDocumentNumber(e.target.value.replace(/\D/g, '').slice(0, 9));
+                      clearFieldError('documentNumber');
+                    }}
+                  />
                 </div>
               </div>
+              <FieldError id="document-number-error" message={fieldErrors.documentNumber} />
               <div>
                 <label htmlFor="phone-number" className="block text-xs font-medium text-aurora-navy/70 mb-1">Teléfono (opcional)</label>
-                <input id="phone-number" type="tel" autoComplete="tel" className="input-aurora" placeholder="11 1234-5678" value={phoneNumber} onChange={(e) => setPhoneNumber(e.target.value)} />
+                <input
+                  id="phone-number"
+                  type="tel"
+                  inputMode="tel"
+                  autoComplete="tel"
+                  maxLength={20}
+                  aria-invalid={!!fieldErrors.phoneNumber}
+                  aria-describedby={fieldErrors.phoneNumber ? 'phone-number-error' : undefined}
+                  className={inputClass('phoneNumber')}
+                  placeholder="11 1234-5678"
+                  value={phoneNumber}
+                  onChange={(e) => {
+                    setPhoneNumber(e.target.value.replace(/[^\d+\-()\s]/g, ''));
+                    clearFieldError('phoneNumber');
+                  }}
+                />
+                <FieldError id="phone-number-error" message={fieldErrors.phoneNumber} />
               </div>
 
               {accountType === 'entrepreneur' && (
@@ -281,9 +473,23 @@ const RegisterPage: React.FC<RegisterPageProps> = ({ accountType = 'customer' })
               )}
 
               <div>
-                <label htmlFor="password" className="block text-xs font-medium text-aurora-navy/70 mb-1">Contraseña</label>
+                <label htmlFor="password" className="block text-xs font-medium text-aurora-navy/70 mb-1">Contraseña<RequiredMark /></label>
                 <div className="relative">
-                  <input id="password" type={showPassword ? 'text' : 'password'} autoComplete="new-password" required className="input-aurora pr-16" placeholder="Mínimo 8 caracteres" value={password} onChange={(e) => setPassword(e.target.value)} />
+                  <input
+                    id="password"
+                    type={showPassword ? 'text' : 'password'}
+                    autoComplete="new-password"
+                    maxLength={72}
+                    aria-invalid={!!fieldErrors.password}
+                    aria-describedby={fieldErrors.password ? 'password-error' : undefined}
+                    className={inputClass('password', 'pr-16')}
+                    placeholder="Mínimo 8 caracteres"
+                    value={password}
+                    onChange={(e) => {
+                      setPassword(e.target.value);
+                      clearFieldError('password');
+                    }}
+                  />
                   <button
                     type="button"
                     onClick={() => setShowPassword((prev) => !prev)}
@@ -305,10 +511,29 @@ const RegisterPage: React.FC<RegisterPageProps> = ({ accountType = 'customer' })
                   </div>
                 )}
                 <p className="text-xs text-aurora-navy/45 mt-1">8+ caracteres, mayúscula, minúscula y número</p>
+                <FieldError id="password-error" message={fieldErrors.password} />
               </div>
               <div>
-                <label htmlFor="confirm-password" className="block text-xs font-medium text-aurora-navy/70 mb-1">Confirmar Contraseña</label>
-                <input id="confirm-password" type={showPassword ? 'text' : 'password'} autoComplete="new-password" required className="input-aurora" placeholder="Repetí tu contraseña" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} />
+                <label htmlFor="confirm-password" className="block text-xs font-medium text-aurora-navy/70 mb-1">Confirmar Contraseña<RequiredMark /></label>
+                <input
+                  id="confirm-password"
+                  type={showPassword ? 'text' : 'password'}
+                  autoComplete="new-password"
+                  maxLength={72}
+                  aria-invalid={!!fieldErrors.confirmPassword || confirmMismatch}
+                  aria-describedby={fieldErrors.confirmPassword || confirmMismatch ? 'confirm-password-error' : undefined}
+                  className={inputClass('confirmPassword', confirmMismatch ? 'border-red-400 focus:border-red-400 focus:ring-red-300/60' : '')}
+                  placeholder="Repetí tu contraseña"
+                  value={confirmPassword}
+                  onChange={(e) => {
+                    setConfirmPassword(e.target.value);
+                    clearFieldError('confirmPassword');
+                  }}
+                />
+                <FieldError
+                  id="confirm-password-error"
+                  message={fieldErrors.confirmPassword || (confirmMismatch ? 'Las contraseñas no coinciden.' : undefined)}
+                />
               </div>
 
               {rulesStatus === 'error' && (
@@ -321,12 +546,15 @@ const RegisterPage: React.FC<RegisterPageProps> = ({ accountType = 'customer' })
               )}
 
               {rulesStatus === 'ready' && rules.length > 0 && (
-                <div className="flex items-start gap-3 rounded-xl bg-aurora-cream p-3">
+                <div className={`flex items-start gap-3 rounded-xl bg-aurora-cream p-3 ${fieldErrors.terms ? 'ring-1 ring-red-400' : ''}`}>
                   <input
                     id="accept-terms"
                     type="checkbox"
                     checked={acceptedTerms}
-                    onChange={(e) => setAcceptedTerms(e.target.checked)}
+                    onChange={(e) => {
+                      setAcceptedTerms(e.target.checked);
+                      clearFieldError('terms');
+                    }}
                     className="mt-1 h-5 w-5 flex-shrink-0 rounded border-aurora-navy/30 accent-aurora-terracotta"
                   />
                   <label htmlFor="accept-terms" className="text-sm text-aurora-navy/80">
@@ -348,6 +576,7 @@ const RegisterPage: React.FC<RegisterPageProps> = ({ accountType = 'customer' })
                   </label>
                 </div>
               )}
+              <FieldError id="terms-error" message={fieldErrors.terms} />
 
               {error && <p role="alert" className="text-red-600 text-sm text-center bg-red-50 border border-red-100 rounded-lg py-2 px-3">{error}</p>}
 
