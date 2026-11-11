@@ -303,23 +303,13 @@ export class CartItemService {
       throw new BadRequestException('Ya tenés una suscripción vigente a los planes de tu carrito');
     }
 
+  
     const method = await findOrCreateMethod(this.prisma, code);
     const now = new Date();
     const mpRef = useMercadoPago ? `AB-${idUser}-${now.getTime()}-${Math.random().toString(36).slice(2, 8)}` : null;
     const mpOrder =
       mpRef !== null
         ? await this.mercadoPago.createOrder({
-            ref: mpRef,
-            items: toCreate.map((entry) => ({
-              id: String(entry.plan.id),
-              title: `${entry.plan.name} - ${entry.club.name}`,
-              amount: entry.amount,
-            })),
-          })
-        : null;    
-    const preference =
-      mpRef !== null
-        ? await this.mercadoPago.createPreference({
             ref: mpRef,
             items: toCreate.map((entry) => ({
               id: String(entry.plan.id),

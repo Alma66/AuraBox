@@ -1156,11 +1156,6 @@ if (!redirecting) setIsProcessing(false);
               <div className="space-y-3" role="radiogroup" aria-label={`Envío de ${club.clubName}`}>
                 {club.couriers.map((courier) => (
                   <RadioCard
-                   {isMercadoPago && (
-                <p className="text-sm text-aurora-navy/80">
-                  Al confirmar la compra te llevamos a Mercado Pago para que pagues de forma segura con tarjeta, dinero en cuenta u otros medios. Cuando se apruebe, tu suscripción se activa automáticamente.
-                </p>
-              )}
                     key={courier.id}
                     id={`courier-${club.clubId}-${courier.id}`}
                     name={`courier-${club.clubId}`}
@@ -1202,10 +1197,15 @@ if (!redirecting) setIsProcessing(false);
                 setTransferConfirmed(false);
                 setStepError(null);
               }}
-              icon={method.icon}
+                            icon={method.icon}
               title={method.label}
               hint={method.hint}
             >
+              {isMercadoPago && (
+                <p className="text-sm text-aurora-navy/80">
+                  Al confirmar la compra te llevamos a Mercado Pago para que pagues de forma segura con tarjeta, dinero en cuenta u otros medios. Cuando se apruebe, tu suscripción se activa automáticamente.
+                </p>
+              )}
               {isCardMethod && (
                 <div>
                   <div className="mb-4">
