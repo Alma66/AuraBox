@@ -34,4 +34,4 @@ export class NotificationsController {
   async markRead(@Param('id', ParseIntPipe) id: number, @Request() req) {
     return this.notificationsService.markRead(req.user.id, id);
   }
-}
+} 

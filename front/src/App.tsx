@@ -23,6 +23,7 @@ import FAQPage from './pages/FAQPage';
 import AboutUsPage from './pages/AboutUsPage';
 import ContactPage from './pages/ContactPage';
 import NotificationsPage from './pages/NotificationsPage';
+import CheckoutResultPage from './pages/client/CheckoutResultPage';
 import ClubReviewsPage from './pages/ClubReviewsPage';
 import PlatformRulesPage from './pages/PlatformRulesPage';
 import SubscriptionPlanDetailPage from './pages/SubscriptionPlanDetailPage';
@@ -308,7 +309,8 @@ const AppContent: React.FC = () => {
       <Route path="/customer/wishlist" element={pr(['customer'], isNativeApp() ? <NativeWishlistPage /> : <WishlistPage />)} />
       <Route path="/cart" element={pr(['customer'], isNativeApp() ? <NativeCartPage /> : <CartPage />)} />
       <Route path="/checkout" element={pr(['customer'], <CheckoutPage />)} />
-
+      <Route path="/checkout/result" element={pr(['customer'], <CheckoutResultPage />)} />
+      
       <Route path="/entrepreneur/dashboard" element={pr(['entrepreneur'], <EntrepreneurDashboardPage />)} />
       <Route path="/entrepreneur/profile" element={pr(['entrepreneur'], <EntrepreneurProfilePage />)} />
 

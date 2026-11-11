@@ -34,6 +34,7 @@ const STATIC_TITLES: Record<string, string> = {
   '/explore': 'Explorar',
   '/cart': 'Mi carrito',
   '/checkout': 'Finalizar compra',
+  '/checkout/result': 'Resultado del pago',
   '/customer/orders': 'Mis pedidos',
   '/customer/subscriptions': 'Mis suscripciones',
   '/customer/profile': 'Mi cuenta',

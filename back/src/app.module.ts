@@ -58,6 +58,7 @@ import { AllExceptionsFilter } from './common/filters/all-exceptions.filter';
 import { InboundRequestsModule } from './modules/inbound-requests/inbound-requests.module';
 import { SiteContentModule } from './modules/site-content/site-content.module';
 import { NotificationsModule } from './modules/notifications/notifications.module';
+import { MercadoPagoModule } from './modules/mercadopago/mercadopago.module';
 import { validationExceptionFactory } from './common/pipes/validation-exception.factory';
 
 const jwtSecret = process.env.JWT_SECRET;
@@ -126,6 +127,7 @@ if (!jwtSecret) {
     ClubLegalContentModule,
     NewsletterModule,
     NotificationsModule,
+    MercadoPagoModule,
   ],
   controllers: [AppController],
 

@@ -11,6 +11,7 @@ import {
 import { nextPaymentFrom, priceFor } from '../../common/utils/billing';
 import { findOrCreateMethod, getAcceptedCodes } from '../../common/utils/payment-methods';
 import { courierFee } from '../../common/utils/shipping';
+import { MercadoPagoService } from '../mercadopago/mercadopago.service';
 
 const CLOSED_STATUSES = ['Cancelada', 'Finalizada'];
 
@@ -36,8 +37,10 @@ function mapPlan(p: any) {
 
 @Injectable()
 export class CartItemService {
-  constructor(private readonly prisma: PrismaService) {}
-
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly mercadoPago: MercadoPagoService,
+  ) {}
   private async assertPlanAvailable(planId: number) {
     const plan = await this.prisma.subscription_Types.findUnique({ where: { id: planId } });
     if (!plan) throw new NotFoundException('Plan de suscripción no encontrado');
@@ -254,7 +257,8 @@ export class CartItemService {
     const code = dto.paymentMethod as PaymentMethodCode;
     const isTransfer = code === 'transferencia';
     const isCash = code === 'efectivo';
-    const paymentConfirmed = isCash ? false : !isTransfer || AUTO_CONFIRM_TRANSFERS;
+    const useMercadoPago = code === 'mercadopago' && this.mercadoPago.isEnabled();
+    const paymentConfirmed = isCash || useMercadoPago ? false : !isTransfer || AUTO_CONFIRM_TRANSFERS;
     const subscriptionActive = isCash || paymentConfirmed;
 
     const toCreate: {
@@ -301,6 +305,29 @@ export class CartItemService {
 
     const method = await findOrCreateMethod(this.prisma, code);
     const now = new Date();
+    const mpRef = useMercadoPago ? `AB-${idUser}-${now.getTime()}-${Math.random().toString(36).slice(2, 8)}` : null;
+    const mpOrder =
+      mpRef !== null
+        ? await this.mercadoPago.createOrder({
+            ref: mpRef,
+            items: toCreate.map((entry) => ({
+              id: String(entry.plan.id),
+              title: `${entry.plan.name} - ${entry.club.name}`,
+              amount: entry.amount,
+            })),
+          })
+        : null;    
+    const preference =
+      mpRef !== null
+        ? await this.mercadoPago.createPreference({
+            ref: mpRef,
+            items: toCreate.map((entry) => ({
+              id: String(entry.plan.id),
+              title: `${entry.plan.name} - ${entry.club.name}`,
+              amount: entry.amount,
+            })),
+          })
+        : null;
     const subscriptionStatus = subscriptionActive ? 'Activa' : 'Pendiente_Pago';
     const paymentStatus = paymentConfirmed ? 'Exitoso' : 'Pendiente';
     const streetNumber = parseInt(dto.address.streetNumber, 10);
@@ -335,7 +362,11 @@ export class CartItemService {
             idUser,
             idClub: plan.idClub,
             idPaymentMethods: method.id,
-            idGatewayTransaction: paymentConfirmed ? `SIM-${now.getTime()}-${sub.id}` : null,
+            idGatewayTransaction: paymentConfirmed
+              ? `SIM-${now.getTime()}-${sub.id}`
+              : mpRef && mpOrder
+                ? this.mercadoPago.pendingMarker(mpOrder.orderId, mpRef)
+                : null,
             totalAmountPaid: String(amount),
             clubAmount: String(amount - AURABOX_COMMISSION),
             commissionAmount: String(AURABOX_COMMISSION),
@@ -387,6 +418,8 @@ export class CartItemService {
       createdCount: created.length,
       pendingPayment: !paymentConfirmed,
       cashOnDelivery: isCash,
+      checkoutUrl: mpOrder ? mpOrder.checkoutUrl : null,
+      paymentRef: mpRef,
       total,
       shippingTotal,
       subscriptions: created,

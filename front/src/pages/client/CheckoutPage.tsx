@@ -5,7 +5,7 @@ import { useAuth } from '../../App';
 import api, { getResponseData } from '../../api/config';
 import { User } from '../../types/user';
 import { notifyCartChanged } from '../../utils/cartEvents';
-import { isNativeApp } from '../../utils/native';
+import { isNativeApp, openPaymentPage } from '../../utils/native';
 
 interface CartPlan {
   planId: number;
@@ -731,7 +731,8 @@ const CheckoutPage: React.FC = () => {
   const grandTotal = plansSubtotal + shippingTotal;
 
   const availableMethods = PAYMENT_METHODS.filter((method) => options.methods.includes(method.id));
-  const isCardMethod = selectedPaymentMethod === 'mercadopago' || selectedPaymentMethod === 'tarjeta';
+  const isMercadoPago = selectedPaymentMethod === 'mercadopago';
+  const isCardMethod = selectedPaymentMethod === 'tarjeta';
   const isTransfer = selectedPaymentMethod === 'transferencia';
   const isCash = selectedPaymentMethod === 'efectivo';
   const methodLabel = PAYMENT_METHODS.find((method) => method.id === selectedPaymentMethod)?.label ?? '';
@@ -809,6 +810,7 @@ const CheckoutPage: React.FC = () => {
     setStepError(null);
     setIsProcessing(true);
     const started = Date.now();
+    let redirecting = false;
     try {
       const res = await api.post('/cart-items/checkout', {
         paymentMethod: selectedPaymentMethod,
@@ -829,6 +831,14 @@ const CheckoutPage: React.FC = () => {
       const minimum = isCardMethod ? 2200 : 800;
       await wait(Math.max(0, minimum - (Date.now() - started)));
       const result = getResponseData(res);
+      if (result?.checkoutUrl) {
+        notifyCartChanged();
+        const inOverlay = await openPaymentPage(result.checkoutUrl);
+        if (!inOverlay) {
+          redirecting = true;
+          return;
+        }
+      }      
       setPaidInCash(Boolean(result?.cashOnDelivery));
       setReceipt(result?.receipt ?? null);
       setCompleted(true);
@@ -839,7 +849,7 @@ const CheckoutPage: React.FC = () => {
       const msg = err?.response?.data?.message;
       setStepError(Array.isArray(msg) ? msg.join(', ') : (msg ?? 'No pudimos procesar tu compra. Intentá de nuevo.'));
     } finally {
-      setIsProcessing(false);
+if (!redirecting) setIsProcessing(false);
     }
   };
 
@@ -868,19 +878,28 @@ const CheckoutPage: React.FC = () => {
   }
 
   if (completed) {
-    const pending = receipt?.pending ?? false;
+       const pending = receipt?.pending ?? false;
+    const awaitingMp = pending && receipt?.method === 'mercadopago';
     const title = paidInCash
       ? '¡Compra confirmada!'
-      : pending
-        ? '¡Suscripción registrada!'
-        : '¡Pago realizado con éxito!';
+      : awaitingMp
+        ? 'Completá tu pago en Mercado Pago'
+        : pending
+          ? '¡Suscripción registrada!'
+          : '¡Pago realizado con éxito!';
     const text = paidInCash
       ? 'Tu suscripción ya está activa. Pagás en efectivo cuando recibas tu caja y el club registra el cobro.'
-      : pending
-        ? 'Tu suscripción queda pendiente de pago hasta que el club confirme tu transferencia.'
-        : 'Tu orden fue procesada correctamente. Podés seguir el estado de tus suscripciones desde tu cuenta.';
+      : awaitingMp
+        ? 'Cuando Mercado Pago confirme el pago, tu suscripción se activa sola y te avisamos con una notificación.'
+        : pending
+          ? 'Tu suscripción queda pendiente de pago hasta que el club confirme tu transferencia.'
+          : 'Tu orden fue procesada correctamente. Podés seguir el estado de tus suscripciones desde tu cuenta.';
     const timeline = [
-      pending && !paidInCash ? 'El club confirma tu transferencia.' : 'El club recibe tu pedido y prepara tu caja.',
+      awaitingMp
+        ? 'Mercado Pago confirma tu pago y se activa tu suscripción.'
+        : pending && !paidInCash
+          ? 'El club confirma tu transferencia.'
+          : 'El club recibe tu pedido y prepara tu caja.',
       'Se asigna la empresa de envío que elegiste.',
       paidInCash ? 'Recibís tu caja y abonás en efectivo.' : 'Recibís tu caja en la dirección indicada.',
     ];
@@ -1137,6 +1156,11 @@ const CheckoutPage: React.FC = () => {
               <div className="space-y-3" role="radiogroup" aria-label={`Envío de ${club.clubName}`}>
                 {club.couriers.map((courier) => (
                   <RadioCard
+                   {isMercadoPago && (
+                <p className="text-sm text-aurora-navy/80">
+                  Al confirmar la compra te llevamos a Mercado Pago para que pagues de forma segura con tarjeta, dinero en cuenta u otros medios. Cuando se apruebe, tu suscripción se activa automáticamente.
+                </p>
+              )}
                     key={courier.id}
                     id={`courier-${club.clubId}-${courier.id}`}
                     name={`courier-${club.clubId}`}
@@ -1392,8 +1416,8 @@ const CheckoutPage: React.FC = () => {
         >
           <div className="mb-4 h-14 w-14 animate-spin rounded-full border-b-4 border-white"></div>
           <p className="text-lg font-semibold text-white">
-            {isCardMethod ? 'Procesando tu pago…' : 'Registrando tu compra…'}
-          </p>
+            {isMercadoPago ? 'Abriendo Mercado Pago…' : isCardMethod ? 'Procesando tu pago…' : 'Registrando tu compra…'}
+           </p>
           <p className="text-sm text-white/80">No cierres ni recargues esta página.</p>
         </div>
       )}
