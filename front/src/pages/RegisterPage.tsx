@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useState } from 'react';
 import { Link, Navigate, useNavigate, useSearchParams } from 'react-router-dom';
 import api, { getResponseData } from '../api/config';
 import { PROVINCES } from '../constants/provinces';
+import AuthLayout from '../components/common/AuthLayout';
 
 type AccountType = 'customer' | 'entrepreneur';
 
@@ -43,6 +44,29 @@ const RequiredMark: React.FC = () => (
 );
 
 const MIN_AGE: Record<AccountType, number> = { customer: 16, entrepreneur: 18 };
+
+const SIDE: Record<AccountType, { eyebrow: string; title: string; text: string; points: string[] }> = {
+  customer: {
+    eyebrow: 'Para clientes',
+    title: 'Descubrí cajas hechas por emprendedores argentinos',
+    text: 'Creá tu cuenta gratis, elegí un club y recibí sorpresas en tu casa.',
+    points: [
+      'Pagá con Mercado Pago, tarjeta, transferencia o efectivo',
+      'Pausá o cancelá tu suscripción cuando quieras',
+      'Seguí tus envíos desde tu cuenta',
+    ],
+  },
+  entrepreneur: {
+    eyebrow: 'Para emprendedores',
+    title: 'Mostrale tu club a toda la comunidad AuraBox',
+    text: 'Registrate, cargá los datos de tu club y nuestro equipo lo revisa antes de publicarlo.',
+    points: [
+      'Armá tu página de club con tus planes y tus fotos',
+      'Gestioná suscriptores y pedidos desde tu panel',
+      'Revisión del equipo antes de publicar',
+    ],
+  },
+};
 
 const COPY: Record<AccountType, { title: string; eyebrow: string; subtitle: string; submit: string }> = {
   customer: {
@@ -287,23 +311,20 @@ const RegisterPage: React.FC<RegisterPageProps> = ({ accountType = 'customer' })
 
   const submitDisabled = loading || rulesStatus === 'loading';
 
-  return (
-    <div className="min-h-[calc(100vh-64px)] flex items-center justify-center bg-aurora-cream py-12 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
-      <div className="absolute -top-32 -right-20 w-96 h-96 bg-aurora-gold/10 rounded-full blur-3xl pointer-events-none" />
-      <div className="absolute -bottom-32 -left-20 w-96 h-96 bg-aurora-terracotta/10 rounded-full blur-3xl pointer-events-none" />
+  const side = SIDE[accountType];
 
-      <div className="max-w-md w-full space-y-6 p-10 card-surface shadow-aurora relative animate-fadeInUp">
+  return (
+    <AuthLayout panelEyebrow={side.eyebrow} panelTitle={side.title} panelText={side.text} points={side.points}>
+      <div className="space-y-6 rounded-3xl bg-white p-8 shadow-aurora ring-1 ring-aurora-navy/5 sm:p-10">
         <div>
-          <div className="flex justify-center mb-4">
-            <img src="/aurabox-mark.svg" alt="AuraBox" className="h-14 w-14 rounded-xl" />
-          </div>
-          <span className="section-eyebrow block text-center">{copy.eyebrow}</span>
-          <h1 className="text-center font-display text-3xl font-bold text-aurora-navy">{copy.title}</h1>
-          <p className="mt-2 text-center text-sm text-aurora-navy/60">{copy.subtitle}</p>
-          <p className="mt-2 text-center text-sm text-aurora-navy/60">
+          <img src="/aurabox-mark.svg" alt="AuraBox" className="mb-5 h-12 w-12 rounded-xl lg:hidden" />
+          <span className="section-eyebrow">{copy.eyebrow}</span>
+          <h1 className="font-display text-4xl font-medium leading-tight text-aurora-navy">{copy.title}</h1>
+          <p className="mt-2 text-sm text-aurora-navy/60">{copy.subtitle}</p>
+          <p className="mt-2 text-sm text-aurora-navy/60">
             ¿Ya tenés una cuenta?{' '}
             <Link to="/login" className="font-semibold text-aurora-terracotta hover:text-aurora-terracottaDark">
-              Iniciá sesión aquí
+              Iniciá sesión acá
             </Link>
           </p>
         </div>
@@ -397,7 +418,7 @@ const RegisterPage: React.FC<RegisterPageProps> = ({ accountType = 'customer' })
 
               {error && <p role="alert" className="text-red-600 text-sm text-center bg-red-50 border border-red-100 rounded-lg py-2 px-3">{error}</p>}
 
-              <button type="button" onClick={goToStep2} className="btn-primary w-full">
+              <button type="button" onClick={goToStep2} className="btn-primary btn-shine w-full">
                 Continuar
               </button>
             </>
@@ -610,7 +631,7 @@ const RegisterPage: React.FC<RegisterPageProps> = ({ accountType = 'customer' })
           )}
         </div>
       </div>
-    </div>
+    </AuthLayout>
   );
 };
 

@@ -3,6 +3,7 @@ import { Link, useNavigate, useLocation } from 'react-router-dom';
 import api from '../api/config';
 import { User } from '../types/user';
 import { userFromToken } from '../utils/session';
+import AuthLayout from '../components/common/AuthLayout';
 
 interface LoginPageProps {
   onLogin: (user: User) => Promise<User>;
@@ -75,31 +76,33 @@ const LoginPage: React.FC<LoginPageProps> = ({ onLogin }) => {
   };
 
   return (
-    <div className="min-h-[calc(100vh-64px)] flex items-center justify-center bg-aurora-cream py-12 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
-      <div className="absolute -top-32 -left-20 w-96 h-96 bg-aurora-gold/10 rounded-full blur-3xl pointer-events-none" />
-      <div className="absolute -bottom-32 -right-20 w-96 h-96 bg-aurora-terracotta/10 rounded-full blur-3xl pointer-events-none" />
-
-      <div className="max-w-md w-full space-y-8 p-10 card-surface shadow-aurora relative animate-fadeInUp">
-        <div className="space-y-3">
-          <div className="flex justify-center mb-4">
-            <img src="/aurabox-mark.svg" alt="AuraBox" className="h-14 w-14 rounded-xl" />
-          </div>
-          <h2 className="text-center font-display text-3xl font-bold text-aurora-navy">
-            Bienvenido de nuevo
-          </h2>
-          <p className="text-center text-sm text-aurora-navy/60">
+    <AuthLayout
+      panelEyebrow="Bienvenido de vuelta"
+      panelTitle="Tu próxima caja ya te espera"
+      panelText="Entrá a tu cuenta para ver tus suscripciones, tus pedidos y tus clubes favoritos."
+      points={[
+        'Tus suscripciones y pedidos en un solo lugar',
+        'Seguimiento de tus envíos',
+        'Tus clubes y planes favoritos siempre a mano',
+      ]}
+    >
+      <div className="rounded-3xl bg-white p-8 shadow-aurora ring-1 ring-aurora-navy/5 sm:p-10">
+        <div className="mb-8">
+          <img src="/aurabox-mark.svg" alt="AuraBox" className="mb-5 h-12 w-12 rounded-xl lg:hidden" />
+          <h1 className="font-display text-4xl font-medium text-aurora-navy">Iniciá sesión</h1>
+          <p className="mt-2 text-sm text-aurora-navy/60">
             ¿No tenés una cuenta?{' '}
             <Link to="/register" className="font-semibold text-aurora-terracotta hover:text-aurora-terracottaDark">
-              Registrate aquí
+              Registrate acá
             </Link>
           </p>
           {reason === 'disabled' && (
-            <p role="alert" className="text-red-600 text-sm text-center bg-red-50 border border-red-100 rounded-lg py-2 px-3">
+            <p role="alert" className="mt-4 rounded-xl border border-red-100 bg-red-50 px-3 py-2 text-sm text-red-600">
               Tu cuenta fue deshabilitada. Si creés que es un error, contactá al equipo de AuraBox.
             </p>
           )}
           {reason === 'expired' && (
-            <p role="status" className="text-aurora-navy text-sm text-center bg-aurora-gold/10 border border-aurora-gold/30 rounded-lg py-2 px-3">
+            <p role="status" className="mt-4 rounded-xl border border-aurora-gold/30 bg-aurora-gold/10 px-3 py-2 text-sm text-aurora-navy">
               Tu sesión expiró. Iniciá sesión de nuevo para continuar.
             </p>
           )}
@@ -107,7 +110,7 @@ const LoginPage: React.FC<LoginPageProps> = ({ onLogin }) => {
 
         <form className="space-y-5" onSubmit={handleSubmit}>
           <div>
-            <label htmlFor="email-address" className="block text-sm font-medium text-aurora-navy/70 mb-1">Email</label>
+            <label htmlFor="email-address" className="mb-1 block text-sm font-medium text-aurora-navy/70">Email</label>
             <input
               id="email-address"
               name="email"
@@ -163,13 +166,13 @@ const LoginPage: React.FC<LoginPageProps> = ({ onLogin }) => {
           <button
             type="submit"
             disabled={loading}
-            className="btn-primary w-full"
+            className="btn-primary btn-shine w-full disabled:opacity-60"
           >
-            {loading ? 'Iniciando...' : 'Iniciar Sesión'}
+            {loading ? 'Iniciando...' : 'Iniciar sesión'}
           </button>
         </form>
       </div>
-    </div>
+    </AuthLayout>
   );
 };
 
