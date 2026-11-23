@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import api from '../api/config';
 import { useAuth } from '../App';
 import { userFromToken } from '../utils/session';
+import AuthLayout from '../components/common/AuthLayout';
 
 const extractMessage = (err: any, fallback: string): string => {
   const message = err.response?.data?.message;
@@ -72,31 +73,52 @@ const CompleteClubPage: React.FC = () => {
 
   if (done) {
     return (
-      <div className="min-h-[calc(100vh-64px)] flex items-center justify-center bg-aurora-cream py-12 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-md w-full space-y-4 p-10 card-surface shadow-aurora text-center animate-fadeInUp" role="status">
-          <span className="section-eyebrow block">¡Listo!</span>
-          <h2 className="font-display text-3xl font-bold text-aurora-navy">Tu club está en revisión</h2>
+      <AuthLayout
+        panelEyebrow="Tu club está en camino"
+        panelTitle="Gracias por sumarte a AuraBox"
+        panelText="Nuestro equipo revisa cada club antes de publicarlo para cuidar a la comunidad."
+        points={[
+          'Ya podés iniciar sesión y configurar tu club',
+          'Cargá planes, fotos y redes desde tu panel',
+          'Cuando lo aprueben, vas a poder publicarlo',
+        ]}
+      >
+        <div className="space-y-4 rounded-3xl bg-white p-8 text-center shadow-aurora ring-1 ring-aurora-navy/5 sm:p-10" role="status">
+          <span className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-aurora-terracotta/15 text-aurora-terracotta">
+            <svg className="h-7 w-7" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M5 13l4 4L19 7" />
+            </svg>
+          </span>
+          <h1 className="font-display text-4xl font-medium text-aurora-navy">Tu club está en revisión</h1>
           <p className="text-sm text-aurora-navy/60">
             El equipo de AuraBox va a revisar tu club y, cuando lo apruebe, vas a poder publicarlo. Mientras tanto ya podés
             iniciar sesión y empezar a configurarlo.
           </p>
-          <Link to="/login" className="btn-primary inline-flex w-full justify-center">
+          <Link to="/login" className="btn-primary btn-shine inline-flex w-full justify-center">
             Iniciar sesión
           </Link>
         </div>
-      </div>
+      </AuthLayout>
     );
   }
 
   return (
-    <div className="min-h-[calc(100vh-64px)] flex items-center justify-center bg-aurora-cream py-12 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
-      <div className="absolute -top-32 -left-20 w-96 h-96 bg-aurora-gold/10 rounded-full blur-3xl pointer-events-none" />
-
-      <div className="max-w-md w-full space-y-6 p-10 card-surface shadow-aurora relative animate-fadeInUp">
+    <AuthLayout
+      panelEyebrow={sessionMode ? 'Te falta un paso' : 'Último paso'}
+      panelTitle="Contanos de tu emprendimiento"
+      panelText="Con unos pocos datos creamos tu club. El resto lo completás con calma desde tu panel."
+      points={[
+        'Nombre, descripción y email de contacto alcanzan para empezar',
+        'Nuestro equipo revisa tu club antes de publicarlo',
+        'Después sumás planes, fotos y redes sociales',
+      ]}
+    >
+      <div className="space-y-6 rounded-3xl bg-white p-8 shadow-aurora ring-1 ring-aurora-navy/5 sm:p-10">
         <div>
-          <span className="section-eyebrow block text-center">{sessionMode ? 'Te falta un paso' : 'Último paso'}</span>
-          <h2 className="text-center font-display text-3xl font-bold text-aurora-navy">Registrá tu club</h2>
-          <p className="mt-2 text-center text-sm text-aurora-navy/60">
+          <img src="/aurabox-mark.svg" alt="AuraBox" className="mb-5 h-12 w-12 rounded-xl lg:hidden" />
+          <span className="section-eyebrow">{sessionMode ? 'Te falta un paso' : 'Último paso'}</span>
+          <h1 className="font-display text-4xl font-medium text-aurora-navy">Registrá tu club</h1>
+          <p className="mt-2 text-sm text-aurora-navy/60">
             {sessionMode
               ? 'Tu cuenta ya está creada, pero todavía no tenés un club. Completá estos datos para acceder a tu panel.'
               : 'Contanos sobre tu emprendimiento. Después vas a poder completar el resto desde tu panel.'}
@@ -105,38 +127,38 @@ const CompleteClubPage: React.FC = () => {
 
         <form className="space-y-4" onSubmit={handleSubmit}>
           <div>
-            <label htmlFor="club-name" className="block text-sm font-medium text-aurora-navy/70 mb-1">Nombre del club <span className="text-aurora-terracotta">*</span></label>
+            <label htmlFor="club-name" className="mb-1 block text-xs font-medium text-aurora-navy/70">Nombre del club <span className="text-aurora-terracotta">*</span></label>
             <input id="club-name" type="text" required className="input-aurora" placeholder="Ej: Manjar Literario" value={clubName} onChange={(e) => setClubName(e.target.value)} />
           </div>
 
           <div>
-            <label htmlFor="short-description" className="block text-sm font-medium text-aurora-navy/70 mb-1">Descripción corta <span className="text-aurora-terracotta">*</span></label>
+            <label htmlFor="short-description" className="mb-1 block text-xs font-medium text-aurora-navy/70">Descripción corta <span className="text-aurora-terracotta">*</span></label>
             <textarea id="short-description" required rows={3} className="input-aurora resize-none" placeholder="Describí tu club en pocas palabras" value={shortDescription} onChange={(e) => setShortDescription(e.target.value)} />
           </div>
 
           <div>
-            <label htmlFor="contact-email" className="block text-sm font-medium text-aurora-navy/70 mb-1">Email de contacto del club <span className="text-aurora-terracotta">*</span></label>
+            <label htmlFor="contact-email" className="mb-1 block text-xs font-medium text-aurora-navy/70">Email de contacto del club <span className="text-aurora-terracotta">*</span></label>
             <input id="contact-email" type="email" required className="input-aurora" placeholder="contacto@tuclub.com" value={contactEmail} onChange={(e) => setContactEmail(e.target.value)} />
           </div>
 
           <div>
-            <label htmlFor="slogan" className="block text-sm font-medium text-aurora-navy/70 mb-1">Slogan (opcional)</label>
+            <label htmlFor="slogan" className="mb-1 block text-xs font-medium text-aurora-navy/70">Slogan (opcional)</label>
             <input id="slogan" type="text" className="input-aurora" placeholder="Ej: Cada mes, una nueva aventura" value={slogan} onChange={(e) => setSlogan(e.target.value)} />
           </div>
 
           <div>
-            <label htmlFor="whatsapp" className="block text-sm font-medium text-aurora-navy/70 mb-1">WhatsApp de contacto (opcional)</label>
+            <label htmlFor="whatsapp" className="mb-1 block text-xs font-medium text-aurora-navy/70">WhatsApp de contacto (opcional)</label>
             <input id="whatsapp" type="tel" className="input-aurora" placeholder="+54 11 1234-5678" value={whatsappContact} onChange={(e) => setWhatsappContact(e.target.value)} />
           </div>
 
           {error && <p role="alert" className="text-red-600 text-sm text-center bg-red-50 border border-red-100 rounded-lg py-2 px-3">{error}</p>}
 
-          <button type="submit" disabled={loading} className="btn-primary w-full">
+          <button type="submit" disabled={loading} className="btn-primary btn-shine w-full disabled:opacity-60">
             {loading ? 'Creando club...' : 'Crear mi club'}
           </button>
         </form>
       </div>
-    </div>
+    </AuthLayout>
   );
 };
 

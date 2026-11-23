@@ -1,14 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import api from '../api/config';
-
-const PROVINCES = [
-  'Buenos Aires', 'CABA', 'Catamarca', 'Chaco', 'Chubut', 'Córdoba',
-  'Corrientes', 'Entre Ríos', 'Formosa', 'Jujuy', 'La Pampa', 'La Rioja',
-  'Mendoza', 'Misiones', 'Neuquén', 'Río Negro', 'Salta', 'San Juan',
-  'San Luis', 'Santa Cruz', 'Santa Fe', 'Santiago del Estero',
-  'Tierra del Fuego', 'Tucumán',
-];
+import { PROVINCES } from '../constants/provinces';
+import AuthLayout from '../components/common/AuthLayout';
 
 const CompleteProfilePage: React.FC = () => {
   const [streetAddress, setStreetAddress] = useState('');
@@ -22,7 +16,7 @@ const CompleteProfilePage: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
-    useEffect(() => {
+  useEffect(() => {
     if (!localStorage.getItem('pending_profile_token')) {
       navigate('/register');
     }
@@ -38,7 +32,7 @@ const CompleteProfilePage: React.FC = () => {
     setError('');
     setLoading(true);
 
-        const profileToken = localStorage.getItem('pending_profile_token');
+    const profileToken = localStorage.getItem('pending_profile_token');
 
     try {
       await api.post('/auth/register/customer/complete-profile', {
@@ -52,79 +46,95 @@ const CompleteProfilePage: React.FC = () => {
         postalCode: postalCode || null,
       });
 
-    localStorage.removeItem('pending_profile_token');
+      localStorage.removeItem('pending_profile_token');
       navigate('/login');
     } catch (err: any) {
-      setError(err.response?.data?.message || 'Error al guardar los datos. Intentá de nuevo.');
+      const message = err.response?.data?.message;
+      setError(
+        Array.isArray(message)
+          ? message.join('. ')
+          : message || 'Error al guardar los datos. Intentá de nuevo.'
+      );
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-aurora-cream py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-md w-full space-y-6 p-10 bg-white rounded-xl shadow-lg">
+    <AuthLayout
+      panelEyebrow="Casi listo"
+      panelTitle="Contanos adónde te mandamos tus cajas"
+      panelText="Con tu dirección, los clubes pueden enviarte tus suscripciones sin vueltas."
+      points={[
+        'Podés completarla ahora o más tarde desde tu perfil',
+        'Todos los campos son opcionales en este paso',
+        'Después podés editarla cuando quieras',
+      ]}
+    >
+      <div className="space-y-6 rounded-3xl bg-white p-8 shadow-aurora ring-1 ring-aurora-navy/5 sm:p-10">
         <div>
-          <h2 className="text-center text-3xl font-extrabold text-aurora-navy">¡Casi listo!</h2>
-          <p className="mt-2 text-center text-sm text-aurora-navy/70">
-            Completá tu dirección para que los clubes puedan enviarte tus cajas.
-            Podés hacerlo ahora o más tarde desde tu perfil.
+          <img src="/aurabox-mark.svg" alt="AuraBox" className="mb-5 h-12 w-12 rounded-xl lg:hidden" />
+          <span className="section-eyebrow">Tu cuenta está creada</span>
+          <h1 className="font-display text-4xl font-medium text-aurora-navy">¡Casi listo!</h1>
+          <p className="mt-2 text-sm text-aurora-navy/60">
+            Completá tu dirección para que los clubes puedan enviarte tus cajas. Podés hacerlo ahora o más tarde desde tu perfil.
           </p>
         </div>
 
         <form className="space-y-4" onSubmit={handleSubmit}>
           <div>
-            <label htmlFor="street" className="block text-sm font-medium text-aurora-navy/80 mb-1">Calle</label>
-            <input id="street" type="text" className="w-full px-3 py-2 border border-aurora-navy/20 rounded-md text-aurora-navy focus:outline-none focus:ring-aurora-terracotta focus:border-aurora-terracotta sm:text-sm" placeholder="Ej: Av. Corrientes" value={streetAddress} onChange={(e) => setStreetAddress(e.target.value)} />
+            <label htmlFor="street" className="mb-1 block text-xs font-medium text-aurora-navy/70">Calle</label>
+            <input id="street" type="text" autoComplete="address-line1" className="input-aurora" placeholder="Ej: Av. Corrientes" value={streetAddress} onChange={(e) => setStreetAddress(e.target.value)} />
           </div>
 
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label htmlFor="address-number" className="block text-sm font-medium text-aurora-navy/80 mb-1">Número</label>
-              <input id="address-number" type="number" className="w-full px-3 py-2 border border-aurora-navy/20 rounded-md text-aurora-navy focus:outline-none focus:ring-aurora-terracotta focus:border-aurora-terracotta sm:text-sm" placeholder="1234" value={addressNumber} onChange={(e) => setAddressNumber(e.target.value)} />
+              <label htmlFor="address-number" className="mb-1 block text-xs font-medium text-aurora-navy/70">Número</label>
+              <input id="address-number" type="number" className="input-aurora" placeholder="1234" value={addressNumber} onChange={(e) => setAddressNumber(e.target.value)} />
             </div>
             <div>
-              <label htmlFor="floor" className="block text-sm font-medium text-aurora-navy/80 mb-1">Piso / Dpto</label>
-              <input id="floor" type="text" className="w-full px-3 py-2 border border-aurora-navy/20 rounded-md text-aurora-navy focus:outline-none focus:ring-aurora-terracotta focus:border-aurora-terracotta sm:text-sm" placeholder="Ej: 3B" value={floorNumber} onChange={(e) => setFloorNumber(e.target.value)} />
+              <label htmlFor="floor" className="mb-1 block text-xs font-medium text-aurora-navy/70">Piso / Dpto</label>
+              <input id="floor" type="text" autoComplete="address-line2" className="input-aurora" placeholder="Ej: 3B" value={floorNumber} onChange={(e) => setFloorNumber(e.target.value)} />
             </div>
           </div>
 
           <div>
-            <label htmlFor="details" className="block text-sm font-medium text-aurora-navy/80 mb-1">Referencias adicionales</label>
-            <input id="details" type="text" className="w-full px-3 py-2 border border-aurora-navy/20 rounded-md text-aurora-navy focus:outline-none focus:ring-aurora-terracotta focus:border-aurora-terracotta sm:text-sm" placeholder="Ej: Timbre 4, edificio azul" value={addressDetails} onChange={(e) => setAddressDetails(e.target.value)} />
+            <label htmlFor="details" className="mb-1 block text-xs font-medium text-aurora-navy/70">Referencias adicionales</label>
+            <input id="details" type="text" className="input-aurora" placeholder="Ej: Timbre 4, edificio azul" value={addressDetails} onChange={(e) => setAddressDetails(e.target.value)} />
           </div>
 
           <div>
-            <label htmlFor="city" className="block text-sm font-medium text-aurora-navy/80 mb-1">Ciudad / Localidad</label>
-            <input id="city" type="text" className="w-full px-3 py-2 border border-aurora-navy/20 rounded-md text-aurora-navy focus:outline-none focus:ring-aurora-terracotta focus:border-aurora-terracotta sm:text-sm" placeholder="Ej: Rosario" value={city} onChange={(e) => setCity(e.target.value)} />
+            <label htmlFor="city" className="mb-1 block text-xs font-medium text-aurora-navy/70">Ciudad / Localidad</label>
+            <input id="city" type="text" autoComplete="address-level2" className="input-aurora" placeholder="Ej: Rosario" value={city} onChange={(e) => setCity(e.target.value)} />
           </div>
 
-          <div>
-            <label htmlFor="province" className="block text-sm font-medium text-aurora-navy/80 mb-1">Provincia</label>
-            <select id="province" className="w-full px-3 py-2 border border-aurora-navy/20 rounded-md text-aurora-navy focus:outline-none focus:ring-aurora-terracotta focus:border-aurora-terracotta sm:text-sm" value={province} onChange={(e) => setProvince(e.target.value)}>
-              <option value="">Seleccioná una provincia</option>
-              {PROVINCES.map((p) => (<option key={p} value={p}>{p}</option>))}
-            </select>
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <label htmlFor="province" className="mb-1 block text-xs font-medium text-aurora-navy/70">Provincia</label>
+              <select id="province" className="input-aurora" value={province} onChange={(e) => setProvince(e.target.value)}>
+                <option value="">Elegí una</option>
+                {PROVINCES.map((p) => (<option key={p} value={p}>{p}</option>))}
+              </select>
+            </div>
+            <div>
+              <label htmlFor="postal-code" className="mb-1 block text-xs font-medium text-aurora-navy/70">Código postal</label>
+              <input id="postal-code" type="text" autoComplete="postal-code" className="input-aurora" placeholder="Ej: 1414" value={postalCode} onChange={(e) => setPostalCode(e.target.value)} />
+            </div>
           </div>
 
-          <div>
-            <label htmlFor="postal-code" className="block text-sm font-medium text-aurora-navy/80 mb-1">Código Postal</label>
-            <input id="postal-code" type="text" className="w-full px-3 py-2 border border-aurora-navy/20 rounded-md text-aurora-navy focus:outline-none focus:ring-aurora-terracotta focus:border-aurora-terracotta sm:text-sm" placeholder="Ej: 1414" value={postalCode} onChange={(e) => setPostalCode(e.target.value)} />
-          </div>
+          {error && <p role="alert" className="rounded-lg border border-red-100 bg-red-50 px-3 py-2 text-center text-sm text-red-600">{error}</p>}
 
-          {error && <p className="text-red-500 text-sm text-center">{error}</p>}
-
-          <div className="flex flex-col space-y-3 pt-2">
-            <button type="submit" disabled={loading} className="w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-aurora-terracotta hover:bg-aurora-terracottaDark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-aurora-terracotta disabled:opacity-50">
+          <div className="flex flex-col gap-3 pt-2">
+            <button type="submit" disabled={loading} className="btn-primary btn-shine w-full disabled:opacity-60">
               {loading ? 'Guardando...' : 'Guardar y continuar'}
             </button>
-            <button type="button" onClick={handleSkip} className="w-full flex justify-center py-2 px-4 border border-aurora-navy/20 text-sm font-medium rounded-md text-aurora-navy/80 bg-white hover:bg-aurora-cream focus:outline-none">
+            <button type="button" onClick={handleSkip} disabled={loading} className="btn-outline w-full">
               Completar más tarde
             </button>
           </div>
         </form>
       </div>
-    </div>
+    </AuthLayout>
   );
 };
 
