@@ -32,28 +32,41 @@ const UserProfilePage: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-aurora-cream flex items-center justify-center">
-        <div className="flex flex-col items-center gap-4">
-          <div className="w-12 h-12 border-4 border-aurora-terracotta/20 border-t-aurora-terracotta rounded-full animate-spin" />
-          <p className="font-display text-aurora-navy/70">Cargando tu perfil...</p>
+      <div className="flex min-h-screen items-center justify-center bg-aurora-cream">
+        <div role="status" className="flex flex-col items-center gap-4">
+          <div className="h-12 w-12 animate-spin rounded-full border-4 border-aurora-navy/15 border-t-aurora-terracotta" />
+          <p className="font-display text-xl text-aurora-navy/70">Cargando tu perfil...</p>
         </div>
       </div>
     );
   }
-  if (!user) return <div className="min-h-screen bg-aurora-cream flex items-center justify-center text-aurora-navy/70">Redirigiendo...</div>;
+  if (!user) return <div className="flex min-h-screen items-center justify-center bg-aurora-cream text-aurora-navy/70">Redirigiendo...</div>;
+
+  const initial = (user.firstName || user.email || '?').charAt(0).toUpperCase();
 
   return (
     <div className="min-h-screen bg-aurora-cream">
-      <div className="container mx-auto px-4 py-10 md:py-14">
-        <div className="mb-8 text-center">
-          <span className="section-eyebrow block">Tu espacio</span>
-          <h1 className="font-display text-4xl md:text-5xl font-bold text-aurora-navy">Mi Cuenta AuraBox</h1>
+      <div className="hero-mesh grain relative overflow-hidden">
+        <div className="container relative mx-auto flex items-center gap-5 px-4 pb-24 pt-12 md:pb-28">
+          <span className="flex h-20 w-20 flex-shrink-0 items-center justify-center rounded-3xl bg-white/15 font-display text-4xl text-white ring-2 ring-white/30 md:h-24 md:w-24 md:text-5xl">
+            {initial}
+          </span>
+          <div className="min-w-0">
+            <span className="mb-1 inline-block text-xs font-semibold uppercase tracking-widest text-aurora-goldLight">Tu espacio</span>
+            <h1 className="truncate font-display text-4xl font-normal leading-tight text-white md:text-5xl">
+              {user.firstName ? `Hola, ${user.firstName}` : 'Mi cuenta AuraBox'}
+            </h1>
+            <p className="truncate text-white/75">{user.email}</p>
+          </div>
         </div>
-        <div className="flex flex-col lg:flex-row gap-6 lg:gap-8">
+      </div>
+
+      <div className="container mx-auto -mt-14 px-4 pb-16 md:-mt-16">
+        <div className="flex flex-col gap-6 lg:flex-row lg:gap-8">
           <div className="lg:w-1/4">
             <ProfileSidebar activeSection={activeSection} setActiveSection={setActiveSection} />
           </div>
-          <div className="lg:w-3/4 bg-white rounded-2xl shadow-aurora-sm border border-aurora-navy/5 p-6 md:p-10">
+          <div className="rounded-3xl bg-white p-6 shadow-aurora ring-1 ring-aurora-navy/5 md:p-10 lg:w-3/4">
             <UserProfileContent activeSection={activeSection} user={user} onUserUpdate={fetchUser} />
           </div>
         </div>

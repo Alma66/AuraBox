@@ -25,8 +25,8 @@ interface UserProfileContentProps {
   onUserUpdate: () => void;
 }
 
-const inputClass = "mt-1 block w-full rounded-lg border border-aurora-navy/15 bg-white px-3 py-2 text-sm text-aurora-navy focus:outline-none focus:ring-2 focus:ring-aurora-terracotta/50 focus:border-aurora-terracotta transition-all duration-200";
-const primaryBtnClass = "mt-4 bg-aurora-terracotta hover:bg-aurora-terracottaDark text-white px-5 py-2.5 rounded-lg font-semibold text-sm shadow-aurora-sm transition-all duration-200";
+const inputClass = "mt-1 block w-full rounded-xl border border-aurora-navy/15 bg-white px-3 py-2 text-sm text-aurora-navy focus:outline-none focus:ring-2 focus:ring-aurora-terracotta/50 focus:border-aurora-terracotta transition-all duration-200";
+const primaryBtnClass = "mt-4 bg-aurora-terracotta hover:bg-aurora-terracottaDark text-white px-6 py-2.5 rounded-full font-semibold text-sm shadow-aurora-sm transition-all duration-200";
 
 const UserProfileContent: React.FC<UserProfileContentProps> = ({ activeSection, user, onUserUpdate }) => {
   const [isEditingName, setIsEditingName] = useState(false);
@@ -151,10 +151,10 @@ const UserProfileContent: React.FC<UserProfileContentProps> = ({ activeSection, 
   const Feedback = () => (
     <>
       {saveSuccess && (
-        <p className="text-green-700 text-sm mb-4 bg-green-50 border border-green-200 px-4 py-2.5 rounded-lg">{saveSuccess}</p>
+        <p className="text-green-700 text-sm mb-4 bg-green-50 border border-green-200 px-4 py-2.5 rounded-xl">{saveSuccess}</p>
       )}
       {saveError && (
-        <p className="text-red-700 text-sm mb-4 bg-red-50 border border-red-200 px-4 py-2.5 rounded-lg">{saveError}</p>
+        <p className="text-red-700 text-sm mb-4 bg-red-50 border border-red-200 px-4 py-2.5 rounded-xl">{saveError}</p>
       )}
     </>
   );
@@ -166,7 +166,7 @@ const UserProfileContent: React.FC<UserProfileContentProps> = ({ activeSection, 
       case 'profile':
         return (
           <div>
-            <h2 className="font-display text-2xl font-bold text-aurora-navy mb-6">Mi Perfil</h2>
+            <h2 className="font-display text-3xl font-medium text-aurora-navy mb-6">Mi Perfil</h2>
             <Feedback />
             <div className="space-y-4">
               <EditProfileField
@@ -203,7 +203,7 @@ const UserProfileContent: React.FC<UserProfileContentProps> = ({ activeSection, 
               </EditProfileField>
 
               <div className="relative bg-aurora-cream/60 p-6 rounded-2xl border border-aurora-navy/5 mt-8">
-                <h3 className="font-display text-lg font-bold text-aurora-navy mb-4">Información de Contacto y Documento</h3>
+                <h3 className="font-display text-xl font-medium text-aurora-navy mb-4">Información de Contacto y Documento</h3>
                 {!showSensitiveProfileInfo && (
                   <div className="absolute inset-0 bg-aurora-cream/95 backdrop-blur-sm flex flex-col items-center justify-center rounded-2xl z-10 px-6">
                     <div className="w-12 h-12 rounded-full bg-aurora-navy/10 flex items-center justify-center mb-3">
@@ -231,7 +231,7 @@ const UserProfileContent: React.FC<UserProfileContentProps> = ({ activeSection, 
       case 'location':
         return (
           <div>
-            <h2 className="font-display text-2xl font-bold text-aurora-navy mb-6">Ubicación</h2>
+            <h2 className="font-display text-3xl font-medium text-aurora-navy mb-6">Ubicación</h2>
             <Feedback />
             <LocationSection
               country={user.country || ''}

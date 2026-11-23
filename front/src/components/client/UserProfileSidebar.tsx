@@ -14,20 +14,21 @@ const menuItems = [
 
 const UserProfileSidebar: React.FC<UserProfileSidebarProps> = ({ activeSection, setActiveSection }) => {
   return (
-    <nav className="bg-white rounded-2xl shadow-aurora-sm border border-aurora-navy/5 p-4 lg:sticky lg:top-24">
-      <p className="font-display text-lg font-bold text-aurora-navy px-3 mb-3">Mi Cuenta</p>
+    <nav aria-label="Secciones de la cuenta" className="rounded-3xl bg-white p-4 shadow-aurora ring-1 ring-aurora-navy/5 lg:sticky lg:top-24">
+      <p className="mb-3 px-3 font-display text-xl font-medium text-aurora-navy">Mi cuenta</p>
       <ul className="space-y-1.5">
         {menuItems.map((item) => (
           <li key={item.id}>
             <button
               onClick={() => setActiveSection(item.id)}
-              className={`w-full flex items-center gap-3 p-3 rounded-xl text-left font-semibold text-sm transition-all duration-200 ${
+              aria-current={activeSection === item.id ? 'page' : undefined}
+              className={`flex w-full items-center gap-3 rounded-2xl p-3 text-left text-sm font-semibold transition-all duration-200 ${
                 activeSection === item.id
                   ? 'bg-aurora-terracotta text-white shadow-aurora-sm'
                   : 'text-aurora-navy/70 hover:bg-aurora-cream hover:text-aurora-terracotta'
               }`}
             >
-              <svg className="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="h-5 w-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d={item.icon} />
               </svg>
               {item.label}
