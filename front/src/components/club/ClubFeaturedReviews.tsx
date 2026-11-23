@@ -31,7 +31,7 @@ const Stars: React.FC<{ rating: number }> = ({ rating }) => (
       <svg
         key={n}
         aria-hidden="true"
-        className={`h-5 w-5 ${n <= Math.round(rating) ? 'text-yellow-400' : 'text-aurora-navy/20'}`}
+        className={`h-4 w-4 ${n <= Math.round(rating) ? 'text-aurora-gold' : 'text-aurora-navy/20'}`}
         fill="currentColor"
         viewBox="0 0 20 20"
       >
@@ -65,41 +65,52 @@ const ClubFeaturedReviews: React.FC<ClubFeaturedReviewsProps> = ({ clubName, clu
   return (
     <section
       aria-labelledby="club-reviews-heading"
-      className="mb-8 animate-fadeInUp rounded-xl border border-aurora-navy/10 bg-white p-8 shadow-aurora-sm"
+      className="rounded-3xl bg-white p-6 shadow-aurora-sm ring-1 ring-aurora-navy/5 md:p-10"
     >
-      <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
-        <h2 id="club-reviews-heading" className="text-2xl font-bold text-aurora-navy">
-          Reseñas de los clientes
-        </h2>
-        <div className="flex items-center gap-2">
-          <span className="text-2xl font-bold text-aurora-navy">{data.summary.average.toFixed(1)}</span>
-          <Stars rating={data.summary.average} />
-          <span className="text-sm text-aurora-navy/60">
-            ({data.summary.count} {data.summary.count === 1 ? 'reseña' : 'reseñas'})
-          </span>
+      <div className="mb-8 flex flex-wrap items-end justify-between gap-4">
+        <div>
+          <span className="section-eyebrow">Opiniones reales</span>
+          <h2 id="club-reviews-heading" className="font-display text-3xl font-medium text-aurora-navy md:text-4xl">
+            Lo que dicen los suscriptores
+          </h2>
+        </div>
+        <div className="flex items-center gap-3 rounded-2xl bg-aurora-cream px-5 py-3">
+          <span className="font-display text-4xl font-medium text-aurora-navy">{data.summary.average.toFixed(1)}</span>
+          <div>
+            <Stars rating={data.summary.average} />
+            <span className="text-xs text-aurora-navy/60">
+              {data.summary.count} {data.summary.count === 1 ? 'reseña' : 'reseñas'}
+            </span>
+          </div>
         </div>
       </div>
 
-      <div className="mb-6 grid grid-cols-1 gap-6 md:grid-cols-2">
+      <div className="mb-6 grid grid-cols-1 gap-5 md:grid-cols-2">
         {data.reviews.slice(0, 2).map((review) => (
-          <div key={review.id} className="rounded-lg border border-aurora-navy/10 bg-aurora-cream p-5 shadow-sm">
-            <div className="mb-2 flex items-center gap-2">
+          <figure key={review.id} className="relative rounded-2xl bg-aurora-cream p-6">
+            <span aria-hidden="true" className="absolute right-5 top-2 font-display text-6xl leading-none text-aurora-terracotta/25">
+              &ldquo;
+            </span>
+            <div className="mb-3 flex flex-wrap items-center gap-2">
               <Stars rating={review.rating} />
-              {review.planName && <span className="text-xs text-aurora-navy/60">{review.planName}</span>}
+              {review.planName && (
+                <span className="rounded-full bg-white px-2.5 py-0.5 text-xs font-medium text-aurora-navy/70">{review.planName}</span>
+              )}
             </div>
             {review.title && <p className="mb-1 font-semibold text-aurora-navy">{review.title}</p>}
-            {review.comment && <p className="mb-2 font-medium text-aurora-navy">"{review.comment}"</p>}
-            <p className="text-sm text-aurora-navy/60">- {review.customerName}</p>
-          </div>
+            {review.comment && <blockquote className="mb-4 leading-relaxed text-aurora-navy/80">{review.comment}</blockquote>}
+            <figcaption className="text-sm font-medium text-aurora-navy/60">{review.customerName}</figcaption>
+          </figure>
         ))}
       </div>
 
-      <div className="mt-6 text-center">
+      <div className="text-center">
         <Link
           to={`/club/${clubId}/reviews`}
-          className="text-lg font-semibold text-aurora-terracotta transition-colors duration-200 hover:text-aurora-terracottaDark hover:underline"
+          className="inline-flex items-center gap-2 font-semibold text-aurora-terracotta transition-colors duration-200 hover:text-aurora-terracottaDark"
         >
           Ver {data.total === 1 ? 'la reseña' : `las ${data.total} reseñas`} de {clubName}
+          <span aria-hidden="true">→</span>
         </Link>
       </div>
     </section>

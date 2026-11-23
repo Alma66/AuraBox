@@ -13,9 +13,10 @@ import ClubPaymentShippingInfo from '../../../../components/club/ClubPaymentShip
 import ClubFeaturedReviews from '../../../../components/club/ClubFeaturedReviews';
 import { LegalSection } from '../../../../types/legalSection';
 import SafeImage from '../../../../components/common/SafeImage';
+import Reveal from '../../../../components/common/Reveal';
 
 const bannerSliderSettings = {
-  dots: true,
+  dots: false,
   infinite: true,
   speed: 500,
   slidesToShow: 1,
@@ -77,6 +78,15 @@ const ACCEPTED_IMAGE_TYPES = ['image/png', 'image/jpeg', 'image/jpg', 'image/web
 const MAX_BANNERS = 6;
 const MAX_DESCRIPTION_LENGTH = 1200;
 const URL_REGEX = /^https?:\/\/[^\s/$.?#].[^\s]*$/i;
+
+const formatMoney = (value: number, currency: string) =>
+  `${currency || 'ARS'} ${value.toLocaleString('es-AR', { maximumFractionDigits: 0 })}`;
+
+interface ClubFact {
+  label: string;
+  value: string;
+  hint: string;
+}
 
 function validateImageFile(file: File): string | null {
   if (!ACCEPTED_IMAGE_TYPES.includes(file.type)) {
@@ -153,7 +163,7 @@ async function getCroppedBlob(imageSrc: string, croppedAreaPixels: any): Promise
 const ClubDetailPage: React.FC = () => {
   const { clubId } = useParams<{ clubId: string }>();
   const navigate = useNavigate();
-    const { pathname } = useLocation();
+  const { pathname } = useLocation();
   const insidePanel = pathname.endsWith('/my-club');
   const { userRole } = useAuth();
   const [club, setClub] = useState<ClubData | null>(null);
@@ -219,8 +229,6 @@ const ClubDetailPage: React.FC = () => {
       document.title = previousTitle;
     };
   }, [club?.name]);
-
-
 
   useEffect(() => {
     const fetchLegalContent = async () => {
@@ -427,8 +435,6 @@ const ClubDetailPage: React.FC = () => {
     }
   };
 
-
-
   if (loading) {
     return (
       <div className="container mx-auto px-4 py-8">
@@ -442,11 +448,11 @@ const ClubDetailPage: React.FC = () => {
     );
   }
 
-    if (error || !club) {
+  if (error || !club) {
     const notFound = error !== 'load';
     return (
       <div role="alert" className="container mx-auto px-4 py-16 text-center">
-        <h1 className="text-3xl font-serif font-bold text-aurora-navy mb-3">
+        <h1 className="font-display text-4xl font-medium text-aurora-navy mb-3">
           {notFound ? 'Club no encontrado' : 'No pudimos cargar el club'}
         </h1>
         <p className="text-aurora-navy/60 mb-8">
@@ -478,6 +484,25 @@ const ClubDetailPage: React.FC = () => {
   const availableNetworkTypes = NETWORK_TYPES.filter(
     (n) => !socialNetworks.some((sn) => sn.networkType.toLowerCase() === n.key),
   );
+  const activePlans = (club.subscriptionPlans ?? []).filter((plan) => plan.active ?? plan.activo ?? true);
+  const minPrice = activePlans.length > 0 ? Math.min(...activePlans.map((plan) => plan.price)) : null;
+  const priceCurrency = activePlans[0]?.currency || 'ARS';
+  const rating = club.averageRating ? Number(club.averageRating) : 0;
+  const reviewsTotal = club.totalReviews ?? 0;
+  const creationYear = club.creationDate ? new Date(club.creationDate).getFullYear() : null;
+  const facts: ClubFact[] = [];
+  if (reviewsTotal > 0 && rating > 0) {
+    facts.push({ label: 'Calificación', value: `★ ${rating.toFixed(1)}`, hint: `${reviewsTotal} ${reviewsTotal === 1 ? 'reseña' : 'reseñas'}` });
+  }
+  if (activePlans.length > 0) {
+    facts.push({ label: 'Planes', value: String(activePlans.length), hint: activePlans.length === 1 ? 'disponible' : 'disponibles' });
+  }
+  if (minPrice !== null) {
+    facts.push({ label: 'Desde', value: formatMoney(minPrice, priceCurrency), hint: 'el plan más accesible' });
+  }
+  if (creationYear && !Number.isNaN(creationYear)) {
+    facts.push({ label: 'En AuraBox desde', value: String(creationYear), hint: 'con nosotros' });
+  }
 
   return (
     <div className="bg-aurora-cream min-h-screen">
@@ -503,7 +528,7 @@ const ClubDetailPage: React.FC = () => {
           <div className="bg-white rounded-2xl shadow-2xl w-full max-w-2xl overflow-hidden">
             <div className="px-6 py-4 border-b border-aurora-navy/10 flex items-center justify-between">
               <div>
-                <h3 className="text-lg font-serif font-semibold text-aurora-navy">
+                <h3 className="font-display text-xl font-medium text-aurora-navy">
                   {cropState.target === 'logo' ? 'Ajustar logo' : cropState.target === 'banner' ? 'Ajustar banner' : 'Ajustar imagen de historia'}
                 </h3>
                 <p className="text-sm text-aurora-navy/50 mt-0.5">Mové y hacé zoom para encuadrar la imagen</p>
@@ -574,7 +599,7 @@ const ClubDetailPage: React.FC = () => {
       {confirmDeleteBannerId !== null && (
         <div className="fixed inset-0 z-50 bg-aurora-navy/60 flex items-center justify-center p-4">
           <div className="bg-white rounded-2xl shadow-2xl w-full max-w-sm p-6">
-            <h3 className="text-lg font-serif font-semibold text-aurora-navy mb-2">¿Eliminar este banner?</h3>
+            <h3 className="text-lg font-display text-xl font-medium text-aurora-navy mb-2">¿Eliminar este banner?</h3>
             <p className="text-sm text-aurora-navy/50 mb-6">Esta acción no se puede deshacer.</p>
             <div className="flex gap-3">
               <button
@@ -596,7 +621,7 @@ const ClubDetailPage: React.FC = () => {
       {confirmDeleteSocialId !== null && (
         <div className="fixed inset-0 z-50 bg-aurora-navy/60 flex items-center justify-center p-4">
           <div className="bg-white rounded-2xl shadow-2xl w-full max-w-sm p-6">
-            <h3 className="text-lg font-serif font-semibold text-aurora-navy mb-2">¿Eliminar esta red social?</h3>
+            <h3 className="text-lg font-display text-xl font-medium text-aurora-navy mb-2">¿Eliminar esta red social?</h3>
             <p className="text-sm text-aurora-navy/50 mb-6">Dejará de mostrarse en el perfil del club.</p>
             <div className="flex gap-3">
               <button
@@ -615,88 +640,120 @@ const ClubDetailPage: React.FC = () => {
           </div>
         </div>
       )}
-      <div className="relative shadow-lg">
-        <div className="h-72 md:h-96" ref={bannerDisplayRef}>
+      <div className="relative">
+        <div className="relative h-80 overflow-hidden md:h-[26rem]" ref={bannerDisplayRef}>
           {bannerList.length > 0 ? (
             <Slider {...bannerSliderSettings}>
               {bannerList.map((imgSrc, index) => (
                 <div key={index}>
-                  <SafeImage src={imgSrc} alt={`Banner ${index + 1}`} fallbackIcon="📦" className="w-full h-72 md:h-96 object-cover object-center" />
+                  <SafeImage src={imgSrc} alt={`Banner ${index + 1}`} fallbackIcon="📦" className="h-80 w-full object-cover object-center md:h-[26rem]" />
                 </div>
               ))}
             </Slider>
           ) : (
-            <div className="w-full h-72 md:h-96 bg-gradient-to-br from-aurora-navy to-aurora-terracotta" />
+            <div className="hero-mesh grain h-80 w-full md:h-[26rem]" />
           )}
         </div>
-        <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent pointer-events-none" />
-        <div className="absolute bottom-0 left-0 w-full px-6 pb-6 flex items-end gap-5">
-          <div className="relative flex-shrink-0 -mb-16">
-            <div className="w-28 h-28 md:w-32 md:h-32 rounded-full border-4 border-white shadow-2xl overflow-hidden bg-white">
-              {logoSrc ? (
-                <SafeImage src={logoSrc} alt={`${club.name} logo`} className="w-full h-full object-cover" />
-              ) : (
-                <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-aurora-navy to-aurora-terracotta">
-                  <span className="text-white text-3xl font-serif font-bold">{club.name?.charAt(0)}</span>
-                </div>
+        <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-aurora-navyDark/90 via-aurora-navyDark/35 to-aurora-navyDark/5" />
+        <div className="absolute inset-x-0 bottom-0">
+          <div className="container mx-auto flex items-end gap-4 px-4 pb-6 md:gap-6">
+            <div className="relative -mb-14 flex-shrink-0 md:-mb-16">
+              <div className="flex h-24 w-24 items-center justify-center overflow-hidden rounded-3xl border-4 border-white bg-white shadow-aurora-lg md:h-32 md:w-32">
+                {logoSrc ? (
+                  <SafeImage src={logoSrc} alt={`${club.name} logo`} className="h-full w-full object-contain p-2" />
+                ) : (
+                  <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-aurora-navy to-aurora-terracotta">
+                    <span className="font-display text-4xl font-medium text-white">{club.name?.charAt(0)}</span>
+                  </div>
+                )}
+              </div>
+              {isOwner && (
+                <>
+                  <button
+                    onClick={() => logoInputRef.current?.click()}
+                    className="absolute -bottom-1 -right-1 rounded-full border border-aurora-navy/10 bg-white p-2 text-aurora-navy shadow-lg transition-colors hover:bg-aurora-cream"
+                    title="Cambiar logo (JPG, PNG o WEBP, máx. 8MB)"
+                  >
+                    <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
+                    </svg>
+                  </button>
+                  <input
+                    ref={logoInputRef}
+                    type="file"
+                    accept="image/png,image/jpeg,image/jpg,image/webp"
+                    className="hidden"
+                    onChange={handleFileSelect('logo')}
+                  />
+                </>
               )}
             </div>
-            {isOwner && (
-              <>
-                <button
-                  onClick={() => logoInputRef.current?.click()}
-                  className="absolute bottom-1 right-1 bg-white text-aurora-navy rounded-full p-2 shadow-lg hover:bg-aurora-cream border border-aurora-navy/10 transition-colors"
-                  title="Cambiar logo (JPG, PNG o WEBP, máx. 8MB)"
-                >
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
-                  </svg>
-                </button>
-                <input
-                  ref={logoInputRef}
-                  type="file"
-                  accept="image/png,image/jpeg,image/jpg,image/webp"
-                  className="hidden"
-                  onChange={handleFileSelect('logo')}
-                />
-              </>
-            )}
-          </div>
-          <div className="flex-1 min-w-0 pb-2">
-            <h1 className="text-2xl md:text-4xl font-serif font-extrabold text-white drop-shadow-lg truncate">{club.name}</h1>
-            {club.slogan && <p className="text-white/85 text-sm md:text-base drop-shadow mt-1">{club.slogan}</p>}
-          </div>
-          {isOwner && (
-            <div className="flex-shrink-0 pb-2">
-              <button
-                onClick={() => bannerInputRef.current?.click()}
-                className="bg-white/15 hover:bg-white/25 text-white text-sm px-4 py-2.5 rounded-xl backdrop-blur-sm border border-white/30 transition-colors flex items-center gap-2 font-medium shadow-sm"
-              >
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                </svg>
-                Agregar banner
-              </button>
-              <input
-                ref={bannerInputRef}
-                type="file"
-                accept="image/png,image/jpeg,image/jpg,image/webp"
-                className="hidden"
-                onChange={handleFileSelect('banner')}
-              />
+            <div className="min-w-0 flex-1 pb-1 text-white">
+              {(club.categories ?? []).length > 0 && (
+                <div className="mb-3 flex flex-wrap gap-2">
+                  {(club.categories ?? []).map((c) => (
+                    <span key={c.id} className="glass rounded-full px-3 py-1 text-xs font-semibold text-white">
+                      {c.name}
+                    </span>
+                  ))}
+                </div>
+              )}
+              <h1 className="line-clamp-2 font-display text-3xl font-normal leading-tight drop-shadow-lg md:text-5xl">{club.name}</h1>
+              {club.slogan && <p className="mt-1.5 line-clamp-2 text-sm text-white/85 drop-shadow md:text-lg">{club.slogan}</p>}
             </div>
-          )}
+            <div className="flex flex-shrink-0 flex-col items-end gap-2 pb-1">
+              {isOwner && (
+                <>
+                  <button
+                    onClick={() => bannerInputRef.current?.click()}
+                    className="glass flex items-center gap-2 rounded-xl px-4 py-2.5 text-sm font-medium text-white shadow-sm transition-colors hover:bg-white/25"
+                  >
+                    <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                    </svg>
+                    <span className="hidden sm:inline">Agregar banner</span>
+                  </button>
+                  <input
+                    ref={bannerInputRef}
+                    type="file"
+                    accept="image/png,image/jpeg,image/jpg,image/webp"
+                    className="hidden"
+                    onChange={handleFileSelect('banner')}
+                  />
+                </>
+              )}
+              {!isOwner && activePlans.length > 0 && (
+                <a
+                  href="#planes"
+                  className="hidden rounded-full bg-aurora-terracotta px-6 py-3 text-sm font-semibold text-white shadow-aurora-glow transition-all duration-300 hover:-translate-y-0.5 hover:bg-aurora-terracottaDark md:inline-flex"
+                >
+                  Ver planes
+                </a>
+              )}
+            </div>
+          </div>
         </div>
       </div>
-      <div className="container mx-auto px-4 pt-20 pb-8">
+      <div className="container mx-auto px-4 pb-16 pt-24">
         {!insidePanel && (
-          <button onClick={() => navigate(-1)} className="mb-6 flex items-center text-aurora-terracotta hover:text-aurora-terracottaDark transition-colors text-sm font-medium">
+          <button onClick={() => navigate(-1)} className="mb-6 flex items-center text-sm font-medium text-aurora-terracotta transition-colors hover:text-aurora-terracottaDark">
             <svg className="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
             </svg>
             Volver
           </button>
+        )}
+        {facts.length > 0 && (
+          <div className="mb-6 flex flex-wrap overflow-hidden rounded-3xl bg-white shadow-aurora-sm ring-1 ring-aurora-navy/5">
+            {facts.map((fact) => (
+              <div key={fact.label} className="flex-1 basis-1/2 border-aurora-navy/10 px-5 py-4 md:basis-0 md:border-r md:last:border-r-0">
+                <p className="text-xs font-semibold uppercase tracking-wider text-aurora-navy/50">{fact.label}</p>
+                <p className="mt-1 font-display text-2xl font-medium text-aurora-navy">{fact.value}</p>
+                <p className="text-xs text-aurora-navy/55">{fact.hint}</p>
+              </div>
+            ))}
+          </div>
         )}
         {isOwner && club.bannerImagesRaw && club.bannerImagesRaw.length > 0 && (
           <div className="bg-white rounded-2xl shadow-aurora-sm border border-aurora-navy/10 p-5 mb-6">
@@ -724,23 +781,11 @@ const ClubDetailPage: React.FC = () => {
             </div>
           </div>
         )}
-        <div className="bg-white rounded-2xl shadow-aurora-sm border border-aurora-navy/10 p-6 md:p-8 mb-6">
-                    {(club.categories ?? []).length > 0 && (
-            <div className="flex flex-wrap gap-2 mb-6">
-              {(club.categories ?? []).map((c) => (
-                <span
-                  key={c.id}
-                  className="inline-flex items-center bg-aurora-gold/10 text-aurora-navy text-xs font-semibold px-3 py-1.5 rounded-full border border-aurora-gold/30"
-                >
-                  {c.name}
-                </span>
-              ))}
-            </div>
-          )}
+        <div className="mb-10 rounded-3xl bg-white p-6 shadow-aurora-sm ring-1 ring-aurora-navy/5 md:p-10">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
             <div>
               <div className="flex items-center justify-between mb-3">
-                <h2 className="text-xl font-serif font-bold text-aurora-navy">Sobre Nosotros</h2>
+                <h2 className="font-display text-3xl font-medium text-aurora-navy">Sobre nosotros</h2>
                 {isOwner && !editingDescription && (
                   <button
                     onClick={() => { setEditDescription(club.shortDescription || ''); setDescriptionError(''); setEditingDescription(true); }}
@@ -785,14 +830,14 @@ const ClubDetailPage: React.FC = () => {
                   </div>
                 </div>
               ) : (
-                <p className="text-aurora-navy/70 leading-relaxed text-sm">{club.shortDescription || 'Este club todavía no cargó una descripción.'}</p>
+                <p className="whitespace-pre-line leading-relaxed text-aurora-navy/70">{club.shortDescription || 'Este club todavía no cargó una descripción.'}</p>
               )}
             </div>
             <div>
               {isOwner ? (
                 <div>
                   <div className="flex items-center justify-between mb-3">
-                    <h2 className="text-xl font-serif font-bold text-aurora-navy">Imagen de historia</h2>
+                    <h2 className="font-display text-3xl font-medium text-aurora-navy">Imagen de historia</h2>
                     <button
                       onClick={() => historyInputRef.current?.click()}
                       className="inline-flex items-center gap-2 text-sm font-semibold text-white bg-aurora-terracotta hover:bg-aurora-terracottaDark px-4 py-2 rounded-lg transition-colors shadow-sm"
@@ -826,17 +871,17 @@ const ClubDetailPage: React.FC = () => {
                 </div>
               ) : (
                 (club.history || club.fullHistory || historyImage) && (
-                  <div className="relative h-56 rounded-xl overflow-hidden shadow-sm">
+                  <div className="relative h-64 overflow-hidden rounded-3xl shadow-aurora-sm">
                     {historyImage ? (
                       <img src={historyImage} alt="Nuestra Historia" className="w-full h-full object-cover" />
                     ) : (
-                      <div className="w-full h-full bg-gradient-to-br from-aurora-navy to-aurora-terracotta" />
+                      <div className="hero-mesh grain h-full w-full" />
                     )}
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-aurora-navyDark/70 via-transparent to-transparent" />
                     <div className="absolute bottom-4 left-0 w-full flex justify-center">
                       <Link
                         to={`/club/${club.id}/history`}
-                        className="text-white text-sm font-semibold px-5 py-2.5 bg-aurora-terracotta rounded-full hover:bg-aurora-terracottaDark transition-colors shadow-lg"
+                        className="rounded-full bg-aurora-terracotta px-6 py-2.5 text-sm font-semibold text-white shadow-aurora-glow transition-colors hover:bg-aurora-terracottaDark"
                       >
                         Conocer Nuestra Historia
                       </Link>
@@ -847,7 +892,7 @@ const ClubDetailPage: React.FC = () => {
             </div>
           </div>
           <div className="border-t border-aurora-navy/10 pt-6">
-            <h3 className="text-sm font-semibold text-aurora-navy/70 uppercase tracking-wider mb-4">Redes Sociales</h3>
+            <h3 className="mb-4 text-xs font-semibold uppercase tracking-widest text-aurora-navy/60">Seguinos en redes</h3>
             {!isOwner && <ClubSocialMedia socialMedia={socialMediaForDisplay} />}
             {isOwner && (
               <div>
@@ -927,10 +972,16 @@ const ClubDetailPage: React.FC = () => {
           </div>
         </div>
         {club.subscriptionPlans && club.subscriptionPlans.length > 0 && (
-          <div className="mb-10">
-            <h2 className="text-2xl font-serif font-bold text-aurora-navy mb-6 text-center">Nuestros Planes de Suscripción</h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {club.subscriptionPlans.map((plan) => {
+          <section id="planes" className="mb-16 scroll-mt-24">
+            <Reveal>
+              <div className="mx-auto mb-10 max-w-2xl text-center">
+                <span className="section-eyebrow">Elegí tu plan</span>
+                <h2 className="font-display text-4xl font-medium text-aurora-navy md:text-5xl">Nuestros planes de suscripción</h2>
+                <p className="mt-3 text-aurora-navy/60">Compará lo que incluye cada uno y suscribite al que mejor se ajuste a vos.</p>
+              </div>
+            </Reveal>
+            <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
+              {club.subscriptionPlans.map((plan, index) => {
                 const planForCard: SubscriptionPlanCardType = {
                   planId: plan.planId,
                   name: plan.name,
@@ -946,31 +997,33 @@ const ClubDetailPage: React.FC = () => {
                   cashDiscount: plan.cashDiscount,
                   transferDiscount: plan.transferDiscount,
                 };
-               return (
-                  <div key={plan.planId} className="relative">
+                return (
+                  <Reveal key={plan.planId} delay={(index % 3) * 90} className="h-full">
                     <SubscriptionPlanCard plan={planForCard} clubName={club.name} detailsLink={`/club/${club.id}/plan/${plan.planId}`} />
-                  </div>
+                  </Reveal>
                 );
               })}
             </div>
-          </div>
+          </section>
         )}
         {(club.paymentMethods || club.shippingInfo) && (
-          <div className="mb-10">
+          <Reveal className="mb-10">
             <ClubPaymentShippingInfo paymentMethods={club.paymentMethods} shippingInfo={club.shippingInfo} />
-          </div>
+          </Reveal>
         )}
         {club.id && (
-          <div className="mb-10">
-    <ClubFeaturedReviews clubName={club.name} clubId={String(club.id)} />
-          </div>
+          <Reveal className="mb-10">
+            <ClubFeaturedReviews clubName={club.name} clubId={String(club.id)} />
+          </Reveal>
         )}
         {(legalContent.termsAndConditions.length > 0 || legalContent.privacyAndSecurityPolicy.length > 0) && (
-          <ClubLegalInfo
-            termsAndConditions={legalContent.termsAndConditions}
-            privacyAndSecurityPolicy={legalContent.privacyAndSecurityPolicy}
-            clubName={club.name}
-          />
+          <Reveal>
+            <ClubLegalInfo
+              termsAndConditions={legalContent.termsAndConditions}
+              privacyAndSecurityPolicy={legalContent.privacyAndSecurityPolicy}
+              clubName={club.name}
+            />
+          </Reveal>
         )}
       </div>
     </div>
