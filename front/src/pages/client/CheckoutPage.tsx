@@ -349,7 +349,7 @@ const SectionCard: React.FC<{ icon: IconName; title: string; subtitle?: string; 
         <Icon name={icon} className="h-6 w-6" />
       </span>
       <div>
-        <h2 className="text-xl font-display font-medium text-aurora-navy">{title}</h2>
+        <h2 className="text-2xl font-display font-medium text-aurora-navy">{title}</h2>
         {subtitle && <p className="mt-0.5 text-sm text-aurora-navy/60">{subtitle}</p>}
       </div>
     </div>
@@ -962,13 +962,15 @@ if (!redirecting) setIsProcessing(false);
           )}
 
           <section className={`${cardClass} p-5 sm:p-7`}>
-<h2 className="font-display text-2xl font-medium text-aurora-navy mb-3">Entrega</h2>            <p className="text-sm text-aurora-navy/80">
+<h2 className="font-display text-2xl font-medium text-aurora-navy mb-3">Entrega</h2>    
+        <p className="text-sm text-aurora-navy/80">
               {address.street} {address.streetNumber}, {address.locality}
             </p>
             <p className="text-sm text-aurora-navy/80">
               {address.city}, {address.province} ({address.postalCode.toUpperCase()})
             </p>
-<h2 className="font-display text-2xl font-medium text-aurora-navy mt-6 mb-3">Qué sigue</h2>            <ol className="space-y-3">
+<h2 className="font-display text-2xl font-medium text-aurora-navy mt-6 mb-3">Qué sigue</h2>   
+         <ol className="space-y-3">
               {timeline.map((entry, index) => (
                 <li key={entry} className="flex items-start gap-3 text-sm text-aurora-navy/80">
                   <span className="flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full bg-aurora-terracotta text-xs font-bold text-white">
