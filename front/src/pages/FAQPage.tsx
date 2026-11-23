@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
+import Reveal from '../components/common/Reveal';
 
 interface FAQItem {
   id: string;
@@ -13,237 +14,299 @@ const faqData: FAQItem[] = [
   {
     id: '1',
     question: '¿Qué es AuraBox y cómo funciona?',
-    answer: 'AuraBox es una plataforma que conecta a emprendedores de clubes de suscripción con suscriptores en Argentina. Te permite descubrir nuevos clubes, gestionar tus suscripciones, realizar pagos de forma segura y seguir tus entregas, todo desde un único lugar. Para los emprendedores, ofrece herramientas de gestión, visibilidad y marketing para profesionalizar su negocio.',
+    answer:
+      'AuraBox es una plataforma que reúne clubes de suscripción de emprendedores argentinos en un solo lugar. Explorás clubes, comparás planes, te suscribís, pagás de forma segura y seguís tus envíos desde tu cuenta. Para los emprendedores, es un panel para gestionar su club.',
     category: 'General',
-    keywords: ['AuraBox', 'funciona', 'qué es', 'plataforma', 'suscripción']
+    keywords: ['AuraBox', 'funciona', 'qué es', 'plataforma', 'suscripción'],
   },
   {
     id: '2',
-    question: '¿Cómo puedo registrarme como suscriptor?',
-    answer: 'Puedes registrarte fácilmente haciendo clic en el botón "Registrarse" en la esquina superior derecha de la página. Solo necesitarás proporcionar algunos datos básicos y podrás empezar a explorar clubes de inmediato.',
-    category: 'Suscriptores',
-    keywords: ['registro', 'suscriptor', 'cuenta', 'crear']
+    question: '¿Qué tipo de clubes puedo encontrar?',
+    answer:
+      'Hay clubes de gastronomía y bebidas, lectura y cultura, belleza y cuidado personal, hogar y plantas, entre otros. Podés filtrarlos por categoría, calificación y cantidad de reseñas desde la página de exploración.',
+    category: 'General',
+    keywords: ['tipos de clubes', 'categorías', 'variedad', 'descubrir', 'filtros'],
   },
   {
     id: '3',
-    question: '¿Cómo puedo registrar mi club en AuraBox?',
-    answer: 'Si eres un emprendedor y deseas registrar tu club, dirígete a la sección "Para Emprendedores" en el pie de página o en la barra de navegación. Allí encontrarás toda la información y los pasos para unirte a nuestra comunidad de clubes.',
-    category: 'Emprendedores',
-    keywords: ['registro', 'club', 'emprendedor', 'vender', 'publicar']
+    question: '¿AuraBox tiene una aplicación móvil?',
+    answer:
+      'Sí, hay una app para Android. También podés usar AuraBox desde el navegador de cualquier dispositivo. Por ahora no hay versión para iOS.',
+    category: 'General',
+    keywords: ['app', 'móvil', 'aplicación', 'Android', 'iOS', 'celular'],
   },
   {
     id: '4',
-    question: '¿Qué métodos de pago acepta AuraBox?',
-    answer: 'AuraBox integra pasarelas de pago seguras como MercadoPago, permitiendo pagos con tarjeta de crédito/débito y débito automático. Todas las transacciones son procesadas de forma segura para tu tranquilidad.',
-    category: 'Pagos',
-    keywords: ['pago', 'métodos', 'MercadoPago', 'tarjeta', 'seguridad']
+    question: '¿Cómo me registro como suscriptor?',
+    answer:
+      'Tocá el botón "Registrate" del menú superior, completá tus datos básicos y listo: ya podés explorar clubes y suscribirte.',
+    category: 'Suscriptores',
+    keywords: ['registro', 'suscriptor', 'cuenta', 'crear'],
   },
   {
     id: '5',
-    question: '¿Puedo pausar o cancelar mi suscripción en cualquier momento?',
-    answer: 'Sí, AuraBox te ofrece total flexibilidad. Puedes pausar o cancelar tus suscripciones directamente desde tu panel de usuario con un solo clic, sin necesidad de contactar al club directamente. Queremos que tengas el control total de tus suscripciones.',
+    question: '¿Puedo pausar o cancelar mi suscripción?',
+    answer:
+      'Sí. Desde "Mis suscripciones" podés pausar o cancelar cada suscripción activa. No hay permanencia mínima.',
     category: 'Suscriptores',
-    keywords: ['pausar', 'cancelar', 'suscripción', 'flexibilidad']
+    keywords: ['pausar', 'cancelar', 'suscripción', 'baja', 'permanencia'],
   },
   {
     id: '6',
-    question: '¿Cómo puedo seguir el estado de mi envío?',
-    answer: 'Desde tu panel de usuario, tendrás acceso a un sistema de seguimiento en tiempo real con un timeline visual. Recibirás notificaciones push sobre el estado de tu entrega, desde que sale del club hasta que llega a tu domicilio.',
-    category: 'Entregas',
-    keywords: ['envío', 'seguimiento', 'tracking', 'entrega', 'paquete']
+    question: '¿Cómo dejo una reseña de un club?',
+    answer:
+      'Si tenés una suscripción activa en un club, o la cancelaste hace poco, podés dejar tu reseña y calificación desde "Mis reseñas". Es una reseña por suscripción, así las opiniones vienen de personas que realmente usaron el club.',
+    category: 'Suscriptores',
+    keywords: ['reseña', 'calificación', 'opinión', 'feedback'],
   },
   {
     id: '7',
-    question: '¿Cómo se asegura la calidad de los clubes en AuraBox?',
-    answer: 'AuraBox implementa un sistema de "Club Verificado" basado en criterios de calidad, atención al cliente y cumplimiento. Además, las reseñas y calificaciones de otros suscriptores te ayudarán a tomar decisiones informadas.',
-    category: 'General',
-    keywords: ['calidad', 'club verificado', 'reseñas', 'confianza']
+    question: '¿Puedo guardar clubes o recibir recomendaciones?',
+    answer:
+      'Sí. Podés guardar tus clubes favoritos en tu lista de deseos, y AuraBox te sugiere clubes según tus suscripciones y tus preferencias.',
+    category: 'Suscriptores',
+    keywords: ['favoritos', 'wishlist', 'recomendaciones', 'intereses', 'lista de deseos'],
   },
   {
     id: '8',
-    question: '¿Qué tipo de clubes puedo encontrar en AuraBox?',
-    answer: 'En AuraBox encontrarás una amplia variedad de clubes de suscripción, desde gastronomía (vinos, quesos, café), belleza y cuidado personal, hasta literatura, botánica, hobbies y mucho más. ¡Siempre hay algo nuevo para descubrir!',
-    category: 'Exploración',
-    keywords: ['tipos de clubes', 'categorías', 'variedad', 'descubrir']
+    question: '¿Qué medios de pago puedo usar?',
+    answer:
+      'Podés pagar con Mercado Pago o con tarjeta de crédito o débito. Según lo que habilite cada club, también puede haber transferencia bancaria o efectivo contra entrega. En el checkout ves las opciones disponibles para tu compra.',
+    category: 'Pagos',
+    keywords: ['pago', 'métodos', 'Mercado Pago', 'tarjeta', 'transferencia', 'efectivo'],
   },
   {
     id: '9',
-    question: '¿Cómo puedo contactar al soporte de AuraBox?',
-    answer: 'Puedes contactar a nuestro equipo de soporte a través del formulario de contacto en la sección "Contacto" de nuestro pie de página. Próximamente, también tendremos un chat de soporte integrado para asistencia más rápida.',
-    category: 'Soporte',
-    keywords: ['contacto', 'soporte', 'ayuda', 'chat']
+    question: '¿Dónde veo mis compras y pagos anteriores?',
+    answer:
+      'En "Historial de compras", dentro del menú de tu cuenta, encontrás todos tus pedidos con su estado.',
+    category: 'Pagos',
+    keywords: ['historial', 'compras', 'pedidos', 'pagos'],
   },
   {
     id: '10',
-    question: '¿AuraBox tiene una aplicación móvil?',
-    answer: 'Sí, AuraBox está diseñada para ser multiplataforma. Además de la versión web, estamos desarrollando aplicaciones nativas para Android y iOS para que puedas gestionar tus suscripciones desde cualquier dispositivo.',
-    category: 'General',
-    keywords: ['app', 'móvil', 'aplicación', 'Android', 'iOS']
+    question: '¿Cómo sigo el estado de mi envío?',
+    answer:
+      'Desde tu cuenta podés ver el estado de cada envío, y te avisamos con notificaciones dentro de AuraBox cuando hay novedades.',
+    category: 'Entregas',
+    keywords: ['envío', 'seguimiento', 'tracking', 'entrega', 'paquete', 'notificaciones'],
   },
   {
     id: '11',
-    question: '¿Cómo puedo dejar una reseña o calificación de un club?',
-    answer: 'Una vez que hayas recibido una caja, podrás dejar una reseña y calificación directamente desde tu panel de usuario. Solo los suscriptores verificados pueden dejar reseñas, asegurando la autenticidad de las opiniones.',
-    category: 'Suscriptores',
-    keywords: ['reseña', 'calificación', 'opinión', 'feedback']
+    question: '¿Qué hago si hay un problema con mi entrega?',
+    answer:
+      'Escribinos desde la página de contacto indicando el nombre del club y tu pedido, y te ayudamos a resolverlo con el emprendedor.',
+    category: 'Entregas',
+    keywords: ['problema', 'entrega', 'dañado', 'retraso', 'reclamo'],
   },
   {
     id: '12',
-    question: '¿AuraBox ofrece herramientas de marketing para emprendedores?',
-    answer: 'Sí, AuraBox proporciona herramientas de marketing integradas como newsletters segmentados, gestión de promociones y cupones, y la posibilidad de publicar actualizaciones directamente en la plataforma para tus suscriptores.',
+    question: '¿Cómo registro mi club en AuraBox?',
+    answer:
+      'Creás una cuenta de emprendedor desde "Registrá tu club", completás tu perfil y los datos del club, y el equipo de AuraBox revisa tu club antes de publicarlo en el catálogo.',
     category: 'Emprendedores',
-    keywords: ['marketing', 'promociones', 'newsletters', 'visibilidad']
+    keywords: ['registro', 'club', 'emprendedor', 'vender', 'publicar'],
   },
   {
     id: '13',
-    question: '¿Cómo se manejan los problemas con las entregas?',
-    answer: 'Si surge algún problema con una entrega (retraso, producto dañado, etc.), puedes reportarlo directamente desde tu panel de usuario. AuraBox facilita la comunicación con el club y el seguimiento de la resolución del incidente.',
-    category: 'Entregas',
-    keywords: ['problema', 'entrega', 'dañado', 'retraso', 'incidente']
+    question: '¿Qué herramientas tienen los emprendedores?',
+    answer:
+      'Un panel para gestionar planes y cajas, clientes y suscripciones, envíos y repartidores, inventario y proveedores, finanzas y estadísticas. También podés crear promociones y enviar newsletters a tus suscriptores.',
+    category: 'Emprendedores',
+    keywords: ['herramientas', 'panel', 'inventario', 'finanzas', 'promociones', 'newsletter', 'marketing'],
   },
   {
     id: '14',
-    question: '¿Puedo descubrir clubes basados en mis intereses?',
-    answer: '¡Claro! AuraBox cuenta con un sistema de recomendaciones personalizadas que sugiere clubes basados en tus gustos, historial de compras y valoraciones. También puedes usar nuestros filtros inteligentes para encontrar exactamente lo que buscas.',
-    category: 'Exploración',
-    keywords: ['recomendaciones', 'intereses', 'personalización', 'descubrir']
+    question: '¿Cómo contacto al soporte de AuraBox?',
+    answer:
+      'Podés escribirnos desde la página de contacto o consultar al asistente virtual, el botón de chat que aparece abajo a la derecha. Respondemos por correo en horario de lunes a viernes.',
+    category: 'Soporte',
+    keywords: ['contacto', 'soporte', 'ayuda', 'chat', 'asistente'],
   },
   {
     id: '15',
-    question: '¿Hay beneficios por ser un suscriptor fiel?',
-    answer: 'Sí, AuraBox valora la fidelidad. Contamos con un sistema de puntos por permanencia, gamificación con retos mensuales e insignias, y promociones exclusivas para nuestros suscriptores más activos. ¡Mientras más uses AuraBox, más beneficios obtendrás!',
-    category: 'Suscriptores',
-    keywords: ['fidelidad', 'beneficios', 'puntos', 'gamificación', 'recompensas']
+    question: '¿Dónde encuentro los términos y políticas de cada club?',
+    answer:
+      'Cada club tiene sus propios términos y condiciones y su política de privacidad, y los encontrás dentro del perfil de ese club.',
+    category: 'Soporte',
+    keywords: ['términos', 'condiciones', 'privacidad', 'políticas'],
   },
 ];
 
+const explore = [
+  { to: '/explore', title: 'Explorar clubes', text: 'Descubrí todos los clubes y encontrá el que más te guste.', cta: 'Ver clubes' },
+  { to: '/register/entrepreneur', title: 'Registrá tu club', text: 'Mirá cómo AuraBox puede ayudarte a gestionar y hacer crecer tu club.', cta: 'Empezar' },
+  { to: '/about-us', title: 'Sobre nosotros', text: 'Conocé nuestra misión, visión y los valores detrás de AuraBox.', cta: 'Leer más' },
+];
+
 const FAQPage: React.FC = () => {
-  const [searchTerm, setSearchTerm] = useState<string>('');
+  const [searchTerm, setSearchTerm] = useState('');
   const [openQuestion, setOpenQuestion] = useState<string | null>(null);
-  const [selectedCategory, setSelectedCategory] = useState<string>('Todas');
+  const [selectedCategory, setSelectedCategory] = useState('Todas');
 
-  const categories = ['Todas', ...Array.from(new Set(faqData.map(item => item.category)))];
+  const categories = useMemo(() => ['Todas', ...Array.from(new Set(faqData.map((item) => item.category)))], []);
 
-  const filteredFaqs = faqData.filter(faq => {
-    const matchesSearch = searchTerm.toLowerCase().split(' ').every(term =>
-      faq.question.toLowerCase().includes(term) ||
-      faq.answer.toLowerCase().includes(term) ||
-      faq.keywords.some(keyword => keyword.toLowerCase().includes(term))
-    );
-    const matchesCategory = selectedCategory === 'Todas' || faq.category === selectedCategory;
-    return matchesSearch && matchesCategory;
-  });
+  const filteredFaqs = useMemo(() => {
+    const terms = searchTerm.toLowerCase().split(' ').filter(Boolean);
+    return faqData.filter((faq) => {
+      const matchesSearch = terms.every(
+        (term) =>
+          faq.question.toLowerCase().includes(term) ||
+          faq.answer.toLowerCase().includes(term) ||
+          faq.keywords.some((keyword) => keyword.toLowerCase().includes(term)),
+      );
+      const matchesCategory = selectedCategory === 'Todas' || faq.category === selectedCategory;
+      return matchesSearch && matchesCategory;
+    });
+  }, [searchTerm, selectedCategory]);
 
   const toggleQuestion = (id: string) => {
-    setOpenQuestion(openQuestion === id ? null : id);
+    setOpenQuestion((current) => (current === id ? null : id));
   };
 
   return (
-    <div className="container mx-auto px-4 py-12 animate-fadeInUp bg-aurora-cream">
-      <span className="section-eyebrow block text-center">¿Tenés dudas?</span>
-      <h1 className="font-display text-5xl font-bold text-center text-aurora-navy mb-8 animate-slideInUp">
-        Preguntas Frecuentes
-      </h1>
-      <p className="text-center text-aurora-navy/60 mb-12 max-w-2xl mx-auto animate-fadeIn">
-        Encontrá respuestas a las preguntas más comunes sobre AuraBox, cómo funciona para suscriptores y emprendedores, y mucho más.
-      </p>
-
-      <div className="mb-10 flex flex-col md:flex-row items-center justify-center space-y-4 md:space-y-0 md:space-x-4 animate-fadeIn">
-        <input
-          type="text"
-          placeholder="Buscá tu pregunta aquí..."
-          className="w-full md:w-1/2 input-aurora"
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
+    <div className="min-h-screen bg-aurora-cream">
+      <section className="hero-mesh grain relative isolate overflow-hidden px-4 pb-28 pt-16 text-center text-white">
+        <div className="pointer-events-none absolute -right-16 -top-16 -z-10 h-72 w-72 animate-blobMove rounded-full bg-aurora-sun/30 blur-3xl" />
+        <div
+          className="pointer-events-none absolute -bottom-20 -left-16 -z-10 h-72 w-72 animate-blobMove rounded-full bg-aurora-coral/40 blur-3xl"
+          style={{ animationDelay: '-8s' }}
         />
-        <div className="relative w-full md:w-auto">
-          <select
-            className="input-aurora appearance-none pr-8"
-            value={selectedCategory}
-            onChange={(e) => setSelectedCategory(e.target.value)}
-          >
-            {categories.map(category => (
-              <option key={category} value={category}>{category}</option>
-            ))}
-          </select>
-          <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-aurora-navy/50">
-            <svg className="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/></svg>
-          </div>
+        <span className="glass mb-5 inline-block animate-fadeInUp rounded-full px-4 py-1.5 text-xs font-semibold uppercase tracking-widest">
+          ¿Tenés dudas?
+        </span>
+        <h1 className="mx-auto max-w-3xl animate-fadeInUp font-display text-4xl font-normal leading-[1.05] md:text-6xl">
+          Preguntas <em className="italic text-aurora-goldLight">frecuentes</em>
+        </h1>
+        <p className="mx-auto mb-9 mt-5 max-w-xl text-lg text-white/85">
+          Respuestas rápidas sobre cómo funciona AuraBox, para suscriptores y para emprendedores.
+        </p>
+        <div className="relative mx-auto max-w-2xl">
+          <svg className="absolute left-5 top-1/2 h-5 w-5 -translate-y-1/2 text-aurora-navy/40" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+          </svg>
+          <input
+            type="search"
+            aria-label="Buscar en las preguntas frecuentes"
+            placeholder="Buscá tu pregunta"
+            className="w-full rounded-full border-0 bg-white py-4 pl-12 pr-6 text-aurora-navy shadow-aurora-lg placeholder:text-aurora-navy/40 focus:outline-none focus:ring-4 focus:ring-aurora-sun/60"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+          />
         </div>
-      </div>
+        <svg className="absolute bottom-[-1px] left-0 block h-10 w-full text-aurora-cream md:h-14" viewBox="0 0 1440 80" preserveAspectRatio="none" aria-hidden="true">
+          <path fill="currentColor" d="M0,48 C240,96 480,0 720,32 C960,64 1200,96 1440,40 L1440,80 L0,80 Z" />
+        </svg>
+      </section>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        {filteredFaqs.length > 0 ? (
-          filteredFaqs.map(faq => (
-            <div
-              key={faq.id}
-              className="bg-white p-6 rounded-xl shadow-aurora-sm border border-aurora-navy/5 hover:shadow-aurora transition-all duration-300 transform hover:-translate-y-1 cursor-pointer animate-fadeInUp"
-              onClick={() => toggleQuestion(faq.id)}
-            >
-              <h3 className="text-xl font-semibold text-aurora-navy mb-3 flex justify-between items-center">
-                {faq.question}
-                <span className="text-aurora-terracotta text-2xl transition-transform duration-300">
-                  {openQuestion === faq.id ? '−' : '+'}
-                </span>
-              </h3>
-              <div
-                className={`overflow-hidden transition-all duration-500 ease-in-out ${
-                  openQuestion === faq.id ? 'max-h-screen opacity-100 pt-2' : 'max-h-0 opacity-0'
+      <div className="mx-auto max-w-4xl px-4 py-12 sm:px-6">
+        <div className="no-scrollbar -mx-1 mb-8 flex gap-2 overflow-x-auto px-1 py-1 sm:flex-wrap sm:justify-center">
+          {categories.map((category) => {
+            const active = selectedCategory === category;
+            return (
+              <button
+                key={category}
+                type="button"
+                onClick={() => setSelectedCategory(category)}
+                aria-pressed={active}
+                className={`shrink-0 rounded-full px-4 py-2 text-sm font-semibold transition-all duration-200 ${
+                  active
+                    ? 'bg-aurora-terracotta text-white shadow-aurora-glow'
+                    : 'bg-white text-aurora-navy ring-1 ring-aurora-navy/10 hover:ring-aurora-terracotta/50'
                 }`}
               >
-                <p className="text-aurora-navy/70 leading-relaxed border-t border-aurora-navy/10 pt-4">
-                  {faq.answer}
-                </p>
-                {faq.keywords.length > 0 && (
-                  <div className="mt-4 flex flex-wrap gap-2">
-                    {faq.keywords.map(keyword => (
-                      <span key={keyword} className="bg-aurora-gold/15 text-aurora-terracottaDark text-xs font-medium px-2.5 py-0.5 rounded-full">
-                        {keyword}
+                {category}
+              </button>
+            );
+          })}
+        </div>
+
+        <p className="mb-4 text-sm text-aurora-navy/55" aria-live="polite">
+          {filteredFaqs.length} {filteredFaqs.length === 1 ? 'pregunta' : 'preguntas'}
+        </p>
+
+        {filteredFaqs.length > 0 ? (
+          <div className="space-y-3">
+            {filteredFaqs.map((faq) => {
+              const open = openQuestion === faq.id;
+              return (
+                <div key={faq.id} className={`overflow-hidden rounded-2xl bg-white ring-1 transition-shadow duration-300 ${open ? 'shadow-aurora ring-aurora-terracotta/30' : 'shadow-aurora-sm ring-aurora-navy/5'}`}>
+                  <h2>
+                    <button
+                      type="button"
+                      onClick={() => toggleQuestion(faq.id)}
+                      aria-expanded={open}
+                      aria-controls={`faq-panel-${faq.id}`}
+                      id={`faq-button-${faq.id}`}
+                      className="flex w-full items-center justify-between gap-4 px-6 py-5 text-left"
+                    >
+                      <span className="font-display text-xl font-medium text-aurora-navy">{faq.question}</span>
+                      <span
+                        className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full transition-all duration-300 ${
+                          open ? 'rotate-180 bg-aurora-terracotta text-white' : 'bg-aurora-cream text-aurora-terracotta'
+                        }`}
+                        aria-hidden="true"
+                      >
+                        <svg className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth={2.6} viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
+                        </svg>
                       </span>
-                    ))}
+                    </button>
+                  </h2>
+                  <div
+                    id={`faq-panel-${faq.id}`}
+                    role="region"
+                    aria-labelledby={`faq-button-${faq.id}`}
+                    className={`grid transition-all duration-300 ease-in-out ${open ? 'grid-rows-[1fr] opacity-100' : 'grid-rows-[0fr] opacity-0'}`}
+                  >
+                    <div className="overflow-hidden">
+                      <p className="px-6 pb-6 leading-relaxed text-aurora-navy/70">{faq.answer}</p>
+                    </div>
                   </div>
-                )}
-              </div>
-            </div>
-          ))
+                </div>
+              );
+            })}
+          </div>
         ) : (
-          <div className="lg:col-span-2 text-center py-10 bg-white rounded-lg shadow-aurora-sm border border-aurora-navy/5 animate-fadeIn">
-            <p className="text-aurora-navy/60 text-lg">No se encontraron preguntas que coincidan con tu búsqueda o categoría.</p>
-            <p className="text-aurora-navy/40 text-sm mt-2">Intentá con otras palabras clave o seleccioná otra categoría.</p>
+          <div className="rounded-3xl bg-white py-14 text-center shadow-aurora-sm ring-1 ring-aurora-navy/5">
+            <p className="font-display text-2xl font-medium text-aurora-navy">No encontramos preguntas con esa búsqueda.</p>
+            <p className="mt-2 text-sm text-aurora-navy/55">Probá con otras palabras o elegí otra categoría.</p>
           </div>
         )}
-      </div>
 
-      <div className="mt-16 text-center bg-white p-8 rounded-xl shadow-aurora-sm border border-aurora-navy/5 animate-fadeInUp">
-        <h2 className="font-display text-3xl font-bold text-aurora-navy mb-4">¿No encontraste tu pregunta?</h2>
-        <p className="text-aurora-navy/70 mb-6 max-w-xl mx-auto">
-          Si no encontraste la respuesta que buscabas, no dudes en contactar a nuestro equipo de soporte. Estamos acá para ayudarte.
-        </p>
-        <Link
-          to="/contact"
-          className="btn-primary inline-flex"
-        >
-          Contactar Soporte
-        </Link>
-      </div>
+        <Reveal className="mt-16">
+          <div className="hero-mesh grain relative isolate overflow-hidden rounded-3xl px-6 py-12 text-center text-white shadow-aurora-lg">
+            <h2 className="font-display text-3xl font-normal md:text-4xl">¿No encontraste tu respuesta?</h2>
+            <p className="mx-auto mt-3 max-w-xl text-white/85">Escribinos y te ayudamos. Respondemos por correo lo antes posible.</p>
+            <Link
+              to="/contact"
+              className="btn-shine mt-7 inline-flex items-center justify-center rounded-full bg-white px-8 py-3.5 font-semibold text-aurora-terracottaDark shadow-aurora-lg transition-all duration-300 hover:-translate-y-0.5 hover:bg-aurora-cream"
+            >
+              Contactar a soporte
+            </Link>
+          </div>
+        </Reveal>
 
-      <div className="mt-16">
-        <h2 className="font-display text-3xl font-bold text-center text-aurora-navy mb-8 animate-fadeIn">Seguí Explorando</h2>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          <div className="bg-white p-6 rounded-xl shadow-aurora-sm border border-aurora-navy/5 hover:shadow-aurora transition-all duration-300 transform hover:-translate-y-1 animate-fadeInUp">
-            <h3 className="text-xl font-semibold text-aurora-terracotta mb-3">Explorar Clubes</h3>
-            <p className="text-aurora-navy/70 mb-4">Descubrí todos los clubes de suscripción disponibles y encontrá el que más te guste.</p>
-            <Link to="/explore" className="text-aurora-terracotta hover:underline font-medium">Ver clubes →</Link>
-          </div>
-          <div className="bg-white p-6 rounded-xl shadow-aurora-sm border border-aurora-navy/5 hover:shadow-aurora transition-all duration-300 transform hover:-translate-y-1 animate-fadeInUp" style={{ animationDelay: '100ms' }}>
-            <h3 className="text-xl font-semibold text-aurora-terracotta mb-3">Registrá tu Club</h3>
-            <p className="text-aurora-navy/70 mb-4">Descubrí cómo AuraBox puede potenciar y profesionalizar tu club de suscripción.</p>
-            <Link to="/register/entrepreneur" className="text-aurora-terracotta hover:underline font-medium">Empezar →</Link>
-          </div>
-          <div className="bg-white p-6 rounded-xl shadow-aurora-sm border border-aurora-navy/5 hover:shadow-aurora transition-all duration-300 transform hover:-translate-y-1 animate-fadeInUp" style={{ animationDelay: '200ms' }}>
-            <h3 className="text-xl font-semibold text-aurora-terracotta mb-3">Sobre Nosotros</h3>
-            <p className="text-aurora-navy/70 mb-4">Conocé nuestra misión, visión y los valores detrás de AuraBox.</p>
-            <Link to="/about-us" className="text-aurora-terracotta hover:underline font-medium">Leer más →</Link>
+        <div className="mt-16">
+          <Reveal>
+            <h2 className="mb-8 text-center font-display text-3xl font-medium text-aurora-navy">Seguí explorando</h2>
+          </Reveal>
+          <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
+            {explore.map((item, index) => (
+              <Reveal key={item.to} delay={index * 90} className="h-full">
+                <Link
+                  to={item.to}
+                  className="group flex h-full flex-col rounded-3xl bg-white p-6 shadow-aurora-sm ring-1 ring-aurora-navy/5 transition-all duration-300 hover:-translate-y-1.5 hover:shadow-aurora-lg"
+                >
+                  <h3 className="font-display text-xl font-medium text-aurora-navy">{item.title}</h3>
+                  <p className="mt-2 flex-grow text-sm leading-relaxed text-aurora-navy/60">{item.text}</p>
+                  <span className="mt-4 inline-flex items-center gap-1 text-sm font-semibold text-aurora-terracotta">
+                    {item.cta}
+                    <span className="transition-transform duration-300 group-hover:translate-x-1" aria-hidden="true">→</span>
+                  </span>
+                </Link>
+              </Reveal>
+            ))}
           </div>
         </div>
       </div>
