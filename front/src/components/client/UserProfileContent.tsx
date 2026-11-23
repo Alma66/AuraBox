@@ -198,7 +198,7 @@ const UserProfileContent: React.FC<UserProfileContentProps> = ({ activeSection, 
                 onEdit={() => setIsEditingBirthDate(true)}
                 onCancel={() => { setEditedBirthDate(user.birthDate || ''); setIsEditingBirthDate(false); }}
               >
-                <input type="date" value={editedBirthDate} onChange={(e) => setEditedBirthDate(e.target.value)} className={inputClass} max={new Date(new Date().setFullYear(new Date().getFullYear() - 18)).toISOString().split('T')[0]} />
+                <input type="date" value={editedBirthDate} onChange={(e) => setEditedBirthDate(e.target.value)} className={inputClass} max={new Date(new Date().setFullYear(new Date().getFullYear() - 16)).toISOString().split('T')[0]} />
                 <button onClick={handleSaveBirthDate} className={primaryBtnClass}>Guardar Fecha de Nacimiento</button>
               </EditProfileField>
 

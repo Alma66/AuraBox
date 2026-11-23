@@ -3,6 +3,9 @@ import { PrismaService } from '../../prisma/prisma.service';
 import { CreateEntrepreneurDto } from './dto/create-entrepreneurs.dto';
 import { UpdateEntrepreneurDto } from './dto/update-entrepreneurs.dto';
 import * as bcrypt from 'bcryptjs';
+import { ageOn, isValidBirthDate } from '../../common/utils/age.util';
+
+const MIN_ENTREPRENEUR_AGE = 18;
 
 function sanitize(entrepreneur: any) {
   if (!entrepreneur) return entrepreneur;
@@ -26,8 +29,10 @@ export class EntrepreneursService {
     if (exists) throw new ConflictException('Email o documento ya registrado');
 
     const birthDate = new Date(dto.birthDate);
-    const age = new Date().getFullYear() - birthDate.getFullYear();
-    if (age < 18) throw new BadRequestException('Debes tener al menos 18 años para registrarte como emprendedor.');
+    if (!isValidBirthDate(birthDate)) throw new BadRequestException('La fecha de nacimiento no es válida.');
+    if (ageOn(birthDate) < MIN_ENTREPRENEUR_AGE) {
+      throw new BadRequestException('Debes tener al menos 18 años para registrarte como emprendedor.');
+    }
 
     const passwordHash = await bcrypt.hash(dto.password, 10);
     const created = await this.prisma.entrepreneurs.create({
@@ -97,7 +102,14 @@ export class EntrepreneursService {
       data.passwordHash = await bcrypt.hash(data.password, 10);
       delete data.password;
     }
-    if (data.birthDate) data.birthDate = new Date(data.birthDate);
+       if (data.birthDate) {
+      const birthDate = new Date(data.birthDate);
+      if (!isValidBirthDate(birthDate)) throw new BadRequestException('La fecha de nacimiento no es válida.');
+      if (ageOn(birthDate) < MIN_ENTREPRENEUR_AGE) {
+        throw new BadRequestException('Debes tener al menos 18 años.');
+      }
+      data.birthDate = birthDate;
+    }
     const updated = await this.prisma.entrepreneurs.update({ where: { id }, data });
     return sanitize(updated);
   }

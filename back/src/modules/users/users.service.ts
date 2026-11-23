@@ -4,7 +4,9 @@ import { Injectable, BadRequestException, NotFoundException, UnauthorizedExcepti
 import { UpdateUserDto } from './dto/update-user.dto';
 import * as bcrypt from 'bcryptjs';
 import { Prisma, DocumentType } from '@prisma/client';
+import { ageOn, isValidBirthDate } from '../../common/utils/age.util';
 
+const MIN_USER_AGE = 16;
 const USER_SELECT = {
   id: true,
   firstName: true,
@@ -113,7 +115,16 @@ export class UsersService {
     if (dto.documentType !== undefined)  data.documentType  = dto.documentType as DocumentType;
     if (dto.documentNumber !== undefined) data.documentNumber = dto.documentNumber;
     if (dto.phoneNumber !== undefined)   data.phoneNumber   = dto.phoneNumber;
-    if (dto.birthDate !== undefined)     data.birthDate     = new Date(dto.birthDate);
+    if (dto.birthDate !== undefined) {
+      const birthDate = new Date(dto.birthDate);
+      if (!isValidBirthDate(birthDate)) {
+        throw new BadRequestException('La fecha de nacimiento no es válida.');
+      }
+      if (ageOn(birthDate) < MIN_USER_AGE) {
+        throw new BadRequestException(`Debes tener al menos ${MIN_USER_AGE} años.`);
+      }
+      data.birthDate = birthDate;
+    }
     if (dto.streetAddress !== undefined) data.streetAddress = dto.streetAddress;
     if (dto.addressNumber !== undefined) data.addressNumber = dto.addressNumber;
     if (dto.floorNumber !== undefined)   data.floorNumber   = dto.floorNumber;
