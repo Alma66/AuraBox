@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../App';
 import api, { getResponseData } from '../../api/config';
 import SafeImage from '../../components/common/SafeImage';
+import Reveal from '../../components/common/Reveal';
 
 interface CartPlan {
   planId: number;
@@ -99,9 +100,9 @@ const CartPage: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-aurora-cream py-12 px-4">
-        <div className="max-w-4xl mx-auto text-center" role="status">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-aurora-terracotta mx-auto mb-4"></div>
+      <div className="min-h-screen bg-aurora-cream px-4 py-16">
+        <div className="mx-auto max-w-4xl text-center" role="status">
+          <div className="mx-auto mb-4 h-12 w-12 animate-spin rounded-full border-4 border-aurora-navy/15 border-t-aurora-terracotta" />
           <p className="text-aurora-navy/70">Cargando tu carrito...</p>
         </div>
       </div>
@@ -110,10 +111,10 @@ const CartPage: React.FC = () => {
 
   if (loadFailed) {
     return (
-      <div className="min-h-screen bg-aurora-cream py-12 px-4">
-        <div role="alert" className="max-w-md mx-auto card-surface shadow-aurora p-8 text-center">
-          <h1 className="font-display text-2xl font-bold text-aurora-navy mb-2">No pudimos cargar tu carrito</h1>
-          <p className="text-aurora-navy/60 mb-6">Revisá tu conexión e intentá de nuevo.</p>
+      <div className="min-h-screen bg-aurora-cream px-4 py-16">
+        <div role="alert" className="mx-auto max-w-md rounded-3xl bg-white p-8 text-center shadow-aurora ring-1 ring-aurora-navy/5">
+          <h1 className="mb-2 font-display text-3xl font-medium text-aurora-navy">No pudimos cargar tu carrito</h1>
+          <p className="mb-6 text-aurora-navy/60">Revisá tu conexión e intentá de nuevo.</p>
           <button type="button" onClick={fetchCart} className="btn-primary">
             Reintentar
           </button>
@@ -123,69 +124,78 @@ const CartPage: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-aurora-cream py-8 px-4">
-      <div className="max-w-4xl mx-auto">
-        <div className="text-center mb-8">
-          <h1 className="font-display text-4xl font-bold text-aurora-navy mb-2">Mi Carrito</h1>
-          <p className="text-aurora-navy/70">{user ? `Hola, ${user.firstName}. Revisá tus planes antes de pagar.` : 'Revisá tus planes seleccionados.'}</p>
+    <div className="min-h-screen bg-aurora-cream">
+      <div className="hero-mesh grain relative overflow-hidden">
+        <div className="container relative mx-auto px-4 pb-24 pt-12 md:pb-28">
+          <span className="mb-3 inline-block text-xs font-semibold uppercase tracking-widest text-aurora-goldLight">Tu carrito</span>
+          <h1 className="font-display text-4xl font-normal leading-tight text-white md:text-6xl">Mi carrito</h1>
+          <p className="mt-3 max-w-xl text-lg text-white/80">
+            {user ? `Hola, ${user.firstName}. Revisá tus planes antes de pagar.` : 'Revisá tus planes seleccionados.'}
+          </p>
         </div>
+      </div>
 
+      <div className="container mx-auto -mt-14 px-4 pb-16 md:-mt-16">
         {actionError && (
-          <div role="alert" className="bg-red-50 border border-red-200 text-red-700 text-sm rounded-xl px-4 py-3 mb-6 text-center">
+          <div role="alert" className="mb-6 rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-center text-sm text-red-700">
             {actionError}
           </div>
         )}
 
         {items.length === 0 ? (
-          <div className="text-center py-12 card-surface shadow-aurora-sm">
-            <svg className="mx-auto h-20 w-20 text-aurora-navy/20 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
-            </svg>
-            <h2 className="text-lg font-semibold text-aurora-navy mb-2">Tu carrito está vacío</h2>
-            <p className="text-aurora-navy/60 mb-6">Agregá planes desde el perfil de un club.</p>
-            <div className="flex flex-wrap justify-center gap-3">
-              <button type="button" onClick={() => navigate('/customer/wishlist')} className="btn-outline">
-                Ver mi lista de deseos
-              </button>
-              <button type="button" onClick={() => navigate('/explore')} className="btn-primary">
-                Explorar clubes
-              </button>
+          <Reveal>
+            <div className="mx-auto max-w-2xl rounded-3xl bg-white p-10 text-center shadow-aurora ring-1 ring-aurora-navy/5">
+              <span className="mx-auto mb-5 flex h-20 w-20 items-center justify-center rounded-full bg-aurora-cream text-aurora-terracotta">
+                <svg className="h-10 w-10" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.6} d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
+                </svg>
+              </span>
+              <h2 className="mb-2 font-display text-3xl font-medium text-aurora-navy">Tu carrito está vacío</h2>
+              <p className="mb-8 text-aurora-navy/60">Agregá planes desde el perfil de un club.</p>
+              <div className="flex flex-wrap justify-center gap-3">
+                <button type="button" onClick={() => navigate('/customer/wishlist')} className="btn-outline">
+                  Ver mi lista de deseos
+                </button>
+                <button type="button" onClick={() => navigate('/explore')} className="btn-primary btn-shine">
+                  Explorar clubes
+                </button>
+              </div>
             </div>
-          </div>
+          </Reveal>
         ) : (
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            <ul className="lg:col-span-2 space-y-4">
+          <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
+            <ul className="space-y-4 lg:col-span-2">
               {items.map((item) => {
                 const discount = bestDiscount(item.plan);
                 const isRemoving = removingId === item.idSubscriptionTypes;
                 return (
                   <li
                     key={item.cartItemId}
-                    className={`bg-white rounded-xl shadow-aurora-sm border p-4 flex gap-4 items-center transition-shadow duration-200 hover:shadow-md ${
-                      item.plan.active ? 'border-aurora-navy/10' : 'border-red-200 bg-red-50/40'
+                    className={`flex items-center gap-4 rounded-3xl p-4 shadow-aurora-sm ring-1 transition-shadow duration-200 hover:shadow-aurora md:gap-5 md:p-5 ${
+                      item.plan.active ? 'bg-white ring-aurora-navy/5' : 'bg-red-50/60 ring-red-200'
                     }`}
                   >
                     <SafeImage
                       src={item.plan.image}
                       alt={item.plan.name}
                       fallbackIcon="📦"
-                      className="w-20 h-20 rounded-lg object-cover flex-shrink-0"
+                      className="h-24 w-24 flex-shrink-0 rounded-2xl object-cover md:h-28 md:w-28"
                     />
-                    <div className="flex-grow min-w-0">
-                      <Link to={`/club/${item.club.id}`} className="text-xs text-aurora-navy/50 hover:text-aurora-terracotta">
+                    <div className="min-w-0 flex-grow">
+                      <Link to={`/club/${item.club.id}`} className="text-xs font-semibold uppercase tracking-wider text-aurora-navy/50 transition-colors hover:text-aurora-terracotta">
                         {item.club.name}
                       </Link>
-                      <h3 className="font-bold text-aurora-navy truncate">{item.plan.name}</h3>
-                      <p className="text-sm text-aurora-navy/60">{item.plan.deliveryFrequency}</p>
-                      <div className="mt-1 flex flex-wrap items-center gap-2">
-                        <span className="font-bold text-aurora-terracotta">{money(item.plan.price)}</span>
+                      <h3 className="truncate font-display text-xl font-medium text-aurora-navy">{item.plan.name}</h3>
+                      {item.plan.deliveryFrequency && <p className="text-sm text-aurora-navy/60">{item.plan.deliveryFrequency}</p>}
+                      <div className="mt-2 flex flex-wrap items-center gap-2">
+                        <span className="font-display text-2xl font-medium text-aurora-navy">{money(item.plan.price)}</span>
                         {discount > 0 && item.plan.active && (
-                          <span className="text-xs font-semibold text-green-700 bg-green-50 border border-green-100 rounded-full px-2 py-0.5">
+                          <span className="rounded-full border border-green-100 bg-green-50 px-2.5 py-0.5 text-xs font-semibold text-green-700">
                             Hasta {discount}% off pagando en efectivo o transferencia
                           </span>
                         )}
                         {!item.plan.active && (
-                          <span className="text-xs font-semibold text-red-700 bg-red-50 border border-red-200 rounded-full px-2 py-0.5">
+                          <span className="rounded-full border border-red-200 bg-red-50 px-2.5 py-0.5 text-xs font-semibold text-red-700">
                             Ya no está disponible
                           </span>
                         )}
@@ -196,9 +206,9 @@ const CartPage: React.FC = () => {
                       onClick={() => handleRemove(item.idSubscriptionTypes)}
                       disabled={isRemoving}
                       aria-label={`Quitar ${item.plan.name} del carrito`}
-                      className="text-red-400 hover:text-red-600 p-2 rounded-full hover:bg-red-50 disabled:opacity-50 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-red-400"
+                      className="rounded-full p-2 text-aurora-navy/35 transition-colors hover:bg-red-50 hover:text-red-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-red-400 disabled:opacity-50"
                     >
-                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                      <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
                       </svg>
                     </button>
@@ -208,21 +218,21 @@ const CartPage: React.FC = () => {
             </ul>
 
             <div className="lg:col-span-1">
-              <div className="bg-white rounded-xl shadow-aurora-sm border border-aurora-navy/10 p-6 lg:sticky lg:top-24">
-                <h2 className="font-display text-xl font-bold text-aurora-navy mb-4">Resumen del pedido</h2>
-                <div className="space-y-3 mb-6">
+              <div className="rounded-3xl bg-white p-6 shadow-aurora-lg ring-1 ring-aurora-navy/5 md:p-8 lg:sticky lg:top-24">
+                <h2 className="mb-5 font-display text-2xl font-medium text-aurora-navy">Resumen del pedido</h2>
+                <div className="mb-6 space-y-3">
                   <div className="flex justify-between text-sm">
                     <span className="text-aurora-navy/60">
                       {items.length} {items.length === 1 ? 'plan' : 'planes'}
                     </span>
                     <span className="font-semibold text-aurora-navy">{money(total)}</span>
                   </div>
-                  <div className="border-t border-aurora-navy/10 pt-3 flex justify-between text-lg font-bold text-aurora-navy">
-                    <span>Total estimado</span>
-                    <span>{money(total)}</span>
+                  <div className="flex items-baseline justify-between border-t border-aurora-navy/10 pt-4">
+                    <span className="font-semibold text-aurora-navy">Total estimado</span>
+                    <span className="font-display text-3xl font-medium text-aurora-navy">{money(total)}</span>
                   </div>
                   {possibleSavings > 0 && (
-                    <p className="text-xs text-green-700 bg-green-50 border border-green-100 rounded-lg px-3 py-2">
+                    <p className="rounded-xl border border-green-100 bg-green-50 px-3 py-2 text-xs text-green-700">
                       Podés ahorrar hasta {money(possibleSavings)} si elegís efectivo o transferencia en el próximo paso.
                     </p>
                   )}
@@ -234,7 +244,7 @@ const CartPage: React.FC = () => {
                   type="button"
                   onClick={handleCheckout}
                   disabled={!canCheckout}
-                  className="btn-primary w-full !py-3 text-lg disabled:opacity-50"
+                  className="btn-primary btn-shine w-full disabled:opacity-50"
                 >
                   Continuar al pago
                 </button>

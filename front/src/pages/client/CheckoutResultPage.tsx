@@ -91,11 +91,11 @@ const CheckoutResultPage: React.FC = () => {
 
   if (outcome === 'checking') {
     return (
-      <div className="min-h-screen bg-aurora-cream px-4 py-16">
-        <div role="status" aria-live="polite" className="mx-auto max-w-md text-center">
-          <div className="mx-auto mb-4 h-12 w-12 animate-spin rounded-full border-b-2 border-aurora-terracotta" />
-          <p className="font-display text-lg font-bold text-aurora-navy">Verificando tu pago…</p>
-          <p className="mt-1 text-sm text-aurora-navy/70">Esto tarda unos segundos. No cierres esta página.</p>
+      <div className="flex min-h-[calc(100vh-64px)] items-center justify-center bg-aurora-cream px-4 py-16">
+        <div role="status" aria-live="polite" className="w-full max-w-md rounded-3xl bg-white p-10 text-center shadow-aurora ring-1 ring-aurora-navy/5">
+          <div className="mx-auto mb-5 h-12 w-12 animate-spin rounded-full border-4 border-aurora-navy/15 border-t-aurora-terracotta" />
+          <p className="font-display text-2xl font-medium text-aurora-navy">Verificando tu pago…</p>
+          <p className="mt-2 text-sm text-aurora-navy/70">Esto tarda unos segundos. No cierres esta página.</p>
         </div>
       </div>
     );
@@ -104,9 +104,9 @@ const CheckoutResultPage: React.FC = () => {
   const content = CONTENT[outcome];
 
   return (
-    <div className="min-h-screen bg-aurora-cream px-4 py-12">
-      <div className="mx-auto max-w-md text-center">
-        <div className={`mx-auto mb-5 flex h-20 w-20 items-center justify-center rounded-full ${content.tone}`}>
+    <div className="flex min-h-[calc(100vh-64px)] items-center justify-center bg-aurora-cream px-4 py-12">
+      <div className="w-full max-w-lg rounded-3xl bg-white p-8 text-center shadow-aurora ring-1 ring-aurora-navy/5 md:p-12">
+        <div className={`mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-full ${content.tone}`}>
           <svg className="h-10 w-10" fill="none" stroke="currentColor" strokeWidth={2.2} viewBox="0 0 24 24" aria-hidden="true">
             {outcome === 'approved' ? (
               <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
@@ -117,22 +117,16 @@ const CheckoutResultPage: React.FC = () => {
             )}
           </svg>
         </div>
-        <h1 className="font-display text-3xl font-bold text-aurora-navy">{content.title}</h1>
-        <p className="mx-auto mt-3 text-aurora-navy/75">{content.text}</p>
+        <h1 className="font-display text-4xl font-medium text-aurora-navy">{content.title}</h1>
+        <p className="mx-auto mt-4 text-aurora-navy/75">{content.text}</p>
         {isNativeApp() ? null : (
-          <p className="mt-2 text-xs text-aurora-navy/50">Si abriste el pago desde la app de AuraBox, ya podés volver a ella.</p>
+          <p className="mt-3 text-xs text-aurora-navy/50">Si abriste el pago desde la app de AuraBox, ya podés volver a ella.</p>
         )}
         <div className="mt-8 flex flex-wrap justify-center gap-3">
-          <Link
-            to="/customer/subscriptions"
-            className="rounded-full bg-aurora-terracotta px-6 py-3 font-semibold text-white transition-colors hover:bg-aurora-terracotta/90"
-          >
+          <Link to="/customer/subscriptions" className="btn-primary btn-shine">
             Ver mis suscripciones
           </Link>
-          <Link
-            to={outcome === 'rejected' ? '/explore' : '/'}
-            className="rounded-full border border-aurora-navy/20 px-6 py-3 font-semibold text-aurora-navy transition-colors hover:bg-white"
-          >
+          <Link to={outcome === 'rejected' ? '/explore' : '/'} className="btn-outline">
             {outcome === 'rejected' ? 'Explorar clubes' : 'Ir al inicio'}
           </Link>
         </div>

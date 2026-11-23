@@ -170,14 +170,13 @@ const fieldBase =
 const inputClass = (error?: string) =>
   `${fieldBase} ${error ? 'border-red-400 focus:ring-red-300' : 'border-aurora-navy/15 focus:ring-aurora-terracotta'}`;
 
-const cardClass = 'bg-white rounded-2xl shadow-aurora-sm border border-aurora-navy/10';
+const cardClass = 'bg-white rounded-3xl shadow-aurora-sm ring-1 ring-aurora-navy/5';
 
 const primaryButtonClass =
-  'min-h-[48px] bg-aurora-terracotta text-white px-8 py-3 rounded-xl hover:bg-aurora-terracottaDark transition-colors font-semibold disabled:opacity-50 disabled:cursor-not-allowed';
+  'min-h-[48px] bg-aurora-terracotta text-white px-8 py-3 rounded-full hover:bg-aurora-terracottaDark transition-all duration-300 hover:shadow-aurora-glow font-semibold disabled:opacity-50 disabled:cursor-not-allowed';
 
 const secondaryButtonClass =
-  'min-h-[48px] border border-aurora-navy/20 text-aurora-navy px-6 py-3 rounded-xl hover:bg-white transition-colors font-semibold disabled:opacity-50';
-
+  'min-h-[48px] border-2 border-aurora-navy/20 text-aurora-navy px-6 py-3 rounded-full hover:bg-white transition-colors font-semibold disabled:opacity-50';
 const discountFor = (plan: CartPlan, method: string) => {
   if (method === 'transferencia') return plan.transferDiscount ?? 0;
   if (method === 'efectivo') return plan.cashDiscount ?? 0;
@@ -350,7 +349,7 @@ const SectionCard: React.FC<{ icon: IconName; title: string; subtitle?: string; 
         <Icon name={icon} className="h-6 w-6" />
       </span>
       <div>
-        <h2 className="text-xl font-serif font-bold text-aurora-navy">{title}</h2>
+        <h2 className="text-xl font-display font-medium text-aurora-navy">{title}</h2>
         {subtitle && <p className="mt-0.5 text-sm text-aurora-navy/60">{subtitle}</p>}
       </div>
     </div>
@@ -868,7 +867,7 @@ if (!redirecting) setIsProcessing(false);
     return (
       <div className="min-h-screen bg-aurora-cream py-8 px-4">
         <div className="max-w-4xl mx-auto text-center py-12">
-          <h2 className="text-2xl font-serif font-bold text-aurora-navy mb-4">{loadError}</h2>
+          <h2 className="text-2xl font-display font-medium text-aurora-navy mb-4">{loadError}</h2>
           <button onClick={() => navigate('/cart')} className={primaryButtonClass}>
             Volver al carrito
           </button>
@@ -911,7 +910,7 @@ if (!redirecting) setIsProcessing(false);
             <div className="mx-auto mb-4 flex h-20 w-20 items-center justify-center rounded-full bg-green-100 text-green-700">
               <Icon name="check" className="h-10 w-10" />
             </div>
-            <h1 className="text-3xl font-serif font-bold text-aurora-navy mb-2">{title}</h1>
+            <h1 className="text-3xl font-display font-medium text-aurora-navy mb-2">{title}</h1>
             <p className="text-aurora-navy/70 max-w-md mx-auto">{text}</p>
           </div>
 
@@ -963,15 +962,13 @@ if (!redirecting) setIsProcessing(false);
           )}
 
           <section className={`${cardClass} p-5 sm:p-7`}>
-            <h2 className="font-serif text-lg font-bold text-aurora-navy mb-3">Entrega</h2>
-            <p className="text-sm text-aurora-navy/80">
+<h2 className="font-display text-2xl font-medium text-aurora-navy mb-3">Entrega</h2>            <p className="text-sm text-aurora-navy/80">
               {address.street} {address.streetNumber}, {address.locality}
             </p>
             <p className="text-sm text-aurora-navy/80">
               {address.city}, {address.province} ({address.postalCode.toUpperCase()})
             </p>
-            <h2 className="font-serif text-lg font-bold text-aurora-navy mt-6 mb-3">Qué sigue</h2>
-            <ol className="space-y-3">
+<h2 className="font-display text-2xl font-medium text-aurora-navy mt-6 mb-3">Qué sigue</h2>            <ol className="space-y-3">
               {timeline.map((entry, index) => (
                 <li key={entry} className="flex items-start gap-3 text-sm text-aurora-navy/80">
                   <span className="flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full bg-aurora-terracotta text-xs font-bold text-white">
@@ -1424,7 +1421,7 @@ if (!redirecting) setIsProcessing(false);
 
       <div className="max-w-6xl mx-auto">
         <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
-          <h1 className="text-3xl sm:text-4xl font-serif font-bold text-aurora-navy">Finalizar compra</h1>
+          <h1 className="text-3xl sm:text-4xl font-display font-medium text-aurora-navy">Finalizar compra</h1>
           <span className="flex items-center gap-2 text-sm font-semibold text-aurora-navy/70">
             <Icon name="lock" className="h-4 w-4" />
             Conexión segura
@@ -1551,7 +1548,7 @@ if (!redirecting) setIsProcessing(false);
           </div>
 
           <aside className={`${cardClass} hidden p-6 lg:sticky lg:top-24 lg:block`}>
-            <h2 className="mb-4 text-xl font-serif font-bold text-aurora-navy">Resumen de tu orden</h2>
+            <h2 className="mb-4 text-xl font-display font-medium text-aurora-navy">Resumen de tu orden</h2>
             {renderSummaryBody()}
           </aside>
         </div>
