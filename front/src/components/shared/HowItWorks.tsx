@@ -1,52 +1,61 @@
 import React from 'react';
+import Reveal from '../common/Reveal';
 
-const HowItWorks: React.FC = () => {
-  const steps = [
-    {
-      icon: '🔍',
-      title: 'Explorá y Descubrí',
-      description: 'Navegá por nuestro catálogo de clubes, filtrando por categoría, precio o intereses. Encontrá la experiencia perfecta para vos.'
-    },
-    {
-      icon: '📦',
-      title: 'Suscribite Fácilmente',
-      description: 'Elegí tu club favorito y suscribite en pocos pasos. Pagos seguros y gestión transparente desde tu panel de usuario.'
-    },
-    {
-      icon: '🎁',
-      title: 'Recibí tu Sorpresa',
-      description: 'Esperá tu caja en la puerta de tu casa. Cada mes, una nueva experiencia curada con amor y dedicación.'
-    },
-    {
-      icon: '💬',
-      title: 'Compartí y Conectá',
-      description: 'Dejá reseñas, interactuá con otros suscriptores y formá parte de una comunidad apasionada por las experiencias únicas.'
-    }
-  ];
+const steps = [
+  {
+    icon: '🔍',
+    title: 'Explorá y descubrí',
+    description: 'Navegá por el catálogo de clubes y filtrá por categoría, calificación o intereses hasta encontrar el tuyo.',
+    tone: 'from-aurora-terracotta to-aurora-coral',
+  },
+  {
+    icon: '📦',
+    title: 'Suscribite fácil',
+    description: 'Elegí tu plan y suscribite en pocos pasos, con pagos seguros y todo gestionado desde tu panel.',
+    tone: 'from-aurora-navy to-aurora-navyLight',
+  },
+  {
+    icon: '🎁',
+    title: 'Recibí tu sorpresa',
+    description: 'Tu caja llega a tu puerta cada mes y podés seguir el envío en todo momento.',
+    tone: 'from-aurora-gold to-aurora-sun',
+  },
+  {
+    icon: '💬',
+    title: 'Compartí y conectá',
+    description: 'Dejá tu reseña y sumate a una comunidad que disfruta de las experiencias únicas.',
+    tone: 'from-aurora-teal to-aurora-navyLight',
+  },
+];
 
-  return (
-    <div className="py-16 bg-white rounded-2xl shadow-aurora-sm border border-aurora-navy/5">
-      <span className="section-eyebrow block text-center">El camino</span>
-      <h2 className="font-display text-4xl font-bold text-aurora-navy mb-12 text-center animate-fadeInUp">¿Cómo funciona AuraBox?</h2>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 px-8">
-        {steps.map((step, index) => (
-          <div
-            key={index}
-            className="relative bg-aurora-cream rounded-xl p-6 text-center flex flex-col items-center
-                       transform transition-all duration-300 hover:scale-[1.03] hover:shadow-aurora-sm animate-slideInUp"
-            style={{ animationDelay: `${index * 100}ms` }}
-          >
-            <span className="absolute top-3 right-4 font-display text-3xl font-bold text-aurora-navy/10">
-              {String(index + 1).padStart(2, '0')}
-            </span>
-            <div className="text-5xl mb-4 p-4 bg-aurora-gold/15 rounded-full inline-block">{step.icon}</div>
-            <h3 className="font-display text-xl font-semibold text-aurora-navy mb-3">{step.title}</h3>
-            <p className="text-aurora-navy/65 text-base">{step.description}</p>
-          </div>
-        ))}
-      </div>
+const HowItWorks: React.FC = () => (
+  <div>
+    <div className="mx-auto mb-14 max-w-2xl text-center">
+      <span className="section-eyebrow">El camino</span>
+      <h2 className="font-display text-4xl font-medium text-aurora-navy md:text-5xl">¿Cómo funciona AuraBox?</h2>
+      <p className="mt-4 text-lg text-aurora-navy/60">Cuatro pasos simples entre vos y tu próxima caja sorpresa.</p>
     </div>
-  );
-};
+
+    <div className="relative grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
+      <div className="pointer-events-none absolute left-[12%] right-[12%] top-12 hidden border-t-2 border-dashed border-aurora-terracotta/30 lg:block" />
+      {steps.map((step, index) => (
+        <Reveal key={step.title} delay={index * 120} className="h-full">
+          <div className="group relative flex h-full flex-col items-center rounded-3xl bg-white p-7 text-center shadow-aurora-sm ring-1 ring-aurora-navy/5 transition-all duration-300 hover:-translate-y-2 hover:shadow-aurora-lg">
+            <div
+              className={`relative z-10 flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br text-3xl shadow-aurora-sm transition-transform duration-300 group-hover:rotate-6 group-hover:scale-110 ${step.tone}`}
+            >
+              <span aria-hidden="true">{step.icon}</span>
+              <span className="absolute -right-2 -top-2 flex h-7 w-7 items-center justify-center rounded-full bg-white font-display text-sm font-bold text-aurora-navy shadow-aurora-sm">
+                {index + 1}
+              </span>
+            </div>
+            <h3 className="mt-5 font-display text-2xl font-medium text-aurora-navy">{step.title}</h3>
+            <p className="mt-2 text-sm leading-relaxed text-aurora-navy/65">{step.description}</p>
+          </div>
+        </Reveal>
+      ))}
+    </div>
+  </div>
+);
 
 export default HowItWorks;

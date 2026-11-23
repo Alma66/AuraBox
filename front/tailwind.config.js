@@ -18,15 +18,23 @@ module.exports = {
           cream: '#FBF4E9',
           creamDark: '#F3E7D5',
           ink: '#221D17',
+          sun: '#FFC857',
+          coral: '#F2704B',
+          berry: '#8E3B6B',
+          teal: '#2F9E8F',
+          plum: '#4A2C5C',
+          plumDark: '#2B1F45',
         },
       },
       fontFamily: {
-        display: ['"Fraunces"', 'serif'],
-        sans: ['"Plus Jakarta Sans"', 'system-ui', 'sans-serif'],
+        display: ['"Newsreader"', 'Georgia', 'serif'],
+        sans: ['"Inter"', 'system-ui', 'sans-serif'],
       },
       boxShadow: {
         aurora: '0 20px 40px -12px rgba(31, 51, 80, 0.25)',
         'aurora-sm': '0 8px 20px -6px rgba(31, 51, 80, 0.15)',
+        'aurora-glow': '0 12px 32px -8px rgba(193, 98, 43, 0.55)',
+        'aurora-lg': '0 30px 60px -20px rgba(31, 51, 80, 0.35)',
       },
       keyframes: {
         fadeInUp: {
@@ -90,6 +98,23 @@ module.exports = {
           '0%, 100%': { opacity: '0.5', transform: 'scale(1)' },
           '50%': { opacity: '0.8', transform: 'scale(1.05)' },
         },
+        blobMove: {
+          '0%, 100%': { transform: 'translate3d(0, 0, 0) scale(1)' },
+          '33%': { transform: 'translate3d(30px, -40px, 0) scale(1.1)' },
+          '66%': { transform: 'translate3d(-25px, 25px, 0) scale(0.95)' },
+        },
+        marquee: {
+          '0%': { transform: 'translateX(0)' },
+          '100%': { transform: 'translateX(-50%)' },
+        },
+        shine: {
+          '0%': { transform: 'translateX(-120%) skewX(-20deg)' },
+          '100%': { transform: 'translateX(220%) skewX(-20deg)' },
+        },
+        ringPulse: {
+          '0%': { transform: 'scale(1)', opacity: '0.55' },
+          '100%': { transform: 'scale(1.7)', opacity: '0' },
+        },
       },
       animation: {
         fadeInUp: 'fadeInUp 0.6s ease-out forwards',
@@ -100,6 +125,10 @@ module.exports = {
         float: 'float 4s ease-in-out infinite',
         shimmer: 'shimmer 2.5s linear infinite',
         glowPulse: 'glowPulse 4s ease-in-out infinite',
+        blobMove: 'blobMove 18s ease-in-out infinite',
+        marquee: 'marquee 38s linear infinite',
+        shine: 'shine 3.2s ease-in-out infinite',
+        ringPulse: 'ringPulse 2.4s ease-out infinite',
       },
     },
   },

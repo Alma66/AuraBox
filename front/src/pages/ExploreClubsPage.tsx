@@ -1,9 +1,10 @@
-import React, { useState, useEffect, useMemo, useRef } from 'react';
+import React, { useState, useEffect, useMemo, useRef, useCallback } from 'react';
 import ExploreClubCard from '../components/shared/ExploreClubCard';
 import api, { getResponseData } from '../api/config';
 import { Link, useSearchParams } from 'react-router-dom';
 import { categoryIdsForGroup } from '../utils/categoryGroups';
 import { Club } from '../types/club';
+import Reveal from '../components/common/Reveal';
 
 interface Category {
   id: number;
@@ -159,16 +160,96 @@ const FilterPanel: React.FC<FilterPanelProps> = ({
   </div>
 );
 
+interface FilterDropdownProps {
+  label: string;
+  activeLabel?: string;
+  children: (close: () => void) => React.ReactNode;
+}
+
+const FilterDropdown: React.FC<FilterDropdownProps> = ({ label, activeLabel, children }) => {
+  const [open, setOpen] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+  const close = useCallback(() => setOpen(false), []);
+
+  useEffect(() => {
+    if (!open) return;
+    const onClick = (event: MouseEvent) => {
+      if (ref.current && !ref.current.contains(event.target as Node)) setOpen(false);
+    };
+    const onKey = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') setOpen(false);
+    };
+    document.addEventListener('mousedown', onClick);
+    document.addEventListener('keydown', onKey);
+    return () => {
+      document.removeEventListener('mousedown', onClick);
+      document.removeEventListener('keydown', onKey);
+    };
+  }, [open]);
+
+  return (
+    <div ref={ref} className="relative">
+      <button
+        type="button"
+        aria-haspopup="listbox"
+        aria-expanded={open}
+        onClick={() => setOpen((value) => !value)}
+        className={`flex items-center gap-2 rounded-full border px-4 py-2 text-sm font-semibold transition-all duration-200 ${
+          activeLabel
+            ? 'border-aurora-terracotta bg-aurora-terracotta/10 text-aurora-terracottaDark'
+            : 'border-aurora-navy/15 bg-white text-aurora-navy hover:border-aurora-terracotta/50'
+        }`}
+      >
+        {activeLabel || label}
+        <svg className={`h-4 w-4 transition-transform duration-200 ${open ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" strokeWidth={2.4} viewBox="0 0 24 24" aria-hidden="true">
+          <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
+        </svg>
+      </button>
+      {open && (
+        <div className="absolute left-0 top-full z-30 mt-2 min-w-[13rem] animate-fadeInUp rounded-2xl bg-white p-2 opacity-0 shadow-aurora-lg ring-1 ring-aurora-navy/10">
+          {children(close)}
+        </div>
+      )}
+    </div>
+  );
+};
+
+interface DropdownOptionProps {
+  selected: boolean;
+  onSelect: () => void;
+  children: React.ReactNode;
+}
+
+const DropdownOption: React.FC<DropdownOptionProps> = ({ selected, onSelect, children }) => (
+  <button
+    type="button"
+    role="option"
+    aria-selected={selected}
+    onClick={onSelect}
+    className={`flex w-full items-center justify-between gap-3 rounded-xl px-3 py-2 text-left text-sm transition-colors ${
+      selected ? 'bg-aurora-terracotta/10 font-semibold text-aurora-terracottaDark' : 'text-aurora-navy/80 hover:bg-aurora-cream'
+    }`}
+  >
+    <span className="flex items-center gap-1.5">{children}</span>
+    {selected && (
+      <svg className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth={2.6} viewBox="0 0 24 24" aria-hidden="true">
+        <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
+      </svg>
+    )}
+  </button>
+);
+
 const ExploreClubsPage: React.FC = () => {
   const [searchParams] = useSearchParams();
   const groupParam = searchParams.get('group') ?? searchParams.get('category');
+  const initialSearch = searchParams.get('search') ?? '';
   const appliedGroup = useRef<string | null | undefined>(undefined);
   const [clubs, setClubs] = useState<ClubWithCategories[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-  const [searchInput, setSearchInput] = useState('');
-  const [debouncedSearch, setDebouncedSearch] = useState('');
+  const [searchInput, setSearchInput] = useState(initialSearch);
+  const [debouncedSearch, setDebouncedSearch] = useState(initialSearch.trim());
   const [selectedCategoryIds, setSelectedCategoryIds] = useState<number[]>([]);
   const [minRating, setMinRating] = useState(0);
   const [minReviews, setMinReviews] = useState(0);
@@ -306,15 +387,23 @@ const ExploreClubsPage: React.FC = () => {
 
   const showSkeleton = loading && clubs.length === 0;
 
+  const ratingLabel = minRating > 0 ? `${minRating}★ o más` : undefined;
+  const reviewsLabel = minReviews > 0 ? `${minReviews}+ reseñas` : undefined;
+  const sortLabel = SORT_OPTIONS.find((opt) => opt.value === sortBy)?.label ?? 'Ordenar';
+
   return (
-    <div className="bg-aurora-cream min-h-screen">
-      <div className="bg-aurora-navy px-4 py-12 text-center relative overflow-hidden">
-        <div className="absolute -top-16 -right-16 w-64 h-64 bg-aurora-gold/10 rounded-full blur-3xl" />
-        <span className="section-eyebrow !text-aurora-gold">Catálogo completo</span>
-        <h1 className="font-display text-4xl md:text-5xl font-bold text-white mb-3 animate-fadeInUp">
-          Explorá Todos los Clubes
-        </h1>
-        <p className="text-white/70 max-w-xl mx-auto mb-8">
+    <div className="min-h-screen bg-aurora-cream">
+      <div className="hero-mesh grain relative isolate overflow-hidden px-4 pb-24 pt-16 text-center">
+        <div className="pointer-events-none absolute -right-16 -top-16 -z-10 h-72 w-72 animate-blobMove rounded-full bg-aurora-sun/30 blur-3xl" />
+        <div
+          className="pointer-events-none absolute -bottom-20 -left-16 -z-10 h-72 w-72 animate-blobMove rounded-full bg-aurora-coral/40 blur-3xl"
+          style={{ animationDelay: '-8s' }}
+        />
+        <span className="glass mb-5 inline-block animate-fadeInUp rounded-full px-4 py-1.5 text-xs font-semibold uppercase tracking-widest text-white">
+          Catálogo completo
+        </span>
+        <h1 className="mb-3 animate-fadeInUp font-display text-4xl font-normal text-white md:text-6xl">Explorá todos los <em className="italic text-aurora-goldLight">clubes</em></h1>
+        <p className="mx-auto mb-9 max-w-xl text-lg text-white/85">
           Encontrá el club perfecto para vos entre todos los emprendimientos de AuraBox.
         </p>
         <div className="relative mx-auto max-w-2xl">
@@ -325,7 +414,7 @@ const ExploreClubsPage: React.FC = () => {
             type="search"
             aria-label="Buscar clubes"
             placeholder="Buscar clubes por nombre, slogan o descripción"
-            className="w-full rounded-full border-0 bg-white py-3.5 pl-12 pr-12 text-aurora-navy shadow-aurora placeholder:text-aurora-navy/40 focus:outline-none focus:ring-2 focus:ring-aurora-gold"
+            className="w-full rounded-full border-0 bg-white py-4 pl-12 pr-12 text-aurora-navy shadow-aurora-lg placeholder:text-aurora-navy/40 focus:outline-none focus:ring-4 focus:ring-aurora-sun/60"
             value={searchInput}
             onChange={(e) => setSearchInput(e.target.value)}
           />
@@ -340,133 +429,230 @@ const ExploreClubsPage: React.FC = () => {
             </button>
           )}
         </div>
+        <svg className="absolute bottom-[-1px] left-0 block h-10 w-full text-aurora-cream md:h-14" viewBox="0 0 1440 80" preserveAspectRatio="none" aria-hidden="true">
+          <path fill="currentColor" d="M0,48 C240,96 480,0 720,32 C960,64 1200,96 1440,40 L1440,80 L0,80 Z" />
+        </svg>
       </div>
 
-      <div className="container mx-auto px-4 py-8">
-        <div className="flex flex-col gap-8 lg:flex-row">
-          <aside className="hidden w-64 flex-shrink-0 lg:block">
-            <div className="sticky top-24 rounded-2xl border border-aurora-navy/5 bg-white p-5 shadow-aurora-sm">
-              <FilterPanel idPrefix="desktop" {...panelProps} />
-            </div>
-          </aside>
-
-          <div className="min-w-0 flex-1">
-            <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
-              <p className="text-sm text-aurora-navy/60" aria-live="polite">
-                {loading && clubs.length === 0
-                  ? 'Buscando clubes...'
-                  : `${sortedClubs.length} ${sortedClubs.length === 1 ? 'club' : 'clubes'}`}
-              </p>
-              <div className="flex items-center gap-2">
-                <button
-                  type="button"
-                  onClick={() => setDrawerOpen(true)}
-                  className="flex items-center gap-2 rounded-full border border-aurora-navy/15 bg-white px-4 py-2 text-sm font-semibold text-aurora-navy transition-colors hover:border-aurora-terracotta/50 lg:hidden"
-                >
-                  Filtros
-                  {activeCount > 0 && (
-                    <span className="flex h-5 w-5 items-center justify-center rounded-full bg-aurora-terracotta text-xs text-white">
-                      {activeCount}
-                    </span>
-                  )}
-                </button>
-                <label className="flex items-center gap-2 text-sm text-aurora-navy/60">
-                  <span className="hidden sm:inline">Ordenar por</span>
-                  <select
-                    className="rounded-full border border-aurora-navy/15 bg-white px-4 py-2 text-sm font-semibold text-aurora-navy transition-colors hover:border-aurora-terracotta/50 focus:outline-none focus:ring-2 focus:ring-aurora-terracotta/40"
-                    value={sortBy}
-                    onChange={(e) => setSortBy(e.target.value as SortOption)}
-                  >
-                    {SORT_OPTIONS.map((opt) => (
-                      <option key={opt.value} value={opt.value}>{opt.label}</option>
-                    ))}
-                  </select>
-                </label>
-              </div>
-            </div>
-
-            {chips.length > 0 && (
-              <div className="mb-5 flex flex-wrap items-center gap-2">
-                {chips.map((chip) => (
+      <div className="hidden border-b border-aurora-navy/5 bg-aurora-cream/90 backdrop-blur lg:sticky lg:top-16 lg:z-20 lg:block">
+        <div className="container mx-auto px-4 py-3">
+          <div className="flex items-center gap-3">
+            <div className="no-scrollbar -mx-1 flex flex-1 items-center gap-2 overflow-x-auto px-1 py-1">
+              <button
+                type="button"
+                onClick={() => setSelectedCategoryIds([])}
+                aria-pressed={selectedCategoryIds.length === 0}
+                className={`shrink-0 rounded-full px-4 py-2 text-sm font-semibold transition-all duration-200 ${
+                  selectedCategoryIds.length === 0
+                    ? 'bg-aurora-navy text-white shadow-aurora-sm'
+                    : 'bg-white text-aurora-navy ring-1 ring-aurora-navy/10 hover:ring-aurora-terracotta/50'
+                }`}
+              >
+                Todos
+              </button>
+              {categories.map((cat) => {
+                const selected = selectedCategoryIds.includes(cat.id);
+                return (
                   <button
-                    key={chip.key}
+                    key={cat.id}
                     type="button"
-                    onClick={chip.onRemove}
-                    aria-label={`Quitar filtro ${chip.label}`}
-                    className="flex items-center gap-1.5 rounded-full bg-aurora-terracotta/10 px-3 py-1 text-sm font-medium text-aurora-terracottaDark transition-colors hover:bg-aurora-terracotta/20"
+                    onClick={() => toggleCategory(cat.id)}
+                    aria-pressed={selected}
+                    className={`shrink-0 rounded-full px-4 py-2 text-sm font-semibold transition-all duration-200 ${
+                      selected
+                        ? 'bg-aurora-terracotta text-white shadow-aurora-glow'
+                        : 'bg-white text-aurora-navy ring-1 ring-aurora-navy/10 hover:-translate-y-0.5 hover:ring-aurora-terracotta/50'
+                    }`}
                   >
-                    {chip.label}
-                    <span aria-hidden="true">✕</span>
+                    {cat.name}
                   </button>
-                ))}
+                );
+              })}
+            </div>
+            <span className="h-6 w-px shrink-0 bg-aurora-navy/10" aria-hidden="true" />
+            <div className="flex shrink-0 items-center gap-2">
+              <FilterDropdown label="Calificación" activeLabel={ratingLabel}>
+                {(close) =>
+                  RATING_OPTIONS.map((opt) => (
+                    <DropdownOption
+                      key={opt.value}
+                      selected={minRating === opt.value}
+                      onSelect={() => {
+                        setMinRating(opt.value);
+                        close();
+                      }}
+                    >
+                      {opt.value > 0 && <StarIcon />}
+                      {opt.label}
+                    </DropdownOption>
+                  ))
+                }
+              </FilterDropdown>
+              <FilterDropdown label="Reseñas" activeLabel={reviewsLabel}>
+                {(close) =>
+                  REVIEW_OPTIONS.map((opt) => (
+                    <DropdownOption
+                      key={opt.value}
+                      selected={minReviews === opt.value}
+                      onSelect={() => {
+                        setMinReviews(opt.value);
+                        close();
+                      }}
+                    >
+                      {opt.label}
+                    </DropdownOption>
+                  ))
+                }
+              </FilterDropdown>
+              <FilterDropdown label={sortLabel}>
+                {(close) =>
+                  SORT_OPTIONS.map((opt) => (
+                    <DropdownOption
+                      key={opt.value}
+                      selected={sortBy === opt.value}
+                      onSelect={() => {
+                        setSortBy(opt.value);
+                        close();
+                      }}
+                    >
+                      {opt.label}
+                    </DropdownOption>
+                  ))
+                }
+              </FilterDropdown>
+              {activeCount > 0 && (
                 <button
                   type="button"
                   onClick={clearFilters}
-                  className="px-2 text-sm font-semibold text-aurora-navy/60 underline transition-colors hover:text-aurora-navy"
+                  className="px-2 text-sm font-semibold text-aurora-terracotta transition-colors hover:text-aurora-terracottaDark"
                 >
-                  Limpiar todo
+                  Limpiar
                 </button>
-              </div>
-            )}
-
-            {error && (
-              <div className="mb-6 rounded-xl border border-red-100 bg-red-50 px-4 py-3 text-center text-red-600" role="alert">
-                {error}
-              </div>
-            )}
-
-            <section className={loading && !showSkeleton ? 'opacity-60 transition-opacity' : 'transition-opacity'}>
-              {showSkeleton ? (
-                <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4 xl:grid-cols-4">
-                  {Array.from({ length: 8 }).map((_, i) => (
-                    <div key={i} className="aspect-square animate-pulse rounded-2xl bg-aurora-navy/10" />
-                  ))}
-                </div>
-              ) : sortedClubs.length > 0 ? (
-                <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4 xl:grid-cols-4">
-                  {sortedClubs.map((club) => (
-                    <ExploreClubCard
-                      key={club.id}
-                      id={String(club.id)}
-                      name={club.name}
-                      slogan={club.slogan || ''}
-                      description={club.shortDescription || club.slogan || ''}
-                      image={club.logoUrl || '/assets/default-club.svg'}
-                      rating={Number(club.averageRating) || 0}
-                      reviewsCount={club.totalReviews || 0}
-                    />
-                  ))}
-                </div>
-              ) : (
-                !loading && (
-                  <div className="rounded-2xl border border-aurora-navy/5 bg-white py-16 text-center shadow-aurora-sm">
-                    <p className="mb-4 text-5xl">🔍</p>
-                    <p className="font-display text-2xl font-semibold text-aurora-navy">
-                      No encontramos clubes con esos filtros.
-                    </p>
-                    <p className="mt-2 text-aurora-navy/50">Probá con otra palabra o quitá algún filtro.</p>
-                    {activeCount > 0 && (
-                      <button type="button" onClick={clearFilters} className="btn-primary mt-6">
-                        Limpiar filtros
-                      </button>
-                    )}
-                  </div>
-                )
               )}
-            </section>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div className="container mx-auto px-4 py-8">
+        <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
+          <p className="text-sm font-medium text-aurora-navy/60" aria-live="polite">
+            {loading && clubs.length === 0
+              ? 'Buscando clubes...'
+              : `${sortedClubs.length} ${sortedClubs.length === 1 ? 'club encontrado' : 'clubes encontrados'}`}
+          </p>
+          <div className="flex items-center gap-2 lg:hidden">
+            <button
+              type="button"
+              onClick={() => setDrawerOpen(true)}
+              className="flex items-center gap-2 rounded-full border border-aurora-navy/15 bg-white px-4 py-2 text-sm font-semibold text-aurora-navy transition-colors hover:border-aurora-terracotta/50"
+            >
+              Filtros
+              {activeCount > 0 && (
+                <span className="flex h-5 w-5 items-center justify-center rounded-full bg-aurora-terracotta text-xs text-white">
+                  {activeCount}
+                </span>
+              )}
+            </button>
+            <label className="flex items-center gap-2 text-sm text-aurora-navy/60">
+              <span className="hidden sm:inline">Ordenar por</span>
+              <select
+                className="rounded-full border border-aurora-navy/15 bg-white px-4 py-2 text-sm font-semibold text-aurora-navy transition-colors hover:border-aurora-terracotta/50 focus:outline-none focus:ring-2 focus:ring-aurora-terracotta/40"
+                value={sortBy}
+                onChange={(e) => setSortBy(e.target.value as SortOption)}
+              >
+                {SORT_OPTIONS.map((opt) => (
+                  <option key={opt.value} value={opt.value}>{opt.label}</option>
+                ))}
+              </select>
+            </label>
           </div>
         </div>
 
-        <section className="text-center py-16 px-6 bg-gradient-to-br from-aurora-navy to-aurora-navyDark text-white rounded-2xl shadow-aurora transform transition-all duration-500 hover:scale-[1.005] mt-16 relative overflow-hidden">
-          <div className="absolute -top-10 -left-10 w-56 h-56 bg-aurora-gold/10 rounded-full blur-3xl" />
-          <h2 className="font-display text-3xl md:text-4xl font-bold mb-4">¿Tenés un Club de Suscripción?</h2>
-          <p className="text-lg mb-8 max-w-2xl mx-auto text-white/75">
-            Unite a AuraBox y profesionalizá tu negocio. Llegá a miles de nuevos suscriptores y gestioná todo de forma sencilla.
-          </p>
-          <Link to="/register/entrepreneur" className="btn-primary !px-10 !py-4 !text-xl">
-            Registrá tu Club Hoy
-          </Link>
+        {chips.length > 0 && (
+          <div className="mb-5 flex flex-wrap items-center gap-2 lg:hidden">
+            {chips.map((chip) => (
+              <button
+                key={chip.key}
+                type="button"
+                onClick={chip.onRemove}
+                aria-label={`Quitar filtro ${chip.label}`}
+                className="flex items-center gap-1.5 rounded-full bg-aurora-terracotta/10 px-3 py-1 text-sm font-medium text-aurora-terracottaDark transition-colors hover:bg-aurora-terracotta/20"
+              >
+                {chip.label}
+                <span aria-hidden="true">✕</span>
+              </button>
+            ))}
+            <button
+              type="button"
+              onClick={clearFilters}
+              className="px-2 text-sm font-semibold text-aurora-navy/60 underline transition-colors hover:text-aurora-navy"
+            >
+              Limpiar todo
+            </button>
+          </div>
+        )}
+
+        {error && (
+          <div className="mb-6 rounded-xl border border-red-100 bg-red-50 px-4 py-3 text-center text-red-600" role="alert">
+            {error}
+          </div>
+        )}
+
+        <section className={loading && !showSkeleton ? 'opacity-60 transition-opacity' : 'transition-opacity'}>
+          {showSkeleton ? (
+            <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
+              {Array.from({ length: 10 }).map((_, i) => (
+                <div key={i} className="aspect-[4/5] animate-pulse rounded-3xl bg-aurora-navy/10" />
+              ))}
+            </div>
+          ) : sortedClubs.length > 0 ? (
+            <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
+              {sortedClubs.map((club, index) => (
+                <div key={club.id} className="animate-fadeInUp opacity-0" style={{ animationDelay: `${Math.min(index, 10) * 50}ms` }}>
+                  <ExploreClubCard
+                    id={String(club.id)}
+                    name={club.name}
+                    slogan={club.slogan || ''}
+                    description={club.shortDescription || club.slogan || ''}
+                    image={club.logoUrl || '/assets/default-club.svg'}
+                    rating={Number(club.averageRating) || 0}
+                    reviewsCount={club.totalReviews || 0}
+                  />
+                </div>
+              ))}
+            </div>
+          ) : (
+            !loading && (
+              <div className="rounded-3xl bg-white py-16 text-center shadow-aurora-sm ring-1 ring-aurora-navy/5">
+                <p className="mb-4 text-5xl">🔍</p>
+                <p className="font-display text-2xl font-semibold text-aurora-navy">No encontramos clubes con esos filtros.</p>
+                <p className="mt-2 text-aurora-navy/50">Probá con otra palabra o quitá algún filtro.</p>
+                {activeCount > 0 && (
+                  <button type="button" onClick={clearFilters} className="btn-primary mt-6">
+                    Limpiar filtros
+                  </button>
+                )}
+              </div>
+            )
+          )}
         </section>
+
+        <Reveal className="mt-20">
+          <section className="hero-mesh grain relative isolate overflow-hidden rounded-3xl px-6 py-16 text-center text-white shadow-aurora-lg">
+            <div className="pointer-events-none absolute -left-10 -top-10 -z-10 h-56 w-56 animate-blobMove rounded-full bg-aurora-sun/30 blur-3xl" />
+            <h2 className="mb-4 font-display text-3xl font-bold md:text-4xl">¿Tenés un club de suscripción?</h2>
+            <p className="mx-auto mb-8 max-w-2xl text-lg text-white/85">
+              Unite a AuraBox y profesionalizá tu negocio. Llegá a nuevos suscriptores y gestioná todo de forma sencilla.
+            </p>
+            <Link
+              to="/register/entrepreneur"
+              className="btn-shine inline-flex items-center rounded-full bg-white px-10 py-4 text-lg font-bold text-aurora-terracottaDark shadow-aurora-lg transition-all duration-300 hover:-translate-y-0.5 hover:bg-aurora-cream"
+            >
+              Registrá tu club hoy
+            </Link>
+          </section>
+        </Reveal>
       </div>
 
       {drawerOpen && (

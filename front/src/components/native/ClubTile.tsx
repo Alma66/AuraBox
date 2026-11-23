@@ -22,16 +22,15 @@ const ClubTile: React.FC<ClubTileProps> = ({ id, name, slogan, logoUrl, averageR
       }}
       className="relative block w-[62vw] max-w-[240px] shrink-0 snap-start overflow-hidden rounded-3xl bg-white shadow-aurora-sm ring-1 ring-aurora-navy/5 transition-transform duration-200 active:scale-[0.97]"
     >
-      <div className="relative h-24 overflow-hidden bg-gradient-to-br from-aurora-navy via-aurora-navyLight to-aurora-terracotta">
-        <div className="absolute -right-6 -top-6 h-24 w-24 rounded-full bg-aurora-gold/30 blur-2xl" />
+      <div className="hero-mesh relative h-24 overflow-hidden">
         <span className="absolute right-3 top-3 inline-flex items-center gap-1 rounded-full bg-white/95 px-2.5 py-1 text-xs font-bold text-aurora-navy shadow-sm">
           <span className="text-aurora-gold" aria-hidden="true">★</span>
           {rating}
         </span>
       </div>
       <div className="px-4 pb-4">
-        <div className="-mt-10 mb-3 h-20 w-20 overflow-hidden rounded-2xl border-4 border-white bg-white shadow-aurora-sm">
-          <SafeImage src={logoUrl} alt={name} className="h-full w-full object-cover" />
+        <div className="relative z-10 -mt-10 mb-3 flex h-20 w-20 items-center justify-center overflow-hidden rounded-2xl border-4 border-white bg-white shadow-aurora-sm">
+          <SafeImage src={logoUrl} alt={name} className="h-full w-full object-contain p-1" />
         </div>
         <h3 className="truncate font-display text-lg font-bold text-aurora-navy">{name}</h3>
         <p className="mt-0.5 line-clamp-2 min-h-[2.5rem] text-sm italic text-aurora-navy/55">{slogan || ''}</p>

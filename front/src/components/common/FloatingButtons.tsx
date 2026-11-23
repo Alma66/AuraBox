@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import AssistantChat from './AssistantChat';
+import ChatIcon from './ChatIcon';
 
 const FloatingButtons: React.FC = () => {
   const [chatOpen, setChatOpen] = useState(false);
@@ -8,28 +9,31 @@ const FloatingButtons: React.FC = () => {
   return (
     <>
       {!chatOpen && (
-        <div className="fixed bottom-6 right-6 flex flex-col space-y-3 z-50">
+        <div className="fixed bottom-6 right-6 z-50 flex flex-col items-end gap-3">
           <Link
             to="/faq"
-            className="floating-button bg-aurora-navy text-white rounded-full w-14 h-14 flex items-center justify-center text-2xl font-display font-bold shadow-aurora
-                       hover:bg-aurora-navyLight transition-all duration-300 transform hover:scale-110 active:scale-95"
-            aria-label="Preguntas Frecuentes"
+            className="floating-button group flex h-12 w-12 items-center justify-center rounded-full bg-aurora-navy font-display text-xl font-bold text-white shadow-aurora transition-all duration-300 hover:scale-110 hover:bg-aurora-navyLight active:scale-95"
+            aria-label="Preguntas frecuentes"
           >
-            ?
+            <span aria-hidden="true">?</span>
+            <span className="pointer-events-none absolute right-14 whitespace-nowrap rounded-lg bg-aurora-navyDark px-3 py-1.5 font-sans text-xs font-semibold opacity-0 shadow-aurora-sm transition-opacity duration-200 group-hover:opacity-100">
+              Preguntas frecuentes
+            </span>
           </Link>
 
           <button
             type="button"
             onClick={() => setChatOpen(true)}
-            className="floating-button bg-aurora-terracotta text-white rounded-full w-14 h-14 flex items-center justify-center text-2xl shadow-aurora
-                       hover:bg-aurora-terracottaDark transition-all duration-300 transform hover:scale-110 active:scale-95 animate-glowPulse"
+            className="floating-button group relative flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-br from-aurora-terracotta to-aurora-coral text-white shadow-aurora-glow transition-all duration-300 hover:scale-110 active:scale-95"
             aria-label="Abrir asistente virtual"
             aria-haspopup="dialog"
             style={{ animationDelay: '150ms' }}
           >
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-7 h-7">
-              <path strokeLinecap="round" strokeLinejoin="round" d="M8.625 12a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0H8.25m4.125 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0h-.375m4.125 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0h-.375M21 12c0 4.556-4.03 8.25-9 8.25a9.75 9.75 0 01-6.75-2.75m1.5-1.5l2.25 2.25m0 0l2.25 2.25M12 21.75V15m-3 0V9m3 6V9m3 0V9M6.75 7.5l-1.5-1.5M15.75 7.5l1.5-1.5M12 3.75h.008v.008H12V3.75zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z" />
-            </svg>
+            <span className="absolute inset-0 animate-ringPulse rounded-full bg-aurora-terracotta" aria-hidden="true" />
+            <ChatIcon className="relative h-7 w-7" />
+            <span className="pointer-events-none absolute right-[4.75rem] whitespace-nowrap rounded-lg bg-aurora-navyDark px-3 py-1.5 font-sans text-xs font-semibold opacity-0 shadow-aurora-sm transition-opacity duration-200 group-hover:opacity-100">
+              ¿Te ayudo?
+            </span>
           </button>
         </div>
       )}

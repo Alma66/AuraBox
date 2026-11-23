@@ -1,6 +1,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import SafeImage from '../common/SafeImage';
+import { clubAccent } from '../../utils/clubAccent';
 
 interface ExploreClubCardProps {
   id: string;
@@ -28,27 +29,31 @@ const ExploreClubCard: React.FC<ExploreClubCardProps> = ({ id, name, slogan, ima
         }
       }}
       aria-label={`Ver club ${name}`}
-      className="group flex w-full cursor-pointer flex-col overflow-hidden rounded-2xl bg-white shadow-aurora-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-aurora focus:outline-none focus-visible:ring-2 focus-visible:ring-aurora-terracotta"
+      className="group relative flex w-full cursor-pointer flex-col overflow-hidden rounded-3xl border border-aurora-navy/10 bg-white shadow-aurora-sm transition-all duration-300 hover:-translate-y-1.5 hover:shadow-aurora-lg focus:outline-none focus-visible:ring-2 focus-visible:ring-aurora-terracotta"
     >
-      <div className="relative aspect-[4/3] w-full bg-white">
+      <span className={`absolute inset-x-0 top-0 z-10 h-1 ${clubAccent(id)}`} aria-hidden="true" />
+      <div className="relative aspect-[4/3] w-full overflow-hidden bg-aurora-cream">
         <SafeImage
           src={image}
           alt={name}
-          className="h-full w-full object-contain p-4 transition-transform duration-500 group-hover:scale-105"
+          className="h-full w-full object-contain p-6 transition-transform duration-500 group-hover:scale-105"
         />
-        <div className="absolute inset-0 flex items-center justify-center bg-aurora-navyDark/0 transition-colors duration-300 group-hover:bg-aurora-navyDark/40">
-          <span className="translate-y-2 rounded-full bg-white px-5 py-2 text-sm font-semibold text-aurora-navy opacity-0 shadow-aurora-sm transition-all duration-300 group-hover:translate-y-0 group-hover:opacity-100">
-            Ver Club
-          </span>
-        </div>
+        <span className="absolute right-3 top-4 inline-flex items-center gap-1 rounded-full bg-white px-2.5 py-1 text-xs font-semibold text-aurora-navy shadow-sm">
+          <span className="text-aurora-gold" aria-hidden="true">★</span>
+          {displayRating}
+        </span>
       </div>
-      <div className="bg-aurora-navy p-3">
-        <h3 className="truncate font-display text-base font-bold text-white">{name}</h3>
-        <p className="mt-0.5 truncate text-xs italic text-white/70">{slogan || ' '}</p>
-        <div className="mt-1.5 flex items-center gap-2">
-          <span className="text-sm text-aurora-gold" aria-hidden="true">★</span>
-          <span className="text-sm font-semibold text-white">{displayRating}</span>
-          <span className="text-xs text-white/55">({reviewsCount} reseñas)</span>
+      <div className="flex flex-1 flex-col p-5">
+        <h3 className="truncate font-display text-xl font-medium text-aurora-navy">{name}</h3>
+        <p className="mt-1 line-clamp-1 min-h-[1.25rem] text-sm text-aurora-navy/60">{slogan || ''}</p>
+        <div className="mt-4 flex items-center justify-between border-t border-aurora-navy/10 pt-3 text-xs">
+          <span className="text-aurora-navy/55">
+            {reviewsCount} {reviewsCount === 1 ? 'reseña' : 'reseñas'}
+          </span>
+          <span className="inline-flex items-center gap-1 text-sm font-semibold text-aurora-terracotta">
+            <span className="hidden sm:inline">Ver club</span>
+            <span className="transition-transform duration-300 group-hover:translate-x-1" aria-hidden="true">→</span>
+          </span>
         </div>
       </div>
     </div>

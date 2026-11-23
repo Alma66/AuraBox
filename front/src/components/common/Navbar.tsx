@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { UserRole } from '../../types/user';
 import { useAuth } from '../../App';
 import { useUnreadNotifications } from '../../utils/useUnreadNotifications';
@@ -22,15 +22,13 @@ const DropdownArrow: React.FC<{ isOpen: boolean }> = ({ isOpen }) => (
   </svg>
 );
 
-const btnClass =
-  'flex items-center text-aurora-navy/80 hover:text-aurora-terracotta px-2 py-2 rounded-md text-sm font-semibold whitespace-nowrap transition-colors duration-200';
+const btnBase = 'flex items-center px-2 py-2 rounded-md text-sm font-semibold whitespace-nowrap transition-colors duration-200';
 const linkClass =
   'block px-3 py-2 text-sm text-aurora-navy/80 hover:bg-aurora-cream hover:text-aurora-terracotta rounded-lg transition-colors duration-150';
 const mobileLinkClass =
   'text-aurora-navy hover:bg-white hover:text-aurora-terracotta block px-3 py-2 rounded-md text-base font-semibold';
 const mobileSubLinkClass = 'block text-sm text-aurora-navy/80 hover:bg-white py-1 rounded';
-const iconLinkClass =
-  'text-aurora-navy/70 hover:text-aurora-terracotta p-2 rounded-full hover:bg-aurora-cream transition-all duration-200';
+const iconBase = 'p-2 rounded-full transition-all duration-200';
 
 const Navbar: React.FC<NavbarProps> = ({ userRole, isAuthenticated, onLogout }) => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -41,8 +39,16 @@ const Navbar: React.FC<NavbarProps> = ({ userRole, isAuthenticated, onLogout }) 
   const userMenuRef = useRef<HTMLDivElement>(null);
   const helpMenuRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
+  const { pathname } = useLocation();
   const { user } = useAuth();
   const unreadCount = useUnreadNotifications(isAuthenticated && userRole === 'customer');
+
+  const isHome = pathname === '/';
+  const overHero = isHome && !isScrolled && !isMobileMenuOpen;
+  const btnClass = `${btnBase} ${overHero ? 'text-white/90 hover:text-white' : 'text-aurora-navy/80 hover:text-aurora-terracotta'}`;
+  const iconLinkClass = `${iconBase} ${
+    overHero ? 'text-white/90 hover:bg-white/10 hover:text-white' : 'text-aurora-navy/70 hover:bg-aurora-cream hover:text-aurora-terracotta'
+  }`;
 
   const closeAllDropdowns = useCallback(() => {
     setIsMobileMenuOpen(false);
@@ -78,6 +84,7 @@ const Navbar: React.FC<NavbarProps> = ({ userRole, isAuthenticated, onLogout }) 
 
   useEffect(() => {
     const handleScroll = () => setIsScrolled(window.scrollY > 8);
+    handleScroll();
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
@@ -126,9 +133,15 @@ const Navbar: React.FC<NavbarProps> = ({ userRole, isAuthenticated, onLogout }) 
             onClick={toggleUserMenu}
             aria-haspopup="true"
             aria-expanded={isUserMenuOpen}
-            className="flex items-center gap-2 rounded-full py-1 pl-1 pr-2 text-aurora-navy transition-colors duration-200 hover:bg-aurora-cream hover:text-aurora-terracotta focus:outline-none"
+            className={`flex items-center gap-2 rounded-full py-1 pl-1 pr-2 transition-colors duration-200 focus:outline-none ${
+              overHero ? 'text-white hover:bg-white/10' : 'text-aurora-navy hover:bg-aurora-cream hover:text-aurora-terracotta'
+            }`}
           >
-            <span className="flex h-8 w-8 items-center justify-center rounded-full bg-aurora-navy font-display text-sm font-bold text-aurora-cream">
+            <span
+              className={`flex h-8 w-8 items-center justify-center rounded-full font-display text-sm font-bold ${
+                overHero ? 'bg-aurora-cream text-aurora-navy' : 'bg-aurora-navy text-aurora-cream'
+              }`}
+            >
               {(user?.firstName?.[0] || 'A').toUpperCase()}
             </span>
             <DropdownArrow isOpen={isUserMenuOpen} />
@@ -166,7 +179,12 @@ const Navbar: React.FC<NavbarProps> = ({ userRole, isAuthenticated, onLogout }) 
     }
     return (
       <div className="flex items-center gap-2">
-        <Link to="/login" className="px-3 py-2 text-sm font-semibold text-aurora-navy transition-colors duration-200 hover:text-aurora-terracotta">
+        <Link
+          to="/login"
+          className={`px-3 py-2 text-sm font-semibold transition-colors duration-200 ${
+            overHero ? 'text-white hover:text-white/80' : 'text-aurora-navy hover:text-aurora-terracotta'
+          }`}
+        >
           Iniciar Sesión
         </Link>
         <Link to="/register" className="btn-primary !px-5 !py-2 text-sm">
@@ -178,16 +196,26 @@ const Navbar: React.FC<NavbarProps> = ({ userRole, isAuthenticated, onLogout }) 
 
   return (
     <nav
-      className={`sticky top-0 z-50 border-b bg-aurora-cream/95 backdrop-blur-md transition-shadow duration-300 ${
-        isScrolled ? 'border-aurora-navy/10 shadow-aurora-sm' : 'border-transparent'
-      }`}
+      className={`${isHome ? 'fixed inset-x-0' : 'sticky'} top-0 z-50 border-b transition-all duration-300 ${
+        overHero ? 'bg-transparent' : 'bg-aurora-cream/95 backdrop-blur-md'
+      } ${isScrolled ? 'border-aurora-navy/10 shadow-aurora-sm' : 'border-transparent'}`}
     >
       <div className="max-w-full px-4 sm:px-6 lg:px-8">
         <div className="flex h-16 items-center justify-between">
           <div className="flex-shrink-0 pl-2">
             <Link to="/" onClick={closeAllDropdowns} className="flex items-center gap-2">
-              <img className="h-9 w-9 rounded-lg" src="/aurabox-mark.svg" alt="AuraBox" />
-              <span className="hidden font-display text-xl font-bold tracking-tight text-aurora-navy sm:block">AuraBox</span>
+              <img
+                className={`h-9 w-9 rounded-lg transition-all duration-300 ${overHero ? 'bg-aurora-cream p-1' : ''}`}
+                src="/aurabox-mark.svg"
+                alt="AuraBox"
+              />
+              <span
+                className={`hidden font-display text-xl font-semibold tracking-tight transition-colors duration-300 sm:block ${
+                  overHero ? 'text-white' : 'text-aurora-navy'
+                }`}
+              >
+                AuraBox
+              </span>
             </Link>
           </div>
 
@@ -224,7 +252,9 @@ const Navbar: React.FC<NavbarProps> = ({ userRole, isAuthenticated, onLogout }) 
                 onClick={toggleMobileMenu}
                 aria-expanded={isMobileMenuOpen}
                 aria-controls="mobile-menu-panel"
-                className="inline-flex items-center justify-center rounded-md p-2 text-aurora-navy hover:bg-aurora-navy/5 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-aurora-terracotta"
+                className={`inline-flex items-center justify-center rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-aurora-terracotta ${
+                  overHero ? 'text-white hover:bg-white/10' : 'text-aurora-navy hover:bg-aurora-navy/5'
+                }`}
               >
                 <span className="sr-only">Abrir menú principal</span>
                 {isMobileMenuOpen ? (

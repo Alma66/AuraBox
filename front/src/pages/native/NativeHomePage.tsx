@@ -10,10 +10,10 @@ import { tapFeedback } from '../../utils/native';
 import { useSiteContent } from '../../utils/useSiteContent';
 
 const categories = [
-  { key: 'gourmet', emoji: '🍫', label: 'Gourmet y bebidas', tone: 'from-aurora-terracotta to-aurora-terracottaLight text-white' },
+  { key: 'gourmet', emoji: '🍫', label: 'Gourmet y bebidas', tone: 'from-aurora-terracotta to-aurora-coral text-white' },
   { key: 'lectura', emoji: '📚', label: 'Lectura y cultura', tone: 'from-aurora-navy to-aurora-navyLight text-white' },
-  { key: 'belleza', emoji: '💅', label: 'Belleza y cuidado', tone: 'from-aurora-gold to-aurora-goldLight text-aurora-navyDark' },
-  { key: 'hogar', emoji: '🌿', label: 'Hogar y plantas', tone: 'from-[#3E6B5A] to-[#5E8F7B] text-white' },
+  { key: 'belleza', emoji: '💅', label: 'Belleza y cuidado', tone: 'from-aurora-berry to-aurora-coral text-white' },
+  { key: 'hogar', emoji: '🌿', label: 'Hogar y plantas', tone: 'from-aurora-teal to-aurora-navyLight text-white' },
 ];
 
 const steps = [
@@ -168,7 +168,7 @@ const NativeHomePage: React.FC = () => {
     <div className="bg-aurora-cream">
       {showWelcome && <WelcomeModal name={welcomeName} onClose={() => setShowWelcome(false)} />}
 
-      <section className="relative overflow-hidden rounded-b-[2.25rem] bg-gradient-to-b from-aurora-navy via-aurora-navy to-aurora-navyLight px-5 pb-9 pt-5 text-white">
+      <section className="hero-mesh grain relative isolate overflow-hidden rounded-b-[2.25rem] px-5 pb-9 pt-5 text-white">
         {siteContent.hero_image && (
           <img src={siteContent.hero_image} alt="" aria-hidden="true" className="absolute inset-0 h-full w-full object-cover opacity-15" />
         )}
@@ -206,7 +206,7 @@ const NativeHomePage: React.FC = () => {
 
           <div className="no-scrollbar -mx-5 mt-5 flex animate-fadeInUp gap-2 overflow-x-auto px-5" style={enter(400)}>
             {['🔒 Pago seguro', '🇦🇷 Emprendedores locales', '📦 Seguí tu caja'].map((chip) => (
-              <span key={chip} className="shrink-0 rounded-full bg-white/10 px-3 py-1.5 text-xs font-semibold text-white/90 ring-1 ring-white/15">
+              <span key={chip} className="glass shrink-0 rounded-full px-3 py-1.5 text-xs font-semibold text-white">
                 {chip}
               </span>
             ))}

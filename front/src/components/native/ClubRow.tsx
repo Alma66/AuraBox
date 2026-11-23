@@ -23,8 +23,8 @@ const ClubRow: React.FC<ClubRowProps> = ({ id, name, slogan, logoUrl, rating, re
     className="flex animate-fadeInUp items-center gap-4 rounded-3xl bg-white p-3 shadow-aurora-sm ring-1 ring-aurora-navy/5 transition-transform duration-200 active:scale-[0.98]"
     style={{ animationDelay: `${Math.min(index, 8) * 45}ms`, animationFillMode: 'both' }}
   >
-    <div className="h-24 w-24 shrink-0 overflow-hidden rounded-2xl bg-aurora-cream">
-      <SafeImage src={logoUrl} alt={name} className="h-full w-full object-cover" />
+    <div className="flex h-24 w-24 shrink-0 items-center justify-center overflow-hidden rounded-2xl bg-aurora-cream">
+      <SafeImage src={logoUrl} alt={name} className="h-full w-full object-contain p-1.5" />
     </div>
     <div className="min-w-0 flex-1">
       <h3 className="truncate font-display text-lg font-bold leading-tight text-aurora-navy">{name}</h3>
