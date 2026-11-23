@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../App';
 import api, { getResponseData } from '../../api/config';
 import ReviewCard from '../../components/client/ReviewCard';
+import Reveal from '../../components/common/Reveal';
 import { User } from '../../types/user';
 import { Club } from '../../types/club';
 import { Review } from '../../types/review';
@@ -157,69 +158,85 @@ const MisReviewsPage: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-aurora-cream py-12 px-4">
-        <div className="max-w-4xl mx-auto text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-aurora-terracotta mx-auto mb-4"></div>
+      <div className="min-h-screen bg-aurora-cream px-4 py-16">
+        <div role="status" className="mx-auto max-w-4xl text-center">
+          <div className="mx-auto mb-4 h-12 w-12 animate-spin rounded-full border-4 border-aurora-navy/15 border-t-aurora-terracotta" />
           <p className="text-aurora-navy/70">Cargando tus reseñas...</p>
         </div>
       </div>
     );
   }
 
-  return (
-    <div className="min-h-screen bg-aurora-cream py-8 px-4">
-      <div className="max-w-4xl mx-auto">
-        <div className="text-center mb-8">
-          <h1 className="text-4xl font-serif font-bold text-aurora-navy mb-2">Mis Reseñas</h1>
-          <p className="text-aurora-navy/70">
-            {user ? `Hola, ${user.firstName}!` : 'Tus opiniones sobre los clubes.'} Acá podés ver y gestionar tus reseñas.
-          </p>
-        </div>
+  const averageRating = reviews.length > 0 ? reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length : 0;
 
-        {reviews.length === 0 ? (
-          <div className="text-center py-12">
-            <svg className="mx-auto h-24 w-24 text-aurora-navy/20 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-            </svg>
-            <h3 className="text-lg font-semibold text-aurora-navy mb-2">No tenés reseñas aún</h3>
-            <p className="text-aurora-navy/60 mb-4">¡Dejá tu opinión en los clubes que probaste!</p>
-            <button
-              onClick={() => navigate('/explore')}
-              className="bg-aurora-terracotta text-white px-6 py-3 rounded-xl hover:bg-aurora-terracottaDark transition-colors font-semibold"
-            >
-              Explorar Clubes
+  return (
+    <div className="min-h-screen bg-aurora-cream">
+      <div className="hero-mesh grain relative overflow-hidden">
+        <div className="container relative mx-auto px-4 pb-24 pt-12 md:pb-28">
+          <span className="mb-3 inline-block text-xs font-semibold uppercase tracking-widest text-aurora-goldLight">Tu voz cuenta</span>
+          <h1 className="font-display text-4xl font-normal leading-tight text-white md:text-6xl">Mis reseñas</h1>
+          <p className="mt-3 max-w-xl text-lg text-white/80">
+            {user ? `Hola, ${user.firstName}. ` : ''}Acá podés ver, editar y eliminar tus opiniones sobre los clubes.
+          </p>
+          {reviews.length > 0 && (
+            <div className="mt-6 flex flex-wrap gap-3">
+              <span className="glass rounded-full px-4 py-1.5 text-sm font-semibold text-white">
+                {reviews.length} {reviews.length === 1 ? 'reseña' : 'reseñas'}
+              </span>
+              <span className="glass rounded-full px-4 py-1.5 text-sm text-white">
+                Promedio {averageRating.toFixed(1)} ★
+              </span>
+            </div>
+          )}
+        </div>
+      </div>
+
+      <div className="container mx-auto -mt-14 px-4 pb-16 md:-mt-16">
+        <div className="mx-auto max-w-5xl">
+          {reviews.length === 0 ? (
+            <Reveal>
+              <div className="mx-auto max-w-2xl rounded-3xl bg-white p-10 text-center shadow-aurora ring-1 ring-aurora-navy/5">
+                <span className="mx-auto mb-5 flex h-20 w-20 items-center justify-center rounded-full bg-aurora-cream text-aurora-terracotta">
+                  <svg className="h-10 w-10" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.6} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                  </svg>
+                </span>
+                <h2 className="mb-2 font-display text-3xl font-medium text-aurora-navy">Todavía no escribiste reseñas</h2>
+                <p className="mb-8 text-aurora-navy/60">Dejá tu opinión en los clubes que probaste y ayudá a otras personas a elegir.</p>
+                <button onClick={() => navigate('/explore')} className="btn-primary btn-shine">
+                  Explorar clubes
+                </button>
+              </div>
+            </Reveal>
+          ) : (
+            <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+              {reviews.map((review, index) => (
+                <Reveal key={review.id} delay={Math.min(index, 5) * 60}>
+                  <ReviewCard
+                    review={review}
+                    club={{ name: getClubName(review.idClub) }}
+                    onDelete={() => handleDelete(review.id)}
+                    onEdit={!review.isHidden ? () => openEdit(review) : undefined}
+                  />
+                </Reveal>
+              ))}
+            </div>
+          )}
+
+          <div className="mt-12 text-center">
+            <button onClick={() => navigate('/customer/profile')} className="btn-outline">
+              Volver a mi perfil
             </button>
           </div>
-        ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {reviews.map((review) => (
-              <ReviewCard
-                key={review.id}
-                review={review}
-                club={{ name: getClubName(review.idClub) }}
-                onDelete={() => handleDelete(review.id)}
-                onEdit={!review.isHidden ? () => openEdit(review) : undefined}
-              />
-            ))}
-          </div>
-        )}
-
-        <div className="mt-12 text-center">
-          <button
-            onClick={() => navigate('/customer/profile')}
-            className="bg-aurora-navy text-white px-8 py-3 rounded-xl hover:bg-aurora-navy/90 transition-colors font-semibold"
-          >
-            Volver a Mi Perfil
-          </button>
         </div>
       </div>
 
       {editingReview && (
-        <div className="fixed inset-0 z-50 bg-aurora-navy/60 flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto">
+        <div role="dialog" aria-modal="true" aria-labelledby="edit-review-title" className="fixed inset-0 z-50 flex items-center justify-center bg-aurora-navy/60 p-4 backdrop-blur-sm">
+          <div className="bg-white rounded-3xl shadow-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto">
             <div className="px-6 py-4 border-b border-aurora-navy/10 flex items-center justify-between">
-              <h3 className="text-lg font-serif font-semibold text-aurora-navy">Editar reseña</h3>
-              <button onClick={closeEdit} className="text-aurora-navy/40 hover:text-aurora-navy transition-colors">
+              <h3 id="edit-review-title" className="font-display text-2xl font-medium text-aurora-navy">Editar reseña</h3>
+              <button onClick={closeEdit} aria-label="Cerrar" className="text-aurora-navy/40 hover:text-aurora-navy transition-colors">
                 <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
                 </svg>
@@ -227,7 +244,7 @@ const MisReviewsPage: React.FC = () => {
             </div>
             <div className="p-6 space-y-5">
               {editError && (
-                <div className="bg-red-50 border border-red-200 text-red-700 text-sm rounded-xl px-4 py-3">
+                <div role="alert" className="bg-red-50 border border-red-200 text-red-700 text-sm rounded-xl px-4 py-3">
                   {editError}
                 </div>
               )}
@@ -235,7 +252,7 @@ const MisReviewsPage: React.FC = () => {
                 <label className="block text-sm font-semibold text-aurora-navy mb-2">Calificación</label>
                 <div className="flex gap-1">
                   {[1, 2, 3, 4, 5].map((n) => (
-                    <button key={n} type="button" onClick={() => setEditRating(n)}>
+                    <button key={n} type="button" onClick={() => setEditRating(n)} aria-label={`${n} ${n === 1 ? 'estrella' : 'estrellas'}`}>
                       <svg
                         className={`w-8 h-8 ${n <= editRating ? 'text-aurora-gold fill-current' : 'text-aurora-navy/20'}`}
                         fill="currentColor"
@@ -281,6 +298,7 @@ const MisReviewsPage: React.FC = () => {
                       )}
                       <button
                         onClick={() => handleRemoveExistingMedia(m.id)}
+                        aria-label="Quitar archivo"
                         className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs"
                       >
                         ✕
@@ -292,6 +310,7 @@ const MisReviewsPage: React.FC = () => {
                       <img src={URL.createObjectURL(file)} alt="Nuevo" className="w-20 h-20 object-cover rounded-lg opacity-80" />
                       <button
                         onClick={() => handleRemoveNewFile(i)}
+                        aria-label="Quitar archivo nuevo"
                         className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs"
                       >
                         ✕

@@ -1,7 +1,9 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../App';
 import api, { getResponseData } from '../../api/config';
+import SafeImage from '../../components/common/SafeImage';
+import Reveal from '../../components/common/Reveal';
 
 interface WishlistPlan {
   planId: number;
@@ -109,9 +111,9 @@ const WishlistPage: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-aurora-cream py-12 px-4">
-        <div className="max-w-6xl mx-auto text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-aurora-terracotta mx-auto mb-4"></div>
+      <div className="min-h-screen bg-aurora-cream px-4 py-16">
+        <div role="status" className="mx-auto max-w-6xl text-center">
+          <div className="mx-auto mb-4 h-12 w-12 animate-spin rounded-full border-4 border-aurora-navy/15 border-t-aurora-terracotta" />
           <p className="text-aurora-navy/70">Cargando tu lista de deseos...</p>
         </div>
       </div>
@@ -119,34 +121,49 @@ const WishlistPage: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-aurora-cream py-8 px-4">
-      <div className="max-w-6xl mx-auto">
-        <div className="text-center mb-8">
-          <h1 className="text-4xl font-serif font-bold text-aurora-navy mb-2">Mi Lista de Deseos</h1>
-          <p className="text-aurora-navy/70">
-            {user ? `Hola, ${user.firstName}! ` : ''}Estos son los planes que marcaste con corazón, agrupados por club.
+    <div className="min-h-screen bg-aurora-cream">
+      <div className="hero-mesh grain relative overflow-hidden">
+        <div className="container relative mx-auto px-4 pb-24 pt-12 md:pb-28">
+          <span className="mb-3 inline-block text-xs font-semibold uppercase tracking-widest text-aurora-goldLight">Tus favoritos</span>
+          <h1 className="font-display text-4xl font-normal leading-tight text-white md:text-6xl">Mi lista de deseos</h1>
+          <p className="mt-3 max-w-xl text-lg text-white/80">
+            {user ? `Hola, ${user.firstName}. ` : ''}Estos son los planes que marcaste con corazón, agrupados por club.
           </p>
+          {entries.length > 0 && (
+            <div className="mt-6 flex flex-wrap gap-3">
+              <span className="glass rounded-full px-4 py-1.5 text-sm font-semibold text-white">
+                {entries.length} {entries.length === 1 ? 'plan' : 'planes'}
+              </span>
+              <span className="glass rounded-full px-4 py-1.5 text-sm text-white">
+                {clubOptions.length} {clubOptions.length === 1 ? 'club' : 'clubes'}
+              </span>
+            </div>
+          )}
         </div>
+      </div>
 
+      <div className="container mx-auto -mt-14 px-4 pb-16 md:-mt-16">
         {error && (
-          <div className="bg-red-50 border border-red-200 text-red-700 text-sm rounded-xl px-4 py-3 mb-6 text-center">
+          <div role="alert" className="mb-6 rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-center text-sm text-red-700">
             {error}
           </div>
         )}
 
         {entries.length > 0 && (
-          <div className="bg-white rounded-xl shadow-aurora-sm border border-aurora-navy/10 p-5 mb-8 flex flex-col md:flex-row gap-4">
+          <div className="mb-8 flex flex-col gap-3 rounded-3xl bg-white p-4 shadow-aurora ring-1 ring-aurora-navy/5 md:flex-row md:p-5">
             <input
               type="text"
+              aria-label="Buscar por club o nombre de plan"
               placeholder="Buscar por club o nombre de plan..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="flex-grow p-3 border border-aurora-navy/15 rounded-xl focus:outline-none focus:ring-2 focus:ring-aurora-terracotta"
+              className="input-aurora flex-grow"
             />
             <select
+              aria-label="Filtrar por club"
               value={selectedClubId ?? ''}
               onChange={(e) => setSelectedClubId(e.target.value ? Number(e.target.value) : null)}
-              className="p-3 border border-aurora-navy/15 rounded-xl focus:outline-none focus:ring-2 focus:ring-aurora-terracotta"
+              className="input-aurora md:w-64"
             >
               <option value="">Todos los clubes</option>
               {clubOptions.map((club) => (
@@ -157,81 +174,87 @@ const WishlistPage: React.FC = () => {
         )}
 
         {entries.length === 0 ? (
-          <div className="text-center py-16 bg-white rounded-xl shadow-aurora-sm border border-aurora-navy/10">
-            <svg className="mx-auto h-20 w-20 text-aurora-navy/15 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
-            </svg>
-            <h3 className="text-lg font-semibold text-aurora-navy mb-2">Todavía no marcaste ningún plan</h3>
-            <p className="text-aurora-navy/60 mb-4">Explorá clubes y tocá el corazón en los planes que te gusten.</p>
-            <button
-              onClick={() => navigate('/explore')}
-              className="bg-aurora-terracotta text-white px-6 py-3 rounded-xl hover:bg-aurora-terracottaDark transition-colors font-semibold"
-            >
-              Explorar Clubes
-            </button>
-          </div>
+          <Reveal>
+            <div className="mx-auto max-w-2xl rounded-3xl bg-white p-10 text-center shadow-aurora ring-1 ring-aurora-navy/5">
+              <span className="mx-auto mb-5 flex h-20 w-20 items-center justify-center rounded-full bg-aurora-cream text-aurora-terracotta">
+                <svg className="h-10 w-10" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.6} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                </svg>
+              </span>
+              <h2 className="mb-2 font-display text-3xl font-medium text-aurora-navy">Todavía no marcaste ningún plan</h2>
+              <p className="mb-8 text-aurora-navy/60">Explorá clubes y tocá el corazón en los planes que te gusten.</p>
+              <button onClick={() => navigate('/explore')} className="btn-primary btn-shine">
+                Explorar clubes
+              </button>
+            </div>
+          </Reveal>
         ) : groupedByClub.length === 0 ? (
-          <div className="text-center py-16 bg-white rounded-xl shadow-aurora-sm border border-aurora-navy/10">
-            <p className="text-lg text-aurora-navy/70 font-medium">No hay resultados para tu búsqueda.</p>
+          <div className="rounded-3xl bg-white p-12 text-center shadow-aurora-sm ring-1 ring-aurora-navy/5">
+            <p className="text-lg font-medium text-aurora-navy/70">No hay resultados para tu búsqueda.</p>
           </div>
         ) : (
-          <div className="space-y-6">
+          <div className="space-y-8">
             {groupedByClub.map((group) => (
-              <div key={group.club.id} className="bg-white rounded-2xl shadow-aurora-sm border border-aurora-navy/10 overflow-hidden">
-                <div
-                  className="flex items-center gap-4 p-5 border-b border-aurora-navy/10 cursor-pointer"
-                  onClick={() => navigate(`/club/${group.club.id}`)}
-                >
-                  <img
-                    src={group.club.logoUrl || '/assets/default-club.svg'}
-                    alt={group.club.name}
-                    className="w-14 h-14 rounded-full object-cover border border-aurora-navy/10"
-                  />
-                  <div>
-                    <h3 className="font-bold text-aurora-navy text-lg hover:text-aurora-terracotta transition-colors">{group.club.name}</h3>
-                    {group.club.slogan && <p className="text-sm text-aurora-navy/50 italic">{group.club.slogan}</p>}
-                  </div>
-                </div>
-                <div className="p-5 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                  {group.entries.map((entry) => {
-                    const descuento = Math.max(entry.plan.cashDiscount ?? 0, entry.plan.transferDiscount ?? 0);
-                    return (
-                      <div key={entry.favoriteId} className="relative border border-aurora-navy/10 rounded-xl overflow-hidden bg-aurora-cream hover:shadow-md transition-shadow duration-200">
-                        <button
-                          onClick={() => handleRemove(entry.favoriteId)}
-                          disabled={removingId === entry.favoriteId}
-                          className="absolute top-2 right-2 z-10 bg-white/90 text-red-500 hover:text-red-700 p-1.5 rounded-full shadow-md transition-colors disabled:opacity-50"
-                          title="Quitar de favoritos"
-                        >
-                          <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                            <path fillRule="evenodd" d="M3.172 5.172a4.5 4.5 0 015.656 0L10 6.343l1.172-1.171a4.5 4.5 0 115.656 5.656L10 17.657l-6.828-6.829a4.5 4.5 0 010-5.656z" clipRule="evenodd" />
-                          </svg>
-                        </button>
-                        <button
-                          onClick={() => navigate(`/club/${group.club.id}/plan/${entry.plan.planId}`)}
-                          className="w-full text-left"
-                        >
-                          <img
-                            src={entry.plan.image || 'https://placehold.co/400x160/FBF4E9/1F3350?text=Sin+imagen'}
-                            alt={entry.plan.name}
-                            className="w-full h-28 object-cover"
-                          />
-                          <div className="p-3">
-                            <h4 className="font-semibold text-aurora-navy text-sm truncate pr-6">{entry.plan.name}</h4>
-                            <p className="text-xs text-aurora-navy/50 mb-1">{entry.plan.deliveryFrequency}</p>
-                            <div className="flex items-center justify-between">
-                              <span className="font-bold text-aurora-terracotta text-sm">ARS {entry.plan.price.toLocaleString('es-AR')}</span>
-                              {descuento > 0 && (
-                                <span className="text-xs bg-red-100 text-red-600 px-2 py-0.5 rounded-full font-semibold">-{descuento}%</span>
-                              )}
+              <Reveal key={group.club.id}>
+                <section className="overflow-hidden rounded-3xl bg-white shadow-aurora-sm ring-1 ring-aurora-navy/5">
+                  <Link
+                    to={`/club/${group.club.id}`}
+                    className="group flex items-center gap-4 border-b border-aurora-navy/10 p-5 transition-colors hover:bg-aurora-cream/60 md:p-6"
+                  >
+                    <img
+                      src={group.club.logoUrl || '/assets/default-club.svg'}
+                      alt={group.club.name}
+                      className="h-16 w-16 flex-shrink-0 rounded-2xl border border-aurora-navy/10 bg-white object-cover"
+                    />
+                    <div className="min-w-0 flex-grow">
+                      <h2 className="truncate font-display text-2xl font-medium text-aurora-navy transition-colors group-hover:text-aurora-terracotta">{group.club.name}</h2>
+                      {group.club.slogan && <p className="truncate text-sm italic text-aurora-navy/55">{group.club.slogan}</p>}
+                    </div>
+                    <span className="hidden text-sm font-semibold text-aurora-terracotta sm:inline">Ver club →</span>
+                  </Link>
+                  <div className="grid grid-cols-1 gap-5 p-5 sm:grid-cols-2 lg:grid-cols-3 md:p-6">
+                    {group.entries.map((entry) => {
+                      const descuento = Math.max(entry.plan.cashDiscount ?? 0, entry.plan.transferDiscount ?? 0);
+                      return (
+                        <div key={entry.favoriteId} className="group/card relative overflow-hidden rounded-2xl bg-aurora-cream ring-1 ring-aurora-navy/5 transition-all duration-300 hover:-translate-y-1 hover:shadow-aurora">
+                          <button
+                            onClick={() => handleRemove(entry.favoriteId)}
+                            disabled={removingId === entry.favoriteId}
+                            aria-label={`Quitar ${entry.plan.name} de favoritos`}
+                            title="Quitar de favoritos"
+                            className="absolute right-3 top-3 z-10 rounded-full bg-white/95 p-2 text-aurora-terracotta shadow-aurora-sm transition-all hover:scale-110 hover:text-red-600 disabled:opacity-50"
+                          >
+                            <svg className="h-4 w-4" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
+                              <path fillRule="evenodd" d="M3.172 5.172a4.5 4.5 0 015.656 0L10 6.343l1.172-1.171a4.5 4.5 0 115.656 5.656L10 17.657l-6.828-6.829a4.5 4.5 0 010-5.656z" clipRule="evenodd" />
+                            </svg>
+                          </button>
+                          {descuento > 0 && (
+                            <span className="absolute left-3 top-3 z-10 rounded-full bg-aurora-terracotta px-2.5 py-1 text-xs font-bold text-white shadow-aurora-sm">
+                              -{descuento}%
+                            </span>
+                          )}
+                          <button
+                            onClick={() => navigate(`/club/${group.club.id}/plan/${entry.plan.planId}`)}
+                            className="w-full text-left"
+                          >
+                            <SafeImage
+                              src={entry.plan.image}
+                              alt={entry.plan.name}
+                              fallbackIcon="📦"
+                              className="h-36 w-full object-cover"
+                            />
+                            <div className="p-4">
+                              <h3 className="truncate font-display text-xl font-medium text-aurora-navy">{entry.plan.name}</h3>
+                              {entry.plan.deliveryFrequency && <p className="mb-2 text-xs text-aurora-navy/55">{entry.plan.deliveryFrequency}</p>}
+                              <span className="font-display text-2xl font-medium text-aurora-navy">ARS {entry.plan.price.toLocaleString('es-AR')}</span>
                             </div>
-                          </div>
-                        </button>
-                      </div>
-                    );
-                  })}
-                </div>
-              </div>
+                          </button>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </section>
+              </Reveal>
             ))}
           </div>
         )}
