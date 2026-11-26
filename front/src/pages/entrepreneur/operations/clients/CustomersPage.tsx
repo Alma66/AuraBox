@@ -129,22 +129,22 @@ const CustomersPage: React.FC = () => {
   };
 
   const tabClass = (isActive: boolean) =>
-    `flex min-h-[44px] items-center gap-2 rounded-lg px-4 text-sm font-semibold transition-colors ${
-      isActive ? 'bg-aurora-navy text-white' : 'text-aurora-navy/70 hover:bg-white'
+    `flex min-h-[44px] items-center gap-2 whitespace-nowrap rounded-full px-5 text-sm font-semibold transition-colors ${
+      isActive ? 'bg-aurora-navy text-white' : 'text-aurora-navy/70 hover:bg-aurora-cream'
     }`;
 
   if (!clubId) return null;
 
   if (loading) {
     return (
-      <div className="animate-pulse space-y-5 px-4 py-6 lg:px-8" aria-busy="true">
-        <div className="h-11 w-72 rounded-xl bg-aurora-navy/10" />
+      <div role="status" className="animate-pulse space-y-5 px-4 py-6 lg:px-8" aria-busy="true">
+        <div className="h-11 w-72 rounded-full bg-aurora-navy/10" />
         <div className="grid grid-cols-2 gap-3 md:grid-cols-5">
           {[0, 1, 2, 3, 4].map((item) => (
-            <div key={item} className="h-20 rounded-xl bg-aurora-navy/10" />
+            <div key={item} className="h-20 rounded-2xl bg-aurora-navy/10" />
           ))}
         </div>
-        <div className="h-64 rounded-xl bg-aurora-navy/10" />
+        <div className="h-64 rounded-3xl bg-aurora-navy/10" />
       </div>
     );
   }
@@ -152,7 +152,7 @@ const CustomersPage: React.FC = () => {
   if (error) {
     return (
       <div className="px-4 py-6 lg:px-8">
-        <div role="alert" className="rounded-2xl border border-red-200 bg-red-50 p-5 text-sm text-red-700">
+        <div role="alert" className="rounded-3xl border border-red-200 bg-red-50 p-5 text-sm text-red-700">
           <p>{error}</p>
           <button
             type="button"
@@ -168,7 +168,7 @@ const CustomersPage: React.FC = () => {
 
   return (
     <div className="space-y-5 px-4 py-6 lg:px-8">
-      <div role="tablist" aria-label="Vistas de clientes" className="inline-flex gap-1 rounded-xl bg-aurora-navy/5 p-1">
+      <div role="tablist" aria-label="Vistas de clientes" className="inline-flex gap-1 rounded-full bg-white p-1.5 shadow-aurora-sm ring-1 ring-aurora-navy/5">
         <button
           type="button"
           role="tab"

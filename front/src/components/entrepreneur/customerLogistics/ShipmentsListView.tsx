@@ -110,50 +110,50 @@ const ShipmentsListView: React.FC<ShipmentsListViewProps> = ({ clubId, clubName,
     document.body.removeChild(link);
   };
 
-  if (loading) return <div className="text-center py-16 text-aurora-navy/60">Cargando envíos...</div>;
-  if (error) return <div className="text-center py-16 text-red-600">{error}</div>;
+  if (loading) return <div role="status" className="py-16 text-center text-aurora-navy/60">Cargando envíos...</div>;
+  if (error) return <div role="alert" className="rounded-3xl border border-red-200 bg-red-50 py-10 text-center text-sm text-red-700">{error}</div>;
 
   return (
-    <div className="container mx-auto px-4 py-10 max-w-6xl">
-      <div className="mb-8">
-        <h1 className="text-2xl font-serif font-bold text-aurora-navy">{title}</h1>
-        <p className="text-sm text-aurora-navy/50 mt-1">{clubName}</p>
+    <div>
+      <div className="mb-6">
+        <h2 className="font-display text-3xl font-medium text-aurora-navy">{title}</h2>
+        <p className="mt-1 text-sm text-aurora-navy/50">{clubName}</p>
       </div>
 
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-6">
-        <div className="bg-white border border-aurora-navy/10 rounded-xl p-4">
-          <p className="text-xs font-medium text-aurora-navy/50 uppercase">Total</p>
-          <p className="text-2xl font-semibold text-aurora-navy mt-1">{stats.total}</p>
+        <div className="rounded-3xl bg-white p-5 shadow-aurora-sm ring-1 ring-aurora-navy/5">
+          <p className="text-xs font-semibold uppercase tracking-wider text-aurora-navy/50">Total</p>
+          <p className="mt-1 font-display text-3xl font-medium text-aurora-navy">{stats.total}</p>
         </div>
-        <div className="bg-white border border-aurora-navy/10 rounded-xl p-4">
-          <p className="text-xs font-medium text-aurora-navy/50 uppercase">Entregados</p>
-          <p className="text-2xl font-semibold text-emerald-600 mt-1">{stats.delivered}</p>
+        <div className="rounded-3xl bg-white p-5 shadow-aurora-sm ring-1 ring-aurora-navy/5">
+          <p className="text-xs font-semibold uppercase tracking-wider text-aurora-navy/50">Entregados</p>
+          <p className="mt-1 font-display text-3xl font-medium text-emerald-600">{stats.delivered}</p>
         </div>
-        <div className="bg-white border border-aurora-navy/10 rounded-xl p-4">
-          <p className="text-xs font-medium text-aurora-navy/50 uppercase">En curso</p>
-          <p className="text-2xl font-semibold text-aurora-terracotta mt-1">{stats.inTransit}</p>
+        <div className="rounded-3xl bg-white p-5 shadow-aurora-sm ring-1 ring-aurora-navy/5">
+          <p className="text-xs font-semibold uppercase tracking-wider text-aurora-navy/50">En curso</p>
+          <p className="mt-1 font-display text-3xl font-medium text-aurora-terracotta">{stats.inTransit}</p>
         </div>
-        <div className="bg-white border border-aurora-navy/10 rounded-xl p-4">
-          <p className="text-xs font-medium text-aurora-navy/50 uppercase">Con problemas</p>
-          <p className="text-2xl font-semibold text-red-600 mt-1">{stats.problem}</p>
+        <div className="rounded-3xl bg-white p-5 shadow-aurora-sm ring-1 ring-aurora-navy/5">
+          <p className="text-xs font-semibold uppercase tracking-wider text-aurora-navy/50">Con problemas</p>
+          <p className="mt-1 font-display text-3xl font-medium text-red-600">{stats.problem}</p>
         </div>
       </div>
 
-      <div className="flex flex-wrap gap-3 mb-6 items-center">
-        <select value={statusFilter} onChange={(e) => setStatusFilter(e.target.value as any)} className="px-3 py-2 border border-aurora-navy/15 rounded-lg text-sm">
+      <div className="mb-6 flex flex-wrap items-center gap-3 rounded-2xl bg-white p-3 shadow-aurora-sm ring-1 ring-aurora-navy/5">
+        <select aria-label="Filtrar por estado" value={statusFilter} onChange={(e) => setStatusFilter(e.target.value as any)} className="min-h-[44px] rounded-lg border border-aurora-navy/15 bg-white px-3 text-sm text-aurora-navy focus:outline-none focus:ring-2 focus:ring-aurora-terracotta/40">
           {STATUS_OPTIONS.map((opt) => (
             <option key={opt.value} value={opt.value}>{opt.label}</option>
           ))}
         </select>
-        <input type="date" value={fromDate} onChange={(e) => setFromDate(e.target.value)} className="px-3 py-2 border border-aurora-navy/15 rounded-lg text-sm" />
+        <input type="date" aria-label="Desde" value={fromDate} onChange={(e) => setFromDate(e.target.value)} className="min-h-[44px] rounded-lg border border-aurora-navy/15 bg-white px-3 text-sm text-aurora-navy focus:outline-none focus:ring-2 focus:ring-aurora-terracotta/40" />
         <span className="text-aurora-navy/40 text-sm">a</span>
-        <input type="date" value={toDate} onChange={(e) => setToDate(e.target.value)} className="px-3 py-2 border border-aurora-navy/15 rounded-lg text-sm" />
-        <button onClick={exportToCSV} className="ml-auto px-4 py-2 bg-aurora-navy text-white text-sm font-medium rounded-lg hover:bg-aurora-navy/90 transition-colors">
+        <input type="date" aria-label="Hasta" value={toDate} onChange={(e) => setToDate(e.target.value)} className="min-h-[44px] rounded-lg border border-aurora-navy/15 bg-white px-3 text-sm text-aurora-navy focus:outline-none focus:ring-2 focus:ring-aurora-terracotta/40" />
+        <button onClick={exportToCSV} className="ml-auto min-h-[44px] rounded-full bg-aurora-navy px-5 text-sm font-semibold text-white transition-colors hover:bg-aurora-navyLight">
           Exportar a CSV
         </button>
       </div>
 
-      <div className="bg-white border border-aurora-navy/10 rounded-xl shadow-aurora-sm overflow-hidden">
+      <div className="overflow-hidden rounded-3xl bg-white shadow-aurora-sm ring-1 ring-aurora-navy/5">
         <div className="overflow-x-auto">
           <table className="min-w-full divide-y divide-aurora-navy/10">
             <thead className="bg-aurora-cream">

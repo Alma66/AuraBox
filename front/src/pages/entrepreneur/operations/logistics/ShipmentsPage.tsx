@@ -50,19 +50,19 @@ const ShipmentsPage: React.FC = () => {
   if (!clubId) return null;
 
   const tabClass = (isActive: boolean) =>
-    `flex min-h-[44px] items-center gap-2 rounded-lg px-4 text-sm font-semibold transition-colors ${
-      isActive ? 'bg-aurora-navy text-white' : 'text-aurora-navy/70 hover:bg-white'
+    `flex min-h-[44px] items-center gap-2 whitespace-nowrap rounded-full px-5 text-sm font-semibold transition-colors ${
+      isActive ? 'bg-aurora-navy text-white' : 'text-aurora-navy/70 hover:bg-aurora-cream'
     }`;
 
   const viewClass = (isActive: boolean) =>
-    `min-h-[40px] rounded-full px-4 text-xs font-semibold transition-colors ${
-      isActive ? 'bg-aurora-terracotta text-white' : 'bg-white text-aurora-navy/70 hover:text-aurora-navy'
+    `min-h-[40px] rounded-full px-4 text-xs font-semibold ring-1 transition-colors ${
+      isActive ? 'bg-aurora-terracotta text-white ring-aurora-terracotta' : 'bg-white text-aurora-navy/70 ring-aurora-navy/10 hover:text-aurora-navy'
     }`;
 
   return (
     <div className="space-y-5 px-4 py-6 lg:px-8">
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <div role="tablist" aria-label="Vistas de envíos" className="flex gap-1 rounded-xl bg-aurora-navy/5 p-1">
+        <div role="tablist" aria-label="Vistas de envíos" className="flex gap-1 rounded-full bg-white p-1.5 shadow-aurora-sm ring-1 ring-aurora-navy/5">
           <button type="button" role="tab" aria-selected={tab === 'assign'} onClick={() => selectTab('assign')} className={tabClass(tab === 'assign')}>
             Por asignar
             {pendingCount > 0 && (
@@ -78,7 +78,7 @@ const ShipmentsPage: React.FC = () => {
         <button
           type="button"
           onClick={openRiders}
-          className="flex min-h-[44px] items-center gap-2 rounded-xl border border-aurora-navy/15 bg-white px-4 text-sm font-semibold text-aurora-navy transition-colors hover:border-aurora-navy/30"
+          className="flex min-h-[44px] items-center gap-2 rounded-full bg-white px-5 text-sm font-semibold text-aurora-navy shadow-aurora-sm ring-1 ring-aurora-navy/10 transition-colors hover:ring-aurora-navy/30"
         >
           <Icon name="users" className="h-4 w-4" />
           Riders y empresas

@@ -95,7 +95,7 @@ const SubscriptionsMonitor: React.FC<SubscriptionsMonitorProps> = ({ subscriptio
         return matchSearch && matchStatus && matchPlan;
       })
       .sort((a, b) => {
-                const result = sortValue(a, sortField).localeCompare(sortValue(b, sortField), 'es');
+        const result = sortValue(a, sortField).localeCompare(sortValue(b, sortField), 'es');
         return sortDir === 'asc' ? result : -result;
       });
   }, [enriched, search, statusFilter, planFilter, sortField, sortDir]);
@@ -143,10 +143,10 @@ const SubscriptionsMonitor: React.FC<SubscriptionsMonitorProps> = ({ subscriptio
           const content = (
             <>
               <p className="text-xs font-semibold uppercase tracking-wide text-aurora-navy/50">{kpi.label}</p>
-              <p className="mt-1 font-display text-2xl font-bold text-aurora-navy">{kpi.value}</p>
+              <p className="mt-1 font-display text-3xl font-medium text-aurora-navy">{kpi.value}</p>
             </>
           );
-          const base = `rounded-xl border-l-4 bg-white px-4 py-3 text-left shadow-aurora-sm ${kpi.accent}`;
+          const base = `rounded-2xl border-l-4 bg-white px-4 py-3 text-left shadow-aurora-sm ${kpi.accent}`;
           if (kpi.filter === null) {
             return (
               <div key={kpi.label} className={base}>
@@ -171,7 +171,7 @@ const SubscriptionsMonitor: React.FC<SubscriptionsMonitorProps> = ({ subscriptio
         })}
       </section>
 
-      <div className="flex flex-col gap-3 rounded-xl border border-aurora-navy/10 bg-white p-3 md:flex-row md:items-center">
+      <div className="flex flex-col gap-3 rounded-2xl bg-white p-3 shadow-aurora-sm ring-1 ring-aurora-navy/5 md:flex-row md:items-center">
         <div className="relative flex-1">
           <Icon name="search" className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-aurora-navy/35" />
           <label htmlFor="subs-search" className="sr-only">
@@ -232,12 +232,12 @@ const SubscriptionsMonitor: React.FC<SubscriptionsMonitorProps> = ({ subscriptio
       </div>
 
       {rows.length === 0 ? (
-        <div className="rounded-xl border border-aurora-navy/10 bg-white px-6 py-16 text-center text-sm text-aurora-navy/55">
+        <div className="rounded-3xl bg-white px-6 py-16 text-center text-sm text-aurora-navy/55 shadow-aurora-sm ring-1 ring-aurora-navy/5">
           No se encontraron suscripciones con los filtros aplicados.
         </div>
       ) : (
         <>
-          <div className="hidden overflow-hidden rounded-xl border border-aurora-navy/10 bg-white shadow-aurora-sm md:block">
+          <div className="hidden overflow-hidden rounded-3xl bg-white shadow-aurora-sm ring-1 ring-aurora-navy/5 md:block">
             <div className="overflow-x-auto">
               <table className="min-w-full divide-y divide-aurora-navy/10">
                 <thead className="bg-aurora-cream">
@@ -331,8 +331,8 @@ const SubscriptionsMonitor: React.FC<SubscriptionsMonitorProps> = ({ subscriptio
                 <button
                   type="button"
                   onClick={() => onOpen(row.sub)}
-                  className={`w-full rounded-xl border bg-white p-4 text-left shadow-aurora-sm ${
-                    row.overdue ? 'border-red-300' : 'border-aurora-navy/10'
+                  className={`w-full rounded-2xl bg-white p-4 text-left shadow-aurora-sm ring-1 ${
+                    row.overdue ? 'ring-red-300' : 'ring-aurora-navy/5'
                   }`}
                 >
                   <div className="flex items-start justify-between gap-3">

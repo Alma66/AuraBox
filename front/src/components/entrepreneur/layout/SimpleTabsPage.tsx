@@ -22,7 +22,7 @@ const SimpleTabsPage: React.FC<SimpleTabsPageProps> = ({ label, tabs }) => {
         <div
           role="tablist"
           aria-label={label}
-          className="flex w-fit max-w-full gap-1 overflow-x-auto rounded-xl bg-aurora-navy/5 p-1"
+          className="flex w-fit max-w-full gap-1 overflow-x-auto rounded-full bg-white p-1.5 shadow-aurora-sm ring-1 ring-aurora-navy/5"
         >
           {tabs.map((tab) => (
             <button
@@ -31,8 +31,8 @@ const SimpleTabsPage: React.FC<SimpleTabsPageProps> = ({ label, tabs }) => {
               role="tab"
               aria-selected={tab.id === active.id}
               onClick={() => setSearchParams({ tab: tab.id }, { replace: true })}
-              className={`min-h-[44px] whitespace-nowrap rounded-lg px-4 text-sm font-semibold transition-colors ${
-                tab.id === active.id ? 'bg-aurora-navy text-white' : 'text-aurora-navy/70 hover:bg-white'
+              className={`min-h-[44px] whitespace-nowrap rounded-full px-5 text-sm font-semibold transition-colors ${
+                tab.id === active.id ? 'bg-aurora-navy text-white' : 'text-aurora-navy/70 hover:bg-aurora-cream'
               }`}
             >
               {tab.label}

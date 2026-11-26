@@ -52,7 +52,7 @@ const SectionedContentPage: React.FC<SectionedContentPageProps> = ({ clubId, gro
 
   if (failed) {
     return (
-      <div role="alert" className="m-4 rounded-2xl border border-red-200 bg-red-50 p-5 text-sm text-red-700 lg:mx-8">
+      <div role="alert" className="m-4 rounded-3xl border border-red-200 bg-red-50 p-5 text-sm text-red-700 lg:mx-8">
         No se pudo cargar el club.
       </div>
     );
@@ -60,16 +60,16 @@ const SectionedContentPage: React.FC<SectionedContentPageProps> = ({ clubId, gro
 
   if (!club) {
     return (
-      <div className="animate-pulse space-y-4 px-4 py-6 lg:px-8" aria-busy="true">
-        <div className="h-11 w-72 rounded-xl bg-aurora-navy/10" />
-        <div className="h-64 rounded-2xl bg-aurora-navy/10" />
+      <div role="status" className="animate-pulse space-y-4 px-4 py-6 lg:px-8" aria-busy="true">
+        <div className="h-11 w-72 rounded-full bg-aurora-navy/10" />
+        <div className="h-64 rounded-3xl bg-aurora-navy/10" />
       </div>
     );
   }
 
   return (
     <div className="space-y-5 px-4 py-6 lg:px-8">
-      <div role="tablist" aria-label="Secciones" className="inline-flex gap-1 rounded-xl bg-aurora-navy/5 p-1">
+      <div role="tablist" aria-label="Secciones" className="inline-flex max-w-full gap-1 overflow-x-auto rounded-full bg-white p-1.5 shadow-aurora-sm ring-1 ring-aurora-navy/5">
         {groups.map((item) => {
           const isActive = item.id === group.id;
           return (
@@ -79,8 +79,8 @@ const SectionedContentPage: React.FC<SectionedContentPageProps> = ({ clubId, gro
               role="tab"
               aria-selected={isActive}
               onClick={() => select(item.id)}
-              className={`flex min-h-[44px] items-center gap-2 rounded-lg px-4 text-sm font-semibold transition-colors ${
-                isActive ? 'bg-aurora-navy text-white' : 'text-aurora-navy/70 hover:bg-white'
+              className={`flex min-h-[44px] items-center gap-2 whitespace-nowrap rounded-full px-5 text-sm font-semibold transition-colors ${
+                isActive ? 'bg-aurora-navy text-white' : 'text-aurora-navy/70 hover:bg-aurora-cream'
               }`}
             >
               {item.label}
@@ -101,8 +101,8 @@ const SectionedContentPage: React.FC<SectionedContentPageProps> = ({ clubId, gro
             type="button"
             aria-pressed={item.id === section.id}
             onClick={() => select(group.id, item.id)}
-            className={`min-h-[40px] rounded-full px-4 text-xs font-semibold transition-colors ${
-              item.id === section.id ? 'bg-aurora-terracotta text-white' : 'bg-white text-aurora-navy/70 hover:text-aurora-navy'
+            className={`min-h-[40px] rounded-full px-4 text-xs font-semibold ring-1 transition-colors ${
+              item.id === section.id ? 'bg-aurora-terracotta text-white ring-aurora-terracotta' : 'bg-white text-aurora-navy/70 ring-aurora-navy/10 hover:text-aurora-navy'
             }`}
           >
             {item.label}
@@ -110,7 +110,7 @@ const SectionedContentPage: React.FC<SectionedContentPageProps> = ({ clubId, gro
         ))}
       </div>
 
-      <div className="rounded-xl border border-aurora-navy/10 bg-white p-4 shadow-aurora-sm sm:p-6">
+      <div className="rounded-3xl bg-white p-4 shadow-aurora-sm ring-1 ring-aurora-navy/5 sm:p-6">
         {group.render(section.id, club, (next) => select(group.id, next))}
       </div>
     </div>

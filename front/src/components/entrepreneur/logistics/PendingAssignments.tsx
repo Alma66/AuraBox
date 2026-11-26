@@ -123,7 +123,7 @@ const PendingAssignments: React.FC<PendingAssignmentsProps> = ({ clubId, refresh
 
   if (error) {
     return (
-      <div role="alert" className="rounded-2xl border border-red-200 bg-red-50 p-5 text-sm text-red-700">
+      <div role="alert" className="rounded-3xl border border-red-200 bg-red-50 p-5 text-sm text-red-700">
         <p>{error}</p>
         <button
           type="button"
@@ -138,14 +138,14 @@ const PendingAssignments: React.FC<PendingAssignmentsProps> = ({ clubId, refresh
 
   if (pending.length === 0) {
     return (
-      <div className="rounded-2xl border border-aurora-navy/10 bg-white px-6 py-16 text-center text-sm text-aurora-navy/60">
+      <div className="rounded-3xl bg-white px-6 py-16 text-center text-sm text-aurora-navy/60 shadow-aurora-sm ring-1 ring-aurora-navy/5">
         No hay envíos pendientes de asignación este mes. Todo está al día.
       </div>
     );
   }
 
   return (
-    <ul className="divide-y divide-aurora-navy/10 overflow-hidden rounded-2xl border border-aurora-navy/10 bg-white">
+    <ul className="divide-y divide-aurora-navy/10 overflow-hidden rounded-3xl bg-white shadow-aurora-sm ring-1 ring-aurora-navy/5">
       {pending.map((delivery) => {
         const selection = selections[delivery.idUserSubscriptions] ?? { idCourier: '', idAssignedRider: '' };
         const internal = isInternal(delivery, selection.idCourier);

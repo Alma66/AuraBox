@@ -43,7 +43,7 @@ const CustomerDirectory: React.FC<CustomerDirectoryProps> = ({ customers, subscr
 
   return (
     <div className="space-y-4">
-      <div className="flex flex-col gap-2 rounded-xl border border-aurora-navy/10 bg-white p-3 sm:flex-row sm:items-center">
+      <div className="flex flex-col gap-2 rounded-2xl bg-white p-3 shadow-aurora-sm ring-1 ring-aurora-navy/5 sm:flex-row sm:items-center">
         <div className="relative flex-1">
           <Icon name="search" className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-aurora-navy/35" />
           <label htmlFor="customers-search" className="sr-only">
@@ -64,11 +64,11 @@ const CustomerDirectory: React.FC<CustomerDirectoryProps> = ({ customers, subscr
       </div>
 
       {list.length === 0 ? (
-        <div className="rounded-xl border border-aurora-navy/10 bg-white px-6 py-16 text-center text-sm text-aurora-navy/55">
+        <div className="rounded-3xl bg-white px-6 py-16 text-center text-sm text-aurora-navy/55 shadow-aurora-sm ring-1 ring-aurora-navy/5">
           {customers.length === 0 ? 'Todavía no tenés clientes suscriptos.' : 'Sin resultados para esa búsqueda.'}
         </div>
       ) : (
-        <ul className="divide-y divide-aurora-navy/10 overflow-hidden rounded-xl border border-aurora-navy/10 bg-white shadow-aurora-sm">
+        <ul className="divide-y divide-aurora-navy/10 overflow-hidden rounded-3xl bg-white shadow-aurora-sm ring-1 ring-aurora-navy/5">
           {list.map((customer) => {
             const stat = counts.get(String(customer.id)) ?? { total: 0, active: 0, pending: 0 };
             const place = [customer.city, customer.province].filter(Boolean).join(', ');
