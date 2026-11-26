@@ -231,7 +231,7 @@ const ModerateReviewsContent: React.FC<ModerateReviewsContentProps> = ({ activeS
         : [];
 
     return (
-      <div className="border border-aurora-navy/10 rounded-xl p-5 bg-white">
+    <div className="rounded-2xl bg-white p-5 shadow-aurora-sm ring-1 ring-aurora-navy/5">
         <div className="flex justify-between items-start mb-2">
           <div>
             <p className="font-semibold text-aurora-navy">{userName(review)}</p>
@@ -278,7 +278,7 @@ const ModerateReviewsContent: React.FC<ModerateReviewsContentProps> = ({ activeS
   if (activeSection === 'palabras') {
     return (
       <div className="animate-fadeInUp">
-        <h2 className="text-xl font-serif font-bold text-aurora-navy mb-2">Palabras Filtro</h2>
+      <h2 className="font-display text-2xl font-medium text-aurora-navy mb-2">Palabras Filtro</h2>
         <p className="text-sm text-aurora-navy/60 mb-6">Las reseñas que contengan estas palabras o frases se ocultarán automáticamente de los clientes. Solo vos podés verlas en "Reseñas Ocultas" y decidir si mostrarlas o eliminarlas.</p>
         <div className="flex gap-3 mb-6 max-w-md">
           <input
@@ -316,7 +316,7 @@ const ModerateReviewsContent: React.FC<ModerateReviewsContentProps> = ({ activeS
 
   return (
     <div className="animate-fadeInUp">
-      <h2 className="text-xl font-serif font-bold text-aurora-navy mb-6">{activeSection === 'ocultas' ? 'Reseñas Ocultas' : 'Reseñas Visibles'}</h2>
+    <h2 className="font-display text-2xl font-medium text-aurora-navy mb-6">{activeSection === 'ocultas' ? 'Reseñas Ocultas' : 'Reseñas Visibles'}</h2>
       {renderFilters()}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {list.map((r) => (

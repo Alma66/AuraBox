@@ -196,7 +196,7 @@ const ManagePromotionsContent: React.FC<ManagePromotionsContentProps> = ({ activ
   if (activeSection === 'nueva') {
     return (
       <div className="animate-fadeInUp">
-        <h2 className="font-serif text-xl font-bold text-aurora-navy mb-6">{editingId ? 'Editar Promoción' : 'Crear Promoción'}</h2>
+      <h2 className="font-display text-2xl font-medium text-aurora-navy mb-6">{editingId ? 'Editar Promoción' : 'Crear Promoción'}</h2>
         <div className="space-y-4 max-w-xl">
           <div>
             <label className="block text-sm font-medium text-aurora-navy/80 mb-1">Nombre</label>
@@ -361,7 +361,7 @@ const ManagePromotionsContent: React.FC<ManagePromotionsContentProps> = ({ activ
 
   return (
     <div className="animate-fadeInUp">
-      <h2 className="font-serif text-xl font-bold text-aurora-navy mb-6">{activeSection === 'historial' ? 'Historial de Promociones' : 'Promociones Activas'}</h2>
+    <h2 className="font-display text-2xl font-medium text-aurora-navy mb-6">{activeSection === 'historial' ? 'Historial de Promociones' : 'Promociones Activas'}</h2>
 
       <div className="flex flex-wrap gap-3 mb-6">
         <select value={filterType} onChange={(e) => setFilterType(e.target.value)} className="px-3 py-2 border border-aurora-navy/15 rounded-lg text-sm">
@@ -383,8 +383,8 @@ const ManagePromotionsContent: React.FC<ManagePromotionsContentProps> = ({ activ
         {filteredPromotions
           .filter((p) => (activeSection === 'activas' ? p.active : true))
           .map((promo) => (
-            <div key={promo.id} className="border border-aurora-navy/10 rounded-xl p-5 bg-white">
-              <div className="flex justify-between items-start mb-2">
+          <div key={promo.id} className="rounded-2xl bg-white p-5 shadow-aurora-sm ring-1 ring-aurora-navy/5">
+            <div className="flex justify-between items-start mb-2">
                 <div>
                   <h3 className="font-semibold text-aurora-navy">{promo.name}</h3>
                   <p className="text-xs text-aurora-navy/50">{TYPE_LABELS[promo.promotionType]}</p>

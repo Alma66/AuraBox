@@ -161,23 +161,25 @@ const SendNewsletterContent: React.FC<SendNewsletterContentProps> = ({ activeSec
   if (activeSection === 'nuevo') {
     return (
       <div className="animate-fadeInUp">
-        <h2 className="font-serif text-xl font-bold text-aurora-navy mb-2">Nuevo Newsletter</h2>
+        <h2 className="font-display text-2xl font-medium text-aurora-navy mb-2">Nuevo Newsletter</h2>
         <p className="text-sm text-aurora-navy/60 mb-6">
           {loadingSubscribers ? 'Calculando audiencia...' : `Se enviará por email a ${subscriberCount ?? 0} suscriptor(es) que aceptaron recibir novedades.`}
         </p>
         <div className="space-y-4 max-w-2xl">
           <input
             type="text"
+            aria-label="Asunto"
             placeholder="Asunto"
             value={subject}
             onChange={(e) => setSubject(e.target.value)}
             className="w-full px-3 py-2 border border-aurora-navy/15 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-aurora-terracotta/40"
           />
           <textarea
+            aria-label="Contenido del newsletter"
             placeholder="Contenido del newsletter"
             value={content}
             onChange={(e) => setContent(e.target.value)}
-            className="w-full px-3 py-2 border border-aurora-navy/15 rounded-lg text-sm"
+            className="w-full px-3 py-2 border border-aurora-navy/15 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-aurora-terracotta/40"
             rows={10}
           />
           <div className="flex gap-3">
@@ -189,9 +191,9 @@ const SendNewsletterContent: React.FC<SendNewsletterContentProps> = ({ activeSec
             </button>
           </div>
           {(subject || content) && (
-            <div className="mt-6 border border-aurora-navy/10 rounded-xl p-4 bg-aurora-cream/50">
+            <div className="mt-6 rounded-2xl bg-aurora-cream/50 p-4 ring-1 ring-aurora-navy/5">
               <p className="text-xs font-medium text-aurora-navy/50 mb-2">Vista previa</p>
-              <h3 className="font-bold text-aurora-navy">{subject}</h3>
+              <h3 className="font-display text-xl font-medium text-aurora-navy">{subject}</h3>
               <p className="text-sm text-aurora-navy/80 whitespace-pre-line mt-2">{content}</p>
             </div>
           )}
@@ -203,13 +205,13 @@ const SendNewsletterContent: React.FC<SendNewsletterContentProps> = ({ activeSec
   if (activeSection === 'borradores') {
     return (
       <div className="animate-fadeInUp">
-        <h2 className="font-serif text-xl font-bold text-aurora-navy mb-6">Borradores</h2>
+        <h2 className="font-display text-2xl font-medium text-aurora-navy mb-6">Borradores</h2>
         {drafts.length === 0 ? (
           <div className="text-center py-16 text-aurora-navy/50">No hay borradores guardados.</div>
         ) : (
           <div className="space-y-3">
             {drafts.map((draft) => (
-              <div key={draft.id} className="border border-aurora-navy/10 rounded-xl p-4">
+              <div key={draft.id} className="rounded-2xl p-4 ring-1 ring-aurora-navy/10">
                 <h3 className="font-semibold text-aurora-navy">{draft.subject || '(Sin asunto)'}</h3>
                 <p className="text-xs text-aurora-navy/50 mb-2">{new Date(draft.createdAt).toLocaleString('es-AR')}</p>
                 <p className="text-sm text-aurora-navy/70 truncate">{draft.content}</p>
@@ -232,10 +234,10 @@ const SendNewsletterContent: React.FC<SendNewsletterContentProps> = ({ activeSec
   if (activeSection === 'plantillas') {
     return (
       <div className="animate-fadeInUp">
-        <h2 className="font-serif text-xl font-bold text-aurora-navy mb-6">Plantillas</h2>
+        <h2 className="font-display text-2xl font-medium text-aurora-navy mb-6">Plantillas</h2>
         <div className="space-y-3">
           {TEMPLATES.map((tpl) => (
-            <div key={tpl.id} className="border border-aurora-navy/10 rounded-xl p-4 hover:bg-aurora-cream/50 cursor-pointer transition-colors" onClick={() => applyTemplate(tpl)}>
+            <div key={tpl.id} className="rounded-2xl p-4 ring-1 ring-aurora-navy/10 hover:bg-aurora-cream/50 cursor-pointer transition-colors" onClick={() => applyTemplate(tpl)}>
               <h3 className="font-semibold text-aurora-navy">{tpl.name}</h3>
               <p className="text-sm text-aurora-navy/50">{tpl.subject.replace('{club}', club.name)}</p>
               <p className="text-sm text-aurora-navy/70 mt-1">{tpl.content.replace('{club}', club.name)}</p>
@@ -251,32 +253,32 @@ const SendNewsletterContent: React.FC<SendNewsletterContentProps> = ({ activeSec
   const totalRecipients = completedRecords.reduce((acc, r) => acc + r.sentCount, 0);
 
   if (loadingHistory) {
-    return <div className="text-center py-16 text-aurora-navy/50">Cargando historial...</div>;
+    return <div role="status" className="text-center py-16 text-aurora-navy/50">Cargando historial...</div>;
   }
 
   return (
     <div className="animate-fadeInUp">
-      <h2 className="font-serif text-xl font-bold text-aurora-navy mb-6">Métricas e Historial de Envíos</h2>
+      <h2 className="font-display text-2xl font-medium text-aurora-navy mb-6">Métricas e Historial de Envíos</h2>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
-        <div className="bg-aurora-navy/10 rounded-xl p-5 text-center">
-          <p className="text-3xl font-bold text-aurora-navy">{totalSent}</p>
+        <div className="bg-aurora-navy/10 rounded-2xl p-5 text-center">
+          <p className="font-display text-4xl font-medium text-aurora-navy">{totalSent}</p>
           <p className="text-sm text-aurora-navy/60 mt-1">Newsletters enviados</p>
         </div>
-        <div className="bg-emerald-50 rounded-xl p-5 text-center">
-          <p className="text-3xl font-bold text-emerald-600">{totalRecipients}</p>
+        <div className="bg-emerald-50 rounded-2xl p-5 text-center">
+          <p className="font-display text-4xl font-medium text-emerald-600">{totalRecipients}</p>
           <p className="text-sm text-aurora-navy/60 mt-1">Total de destinatarios alcanzados</p>
         </div>
-        <div className="bg-aurora-gold/10 rounded-xl p-5 text-center">
-          <p className="text-3xl font-bold text-aurora-terracottaDark">{subscriberCount ?? '—'}</p>
+        <div className="bg-aurora-gold/10 rounded-2xl p-5 text-center">
+          <p className="font-display text-4xl font-medium text-aurora-terracottaDark">{subscriberCount ?? '—'}</p>
           <p className="text-sm text-aurora-navy/60 mt-1">Suscriptores actuales con opt-in</p>
         </div>
       </div>
-      <h3 className="text-md font-semibold text-aurora-navy mb-3">Historial de Envíos</h3>
+      <h3 className="font-display text-xl font-medium text-aurora-navy mb-3">Historial de Envíos</h3>
       {history.length === 0 ? (
         <div className="text-center py-16 text-aurora-navy/50">Todavía no enviaste ningún newsletter.</div>
       ) : (
-        <div className="overflow-x-auto">
-          <table className="min-w-full divide-y divide-aurora-navy/10 border border-aurora-navy/10 rounded-xl">
+        <div className="overflow-x-auto rounded-2xl ring-1 ring-aurora-navy/10">
+          <table className="min-w-full divide-y divide-aurora-navy/10">
             <thead className="bg-aurora-cream">
               <tr>
                 <th className="px-4 py-3 text-left text-xs font-semibold text-aurora-navy/60 uppercase">Fecha</th>

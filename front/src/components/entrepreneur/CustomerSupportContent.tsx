@@ -259,7 +259,7 @@ const CustomerSupportContent: React.FC<CustomerSupportContentProps> = ({ activeS
   if (activeSection === 'automaticos') {
     return (
       <div className="animate-fadeInUp">
-        <h2 className="text-xl font-serif font-bold text-aurora-navy mb-2">Mensajes Automáticos</h2>
+      <h2 className="font-display text-2xl font-medium text-aurora-navy mb-2">Mensajes Automáticos</h2>
         <p className="text-sm text-aurora-navy/60 mb-6">Configurá respuestas automáticas para el primer mensaje de cada cliente o cuando se detecte una frase específica.</p>
 
         <div className="border border-aurora-navy/10 rounded-xl p-5 mb-8 max-w-xl space-y-3">
