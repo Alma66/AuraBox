@@ -37,15 +37,15 @@ const shipmentStatus = (shipment: any): string =>
 const MetricCard: React.FC<MetricCardProps> = ({ label, value, hint, to }) => {
   const content = (
     <>
-      <p className="text-xs font-semibold uppercase tracking-wide text-aurora-navy/50">{label}</p>
-      <p className="mt-2 font-display text-3xl font-bold text-aurora-navy">{value}</p>
+      <p className="text-xs font-semibold uppercase tracking-wider text-aurora-navy/50">{label}</p>
+      <p className="mt-2 font-display text-3xl font-medium text-aurora-navy">{value}</p>
       {hint && <p className="mt-1 text-xs text-aurora-navy/50">{hint}</p>}
     </>
   );
-  const base = 'block rounded-2xl border border-aurora-navy/10 bg-white p-5 shadow-aurora-sm';
+  const base = 'block rounded-3xl bg-white p-5 shadow-aurora-sm ring-1 ring-aurora-navy/5';
   if (to) {
     return (
-      <Link to={to} className={`${base} transition-shadow hover:shadow-aurora focus:outline-none focus-visible:ring-2 focus-visible:ring-aurora-terracotta`}>
+      <Link to={to} className={`${base} transition-all duration-300 hover:-translate-y-0.5 hover:shadow-aurora focus:outline-none focus-visible:ring-2 focus-visible:ring-aurora-terracotta`}>
         {content}
       </Link>
     );
@@ -165,30 +165,32 @@ const EntrepreneurDashboardPage: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="animate-pulse space-y-6 px-4 py-6 lg:px-8">
-        <div className="h-8 w-64 rounded bg-aurora-navy/10" />
+      <div role="status" aria-label="Cargando panel" className="animate-pulse space-y-6 px-4 py-6 lg:px-8">
+        <div className="h-32 rounded-3xl bg-aurora-navy/10" />
         <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
           {[0, 1, 2, 3].map((item) => (
-            <div key={item} className="h-28 rounded-2xl bg-aurora-navy/10" />
+            <div key={item} className="h-28 rounded-3xl bg-aurora-navy/10" />
           ))}
         </div>
-        <div className="h-40 rounded-2xl bg-aurora-navy/10" />
+        <div className="h-40 rounded-3xl bg-aurora-navy/10" />
       </div>
     );
   }
 
   return (
     <div className="space-y-8 px-4 py-6 lg:px-8">
-      <div>
-        <p className="text-sm capitalize text-aurora-navy/50">{today}</p>
-        <h1 className="font-display text-2xl font-bold text-aurora-navy md:text-3xl">
-          Hola, {user?.firstName || 'emprendedor'}
-        </h1>
-        {data?.club?.name && <p className="text-sm text-aurora-navy/60">Así viene {data.club.name} hoy.</p>}
+      <div className="hero-mesh grain relative overflow-hidden rounded-3xl px-6 py-8 shadow-aurora md:px-10 md:py-10">
+        <div className="relative">
+          <p className="mb-2 text-xs font-semibold uppercase tracking-widest text-aurora-goldLight">{today}</p>
+          <h1 className="font-display text-3xl font-normal leading-tight text-white md:text-5xl">
+            Hola, {user?.firstName || 'emprendedor'}
+          </h1>
+          {data?.club?.name && <p className="mt-2 text-white/80">Así viene {data.club.name} hoy.</p>}
+        </div>
       </div>
-            <ComplianceBanner to={complianceTo} />
+      <ComplianceBanner to={complianceTo} />
       {failed && (
-        <div role="alert" className="rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-700">
+        <div role="alert" className="rounded-2xl border border-red-200 bg-red-50 p-4 text-sm text-red-700">
           No pudimos cargar los datos del club. Probá recargar la página.
         </div>
       )}
@@ -229,13 +231,13 @@ const EntrepreneurDashboardPage: React.FC = () => {
       </section>
 
       <section aria-label="Requiere tu atención">
-        <h2 className="mb-3 font-display text-lg font-bold text-aurora-navy">Requiere tu atención</h2>
+        <h2 className="mb-3 font-display text-2xl font-medium text-aurora-navy">Requiere tu atención</h2>
         {attention.length === 0 ? (
-          <div className="rounded-2xl border border-aurora-navy/10 bg-white p-5 text-sm text-aurora-navy/60">
+          <div className="rounded-3xl bg-white p-5 text-sm text-aurora-navy/60 shadow-aurora-sm ring-1 ring-aurora-navy/5">
             Todo al día. No hay pendientes urgentes.
           </div>
         ) : (
-          <ul className="divide-y divide-aurora-navy/10 overflow-hidden rounded-2xl border border-aurora-navy/10 bg-white">
+          <ul className="divide-y divide-aurora-navy/10 overflow-hidden rounded-3xl bg-white shadow-aurora-sm ring-1 ring-aurora-navy/5">
             {attention.map((item) => (
               <li key={item.key}>
                 <Link
@@ -252,15 +254,15 @@ const EntrepreneurDashboardPage: React.FC = () => {
       </section>
 
       <section aria-label="Accesos rápidos">
-        <h2 className="mb-3 font-display text-lg font-bold text-aurora-navy">Accesos rápidos</h2>
+        <h2 className="mb-3 font-display text-2xl font-medium text-aurora-navy">Accesos rápidos</h2>
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
           {ENTREPRENEUR_SECTIONS.filter((section) => section.id !== 'dashboard').map((section) => (
             <Link
               key={section.id}
               to={sectionHref(section, clubId)}
-              className="flex items-start gap-4 rounded-2xl border border-aurora-navy/10 bg-white p-4 transition-shadow hover:shadow-aurora focus:outline-none focus-visible:ring-2 focus-visible:ring-aurora-terracotta"
+              className="flex items-start gap-4 rounded-3xl bg-white p-4 shadow-aurora-sm ring-1 ring-aurora-navy/5 transition-all duration-300 hover:-translate-y-0.5 hover:shadow-aurora focus:outline-none focus-visible:ring-2 focus-visible:ring-aurora-terracotta"
             >
-              <span className="flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-xl bg-aurora-navy text-aurora-cream">
+              <span className="flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-aurora-navy to-aurora-plum text-aurora-cream">
                 <Icon name={section.icon} className="h-5 w-5" />
               </span>
               <span className="min-w-0">

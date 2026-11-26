@@ -80,10 +80,10 @@ const EntrepreneurProfilePage: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center px-4 py-24" aria-busy="true">
+      <div role="status" className="flex items-center justify-center px-4 py-24" aria-busy="true">
         <div className="flex flex-col items-center gap-4">
-          <div className="h-12 w-12 animate-spin rounded-full border-4 border-aurora-navy/20 border-t-aurora-navy" />
-          <p className="font-display text-aurora-navy/70">Cargando tu perfil...</p>
+          <div className="h-12 w-12 animate-spin rounded-full border-4 border-aurora-navy/15 border-t-aurora-terracotta" />
+          <p className="font-display text-xl text-aurora-navy/70">Cargando tu perfil...</p>
         </div>
       </div>
     );
@@ -94,11 +94,21 @@ const EntrepreneurProfilePage: React.FC = () => {
   }
 
   return (
-    <div className="space-y-5 px-4 py-6 lg:px-8">
+    <div className="space-y-6 px-4 py-6 lg:px-8">
+      <div className="hero-mesh grain relative overflow-hidden rounded-3xl px-6 py-8 shadow-aurora md:px-10 md:py-10">
+        <div className="relative">
+          <p className="mb-2 text-xs font-semibold uppercase tracking-widest text-aurora-goldLight">Tu cuenta</p>
+          <h1 className="font-display text-3xl font-normal leading-tight text-white md:text-5xl">
+            {loggedInUser.firstName} {loggedInUser.lastName}
+          </h1>
+          <p className="mt-2 text-white/80">{loggedInUser.email}</p>
+        </div>
+      </div>
+
       {managedClub && (
         <Link
           to={`/entrepreneur/club/${managedClub.id}/my-club`}
-          className="group inline-flex items-center gap-3 rounded-2xl border border-aurora-navy/10 bg-white px-5 py-3 shadow-aurora-sm transition-all duration-200 hover:-translate-y-0.5 hover:shadow-aurora"
+          className="group inline-flex items-center gap-3 rounded-3xl bg-white px-5 py-3 shadow-aurora-sm ring-1 ring-aurora-navy/5 transition-all duration-300 hover:-translate-y-0.5 hover:shadow-aurora"
         >
           {managedClub.logoUrl && (
             <img
@@ -109,11 +119,12 @@ const EntrepreneurProfilePage: React.FC = () => {
           )}
           <div className="text-left">
             <p className="text-xs font-semibold uppercase tracking-wide text-aurora-terracotta">Mi Club</p>
-            <p className="font-display font-bold text-aurora-navy transition-colors group-hover:text-aurora-terracotta">
+            <p className="font-display text-xl font-medium text-aurora-navy transition-colors group-hover:text-aurora-terracotta">
               {managedClub.name}
             </p>
           </div>
           <svg
+            aria-hidden="true"
             className="ml-1 h-5 w-5 text-aurora-navy/40 transition-all group-hover:translate-x-1 group-hover:text-aurora-terracotta"
             fill="none"
             stroke="currentColor"
@@ -125,7 +136,7 @@ const EntrepreneurProfilePage: React.FC = () => {
       )}
 
       <div className="max-w-full overflow-x-auto">
-        <div role="tablist" aria-label="Secciones del perfil" className="inline-flex gap-1 rounded-xl bg-aurora-navy/5 p-1">
+        <div role="tablist" aria-label="Secciones del perfil" className="inline-flex gap-1 rounded-full bg-white p-1.5 shadow-aurora-sm ring-1 ring-aurora-navy/5">
           {TABS.map((item) => (
             <button
               key={item.id}
@@ -133,8 +144,8 @@ const EntrepreneurProfilePage: React.FC = () => {
               role="tab"
               aria-selected={activeSection === item.id}
               onClick={() => setSearchParams({ tab: item.id }, { replace: true })}
-              className={`min-h-[44px] whitespace-nowrap rounded-lg px-4 text-sm font-semibold transition-colors ${
-                activeSection === item.id ? 'bg-aurora-navy text-white' : 'text-aurora-navy/70 hover:bg-white'
+              className={`min-h-[44px] whitespace-nowrap rounded-full px-5 text-sm font-semibold transition-colors ${
+                activeSection === item.id ? 'bg-aurora-navy text-white' : 'text-aurora-navy/70 hover:bg-aurora-cream'
               }`}
             >
               {item.label}
@@ -143,7 +154,7 @@ const EntrepreneurProfilePage: React.FC = () => {
         </div>
       </div>
 
-      <div className="rounded-2xl border border-aurora-navy/5 bg-white p-6 shadow-aurora-sm md:p-10">
+      <div className="rounded-3xl bg-white p-6 shadow-aurora-sm ring-1 ring-aurora-navy/5 md:p-10">
         <EntrepreneurProfileContent
           activeSection={activeSection}
           user={loggedInUser}
